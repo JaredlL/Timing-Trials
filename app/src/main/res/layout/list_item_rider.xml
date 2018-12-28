@@ -13,6 +13,7 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:orientation="vertical"
+    android:onLongClick="@{(view) -> rider.changeName(view)}"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -22,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:text="@{rider.name}"
+        android:text="@{rider.firstName}"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Firstname" />
@@ -33,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:text="@{rider.name}"
+        android:text="@{rider.lastName}"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/textView4"
         app:layout_constraintStart_toEndOf="@+id/textView2"

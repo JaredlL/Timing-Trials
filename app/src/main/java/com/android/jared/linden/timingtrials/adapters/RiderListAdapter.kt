@@ -47,8 +47,8 @@ class RiderListAdapter internal constructor(context: Context): RecyclerView.Adap
     }
 
 
-    fun setRiders(newRiders: List<Rider>){
-        mRiders = newRiders.map { r -> RiderViewModel(r) }
+    fun setRiders(newRiders: List<RiderViewModel>){
+        mRiders = newRiders
         notifyDataSetChanged()
     }
 
