@@ -19,6 +19,8 @@ import com.android.jared.linden.timingtrials.adapters.RiderListAdapter
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.databinding.RiderListFragmentBinding
 import com.android.jared.linden.timingtrials.viewmodels.RidersViewModel
+import kotlinx.android.synthetic.main.rider_list_fragment.*
+import kotlinx.android.synthetic.main.rider_list_fragment.view.*
 
 class RiderListFragment : Fragment() {
 
@@ -46,6 +48,10 @@ class RiderListFragment : Fragment() {
 
         binding.recyclerview.adapter = adapter
         binding.recyclerview.layoutManager = viewManager
+
+        binding.root.fab2.setOnClickListener {
+            v -> editRider( Rider("", "", "", 0))
+        }
 
         return binding.root
     }

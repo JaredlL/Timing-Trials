@@ -9,6 +9,7 @@ import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.databinding.ActivityEditItemBinding
 import com.android.jared.linden.timingtrials.viewmodels.MyViewModelFactory
 import com.android.jared.linden.timingtrials.viewmodels.RiderViewModel
+import com.android.jared.linden.timingtrials.viewmodels.RidersViewModel
 
 import kotlinx.android.synthetic.main.activity_edit_item.*
 
@@ -17,6 +18,7 @@ import kotlinx.android.synthetic.main.activity_edit_item.*
 class EditItemActivity : AppCompatActivity() {
 
     private lateinit var viewModel: RiderViewModel
+    private lateinit var ridersViewModel: RidersViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +30,7 @@ class EditItemActivity : AppCompatActivity() {
 
         var rider = intent?.getParcelableExtra(RIDER_EXTRA) ?: Rider("", "", "", 0)
         viewModel = ViewModelProviders.of(this, MyViewModelFactory(this.application, rider)).get(RiderViewModel::class.java!!)
+        ridersViewModel = ViewModelProviders.of(this).get(RidersViewModel::class.java)
         binding.viewModel = viewModel
         supportActionBar?.setTitle("Edit Rider")
 
@@ -35,9 +38,10 @@ class EditItemActivity : AppCompatActivity() {
 
 
 
+
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+            ridersViewModel.insert(viewModel.rider)
+            finish()
         }
     }
 

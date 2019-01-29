@@ -51,6 +51,7 @@ class RidersViewModel(application: Application) : AndroidViewModel(application) 
         }}
 
 
+
     var editRider = {(rider):Rider -> Unit}
 
     override fun onCleared() {
