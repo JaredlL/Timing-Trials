@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [Rider::class], version = 1, exportSchema = false)
+@Database(entities = [Rider::class], version = 2, exportSchema = false)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 
     abstract fun riderDao() : RiderDao

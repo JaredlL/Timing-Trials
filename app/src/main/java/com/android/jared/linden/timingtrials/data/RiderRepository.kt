@@ -19,4 +19,22 @@ class RiderRepository(private  val riderDao: RiderDao) {
         riderDao.insert(rider)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun update(rider: Rider) {
+        riderDao.updateRider(rider)
+    }
+
+        @Suppress("RedundantSuspendModifier")
+        @WorkerThread
+        suspend fun insertOrUpdate(rider: Rider){
+            val id = rider.Id ?: 0
+            if(id != 0L){
+                riderDao.updateRider(rider)
+            }else{
+                riderDao.insert(rider)
+            }
+
+        }
+
 }

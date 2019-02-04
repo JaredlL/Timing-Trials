@@ -50,7 +50,7 @@ class RiderListFragment : Fragment() {
         binding.recyclerview.layoutManager = viewManager
 
         binding.root.fab2.setOnClickListener {
-            v -> editRider( Rider("", "", "", 0))
+            editRider( Rider("", "", "", 0))
         }
 
         return binding.root

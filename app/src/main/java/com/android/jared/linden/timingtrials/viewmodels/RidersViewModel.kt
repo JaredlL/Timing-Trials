@@ -41,9 +41,11 @@ class RidersViewModel(application: Application) : AndroidViewModel(application) 
     /**
      * Launching a new coroutine to insert the data in a non-blocking way
      */
-    fun insert(rider: Rider) = scope.launch(Dispatchers.IO) {
-        repository.insert(rider)
+
+    fun insertOrUpdate(rider: Rider) = scope.launch(Dispatchers.IO) {
+        repository.insertOrUpdate(rider)
     }
+
 
     fun getAllRiders(): LiveData<List<RiderViewModel>>{
         return Transformations.map(mRiderList){ x -> x.map { r ->

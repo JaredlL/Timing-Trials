@@ -12,9 +12,35 @@ class RiderViewModel(val rider: Rider): ObservableViewModel() {
 
     val fullName = rider.firstName + " " + rider.lastName
 
-    val firstName = rider.firstName
+    @Bindable
+    fun getFirstName(): String{
+        return rider.firstName
+    }
 
-    val lastName = rider.lastName
+    @Bindable
+    fun setFirstName(value: String){
+        rider.firstName = value
+    }
+
+    @Bindable
+    fun getLastName(): String{
+        return rider.lastName
+    }
+
+    @Bindable
+    fun setLastName(value: String){
+        rider.lastName = value
+    }
+
+    @Bindable
+    fun getClub(): String{
+        return rider.club
+    }
+
+    @Bindable
+    fun setClub(value: String){
+        rider.club = value
+    }
 
     val club = ObservableField<String>(rider.club)
 

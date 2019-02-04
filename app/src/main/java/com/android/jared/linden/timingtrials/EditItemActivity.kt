@@ -29,18 +29,18 @@ class EditItemActivity : AppCompatActivity() {
 
 
         var rider = intent?.getParcelableExtra(RIDER_EXTRA) ?: Rider("", "", "", 0)
-        viewModel = ViewModelProviders.of(this, MyViewModelFactory(this.application, rider)).get(RiderViewModel::class.java!!)
+        viewModel = ViewModelProviders.of(this, MyViewModelFactory(this.application, rider)).get(RiderViewModel::class.java)
         ridersViewModel = ViewModelProviders.of(this).get(RidersViewModel::class.java)
         binding.viewModel = viewModel
-        supportActionBar?.setTitle("Edit Rider")
+        supportActionBar?.title = "Edit Rider"
 
 
 
 
 
 
-        fab.setOnClickListener { view ->
-            ridersViewModel.insert(viewModel.rider)
+        fab.setOnClickListener {
+            ridersViewModel.insertOrUpdate(viewModel.rider)
             finish()
         }
     }

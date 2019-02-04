@@ -10,10 +10,10 @@ data class Rider(
         var firstName: String,
         var lastName: String,
         var club: String = "",
-        var age: Int
+        var age: Int,
+        @PrimaryKey(autoGenerate = true) var Id: Long? = null
 ) : Parcelable {
-    @PrimaryKey(autoGenerate = true)
-     var Id: Int = 0
+
 
     //val fullName = "$firstName $lastName"
 }
