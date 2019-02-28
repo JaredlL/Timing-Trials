@@ -8,26 +8,24 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.viewmodels.MyViewModelFactory
-import com.android.jared.linden.timingtrials.viewmodels.RiderViewModel
-import com.android.jared.linden.timingtrials.viewmodels.RidersViewModel
+import com.android.jared.linden.timingtrials.viewmodels.CourseViewModel
 
-class EditItemFragment : Fragment() {
+class EditCourseFragment : Fragment() {
 
     companion object {
-        fun newInstance() = EditItemFragment()
+        fun newInstance() = EditCourseFragment()
     }
 
-    private lateinit var viewModel: RiderViewModel
+    private lateinit var viewModel: CourseViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.edit_item_fragment, container, false)
+        return inflater.inflate(R.layout.edit_course_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(RiderViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(CourseViewModel::class.java)
         // TODO: Use the ViewModel
     }
 

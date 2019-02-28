@@ -1,48 +1,38 @@
 package com.android.jared.linden.timingtrials
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProviders
-import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.databinding.ActivityEditItemBinding
-import com.android.jared.linden.timingtrials.viewmodels.MyViewModelFactory
-import com.android.jared.linden.timingtrials.viewmodels.RiderViewModel
-import com.android.jared.linden.timingtrials.viewmodels.RidersViewModel
-
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.android.jared.linden.timingtrials.fragments.CourseFragment
+import com.android.jared.linden.timingtrials.fragments.EditRiderFragment
+import com.android.jared.linden.timingtrials.fragments.RiderListFragment
 import kotlinx.android.synthetic.main.activity_edit_item.*
-
 
 
 class EditItemActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: RiderViewModel
-    private lateinit var ridersViewModel: RidersViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding: ActivityEditItemBinding = DataBindingUtil.setContentView(
-                this, R.layout.activity_edit_item)
+        setContentView(R.layout.activity_edit_item)
 
+        val dataType = intent.getStringExtra(ITEM_TYPE_EXTRA)
+        val itemId = intent.getLongExtra(ITEM_ID_EXTRA, 0)
 
-        var rider = intent?.getParcelableExtra(RIDER_EXTRA) ?: Rider("", "", "", 0)
-        viewModel = ViewModelProviders.of(this, MyViewModelFactory(this.application, rider)).get(RiderViewModel::class.java)
-        ridersViewModel = ViewModelProviders.of(this).get(RidersViewModel::class.java)
-        binding.viewModel = viewModel
-        supportActionBar?.title = "Edit Rider"
+        if(savedInstanceState != null) return
 
-
-
-
-
-
-        fab.setOnClickListener {
-            ridersViewModel.insertOrUpdate(viewModel.rider)
-            finish()
+        val frag: Fragment = when(dataType){
+           ITEM_RIDER -> EditRiderFragment.newInstance(itemId)
+           ITEM_COURSE -> CourseFragment.newInstance(1)
+           else -> RiderListFragment.newInstance()
         }
+
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        fragmentTransaction.add(editItemContainer.id, frag).commit()
+
     }
+
 
 }

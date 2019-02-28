@@ -2,8 +2,9 @@ package com.android.jared.linden.timingtrials.data
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 
-class RiderRepository(private  val riderDao: RiderDao) {
+class RiderRepository private constructor(private  val riderDao: RiderDao) {
 
     // Room executes all queries on a separate thread.
     // Observed LiveData will notify the observer when the data has changed.
@@ -19,10 +20,32 @@ class RiderRepository(private  val riderDao: RiderDao) {
         riderDao.insert(rider)
     }
 
+    companion object {
+        @Volatile private var instance: RiderRepository? = null
+        fun getInstance(riderDao: RiderDao) =
+                instance ?: synchronized(this) {
+                    instance ?: RiderRepository(riderDao).also { instance = it }
+                }
+    }
+
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun update(rider: Rider) {
-        riderDao.updateRider(rider)
+        riderDao.update(rider)
+    }
+
+
+    fun getRider(riderId: Long) : LiveData<Rider> {
+        return when(riderId){
+            0L ->  MutableLiveData<Rider>(Rider.createBlank())
+            else ->  riderDao.getRiderById(riderId)
+        }
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun delete(rider: Rider) {
+        riderDao.delete(rider)
     }
 
         @Suppress("RedundantSuspendModifier")
@@ -30,7 +53,7 @@ class RiderRepository(private  val riderDao: RiderDao) {
         suspend fun insertOrUpdate(rider: Rider){
             val id = rider.Id ?: 0
             if(id != 0L){
-                riderDao.updateRider(rider)
+                riderDao.update(rider)
             }else{
                 riderDao.insert(rider)
             }

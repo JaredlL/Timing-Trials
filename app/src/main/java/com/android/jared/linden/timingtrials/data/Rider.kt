@@ -15,5 +15,8 @@ data class Rider(
 ) : Parcelable {
 
 
+    companion object {
+        fun createBlank() = Rider("", "", "", 0)
+    }
     //val fullName = "$firstName $lastName"
 }

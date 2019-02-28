@@ -6,8 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
 
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -17,67 +17,33 @@
             tools:context=".fragments.RiderListFragment">
 
 
-            <RelativeLayout
-                android:id="@+id/linearLayoutCompat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+            <include
+                android:id="@+id/heading"
+                layout="@layout/list_item_rider"
+                android:layout_width="fill_parent"
+                android:layout_height="32dp" />
 
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Firstname"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Firstname" />
-
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="Lastname"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/textView4"
-                    app:layout_constraintStart_toEndOf="@+id/textView2"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Lastname" />
-
-                <TextView
-                    android:id="@+id/textView4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:text="Club"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Club" />
-
-            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="20dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
                 android:background="@android:color/background_light"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayoutCompat"
+                app:layout_constraintTop_toBottomOf="@+id/heading"
                 tools:listitem="@layout/list_item_rider" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab2"
+            android:id="@+id/riderListFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_add_black_24dp"
             android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"/>
+            android:layout_margin="@dimen/fab_margin"
+            app:layout_anchorGravity="bottom|end"
+            android:src="@drawable/ic_add_black_24dp" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

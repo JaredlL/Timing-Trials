@@ -12,13 +12,18 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         ma_butt_manageRiders.setOnClickListener{
             val intent = Intent(this@MainActivity, TimingTrialsDbActivity::class.java)
             startActivity(intent)
         }
 
+        ma_butt_begintt.setOnClickListener {
+            val intent = Intent(this@MainActivity, SetupActivity::class.java)
+            startActivity(intent)
+        }
 
-        //val manageRidersButt: Button = findViewById(R.layout.ma_butt_manageRiders)
+
 
     }
 }

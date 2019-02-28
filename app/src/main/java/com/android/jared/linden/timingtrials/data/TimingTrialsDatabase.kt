@@ -9,10 +9,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [Rider::class], version = 2, exportSchema = false)
+@Database(entities = [Rider::class, Course::class], version = 4, exportSchema = false)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 
     abstract fun riderDao() : RiderDao
+    abstract fun courseDao(): CourseDao
 
     companion object {
         @Volatile private var INSTANCE: TimingTrialsDatabase? = null
@@ -43,13 +44,13 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
                 // comment out the following line.
                 INSTANCE?.let { database ->
                     scope.launch(Dispatchers.IO) {
-                        populateDatabase(database.riderDao())
+                        populateRiders(database.riderDao())
                     }
                 }
             }
         }
 
-        fun populateDatabase(riderDao: RiderDao) {
+        fun populateRiders(riderDao: RiderDao) {
             // Start the app with a clean database every time.
             // Not needed if you only populate on creation.
             riderDao.deleteAll()
@@ -59,6 +60,13 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             riderDao.insert(Rider("Lauren", "Johnston", "Avid", 25))
             riderDao.insert(Rider("Steve", "Beal", "VeloVitesse", 42))
             riderDao.insert(Rider("Jo", "Jago", "PerformanceCycles", 39))
+        }
+
+        fun populateCourses(courseDao: CourseDao){
+            courseDao.deleteAll()
+            courseDao.insert(Course("Lydbrook 10", 10.0))
+            courseDao.insert(Course("Hilly Lydbrook"))
+            courseDao.insert(Course("Cannop"))
         }
 
     }
