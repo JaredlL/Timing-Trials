@@ -2,15 +2,15 @@ package com.android.jared.linden.timingtrials.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
-import com.android.jared.linden.timingtrials.viewmodels.RiderViewModel
+import com.android.jared.linden.timingtrials.databinding.ListItemSelectableRiderBinding
+import com.android.jared.linden.timingtrials.setup.SelectRidersViewModel
+
 
 /**
  * Adapter for the [RecyclerView] in [RiderListFragment].
@@ -28,15 +28,7 @@ class RiderListAdapter internal constructor(val context: Context): RecyclerView.
 
             _binding.apply{
                 rider = riderVm
-                checkBox.isChecked = mSelected.contains(riderVm.Id)
-                checkBox.setOnClickListener {
-                   if(checkBox.isChecked) {
-                       mSelected.add(riderVm.Id ?: 0)
-                   } else {
-                       (mSelected.remove(riderVm.Id))
-                   }
-                }
-                relLay.setOnLongClickListener { longPress(riderVm)
+                riderLayout.setOnLongClickListener { longPress(riderVm)
                     true
                 }
 
@@ -46,14 +38,12 @@ class RiderListAdapter internal constructor(val context: Context): RecyclerView.
     }
 
     var mRiders: List<Rider> = listOf()
-    var mSelected: ArrayList<Long> = arrayListOf()
     val layoutInflater = LayoutInflater.from(context)
     var selectable: Boolean = false
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RiderViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RiderListAdapter.RiderViewHolder {
 
-        val binding: ListItemRiderBinding = DataBindingUtil.inflate(layoutInflater, R.layout.list_item_rider, parent, false)
-        binding.checkBox.visibility = if(selectable) View.VISIBLE else View.GONE
+        val binding = DataBindingUtil.inflate<ListItemRiderBinding>(layoutInflater, R.layout.list_item_rider, parent, false)
         return RiderViewHolder(binding)
 
     }
@@ -70,9 +60,60 @@ class RiderListAdapter internal constructor(val context: Context): RecyclerView.
 
     var editRider = {(rider):Rider -> Unit}
 
-    fun setRiders(newRiders: List<Rider>, selectedIds: ArrayList<Long>){
+    fun setRiders(newRiders: List<Rider>){
         mRiders = newRiders
-        mSelected = selectedIds
+        notifyDataSetChanged()
+    }
+
+    override fun getItemCount(): Int{ return mRiders.count() }
+
+}
+
+class SelectableRiderListAdapter internal constructor(val context: Context): RecyclerView.Adapter<SelectableRiderListAdapter.SelectableRiderViewHolder>() {
+
+
+    inner class SelectableRiderViewHolder(val binding: ListItemSelectableRiderBinding): RecyclerView.ViewHolder(binding.root) {
+
+        var longPress = {(rider):Rider -> Unit}
+
+        fun bind(riderVm: SelectRidersViewModel.SelectableRiderViewWrapper){
+
+            binding.apply{
+                selectableRider = riderVm
+                riderLayout.setOnLongClickListener { longPress(riderVm.rider)
+                    true
+                }
+
+                executePendingBindings()
+            }
+        }
+    }
+
+    var mRiders: List<SelectRidersViewModel.SelectableRiderViewWrapper> = listOf()
+    //var mSelected: ArrayList<Long> = arrayListOf()
+    val layoutInflater = LayoutInflater.from(context)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectableRiderListAdapter.SelectableRiderViewHolder {
+
+        val binding = DataBindingUtil.inflate<ListItemSelectableRiderBinding>(layoutInflater, R.layout.list_item_selectable_rider, parent, false)
+        return SelectableRiderViewHolder(binding)
+
+    }
+
+    override fun onBindViewHolder(holder: SelectableRiderListAdapter.SelectableRiderViewHolder, position: Int) {
+        mRiders.get(position).let { rider ->
+            with(holder){
+                itemView.tag = rider
+                holder.longPress = editRider
+                bind(rider)
+            }
+        }
+    }
+
+    var editRider = {(SelectableRiderViewWrapper):Rider -> Unit}
+
+    fun setRiders(newRiders: List<SelectRidersViewModel.SelectableRiderViewWrapper>){
+        mRiders = newRiders
         notifyDataSetChanged()
     }
 

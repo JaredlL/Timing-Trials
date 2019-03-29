@@ -2,11 +2,50 @@ package com.android.jared.linden.timingtrials.data
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.android.jared.linden.timingtrials.data.source.CourseDao
 
-class CourseRepository(private val courseDao: CourseDao) {
+interface ICourseRepository {
+
+    val allCourses: LiveData<List<Course>>
+
+    fun getCourse(courseId: Long) : LiveData<Course>
+
+    fun getFirst() : LiveData<Course>
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun insert(course: Course)
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun update(course: Course)
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun delete(course: Course)
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun insertOrUpdate(course: Course)
+}
+
+class RoomCourseRepository(private val courseDao: CourseDao) : ICourseRepository {
+
     // Room executes all queries on a separate thread.
     // Observed LiveData will notify the observer when the data has changed.
-    val allCourses: LiveData<List<Course>> = courseDao.getAllCourses()
+    override val allCourses: LiveData<List<Course>> = courseDao.getAllCourses()
+
+    override fun getCourse(courseId: Long) : LiveData<Course> {
+        return when(courseId){
+            0L ->  MutableLiveData<Course>(Course.createBlank())
+            else ->  courseDao.getCourseById(courseId)
+        }
+    }
+
+    override fun getFirst() : LiveData<Course> {
+       return  courseDao.getFirst()
+    }
 
     // You must call this on a non-UI thread or your app will crash. So we're making this a
     // suspend function so the caller methods know this.
@@ -14,26 +53,26 @@ class CourseRepository(private val courseDao: CourseDao) {
     // thread, blocking the UI.
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insert(course: Course) {
+    override suspend fun insert(course: Course) {
         courseDao.insert(course)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun update(course: Course) {
+    override suspend fun update(course: Course) {
         courseDao.update(course)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun delete(course: Course) {
+    override suspend fun delete(course: Course) {
         courseDao.delete(course)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insertOrUpdate(course: Course){
-        val id = course.Id ?: 0
+    override suspend fun insertOrUpdate(course: Course){
+        val id = course.id ?: 0
         if(id != 0L){
             courseDao.update(course)
         }else{

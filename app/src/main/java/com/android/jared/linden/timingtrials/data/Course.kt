@@ -7,8 +7,12 @@ import kotlinx.android.parcel.Parcelize
 
 @Entity(tableName = "course_table") @Parcelize
 data class Course(
-       var name: String,
-       var length: Double = 0.0,
-       var cttname: String = "",
-       @PrimaryKey(autoGenerate = true) var Id: Long? = null
-) : Parcelable
+        var courseName: String,
+        var length: Double = 0.0,
+        var cttName: String = "",
+        @PrimaryKey(autoGenerate = true) var id: Long? = null
+) : Parcelable{
+    companion object {
+        fun createBlank() = Course("", 0.0, "")
+    }
+}

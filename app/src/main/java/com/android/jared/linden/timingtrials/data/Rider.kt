@@ -11,7 +11,8 @@ data class Rider(
         var lastName: String,
         var club: String = "",
         var age: Int,
-        @PrimaryKey(autoGenerate = true) var Id: Long? = null
+        var gender: String = "Male",
+        @PrimaryKey(autoGenerate = true) var id: Long? = null
 ) : Parcelable {
 
 

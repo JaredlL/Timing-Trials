@@ -10,55 +10,46 @@
             name="rider"
             type="com.android.jared.linden.timingtrials.data.Rider"/>
 
-        <variable
-            name="selectable"
-            type="Boolean"/>
     </data>
 
-<RelativeLayout
-    android:id="@+id/relLay"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:id="@+id/riderLayout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="@{rider.firstName}"
-        tools:text="Firstname" />
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@{rider.firstName}"
+            tools:text="Firstname" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="@{rider.lastName}"
-        tools:text="Lastname" />
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@{rider.lastName}"
+            tools:text="Lastname" />
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_toLeftOf="@id/checkBox"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginRight="8dp"
-        android:text="@{rider.club}"
-        tools:text="Club" />
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_toLeftOf="@id/checkBox"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            android:text="@{rider.club}"
+            tools:text="Club" />
 
-    <CheckBox
-        android:id="@+id/checkBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_alignParentRight="true" />
 
-</RelativeLayout>
+    </RelativeLayout>
 
 </layout>

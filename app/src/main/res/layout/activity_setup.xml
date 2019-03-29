@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".SetupActivity">
+    tools:context=".setup.SetupActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -50,11 +50,6 @@
             android:layout_height="wrap_content"
             android:text="@string/setup_tab_text_3" />
 
-            <com.google.android.material.tabs.TabItem
-                android:id="@+id/tabItem4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/setup_tab_text_4" />
 
         </com.google.android.material.tabs.TabLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -63,14 +58,15 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="?attr/actionBarSize"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_media_play" />
+    <!--<com.google.android.material.floatingactionbutton.FloatingActionButton-->
+        <!--android:id="@+id/fab"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="end|bottom"-->
+        <!--android:layout_margin="@dimen/fab_margin"-->
+        <!--app:srcCompat="@android:drawable/ic_media_play" />-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

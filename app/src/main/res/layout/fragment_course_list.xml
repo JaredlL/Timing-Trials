@@ -1,13 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list"
-    android:name="com.android.jared.linden.timingtrials.fragments.CourseFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    app:layoutManager="LinearLayoutManager"
-    tools:context=".fragments.CourseFragment"
-    tools:listitem="@layout/fragment_course" />
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".viewdata.CourseListFragment">
+
+
+            <include
+                android:id="@+id/courseHeading"
+                layout="@layout/list_item_course"
+                android:layout_width="fill_parent"
+                android:layout_height="32dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/textView14" />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/courseRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:background="@android:color/background_light"
+                app:layout_constraintTop_toBottomOf="@+id/courseHeading"
+                tools:listitem="@layout/list_item_course" />
+
+            <TextView
+                android:id="@+id/textView14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/select_course"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/courseHeading"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@string/select_course" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/courseListFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_add_black_24dp"
+            app:layout_anchorGravity="bottom|end" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

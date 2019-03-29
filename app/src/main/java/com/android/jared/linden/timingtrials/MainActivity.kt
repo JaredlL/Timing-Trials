@@ -2,9 +2,9 @@ package com.android.jared.linden.timingtrials
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import com.android.jared.linden.timingtrials.setup.SetupActivity
+import com.android.jared.linden.timingtrials.viewdata.TimingTrialsDbActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
