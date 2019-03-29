@@ -4,8 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.domain.TimeTrialSetup
+import javax.inject.Inject
 
-class OrderRidersViewModel(private val timeTrialSetup: TimeTrialSetup) : ViewModel() {
+class OrderRidersViewModel @Inject constructor(private val timeTrialSetup: TimeTrialSetup) : ViewModel() {
 
 
     fun getOrderableRiders(): LiveData<List<Rider>>{

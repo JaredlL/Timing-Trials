@@ -10,8 +10,9 @@ import com.android.jared.linden.timingtrials.domain.TimeTrialSetup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SelectRidersViewModel(private val timeTrialSetup: TimeTrialSetup) : ViewModel(){
+class SelectRidersViewModel @Inject constructor(private val timeTrialSetup: TimeTrialSetup) : ViewModel(){
 
     private var parentJob = Job()
 

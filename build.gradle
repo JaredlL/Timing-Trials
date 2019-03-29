@@ -38,6 +38,7 @@ ext {
     koinVersion='1.0.2'
     advRecyclerVersion='1.0.0'
     gsonVersion='2.8.5'
+    daggerVersion='2.21'
 }
 
 task clean(type: Delete) {

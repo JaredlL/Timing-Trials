@@ -65,6 +65,10 @@ dependencies {
     //Advanced Recycler View
     implementation "com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:$rootProject.advRecyclerVersion"
 
+    //Dagger
+    implementation "com.google.dagger:dagger:$rootProject.daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
+
     //GSON
     implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
 

@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
 interface ITimeTrialRepository{
 
@@ -14,7 +16,8 @@ interface ITimeTrialRepository{
 
 }
 
-class RoomTimeTrialRepository(private  val timeTrialDao: TimeTrialDao): ITimeTrialRepository {
+@Singleton
+class RoomTimeTrialRepository @Inject constructor(private  val timeTrialDao: TimeTrialDao): ITimeTrialRepository {
 
 
     val allTimeTrials: LiveData<List<TimeTrial>> = timeTrialDao.gatAllTimeTrials()

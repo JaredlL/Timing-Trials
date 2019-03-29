@@ -10,9 +10,10 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode
+import javax.inject.Inject
 
 
-class CourseViewModel(private val repository: ICourseRepository, courseId: Long) : ObservableViewModel() {
+class CourseViewModel @Inject constructor(private val repository: ICourseRepository, courseId: Long) : ObservableViewModel() {
     val course: LiveData<Course> = repository.getCourse(courseId)
 
     val mutableCourse: MediatorLiveData<Course> = MediatorLiveData()

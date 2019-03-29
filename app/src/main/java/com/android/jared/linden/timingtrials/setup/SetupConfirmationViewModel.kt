@@ -11,8 +11,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
-class SetupConfirmationViewModel(private val timeTrialSetup: TimeTrialSetup) : ViewModel(){
+class SetupConfirmationViewModel @Inject constructor(private val timeTrialSetup: TimeTrialSetup) : ViewModel(){
 
     val title = Transformations.map(timeTrialSetup.timeTrial){tt ->
         "Starting ${tt.ttName}"

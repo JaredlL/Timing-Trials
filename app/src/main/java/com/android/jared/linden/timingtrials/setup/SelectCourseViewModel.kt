@@ -11,8 +11,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
-class SelectCourseViewModel(private val timeTrialSetup: TimeTrialSetup) : ViewModel() {
+class SelectCourseViewModel @Inject constructor(private val timeTrialSetup: TimeTrialSetup) : ViewModel() {
 
     private var parentJob = Job()
 

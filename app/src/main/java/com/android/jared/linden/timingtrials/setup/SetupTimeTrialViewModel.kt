@@ -4,8 +4,9 @@ import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.domain.TimeTrialSetup
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import java.util.*
+import javax.inject.Inject
 
-class SetupTimeTrialViewModel(private val timeTrialSetup: TimeTrialSetup) : ViewModel() {
+class SetupTimeTrialViewModel @Inject constructor(private val timeTrialSetup: TimeTrialSetup) : ViewModel() {
 
 
     val courseName: LiveData<String> = Transformations.map(timeTrialSetup.selectedCourse){

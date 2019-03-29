@@ -6,8 +6,9 @@ import com.android.jared.linden.timingtrials.data.IRiderRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RiderListViewModel(private val repository: IRiderRepository) : ViewModel() {
+class RiderListViewModel @Inject constructor(private val repository: IRiderRepository) : ViewModel() {
 
     private var parentJob = Job()
 
