@@ -28,6 +28,8 @@ interface AppComponent{
 
     fun riderListViewModel(): RiderListViewModel
 
+    fun riderViewModel(): RiderViewModel
+
     fun inject(activity: MainActivity)
 
 }

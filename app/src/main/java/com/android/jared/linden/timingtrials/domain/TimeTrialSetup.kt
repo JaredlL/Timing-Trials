@@ -1,11 +1,26 @@
 package com.android.jared.linden.timingtrials.domain
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.*
+import com.android.jared.linden.timingtrials.setup.OrderRidersViewModel
 import java.util.*
+import javax.inject.Inject
+
+
+interface IOrderRidersViewModel{
+    fun getOrderableRiders(): LiveData<List<Rider>>
+    fun moveItem(fromPosition: Int, toPosition:Int)
+}
+
+
+class TimeTrialSetupViewModel @Inject constructor(private val timetrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository, private val courseRepository: ICourseRepository)
+    : ViewModel(), IOrderRidersViewModel by or
+{
+
+    val or: OrderRidersViewModel = OrderRidersViewModel()
+}
+
+
 
 class TimeTrialSetup(private val timetrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository, private val courseRepository: ICourseRepository)
     : ITimeTrialRepository by timetrialRepository, IRiderRepository by riderRepository, ICourseRepository by courseRepository{

@@ -8,17 +8,19 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 
 
-class RiderViewModel @Inject constructor(private val repository: IRiderRepository, riderId: Long): ViewModel() {
+class RiderViewModel @Inject constructor(private val repository: IRiderRepository): ViewModel() {
 
 
-    val rider: LiveData<Rider> = repository.getRider(riderId)
     val clubs: LiveData<List<String>> = repository.allClubs
     val mutableRider: MediatorLiveData<Rider> = MediatorLiveData()
 
-
-
-    init{
-        mutableRider.addSource(rider){result: Rider -> result.let { mutableRider.value = result }}
+    fun initialise(riderId: Long){
+        mutableRider.addSource(repository.getRider(riderId)){result: Rider ->
+            if(mutableRider.value == null){
+                result.let { mutableRider.value = result
+            }
+            }
+        }
     }
 
     fun addOrUpdate(){

@@ -13,6 +13,8 @@ import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentRiderBinding
 import com.android.jared.linden.timingtrials.util.argument
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_rider.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -31,11 +33,12 @@ class RiderEditFragment : Fragment() {
 
     //private lateinit var riderViewModel:
     private val riderId by argument<Long>(RIDER_ID_EXTRA)
-    private val riderViewModel: RiderViewModel by viewModel { parametersOf(riderId) }
+    private lateinit var riderViewModel: RiderViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
+        riderViewModel = getViewModel { injector.riderViewModel().apply { initialise(riderId) } }
         val mAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
 
         riderViewModel.clubs.observe(viewLifecycleOwner, Observer{
@@ -49,7 +52,7 @@ class RiderEditFragment : Fragment() {
             lifecycleOwner = (this@RiderEditFragment)
             autoCompleteClub.setAdapter(mAdapter)
             editRiderFab.setOnClickListener {
-                if(riderViewModel.rider.value?.firstName != ""){
+                if(riderViewModel.mutableRider.value?.firstName != ""){
                     riderViewModel.addOrUpdate()
                     activity?.finish()
                 }else{

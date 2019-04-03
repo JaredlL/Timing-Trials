@@ -24,5 +24,4 @@ interface DaggerComponentProvider {
     val component: AppComponent
 }
 
-val Activity.injector get() = (TimingTrialsApplication.get()).component
-val Fragment.injector get() = (TimingTrialsApplication.get()).component
+

@@ -15,8 +15,8 @@ import com.android.jared.linden.timingtrials.adapters.RiderListAdapter
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.databinding.FragmentRiderListBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
-import com.android.jared.linden.timingtrials.util.createViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
 
 const val SELECTABLE = "selectable"
 
@@ -38,7 +38,7 @@ class RiderListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        viewModel = createViewModel { injector.riderListViewModel() }
+        viewModel = getViewModel { injector.riderListViewModel() }
         viewManager = LinearLayoutManager(context)
         adapter = RiderListAdapter(requireContext()).apply { selectable = false }
         viewModel.getAllRiders().observe(viewLifecycleOwner, Observer { riders ->

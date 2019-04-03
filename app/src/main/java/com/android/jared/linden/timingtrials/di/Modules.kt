@@ -41,7 +41,7 @@ val timingTrialsAppModule = module {
 
     scope("setup") { TimeTrialSetup(get(), get(), get()) }
 
-    viewModel { (riderId: Long) -> RiderViewModel(get(), riderId) }
+    //viewModel { (riderId: Long) -> RiderViewModel(get(), riderId) }
 
     viewModel { RiderListViewModel(get()) }
 
