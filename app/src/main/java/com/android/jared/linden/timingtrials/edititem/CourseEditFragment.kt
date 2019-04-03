@@ -37,6 +37,7 @@ class CourseEditFragment : Fragment() {
                 courseViewModel.addOrUpdate()
                 activity?.finish()
             }
+
         }
 
         return binding.root

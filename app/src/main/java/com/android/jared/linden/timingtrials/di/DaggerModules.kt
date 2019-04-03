@@ -2,6 +2,8 @@ package com.android.jared.linden.timingtrials.di
 
 import android.content.Context
 import androidx.room.Room
+import com.android.jared.linden.timingtrials.data.IRiderRepository
+import com.android.jared.linden.timingtrials.data.RoomRiderRepository
 import com.android.jared.linden.timingtrials.data.source.CourseDao
 import com.android.jared.linden.timingtrials.data.source.RiderDao
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
@@ -14,10 +16,7 @@ import javax.inject.Singleton
 @Module
 class RoomDatabaseModule{
     @Provides @Singleton
-    fun timingTrialsDatabase(context: Context): TimingTrialsDatabase = Room.databaseBuilder(context, TimingTrialsDatabase::class.java,"timingtrials_database")
-            .fallbackToDestructiveMigration()
-            .addCallback(TimingTrialsDatabase.Companion.TimingTrialsDatabaseCallback(scope))
-            .build()
+    fun timingTrialsDatabase(context: Context): TimingTrialsDatabase = TimingTrialsDatabase.getDatabase(context, scope)
 
     @Provides @Singleton
     fun riderDao(db: TimingTrialsDatabase): RiderDao{
@@ -36,7 +35,16 @@ class RoomDatabaseModule{
 }
 
 @Module
+class RepositoryModule{
+    @Provides @Singleton
+    fun riderRepository(riderDao: RiderDao): IRiderRepository{
+        return RoomRiderRepository(riderDao)
+    }
+}
+
+@Module
 class ContextModule(private val appContext: Context) {
     @Provides
     fun appContext(): Context = appContext
+
 }
