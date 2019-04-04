@@ -8,7 +8,7 @@
     <data>
         <variable
             name="selectableRider"
-            type="com.android.jared.linden.timingtrials.setup.SelectRidersViewModel.SelectableRiderViewWrapper"/>
+            type="com.android.jared.linden.timingtrials.setup.SelectableRiderViewWrapper"/>
     </data>
 
     <RelativeLayout

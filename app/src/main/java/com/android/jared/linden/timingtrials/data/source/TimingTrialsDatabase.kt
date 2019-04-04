@@ -6,7 +6,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.di.scope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

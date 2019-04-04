@@ -3,61 +3,57 @@ package com.android.jared.linden.timingtrials.setup
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.BR
-import com.android.jared.linden.timingtrials.domain.TimeTrialSetup
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.inject.Inject
 
-class SelectCourseViewModel @Inject constructor(private val timeTrialSetup: TimeTrialSetup) : ViewModel() {
 
-    private var parentJob = Job()
+interface ISelectCourseViewModel{
+    fun getAllCourses(): LiveData<List<CourseListViewWrapper>>
+    var courseSelected: () -> Unit
+}
 
-    // By default all the coroutines launched in this scope should be using the Main dispatcher
+class SelectCourseViewModelImpl(private val ttSetup: TimeTrialSetupViewModel): ISelectCourseViewModel{
 
-    private val scope = CoroutineScope(Dispatchers.Main + parentJob)
 
-    // Using LiveData and caching what getAllRiders returns has several benefits:
-    // - We can put an observer on the data (instead of polling for changes) and only update the
-    //   the UI when the data actually changes.
-    // - Repository is completely separated from the UI through the ViewModel.
+    private fun selectedCourse() = ttSetup.timeTrial.value?.course
 
     private val mCourseWrapperList: LiveData<List<CourseListViewWrapper>>
-            = Transformations.map(timeTrialSetup.allCourses){ list -> list.map {course -> CourseListViewWrapper(course).apply {
-        getSelected = {c -> selectedCourse.value?.course?.id == c.id}
-        onSet = ::setOnSelected
+            = Transformations.map(ttSetup.courseRepository.allCourses){ list -> list.map {course -> CourseListViewWrapper(course).apply {
+        getSelected = {c -> selectedCourse()?.id == c.id}
+        onSet = ::onCourseSelected
     } }}
 
-    fun getAllCourses(): LiveData<List<CourseListViewWrapper>> {
-        return mCourseWrapperList
-    }
 
-    fun setOnSelected(sCourse: Course){
+    override var courseSelected: () -> Unit = { Unit}
 
-        if(selectedCourse.value?.course?.id != sCourse.id){
+    override fun getAllCourses(): LiveData<List<CourseListViewWrapper>> = mCourseWrapperList
 
-            val oldCourseName = selectedCourse.value?.course?.courseName?: ""
+    private fun onCourseSelected(course: Course) {
 
-            timeTrialSetup.timeTrial.value?.let {tt->
+        if(selectedCourse()?.id != course.id){
+
+            val oldCourseName = selectedCourse()?.courseName?: ""
+
+            ttSetup.timeTrial.value?.let {tt->
                 if(tt.ttName == ""){
                     val f = SimpleDateFormat("dd/mm/yy")
                     val c = Calendar.getInstance()
                     val formatString = f.format(c.time)
 
-                    timeTrialSetup.timeTrial.value = timeTrialSetup.timeTrial.value.apply { tt.ttName = sCourse.courseName + " " + formatString}
+                    ttSetup.timeTrial.value = ttSetup.timeTrial.value.apply {
+                        tt.ttName = course.courseName + " " + formatString
+                        tt.course = course
+                    }
                 }else if( oldCourseName != ""  && tt.ttName.contains(oldCourseName, false)){
 
                     val oldTtName = tt.ttName
-                    timeTrialSetup.timeTrial.value = timeTrialSetup.timeTrial.value.apply { tt.ttName = oldTtName.replace(oldCourseName, sCourse.courseName)}
+                    ttSetup.timeTrial.value = ttSetup.timeTrial.value.apply {
+                        tt.ttName = oldTtName.replace(oldCourseName, course.courseName)
+                        tt.course = course
+                    }
                 }
             }
-
-            selectedCourse.value = CourseListViewWrapper(sCourse)
-            timeTrialSetup.selectedCourse.value = sCourse
 
             mCourseWrapperList.value?.let { cv ->
                 cv.forEach{ it.notifyPropertyChanged(BR.courseIsSelected)}
@@ -65,40 +61,7 @@ class SelectCourseViewModel @Inject constructor(private val timeTrialSetup: Time
         }
 
         courseSelected()
-    }
 
-    var courseSelected: () -> Unit = { Unit}
-
-
-    val selectedCourse: MediatorLiveData<CourseListViewWrapper> = MediatorLiveData()
-
-    init {
-
-        timeTrialSetup.selectedCourse.value?.let{selectedCourse.value = CourseListViewWrapper(it)}
-        selectedCourse.addSource(timeTrialSetup.selectedCourse){result:Course? ->
-            if (result == null) {
-                insertOrUpdate(Course("New Course", 1000.0, ""))
-                //selectedCourse.value = CourseListViewWrapper(Course("", 0.0, ""))
-            } else {
-                selectedCourse.value = CourseListViewWrapper(result)
-            }
-        }
-    }
-
-
-
-    private fun insertOrUpdate(course: Course) = scope.launch(Dispatchers.IO) {
-        if(course.courseName != ""){
-            timeTrialSetup.insertOrUpdate(course)
-        }
-
-    }
-
-    var editCourse = {(course): Course -> Unit}
-
-    override fun onCleared() {
-        super.onCleared()
-        parentJob.cancel()
     }
 
 }

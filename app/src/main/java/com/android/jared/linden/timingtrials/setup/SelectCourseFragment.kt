@@ -22,28 +22,26 @@ import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.databinding.FragmentCourseListBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.*
-import org.koin.androidx.scope.ext.android.bindScope
-import org.koin.androidx.scope.ext.android.getOrCreateScope
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SelectCourseFragment : DialogFragment() {
 
 
-    private val courseViewModel: SelectCourseViewModel by sharedViewModel()
+    private lateinit var viewModel: ISelectCourseViewModel
     private lateinit var adapter: CourseListAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        //bindScope(getOrCreateScope("setup"))
+        viewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.selectCourseViewModel
 
         viewManager = LinearLayoutManager(context)
         adapter = CourseListAdapter(requireContext())
         adapter.editCourse = ::editCourse
-        courseViewModel.getAllCourses().observe(viewLifecycleOwner, Observer { courses ->
+        viewModel.getAllCourses().observe(viewLifecycleOwner, Observer { courses ->
             courses?.let{adapter.setCourses(it)}
         })
 
@@ -67,7 +65,7 @@ class SelectCourseFragment : DialogFragment() {
         }
 
 
-        courseViewModel.courseSelected ={ dismiss()}
+        viewModel.courseSelected ={ dismiss()}
 
 
         return binding.root

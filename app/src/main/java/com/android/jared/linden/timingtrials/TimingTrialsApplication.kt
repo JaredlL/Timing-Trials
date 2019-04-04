@@ -11,11 +11,6 @@ class TimingTrialsApplication: Application(), DaggerComponentProvider {
 
     override val component: AppComponent by lazy { DaggerAppComponent.builder().applicationContext(applicationContext).build() }
 
-    companion object {
-        private var INSTANCE: TimingTrialsApplication? = null
-        @JvmStatic
-        fun get(): TimingTrialsApplication = INSTANCE!!
-    }
 
 }
 

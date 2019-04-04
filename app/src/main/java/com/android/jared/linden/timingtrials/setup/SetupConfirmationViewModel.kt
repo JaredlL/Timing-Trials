@@ -2,28 +2,31 @@ package com.android.jared.linden.timingtrials.setup
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.android.jared.linden.timingtrials.domain.TimeTrialSetup
 import com.android.jared.linden.timingtrials.util.ConverterUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 import java.util.*
-import javax.inject.Inject
 
-class SetupConfirmationViewModel @Inject constructor(private val timeTrialSetup: TimeTrialSetup) : ViewModel(){
+interface ISetupConformationViewModel{
+    val title: LiveData<String>
+    val lapsCourse: LiveData<String>
+    val ridersInterval: LiveData<String>
+    val startTime: LiveData<String>
+    var onStartTT: (Boolean) -> Unit
+    fun startTt()
+}
 
-    val title = Transformations.map(timeTrialSetup.timeTrial){tt ->
+class SetupConfirmationViewModel (private val ttSetup: TimeTrialSetupViewModel) : ISetupConformationViewModel{
+
+    val timeTrial = ttSetup.timeTrial
+
+    override val title = Transformations.map(timeTrial){tt ->
         "Starting ${tt.ttName}"
     }
 
-    val lapsCourse = Transformations.map(timeTrialSetup.timeTrial){tt->
+    override val lapsCourse = Transformations.map(timeTrial){tt->
         "${tt.laps} laps of ${tt.course?.courseName}"
     }
 
-    val ridersInterval = Transformations.map(timeTrialSetup.timeTrial){tt->
+   override val ridersInterval = Transformations.map(timeTrial){tt->
         if(tt.interval == 0){
             "${tt.riders.count()} riders starting at 0 second intervals, mass start!"
         }else{
@@ -32,22 +35,22 @@ class SetupConfirmationViewModel @Inject constructor(private val timeTrialSetup:
 
     }
 
-    val startTime = Transformations.map(timeTrialSetup.timeTrial){tt->
+   override val startTime = Transformations.map(timeTrial){tt->
         "First rider starting at ${ConverterUtils.dateToTimeDisplayString(tt.startTime)}"
 
     }
 
-    var onStartTT: (Boolean) -> Unit ={}
+    override var onStartTT: (Boolean) -> Unit ={}
 
-    fun startTt(){
+    override fun startTt(){
 
-        timeTrialSetup.timeTrial.value?.let {
+        timeTrial.value?.let {
            if(it.startTime.after(Calendar.getInstance().time)){
 
                it.isSetup = true
-               viewModelScope.launch(Dispatchers.IO) {
-                   timeTrialSetup.insert(it)
-               }
+               timeTrial.value = it
+               ttSetup.insertTt()
+
                onStartTT(true)
            }else{
                onStartTT(false)
@@ -61,11 +64,7 @@ class SetupConfirmationViewModel @Inject constructor(private val timeTrialSetup:
     }
 
 
-    @ExperimentalCoroutinesApi
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.cancel()
-    }
+
 
 
 

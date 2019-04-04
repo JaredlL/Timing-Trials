@@ -8,6 +8,7 @@ import com.android.jared.linden.timingtrials.data.source.RiderDao
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
 import com.android.jared.linden.timingtrials.data.source.TimingTrialsDatabase
 import com.android.jared.linden.timingtrials.edititem.RiderViewModel
+import com.android.jared.linden.timingtrials.setup.TimeTrialSetupViewModel
 import com.android.jared.linden.timingtrials.viewdata.RiderListViewModel
 import dagger.BindsInstance
 import dagger.Component
@@ -30,6 +31,6 @@ interface AppComponent{
 
     fun riderViewModel(): RiderViewModel
 
-    fun inject(activity: MainActivity)
+    fun timeTrialSetupViewModel(): TimeTrialSetupViewModel
 
 }

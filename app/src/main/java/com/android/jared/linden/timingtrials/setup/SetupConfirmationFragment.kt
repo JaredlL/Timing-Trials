@@ -13,13 +13,14 @@ import androidx.lifecycle.Observer
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentSetupConfirmationBinding
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_setup_confirmation.*
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 
 class SetupConfirmationFragment : DialogFragment() {
 
-    private val setupViewModel: SetupConfirmationViewModel by sharedViewModel()
+    private lateinit var setupViewModel: ISetupConformationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +30,8 @@ class SetupConfirmationFragment : DialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
+
+        setupViewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.setupConformationViewModel
 
         setupViewModel.title.observe(viewLifecycleOwner, Observer { dialog?.setTitle(it) })
 

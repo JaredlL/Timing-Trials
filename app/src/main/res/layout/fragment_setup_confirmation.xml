@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.android.jared.linden.timingtrials.setup.SetupConfirmationViewModel"/>
+            type="com.android.jared.linden.timingtrials.setup.ISetupConformationViewModel"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
