@@ -37,7 +37,7 @@ class SelectCourseViewModelImpl(private val ttSetup: TimeTrialSetupViewModel): I
 
             ttSetup.timeTrial.value?.let {tt->
                 if(tt.ttName == ""){
-                    val f = SimpleDateFormat("dd/mm/yy")
+                    val f = SimpleDateFormat("dd/MM/yy")
                     val c = Calendar.getInstance()
                     val formatString = f.format(c.time)
 

@@ -15,9 +15,6 @@ import com.android.jared.linden.timingtrials.databinding.FragmentRiderBinding
 import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import kotlinx.android.synthetic.main.fragment_rider.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
 
 const val RIDER_ID_EXTRA = "rider_id"

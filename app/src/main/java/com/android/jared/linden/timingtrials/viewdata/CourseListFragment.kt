@@ -17,7 +17,8 @@ import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.databinding.FragmentCourseListBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
 
 
 /**
@@ -27,13 +28,15 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class CourseListFragment : Fragment() {
 
 
-    private val courseViewModel: CourseListViewModel by viewModel()
+    private lateinit var courseViewModel: CourseListViewModel
     private lateinit var adapter: CourseListAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
+
+        courseViewModel = getViewModel { injector.courseListViewModel() }
 
         viewManager = LinearLayoutManager(context)
         adapter = CourseListAdapter(requireContext())

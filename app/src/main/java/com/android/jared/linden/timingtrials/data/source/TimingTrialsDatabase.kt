@@ -9,9 +9,6 @@ import com.android.jared.linden.timingtrials.data.TimeTrial
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.koin.standalone.KoinComponent
-import org.koin.standalone.inject
-import javax.inject.Inject
 
 @Database(entities = [Rider::class, Course::class, TimeTrial::class], version = 9, exportSchema = false)
 @TypeConverters(Converters::class)

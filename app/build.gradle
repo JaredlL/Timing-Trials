@@ -59,8 +59,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
     kapt "androidx.lifecycle:lifecycle-compiler:$rootProject.lifecycleVersion"
 
-    // Koin dependency injection
-    implementation "org.koin:koin-androidx-viewmodel:$rootProject.koinVersion"
 
     //Advanced Recycler View
     implementation "com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:$rootProject.advRecyclerVersion"

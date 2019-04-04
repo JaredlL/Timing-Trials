@@ -15,12 +15,13 @@ class RiderViewModel @Inject constructor(private val repository: IRiderRepositor
     val mutableRider: MediatorLiveData<Rider> = MediatorLiveData()
 
     fun initialise(riderId: Long){
-        mutableRider.addSource(repository.getRider(riderId)){result: Rider ->
-            if(mutableRider.value == null){
+        if(mutableRider.value == null){
+            mutableRider.addSource(repository.getRider(riderId)){result: Rider ->
                 result.let { mutableRider.value = result
-            }
+                }
             }
         }
+
     }
 
     fun addOrUpdate(){

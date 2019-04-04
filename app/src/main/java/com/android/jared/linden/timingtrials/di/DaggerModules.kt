@@ -7,13 +7,11 @@ import com.android.jared.linden.timingtrials.data.source.CourseDao
 import com.android.jared.linden.timingtrials.data.source.RiderDao
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
 import com.android.jared.linden.timingtrials.data.source.TimingTrialsDatabase
-import com.android.jared.linden.timingtrials.setup.SetupActivity
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import org.koin.android.ext.koin.androidApplication
 import javax.inject.Singleton
 
 @Module
@@ -58,9 +56,21 @@ class RepositoryModule {
     }
 }
 
-@Module
-class ContextModule(private val appContext: Context) {
-    @Provides
-    fun appContext(): Context = appContext
+//@Module
+//class ContextModule(private val appContext: Context) {
+//    @Binds
+//    fun appContext(): Context = appContext
+//
+//}
 
-}
+//@Module(subcomponents = [SetupComponant::class])
+//class SetupModule{}
+//
+//@Module
+//class SetupActivityModule(private val setupVm: TimeTrialSetupViewModel) {
+//    @Binds
+//    fun timeTrialSetupViewModel(): TimeTrialSetupViewModel = setupVm
+//
+//
+//
+//}

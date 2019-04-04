@@ -7,11 +7,14 @@ import com.android.jared.linden.timingtrials.data.source.CourseDao
 import com.android.jared.linden.timingtrials.data.source.RiderDao
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
 import com.android.jared.linden.timingtrials.data.source.TimingTrialsDatabase
+import com.android.jared.linden.timingtrials.edititem.CourseViewModel
 import com.android.jared.linden.timingtrials.edititem.RiderViewModel
 import com.android.jared.linden.timingtrials.setup.TimeTrialSetupViewModel
+import com.android.jared.linden.timingtrials.viewdata.CourseListViewModel
 import com.android.jared.linden.timingtrials.viewdata.RiderListViewModel
 import dagger.BindsInstance
 import dagger.Component
+import dagger.Subcomponent
 import javax.inject.Singleton
 
 @Singleton
@@ -27,10 +30,23 @@ interface AppComponent{
         fun build(): AppComponent
     }
 
+    fun courseListViewModel(): CourseListViewModel
+
     fun riderListViewModel(): RiderListViewModel
 
     fun riderViewModel(): RiderViewModel
 
+    fun courseViewModel(): CourseViewModel
+
     fun timeTrialSetupViewModel(): TimeTrialSetupViewModel
 
 }
+
+//@Subcomponent(modules = [SetupActivityModule::class])
+//interface SetupComponant {
+//
+//
+//}
+
+
+
