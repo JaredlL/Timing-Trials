@@ -32,7 +32,7 @@ ext {
     coroutinesVersion = "1.1.1"
     ktxVersion = '1.0.1'
     materialVersion = '1.0.0'
-    fragmentVersion = '1.1.0-alpha05'
+    fragmentVersion = '1.1.0-alpha06'
     coreVersion = '1.1.0-alpha05'
 
     advRecyclerVersion='1.0.0'

@@ -21,7 +21,7 @@ class RiderListViewModel @Inject constructor(private val repository: IRiderRepos
     // - We can put an observer on the data (instead of polling for changes) and only update the
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
-    private val mRiderList: LiveData<List<Rider>> = repository.allRiders
+    val mRiderList: LiveData<List<Rider>> = Transformations.map(repository.allRiders){r -> r}
 
 
     /**
@@ -35,8 +35,6 @@ class RiderListViewModel @Inject constructor(private val repository: IRiderRepos
     }
 
     var selectable: Boolean = false
-
-    fun getAllRiders(): LiveData<List<Rider>>{ return mRiderList }
 
 
     override fun onCleared() {

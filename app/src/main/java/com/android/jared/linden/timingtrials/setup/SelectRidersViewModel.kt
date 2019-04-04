@@ -10,16 +10,16 @@ import java.util.ArrayList
 
 
 interface ISelectRidersViewModel{
-    fun getAllRiders(): LiveData<List<SelectableRiderViewWrapper>>
+    var allSelectableRiders: LiveData<List<SelectableRiderViewWrapper>>
 }
 
 class SelectRidersViewModelImpl(private val ttSetup: TimeTrialSetupViewModel):ISelectRidersViewModel {
 
-    private val mRiderViewWrapperList: MediatorLiveData<List<SelectableRiderViewWrapper>> = MediatorLiveData()
+
+    var mRiderViewWrapperList: MediatorLiveData<List<SelectableRiderViewWrapper>> = MediatorLiveData()
     private fun selectedRiders() = ttSetup.timeTrial.value?.riders
-    override fun getAllRiders(): LiveData<List<SelectableRiderViewWrapper>> {
-        return  mRiderViewWrapperList
-    }
+
+    override var allSelectableRiders: LiveData<List<SelectableRiderViewWrapper>> = mRiderViewWrapperList
 
     init {
         mRiderViewWrapperList.addSource(ttSetup.riderRepository.allRiders){ result: List<Rider>? ->

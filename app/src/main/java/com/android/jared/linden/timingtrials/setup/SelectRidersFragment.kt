@@ -44,13 +44,14 @@ class SelectRidersFragment : Fragment() {
 
         viewManager = LinearLayoutManager(context)
         adapter = SelectableRiderListAdapter(requireContext())
-        viewModel.getAllRiders().observe(viewLifecycleOwner, Observer { riders ->
+        viewModel.allSelectableRiders.observe(viewLifecycleOwner, Observer { riders ->
             riders?.let {adapter.setRiders(it)}
         })
 
         adapter.editRider = ::editRider
 
         val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
+            lifecycleOwner = (this@SelectRidersFragment)
             riderHeading.selectableRider =  SelectableRiderViewWrapper(Rider("Name", "", "Club", 0))
             riderHeading.checkBox.visibility =  View.INVISIBLE
             riderRecyclerView.adapter = adapter

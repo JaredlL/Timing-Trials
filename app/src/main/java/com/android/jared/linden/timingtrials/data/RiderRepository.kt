@@ -33,7 +33,7 @@ interface IRiderRepository {
     suspend fun insertOrUpdate(rider: Rider)
 }
 @Singleton
-class RoomRiderRepository @Inject constructor(private  val riderDao: RiderDao) : IRiderRepository {
+class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : IRiderRepository {
 
     // Room executes all queries on a separate thread.
     // Observed LiveData will notify the observer when the data has changed.

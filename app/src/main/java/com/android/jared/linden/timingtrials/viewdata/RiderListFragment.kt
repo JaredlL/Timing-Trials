@@ -41,11 +41,16 @@ class RiderListFragment : Fragment() {
         viewModel = getViewModel { injector.riderListViewModel() }
         viewManager = LinearLayoutManager(context)
         adapter = RiderListAdapter(requireContext()).apply { selectable = false }
-        viewModel.getAllRiders().observe(viewLifecycleOwner, Observer { riders ->
-            riders?.let {adapter.setRiders(it)}
-        })
+
 
         adapter.editRider = ::editRider
+
+        viewModel.mRiderList.observe(viewLifecycleOwner, Observer { riders ->
+            riders.let {
+                adapter.setRiders(it)
+                adapter.notifyDataSetChanged()
+            }
+        })
 
         val binding = DataBindingUtil.inflate<FragmentRiderListBinding>(inflater, R.layout.fragment_rider_list, container, false).apply {
             riderHeading.rider = Rider("First Name", "Surname", "Club", 0)
@@ -55,6 +60,7 @@ class RiderListFragment : Fragment() {
                 editRider(Rider.createBlank())
             }
         }
+
 
 
         return binding.root
