@@ -48,7 +48,6 @@ class RiderListFragment : Fragment() {
         viewModel.mRiderList.observe(viewLifecycleOwner, Observer { riders ->
             riders.let {
                 adapter.setRiders(it)
-                adapter.notifyDataSetChanged()
             }
         })
 

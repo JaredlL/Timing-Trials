@@ -10,8 +10,7 @@ interface ISetupConformationViewModel{
     val lapsCourse: LiveData<String>
     val ridersInterval: LiveData<String>
     val startTime: LiveData<String>
-    var onStartTT: (Boolean) -> Unit
-    fun startTt()
+    fun confirmationFunction(): Boolean
 }
 
 class SetupConfirmationViewModel (private val ttSetup: TimeTrialSetupViewModel) : ISetupConformationViewModel{
@@ -40,33 +39,55 @@ class SetupConfirmationViewModel (private val ttSetup: TimeTrialSetupViewModel) 
 
     }
 
-    override var onStartTT: (Boolean) -> Unit ={}
 
-    override fun startTt(){
+    override fun confirmationFunction(): Boolean{
 
         timeTrial.value?.let {
-           if(it.startTime.after(Calendar.getInstance().time)){
+            return if(it.startTime.after(Calendar.getInstance().time)){
 
-               it.isSetup = true
-               timeTrial.value = it
-               ttSetup.insertTt()
+                it.isSetup = true
+                timeTrial.value = it
+                ttSetup.insertTt()
 
-               onStartTT(true)
-           }else{
-               onStartTT(false)
-           }
+                true
+            }else{
+                false
+            }
+        }
+        return false
+    }
+}
 
+class ResumeOldConfirmationViewModel (private val ttSetup: TimeTrialSetupViewModel) : ISetupConformationViewModel{
 
+    val timeTrial = ttSetup.originalTimeTrial
 
+    override val title = Transformations.map(timeTrial){tt ->
+        "Resume setting up previous ${tt.ttName} ?"
+    }
+
+    override val lapsCourse = Transformations.map(timeTrial){tt->
+        "${tt.laps} laps of ${tt.course?.courseName}"
+    }
+
+    override val ridersInterval = Transformations.map(timeTrial){tt->
+        if(tt.interval == 0){
+            "${tt.riders.count()} riders starting at 0 second intervals, mass start!"
+        }else{
+            "${tt.riders.count()} riders starting at ${tt.interval} second intervals"
         }
 
+    }
+
+    override val startTime = Transformations.map(timeTrial){tt->
+        "First rider starting at ${ConverterUtils.dateToTimeDisplayString(tt.startTime)}"
 
     }
 
 
+    override fun confirmationFunction(): Boolean{
 
-
-
-
-
+        timeTrial.value?.let { ttSetup.timeTrial.postValue(it) }
+        return true
+    }
 }

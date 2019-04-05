@@ -11,6 +11,7 @@ import javax.inject.Singleton
 interface ITimeTrialRepository{
 
     suspend fun insert(timeTrial: TimeTrial)
+    suspend fun insertOrUpdate(timeTrial: TimeTrial)
     suspend fun update(rider: TimeTrial)
     fun getSetupTimeTrial(): LiveData<TimeTrial>
 
@@ -32,7 +33,9 @@ class RoomTimeTrialRepository @Inject constructor(private  val timeTrialDao: Tim
         timeTrialDao.insert(timeTrial)
     }
 
-    override fun getSetupTimeTrial(): MutableLiveData<TimeTrial> {
+    override fun getSetupTimeTrial(): LiveData<TimeTrial> {
+
+        return timeTrialDao.getSetupTimeTrial()
         val c = Calendar.getInstance()
         c.add(Calendar.MINUTE, 10)
         c.set(Calendar.SECOND, 0)
@@ -61,7 +64,7 @@ class RoomTimeTrialRepository @Inject constructor(private  val timeTrialDao: Tim
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insertOrUpdate(timeTrial: TimeTrial){
+    override suspend fun insertOrUpdate(timeTrial: TimeTrial){
         val id = timeTrial.id ?: 0
         if(id != 0L){
             timeTrialDao.update(timeTrial)

@@ -30,14 +30,31 @@ class SetupActivity : AppCompatActivity() {
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
     //private lateinit var riderListViewModel: RiderListViewModel
-    private lateinit var timeTrialViewModel: ITimeTrialPropertiesViewModel
+    private lateinit var timeTrialViewModel: TimeTrialSetupViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setup)
 
-        timeTrialViewModel = getViewModel { injector.timeTrialSetupViewModel() }.timeTrialPropertiesViewModel
-        timeTrialViewModel.onBeginTt = {
+        timeTrialViewModel = getViewModel { injector.timeTrialSetupViewModel() }
+
+        /**
+         * Check if there is a previous tt to et up
+         */
+        timeTrialViewModel.originalTimeTrial.observe(this, androidx.lifecycle.Observer { tt->
+            tt?.let {
+                if(timeTrialViewModel.timeTrial.value == null){
+                    val dialog: UseOldConfirmationFragment = supportFragmentManager
+                            .findFragmentByTag("useold") as? UseOldConfirmationFragment ?: UseOldConfirmationFragment()
+
+                    dialog.show(supportFragmentManager, "useold")
+                }
+
+            }
+        })
+
+
+        timeTrialViewModel.timeTrialPropertiesViewModel.onBeginTt = {
 
             timeTrialViewModel.timeTrial.value?.let {
                 if(it.riders.count() == 0){

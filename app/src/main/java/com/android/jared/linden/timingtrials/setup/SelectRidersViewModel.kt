@@ -37,6 +37,10 @@ class SelectRidersViewModelImpl(private val ttSetup: TimeTrialSetupViewModel):IS
         }
     }
 
+    /**
+     * Need to remember order of ids were selected when a selection is changed
+     *
+     */
     private fun riderSelectionChangeHandler(rider: Rider, sel:Boolean){
         val oldList = selectedRiders()?.toMutableList()?: ArrayList()
         val newList = ArrayList<Rider>()

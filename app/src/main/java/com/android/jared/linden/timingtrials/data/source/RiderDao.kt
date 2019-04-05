@@ -18,7 +18,7 @@ interface RiderDao {
 
     @Query("DELETE FROM rider_table") fun deleteAll()
 
-    @Query("SELECT * from rider_table ORDER BY firstName ASC") fun getAllRiders(): LiveData<List<Rider>>
+    @Query("SELECT * from rider_table ORDER BY firstName COLLATE NOCASE ASC") fun getAllRiders(): LiveData<List<Rider>>
 
     @Query("SELECT DISTINCT club from rider_table") fun getAllClubs(): LiveData<List<String>>
 

@@ -17,6 +17,18 @@ data class TimeTrial(var ttName: String,
                      var isFinished: Boolean = false,
                      @PrimaryKey(autoGenerate = true) var id: Long? = null) {
 
+    companion object {
+
+        fun createBlank(): TimeTrial {
+            val c = Calendar.getInstance()
+            c.add(Calendar.MINUTE, 10)
+            c.set(Calendar.SECOND, 0)
+            c.set(Calendar.MILLISECOND, 0)
+
+            return TimeTrial(ttName = "", course = null, riders = listOf(), laps = 1, interval = 60, startTime = c.time, isSetup = false, isFinished = false)
+        }
+    }
+
 }
 
 //Todo: Use proper relational mapping, for now we siply store as JSON

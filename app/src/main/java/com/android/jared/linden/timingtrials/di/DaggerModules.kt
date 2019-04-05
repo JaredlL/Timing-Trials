@@ -55,22 +55,3 @@ class RepositoryModule {
         return RoomTimeTrialRepository(timeTrialDao)
     }
 }
-
-//@Module
-//class ContextModule(private val appContext: Context) {
-//    @Binds
-//    fun appContext(): Context = appContext
-//
-//}
-
-//@Module(subcomponents = [SetupComponant::class])
-//class SetupModule{}
-//
-//@Module
-//class SetupActivityModule(private val setupVm: TimeTrialSetupViewModel) {
-//    @Binds
-//    fun timeTrialSetupViewModel(): TimeTrialSetupViewModel = setupVm
-//
-//
-//
-//}

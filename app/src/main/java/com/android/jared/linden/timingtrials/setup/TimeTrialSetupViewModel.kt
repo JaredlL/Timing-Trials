@@ -15,6 +15,7 @@ interface ITimeTrialSetupViewModel{
     val selectRidersViewModel: ISelectRidersViewModel
     val timeTrialPropertiesViewModel: ITimeTrialPropertiesViewModel
     val setupConformationViewModel: ISetupConformationViewModel
+    val resumeOldConfirmationViewModel: ISetupConformationViewModel
 }
 
 class TimeTrialSetupViewModel @Inject constructor(
@@ -25,6 +26,7 @@ class TimeTrialSetupViewModel @Inject constructor(
 
 
 
+    val originalTimeTrial = timeTrialRepository.getSetupTimeTrial()
     val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
     private fun selectedRiders() = timeTrial.value?.riders
 
@@ -53,19 +55,15 @@ class TimeTrialSetupViewModel @Inject constructor(
     override val selectRidersViewModel: ISelectRidersViewModel = SelectRidersViewModelImpl(this)
     override val timeTrialPropertiesViewModel: ITimeTrialPropertiesViewModel = TimeTrialPropertiesViewModelImpl(this)
     override val setupConformationViewModel: ISetupConformationViewModel = SetupConfirmationViewModel(this)
+    override val resumeOldConfirmationViewModel: ISetupConformationViewModel = ResumeOldConfirmationViewModel(this)
 
     fun insertTt(){
         viewModelScope.launch(Dispatchers.IO) {
-            timeTrial.value?.let { timeTrialRepository.insert(it) }
-
+            timeTrial.value?.let { timeTrialRepository.insertOrUpdate(it) }
         }
     }
 
     init {
-
-        timeTrial.addSource(timeTrialRepository.getSetupTimeTrial()){tt->
-            timeTrial.value = tt
-        }
 
         /**
          * Need to remember which ids were selected when a rider is added/removed

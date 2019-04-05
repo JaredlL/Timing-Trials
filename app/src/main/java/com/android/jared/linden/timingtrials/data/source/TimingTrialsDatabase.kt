@@ -9,6 +9,7 @@ import com.android.jared.linden.timingtrials.data.TimeTrial
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 @Database(entities = [Rider::class, Course::class, TimeTrial::class], version = 9, exportSchema = false)
 @TypeConverters(Converters::class)
@@ -94,7 +95,10 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             riderDao.insert(Rider("Jon", "Morris", "Chepstow CC", 50))
             riderDao.insert(Rider("Gordon", "Marcus", "Severn RC", 40))
             riderDao.insert(Rider("Joe", "Griffiths", "78 Degrees", 23))
-            riderDao.insert(Rider("Nino", "Schurter", "Scott", 23))
+            riderDao.insert(Rider("Matt", "Fratesi", "TORQ", 20))
+
+
+
         }
 
         fun populateCourses(courseDao: CourseDao){
@@ -105,6 +109,12 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             courseDao.insert(Course("Tomarton", 37014.9, "U601B"))
             courseDao.insert(Course("Tintern 10", 16093.4, "UC620"))
             courseDao.insert(Course("Speech House 10", 16093.4, "UC606"))
+        }
+
+        fun populateTt(timeTrialDao: TimeTrialDao){
+
+            timeTrialDao.deleteAll()
+            timeTrialDao.insert(TimeTrial.createBlank().apply { ttName = "New TT" })
         }
 
     }

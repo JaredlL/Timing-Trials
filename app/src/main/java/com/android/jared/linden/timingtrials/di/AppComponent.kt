@@ -42,11 +42,6 @@ interface AppComponent{
 
 }
 
-//@Subcomponent(modules = [SetupActivityModule::class])
-//interface SetupComponant {
-//
-//
-//}
 
 
 
