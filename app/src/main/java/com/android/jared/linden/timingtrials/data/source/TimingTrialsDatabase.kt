@@ -57,6 +57,7 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
                     scope.launch(Dispatchers.IO) {
                         populateRiders(database.riderDao())
                         populateCourses(database.courseDao())
+                        populateTt(database.timeTrialDao())
                     }
                 }
             }
