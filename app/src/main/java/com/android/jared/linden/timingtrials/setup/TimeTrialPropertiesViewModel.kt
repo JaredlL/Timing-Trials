@@ -37,8 +37,9 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: TimeTrialSetupViewMo
      */
     override val timeTrialName: MutableLiveData<String> = MutableLiveData()
     private val nameMediator = MediatorLiveData<String>().apply {
-        addSource(ttSetup.timeTrial) {
-           if(timeTrialName.value != it.ttName) timeTrialName.value = it.ttName
+        addSource(ttSetup.timeTrial) {tt->
+            tt?.let { if(timeTrialName.value != it.ttName) timeTrialName.value = it.ttName }
+
         }
         addSource(timeTrialName) { newName ->
             timeTrialValue()?.let {
@@ -53,10 +54,13 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: TimeTrialSetupViewMo
 
     override val laps = MutableLiveData<String>()
     private val lapsMediator = MediatorLiveData<String>().apply {
-        addSource(ttSetup.timeTrial) {
-            if (laps.value != it.laps.toString()) {
-                laps.value = it.laps.toString()
+        addSource(ttSetup.timeTrial) {tt->
+            tt?.let {
+                if (laps.value != it.laps.toString()) {
+                    laps.value = it.laps.toString()
+                }
             }
+
         }
         addSource(laps) {laps->
             laps.toIntOrNull()?.let{newLaps ->
@@ -81,19 +85,25 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: TimeTrialSetupViewMo
                 }
             }
         }
-        addSource(ttSetup.timeTrial) {
-            if (interval.value != it.interval.toString()) {
-                interval.value = it.interval.toString()
+        addSource(ttSetup.timeTrial) {tt->
+            tt?.let {
+                if (interval.value != it.interval.toString()) {
+                    interval.value = it.interval.toString()
+                }
             }
+
         }
     }.also { it.observeForever {  } }
 
     override val startTime = MutableLiveData<Date>()
     private val startTimeMediator = MediatorLiveData<Date>().apply {
-        addSource(ttSetup.timeTrial) {
-            if (startTime.value != it.startTime) {
-            startTime.value = it.startTime
+        addSource(ttSetup.timeTrial) {tt->
+            tt?.let {
+                if (startTime.value != it.startTime) {
+                    startTime.value = it.startTime
+                }
             }
+
         }
         addSource(startTime) {newStartTime->
             timeTrialValue()?.let {tt->
@@ -105,8 +115,8 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: TimeTrialSetupViewMo
         }
     }.also { it.observeForever {  } }
 
-    override val startTimeString: LiveData<String>  = Transformations.map(ttSetup.timeTrial){
-        ConverterUtils.dateToTimeDisplayString(it.startTime)
+    override val startTimeString: LiveData<String>  = Transformations.map(ttSetup.timeTrial){tt->
+        tt?.let { ConverterUtils.dateToTimeDisplayString(it.startTime)}
     }
 
     override val availableLaps = 1.rangeTo(99).map { i -> i.toString() }

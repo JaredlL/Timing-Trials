@@ -61,7 +61,9 @@ class SetupTimeTrialFragment : Fragment() {
         val courseFrag: SelectCourseFragment = requireActivity().supportFragmentManager
                 .findFragmentByTag("dialog") as? SelectCourseFragment ?: SelectCourseFragment.newInstance()
 
-        courseFrag.show(requireActivity().supportFragmentManager, "dialog")
+        if(courseFrag.dialog?.isShowing != true) {
+            courseFrag.show(requireActivity().supportFragmentManager, "dialog")
+        }
     }
 
 

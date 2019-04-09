@@ -37,11 +37,12 @@ class SetupConfirmationFragment : DialogFragment() {
             lifecycleOwner = (this@SetupConfirmationFragment)
             viewModel = confirmationViewModel
             cancelButton.setOnClickListener {
+                confirmationViewModel.negativeFunction()
                 this@SetupConfirmationFragment.dismiss()
             }
 
             okButton.setOnClickListener {
-                if(confirmationViewModel.confirmationFunction()){
+                if(confirmationViewModel.positiveFunction()){
 
                 }else{
                     Toast.makeText(requireActivity(), "TT must start in the future, select start time", Toast.LENGTH_LONG).show()
@@ -77,11 +78,12 @@ class UseOldConfirmationFragment : DialogFragment() {
             lifecycleOwner = (this@UseOldConfirmationFragment)
             viewModel = confirmationViewModel
             cancelButton.setOnClickListener {
+                confirmationViewModel.negativeFunction()
                 this@UseOldConfirmationFragment.dismiss()
             }
 
             okButton.setOnClickListener{
-                confirmationViewModel.confirmationFunction()
+                confirmationViewModel.positiveFunction()
                 this@UseOldConfirmationFragment.dismiss()
             }
 

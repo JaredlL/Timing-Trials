@@ -57,7 +57,7 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
                     scope.launch(Dispatchers.IO) {
                         populateRiders(database.riderDao())
                         populateCourses(database.courseDao())
-                        populateTt(database.timeTrialDao())
+                        populateTt(database.timeTrialDao(), database.riderDao(), database.courseDao())
                     }
                 }
             }
@@ -112,7 +112,7 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             courseDao.insert(Course("Speech House 10", 16093.4, "UC606"))
         }
 
-        fun populateTt(timeTrialDao: TimeTrialDao){
+        fun populateTt(timeTrialDao: TimeTrialDao, riderDao: RiderDao, courseDao: CourseDao){
 
             timeTrialDao.deleteAll()
             timeTrialDao.insert(TimeTrial.createBlank().apply { ttName = "New TT" })

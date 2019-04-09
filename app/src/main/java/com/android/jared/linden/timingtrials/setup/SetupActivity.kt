@@ -44,10 +44,13 @@ class SetupActivity : AppCompatActivity() {
         timeTrialViewModel.originalTimeTrial.observe(this, androidx.lifecycle.Observer { tt->
             tt?.let {
                 if(timeTrialViewModel.timeTrial.value == null){
-                    val dialog: UseOldConfirmationFragment = supportFragmentManager
+                    val useOldDialog: UseOldConfirmationFragment = supportFragmentManager
                             .findFragmentByTag("useold") as? UseOldConfirmationFragment ?: UseOldConfirmationFragment()
 
-                    dialog.show(supportFragmentManager, "useold")
+                    if(useOldDialog.dialog?.isShowing != true){
+                        useOldDialog.show(supportFragmentManager, "useold")
+                    }
+
                 }
 
             }
@@ -67,10 +70,13 @@ class SetupActivity : AppCompatActivity() {
                     TimePickerFragment().show(supportFragmentManager, "timePicker")
                     return@let
                 }
-                val dialog: SetupConfirmationFragment = supportFragmentManager
+                val confDialog: SetupConfirmationFragment = supportFragmentManager
                         .findFragmentByTag("confdialog") as? SetupConfirmationFragment ?: SetupConfirmationFragment()
 
-                dialog.show(supportFragmentManager, "confdialog")
+                if(confDialog.dialog?.isShowing != true){
+                    confDialog.show(supportFragmentManager, "confdialog")
+                }
+
             }
 
         }

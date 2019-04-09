@@ -27,6 +27,8 @@ data class TimeTrial(var ttName: String,
 
             return TimeTrial(ttName = "", course = null, riders = listOf(), laps = 1, interval = 60, startTime = c.time, isSetup = false, isFinished = false)
         }
+
+
     }
 
 }

@@ -2,6 +2,7 @@ package com.android.jared.linden.timingtrials.setup
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import java.util.*
 
@@ -10,7 +11,8 @@ interface ISetupConformationViewModel{
     val lapsCourse: LiveData<String>
     val ridersInterval: LiveData<String>
     val startTime: LiveData<String>
-    fun confirmationFunction(): Boolean
+    fun positiveFunction(): Boolean
+    fun negativeFunction(): Boolean
 }
 
 class SetupConfirmationViewModel (private val ttSetup: TimeTrialSetupViewModel) : ISetupConformationViewModel{
@@ -40,7 +42,7 @@ class SetupConfirmationViewModel (private val ttSetup: TimeTrialSetupViewModel) 
     }
 
 
-    override fun confirmationFunction(): Boolean{
+    override fun positiveFunction(): Boolean{
 
         timeTrial.value?.let {
             return if(it.startTime.after(Calendar.getInstance().time)){
@@ -56,9 +58,14 @@ class SetupConfirmationViewModel (private val ttSetup: TimeTrialSetupViewModel) 
         }
         return false
     }
+
+    override fun negativeFunction(): Boolean {
+        return true
+    }
 }
 
 class ResumeOldConfirmationViewModel (private val ttSetup: TimeTrialSetupViewModel) : ISetupConformationViewModel{
+
 
     val timeTrial = ttSetup.originalTimeTrial
 
@@ -84,10 +91,16 @@ class ResumeOldConfirmationViewModel (private val ttSetup: TimeTrialSetupViewMod
 
     }
 
-
-    override fun confirmationFunction(): Boolean{
+    override fun positiveFunction(): Boolean{
 
         timeTrial.value?.let { ttSetup.timeTrial.postValue(it) }
         return true
     }
+
+    override fun negativeFunction(): Boolean {
+        ttSetup.timeTrial.value = TimeTrial.createBlank()
+        return true
+    }
+
+
 }

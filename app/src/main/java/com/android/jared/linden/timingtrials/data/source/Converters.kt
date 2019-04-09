@@ -5,7 +5,6 @@ import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.data.Rider
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import java.lang.reflect.Type
 import java.util.*
 
 class Converters {
@@ -24,26 +23,29 @@ class Converters {
 
 
     @TypeConverter
-    fun ridersFromString(ridersString:String): List<Rider>{
-        val riderListType = object : TypeToken<List<Rider>>() {}.type
-        return Gson().fromJson<List<Rider>>(ridersString, riderListType)
+    fun ridersFromString(ridersString:String?): List<Rider>?{
+        return ridersString?.let {
+            val riderListType = object : TypeToken<List<Rider>>() {}.type
+            Gson().fromJson<List<Rider>>(ridersString, riderListType)
+        }
 
     }
 
     @TypeConverter
-    fun ridersToString(riders: List<Rider>): String{
-        return Gson().toJson(riders)
+    fun ridersToString(riders: List<Rider>?): String?{
+        return riders?.let{Gson().toJson(riders)}
     }
 
     @TypeConverter
-    fun courseFromString(courseString:String): Course {
+    fun courseFromString(courseString:String?): Course? {
+       return courseString?.let{
         val courseType = object : TypeToken<Course>() {}.type
-        return Gson().fromJson<Course>(courseString, courseType)
+         Gson().fromJson<Course>(courseString, courseType)}
 
     }
 
     @TypeConverter
-    fun courseToString(course: Course): String{
-        return Gson().toJson(course)
+    fun courseToString(course: Course?): String?{
+        return course?.let { Gson().toJson(course)}
     }
 }
