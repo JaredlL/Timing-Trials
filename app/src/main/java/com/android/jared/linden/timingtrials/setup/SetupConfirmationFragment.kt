@@ -1,6 +1,7 @@
 package com.android.jared.linden.timingtrials.setup
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.lifecycle.Observer
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentSetupConfirmationBinding
+import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 
@@ -43,7 +45,10 @@ class SetupConfirmationFragment : DialogFragment() {
 
             okButton.setOnClickListener {
                 if(confirmationViewModel.positiveFunction()){
-
+                    val intent = Intent(requireActivity(), TimingActivity::class.java)
+                    intent.putExtra(TIMETRIAL_ID_EXTRA, confirmationViewModel.timeTrial.value?.id)
+                    startActivity(intent)
+                    this@SetupConfirmationFragment.dismiss()
                 }else{
                     Toast.makeText(requireActivity(), "TT must start in the future, select start time", Toast.LENGTH_LONG).show()
                     this@SetupConfirmationFragment.dismiss()
@@ -70,7 +75,7 @@ class UseOldConfirmationFragment : DialogFragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
 
-        confirmationViewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.resumeOldConfirmationViewModel
+        confirmationViewModel = requireActivity().getViewModel { injector.mainViewModel() }.resumeOldViewModel
 
         confirmationViewModel.title.observe(viewLifecycleOwner, Observer { dialog?.setTitle(it) })
 
@@ -79,11 +84,15 @@ class UseOldConfirmationFragment : DialogFragment() {
             viewModel = confirmationViewModel
             cancelButton.setOnClickListener {
                 confirmationViewModel.negativeFunction()
+                val intent = Intent(requireActivity(), SetupActivity::class.java)
+                startActivity(intent)
                 this@UseOldConfirmationFragment.dismiss()
             }
 
             okButton.setOnClickListener{
-                confirmationViewModel.positiveFunction()
+                val intent = Intent(requireActivity(), SetupActivity::class.java)
+                intent.putExtra(TIMETRIAL_ID_EXTRA, confirmationViewModel.timeTrial.value?.id)
+                startActivity(intent)
                 this@UseOldConfirmationFragment.dismiss()
             }
 

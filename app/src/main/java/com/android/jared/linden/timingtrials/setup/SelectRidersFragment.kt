@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewCompat.jumpDrawablesToCurrentState
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -44,9 +46,7 @@ class SelectRidersFragment : Fragment() {
 
         viewManager = LinearLayoutManager(context)
         adapter = SelectableRiderListAdapter(requireContext())
-        viewModel.allSelectableRiders.observe(viewLifecycleOwner, Observer { riders ->
-            riders?.let {adapter.setRiders(it)}
-        })
+
 
         adapter.editRider = ::editRider
 
@@ -61,6 +61,12 @@ class SelectRidersFragment : Fragment() {
                 editRider(Rider.createBlank())
             }
         }
+
+        viewModel.allSelectableRiders.observe(viewLifecycleOwner, Observer { riders ->
+            riders?.let {adapter.setRiders(it)}
+            view?.jumpDrawablesToCurrentState()
+        })
+
 
         return binding.root
     }

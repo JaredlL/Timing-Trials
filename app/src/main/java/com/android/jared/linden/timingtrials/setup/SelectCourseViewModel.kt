@@ -53,6 +53,11 @@ class SelectCourseViewModelImpl(private val ttSetup: TimeTrialSetupViewModel): I
                         tt.course = course
                     }
                 }
+                else{
+                    ttSetup.timeTrial.value = ttSetup.timeTrial.value.apply {
+                        tt.course = course
+                    }
+                }
             }
 
             mCourseWrapperList.value?.let { cv ->

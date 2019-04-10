@@ -2,7 +2,10 @@ package com.android.jared.linden.timingtrials.di
 
 import android.content.Context
 import com.android.jared.linden.timingtrials.MainActivity
+import com.android.jared.linden.timingtrials.MainViewModel
+import com.android.jared.linden.timingtrials.TestViewModel
 import com.android.jared.linden.timingtrials.TimingTrialsApplication
+import com.android.jared.linden.timingtrials.data.RoomTimeTrialRepository
 import com.android.jared.linden.timingtrials.data.source.CourseDao
 import com.android.jared.linden.timingtrials.data.source.RiderDao
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
@@ -39,6 +42,10 @@ interface AppComponent{
     fun courseViewModel(): CourseViewModel
 
     fun timeTrialSetupViewModel(): TimeTrialSetupViewModel
+
+    fun mainViewModel(): MainViewModel
+
+    fun testViewModel(): TestViewModel
 
 }
 

@@ -25,4 +25,6 @@
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
     <string name="title_activity_timing">TimingActivity</string>
+    <string name="manage_riders">Manage Riders</string>
+    <string name="start_tt">Start TT</string>
 </resources>

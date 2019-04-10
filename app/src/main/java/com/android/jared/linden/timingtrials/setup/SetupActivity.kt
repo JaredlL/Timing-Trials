@@ -10,11 +10,15 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import com.android.jared.linden.timingtrials.viewdata.ITEM_TYPE_EXTRA
 
 import kotlinx.android.synthetic.main.activity_setup.*
 import java.util.*
+
+const val TIMETRIAL_ID_EXTRA = "timetrial_id"
 
 class SetupActivity : AppCompatActivity() {
 
@@ -38,23 +42,11 @@ class SetupActivity : AppCompatActivity() {
 
         timeTrialViewModel = getViewModel { injector.timeTrialSetupViewModel() }
 
-        /**
-         * Check if there is a previous tt to et up
-         */
-        timeTrialViewModel.originalTimeTrial.observe(this, androidx.lifecycle.Observer { tt->
-            tt?.let {
-                if(timeTrialViewModel.timeTrial.value == null){
-                    val useOldDialog: UseOldConfirmationFragment = supportFragmentManager
-                            .findFragmentByTag("useold") as? UseOldConfirmationFragment ?: UseOldConfirmationFragment()
 
-                    if(useOldDialog.dialog?.isShowing != true){
-                        useOldDialog.show(supportFragmentManager, "useold")
-                    }
+        intent.getLongExtra(TIMETRIAL_ID_EXTRA, 0L).let {
+            timeTrialViewModel.initialise(it)
+        }
 
-                }
-
-            }
-        })
 
 
         timeTrialViewModel.timeTrialPropertiesViewModel.onBeginTt = {
@@ -96,6 +88,7 @@ class SetupActivity : AppCompatActivity() {
 
 
     }
+
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

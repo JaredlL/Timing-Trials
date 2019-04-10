@@ -4,6 +4,7 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
+import java.sql.Time
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,15 +14,25 @@ interface ITimeTrialRepository{
     suspend fun insert(timeTrial: TimeTrial)
     suspend fun insertOrUpdate(timeTrial: TimeTrial)
     suspend fun update(rider: TimeTrial)
+    suspend fun getTimeTrialByName(name: String): TimeTrial?
+    suspend fun delete(timeTrial: TimeTrial)
     fun getSetupTimeTrial(): LiveData<TimeTrial>
+    fun getTimeTrialById(id: Long): LiveData<TimeTrial>
+
 
 }
 
 @Singleton
 class RoomTimeTrialRepository @Inject constructor(private  val timeTrialDao: TimeTrialDao): ITimeTrialRepository {
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun getTimeTrialByName(name: String): TimeTrial? {
+        return timeTrialDao.getTimeTrialByName(name)
+    }
 
-    val allTimeTrials: LiveData<List<TimeTrial>> = timeTrialDao.gatAllTimeTrials()
+
+    val allTimeTrials: LiveData<List<TimeTrial>> = timeTrialDao.getAllTimeTrials()
 
     // You must call this on a non-UI thread or your app will crash. So we're making this a
     // suspend function so the caller methods know this.
@@ -51,14 +62,14 @@ class RoomTimeTrialRepository @Inject constructor(private  val timeTrialDao: Tim
     }
 
 
-    fun getTimeTrial(timeTrialId: Long) : LiveData<TimeTrial> {
+   override fun getTimeTrialById(timeTrialId: Long) : LiveData<TimeTrial> {
        return timeTrialDao.getTimeTrialById(timeTrialId)
     }
 
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun delete(timeTrial: TimeTrial) {
+    override suspend fun delete(timeTrial: TimeTrial) {
         timeTrialDao.delete(timeTrial)
     }
 

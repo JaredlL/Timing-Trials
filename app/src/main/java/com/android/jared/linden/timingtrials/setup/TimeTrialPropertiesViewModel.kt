@@ -35,7 +35,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: TimeTrialSetupViewMo
     /**
      * Best way i have found to perform a custom action on livedata set
      */
-    override val timeTrialName: MutableLiveData<String> = MutableLiveData()
+    override val timeTrialName: MutableLiveData<String> = MutableLiveData("")
     private val nameMediator = MediatorLiveData<String>().apply {
         addSource(ttSetup.timeTrial) {tt->
             tt?.let { if(timeTrialName.value != it.ttName) timeTrialName.value = it.ttName }

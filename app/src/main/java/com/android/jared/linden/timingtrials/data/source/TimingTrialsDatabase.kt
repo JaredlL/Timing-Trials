@@ -115,7 +115,6 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
         fun populateTt(timeTrialDao: TimeTrialDao, riderDao: RiderDao, courseDao: CourseDao){
 
             timeTrialDao.deleteAll()
-            timeTrialDao.insert(TimeTrial.createBlank().apply { ttName = "New TT" })
         }
 
     }
