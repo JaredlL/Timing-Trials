@@ -10,10 +10,10 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
 
 import kotlinx.android.synthetic.main.activity_setup.*
-import org.koin.android.ext.android.getKoin
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
 class SetupActivity : AppCompatActivity() {
@@ -30,15 +30,34 @@ class SetupActivity : AppCompatActivity() {
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
     //private lateinit var riderListViewModel: RiderListViewModel
-    private val timeTrialViewModel: SetupTimeTrialViewModel by viewModel()
+    private lateinit var timeTrialViewModel: TimeTrialSetupViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setup)
 
-        getKoin().getOrCreateScope("setup")
+        timeTrialViewModel = getViewModel { injector.timeTrialSetupViewModel() }
 
-        timeTrialViewModel.onBeginTt = {
+        /**
+         * Check if there is a previous tt to et up
+         */
+        timeTrialViewModel.originalTimeTrial.observe(this, androidx.lifecycle.Observer { tt->
+            tt?.let {
+                if(timeTrialViewModel.timeTrial.value == null){
+                    val useOldDialog: UseOldConfirmationFragment = supportFragmentManager
+                            .findFragmentByTag("useold") as? UseOldConfirmationFragment ?: UseOldConfirmationFragment()
+
+                    if(useOldDialog.dialog?.isShowing != true){
+                        useOldDialog.show(supportFragmentManager, "useold")
+                    }
+
+                }
+
+            }
+        })
+
+
+        timeTrialViewModel.timeTrialPropertiesViewModel.onBeginTt = {
 
             timeTrialViewModel.timeTrial.value?.let {
                 if(it.riders.count() == 0){
@@ -51,10 +70,13 @@ class SetupActivity : AppCompatActivity() {
                     TimePickerFragment().show(supportFragmentManager, "timePicker")
                     return@let
                 }
-                val dialog: SetupConfirmationFragment = supportFragmentManager
+                val confDialog: SetupConfirmationFragment = supportFragmentManager
                         .findFragmentByTag("confdialog") as? SetupConfirmationFragment ?: SetupConfirmationFragment()
 
-                dialog.show(supportFragmentManager, "confdialog")
+                if(confDialog.dialog?.isShowing != true){
+                    confDialog.show(supportFragmentManager, "confdialog")
+                }
+
             }
 
         }

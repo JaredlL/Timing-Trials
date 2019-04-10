@@ -8,10 +8,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
-
-class CourseListViewModel(private val repository: ICourseRepository) : ViewModel() {
+class CourseListViewModel @Inject constructor(private val repository: ICourseRepository) : ViewModel() {
 
     private var parentJob = Job()
 

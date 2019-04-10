@@ -5,16 +5,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
 interface ITimeTrialRepository{
 
     suspend fun insert(timeTrial: TimeTrial)
+    suspend fun insertOrUpdate(timeTrial: TimeTrial)
     suspend fun update(rider: TimeTrial)
     fun getSetupTimeTrial(): LiveData<TimeTrial>
 
 }
 
-class RoomTimeTrialRepository(private  val timeTrialDao: TimeTrialDao): ITimeTrialRepository {
+@Singleton
+class RoomTimeTrialRepository @Inject constructor(private  val timeTrialDao: TimeTrialDao): ITimeTrialRepository {
 
 
     val allTimeTrials: LiveData<List<TimeTrial>> = timeTrialDao.gatAllTimeTrials()
@@ -29,7 +33,9 @@ class RoomTimeTrialRepository(private  val timeTrialDao: TimeTrialDao): ITimeTri
         timeTrialDao.insert(timeTrial)
     }
 
-    override fun getSetupTimeTrial(): MutableLiveData<TimeTrial> {
+    override fun getSetupTimeTrial(): LiveData<TimeTrial> {
+
+        return timeTrialDao.getSetupTimeTrial()
         val c = Calendar.getInstance()
         c.add(Calendar.MINUTE, 10)
         c.set(Calendar.SECOND, 0)
@@ -58,7 +64,7 @@ class RoomTimeTrialRepository(private  val timeTrialDao: TimeTrialDao): ITimeTri
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insertOrUpdate(timeTrial: TimeTrial){
+    override suspend fun insertOrUpdate(timeTrial: TimeTrial){
         val id = timeTrial.id ?: 0
         if(id != 0L){
             timeTrialDao.update(timeTrial)

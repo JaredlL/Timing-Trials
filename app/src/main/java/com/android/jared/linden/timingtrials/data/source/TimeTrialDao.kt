@@ -20,4 +20,8 @@ interface TimeTrialDao {
     @Query("SELECT * from timetrial_table ORDER BY startTime ASC") fun gatAllTimeTrials(): LiveData<List<TimeTrial>>
 
     @Query("SELECT * FROM timetrial_table WHERE Id = :ttId LIMIT 1") fun getTimeTrialById(ttId: Long): LiveData<TimeTrial>
+
+
+    //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
+    @Query("SELECT * FROM timetrial_table WHERE isSetup = 0 LIMIT 1") fun getSetupTimeTrial(): LiveData<TimeTrial>
 }

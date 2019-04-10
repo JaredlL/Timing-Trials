@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.android.jared.linden.timingtrials.setup.SetupConfirmationViewModel"/>
+            type="com.android.jared.linden.timingtrials.setup.ISetupConformationViewModel"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -61,7 +61,6 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="32dp"
             android:text="@string/ok"
-            android:onClick="@{() -> viewModel.startTt()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView17"
             tools:text="OK" />

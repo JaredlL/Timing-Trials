@@ -6,12 +6,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.di.scope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.koin.standalone.KoinComponent
-import org.koin.standalone.inject
+import java.util.*
 
 @Database(entities = [Rider::class, Course::class, TimeTrial::class], version = 9, exportSchema = false)
 @TypeConverters(Converters::class)
@@ -24,40 +22,42 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
     companion object {
         @Volatile private var INSTANCE: TimingTrialsDatabase? = null
 
-//        fun getDatabase(context: Context, scope: CoroutineScope): TimingTrialsDatabase {
-//            // if the INSTANCE is not null, then return it,
-//            // if it is, then create the database
-//            return INSTANCE ?: synchronized(this){
-//                val instance = Room.databaseBuilder(context,
-//                        TimingTrialsDatabase::class.java,
-//                        "timingtrials_database")
-//                        .fallbackToDestructiveMigration()
-//                        //.addCallback(TimingTrialsDatabaseCallback(scope, INSTANCE))
-//                        .build()
-//                INSTANCE = instance
-//                instance
-//            }
-//        }
+        fun getDatabase(context: Context, scope: CoroutineScope): TimingTrialsDatabase {
+            // if the INSTANCE is not null, then return it,
+            // if it is, then create the database
+            return INSTANCE ?: synchronized(this){
+                val instance = Room.databaseBuilder(context,
+                        TimingTrialsDatabase::class.java,
+                        "timingtrials_database")
+                        .fallbackToDestructiveMigration()
+                        .addCallback(TimingTrialsDatabaseCallback(scope))
+                        .build()
+                INSTANCE = instance
+                instance
+            }
+        }
 
-        class TimingTrialsDatabaseCallback(val scope: CoroutineScope) : RoomDatabase.Callback(), KoinComponent {
+        class TimingTrialsDatabaseCallback(val scope: CoroutineScope) : RoomDatabase.Callback() {
             /**
              * Override the onOpen method to populate the database.
              * For this sample, we clear the database every time it is created or opened.
              */
 
             /**
-             * Koin provides the database
+             * DI provides the database
              */
-            private val ttdb: TimingTrialsDatabase by inject()
+
+            //@Inject lateinit var ttdb: TimingTrialsDatabase
 
             override fun onOpen(db: SupportSQLiteDatabase) {
                 super.onOpen(db)
                 // If you want to keep the data through app restarts,
                 // comment out the following line.
-                ttdb?.let { database ->
+                INSTANCE?.let { database ->
                     scope.launch(Dispatchers.IO) {
                         populateRiders(database.riderDao())
                         populateCourses(database.courseDao())
+                        populateTt(database.timeTrialDao(), database.riderDao(), database.courseDao())
                     }
                 }
             }
@@ -96,7 +96,10 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             riderDao.insert(Rider("Jon", "Morris", "Chepstow CC", 50))
             riderDao.insert(Rider("Gordon", "Marcus", "Severn RC", 40))
             riderDao.insert(Rider("Joe", "Griffiths", "78 Degrees", 23))
-            riderDao.insert(Rider("Nino", "Schurter", "Scott", 23))
+            riderDao.insert(Rider("Matt", "Fratesi", "TORQ", 20))
+
+
+
         }
 
         fun populateCourses(courseDao: CourseDao){
@@ -107,6 +110,12 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             courseDao.insert(Course("Tomarton", 37014.9, "U601B"))
             courseDao.insert(Course("Tintern 10", 16093.4, "UC620"))
             courseDao.insert(Course("Speech House 10", 16093.4, "UC606"))
+        }
+
+        fun populateTt(timeTrialDao: TimeTrialDao, riderDao: RiderDao, courseDao: CourseDao){
+
+            timeTrialDao.deleteAll()
+            timeTrialDao.insert(TimeTrial.createBlank().apply { ttName = "New TT" })
         }
 
     }

@@ -2,27 +2,32 @@ package com.android.jared.linden.timingtrials.setup
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.android.jared.linden.timingtrials.domain.TimeTrialSetup
+import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.util.ConverterUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 import java.util.*
 
-class SetupConfirmationViewModel(private val timeTrialSetup: TimeTrialSetup) : ViewModel(){
+interface ISetupConformationViewModel{
+    val title: LiveData<String>
+    val lapsCourse: LiveData<String>
+    val ridersInterval: LiveData<String>
+    val startTime: LiveData<String>
+    fun positiveFunction(): Boolean
+    fun negativeFunction(): Boolean
+}
 
-    val title = Transformations.map(timeTrialSetup.timeTrial){tt ->
+class SetupConfirmationViewModel (private val ttSetup: TimeTrialSetupViewModel) : ISetupConformationViewModel{
+
+    val timeTrial = ttSetup.timeTrial
+
+    override val title = Transformations.map(timeTrial){tt ->
         "Starting ${tt.ttName}"
     }
 
-    val lapsCourse = Transformations.map(timeTrialSetup.timeTrial){tt->
+    override val lapsCourse = Transformations.map(timeTrial){tt->
         "${tt.laps} laps of ${tt.course?.courseName}"
     }
 
-    val ridersInterval = Transformations.map(timeTrialSetup.timeTrial){tt->
+   override val ridersInterval = Transformations.map(timeTrial){tt->
         if(tt.interval == 0){
             "${tt.riders.count()} riders starting at 0 second intervals, mass start!"
         }else{
@@ -31,42 +36,71 @@ class SetupConfirmationViewModel(private val timeTrialSetup: TimeTrialSetup) : V
 
     }
 
-    val startTime = Transformations.map(timeTrialSetup.timeTrial){tt->
+   override val startTime = Transformations.map(timeTrial){tt->
         "First rider starting at ${ConverterUtils.dateToTimeDisplayString(tt.startTime)}"
 
     }
 
-    var onStartTT: (Boolean) -> Unit ={}
 
-    fun startTt(){
+    override fun positiveFunction(): Boolean{
 
-        timeTrialSetup.timeTrial.value?.let {
-           if(it.startTime.after(Calendar.getInstance().time)){
+        timeTrial.value?.let {
+            return if(it.startTime.after(Calendar.getInstance().time)){
 
-               it.isSetup = true
-               viewModelScope.launch(Dispatchers.IO) {
-                   timeTrialSetup.insert(it)
-               }
-               onStartTT(true)
-           }else{
-               onStartTT(false)
-           }
+                it.isSetup = true
+                timeTrial.value = it
+                ttSetup.insertTt()
+
+                true
+            }else{
+                false
+            }
+        }
+        return false
+    }
+
+    override fun negativeFunction(): Boolean {
+        return true
+    }
+}
+
+class ResumeOldConfirmationViewModel (private val ttSetup: TimeTrialSetupViewModel) : ISetupConformationViewModel{
 
 
+    val timeTrial = ttSetup.originalTimeTrial
 
+    override val title = Transformations.map(timeTrial){tt ->
+        "Resume setting up previous ${tt.ttName} ?"
+    }
+
+    override val lapsCourse = Transformations.map(timeTrial){tt->
+        "${tt.laps} laps of ${tt.course?.courseName}"
+    }
+
+    override val ridersInterval = Transformations.map(timeTrial){tt->
+        if(tt.interval == 0){
+            "${tt.riders.count()} riders starting at 0 second intervals, mass start!"
+        }else{
+            "${tt.riders.count()} riders starting at ${tt.interval} second intervals"
         }
 
+    }
+
+    override val startTime = Transformations.map(timeTrial){tt->
+        "First rider starting at ${ConverterUtils.dateToTimeDisplayString(tt.startTime)}"
 
     }
 
+    override fun positiveFunction(): Boolean{
 
-    @ExperimentalCoroutinesApi
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.cancel()
+        timeTrial.value?.let { ttSetup.timeTrial.postValue(it) }
+        return true
     }
 
-
+    override fun negativeFunction(): Boolean {
+        ttSetup.timeTrial.value = TimeTrial.createBlank()
+        return true
+    }
 
 
 }

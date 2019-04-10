@@ -16,13 +16,13 @@ import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.adapters.SelectableRiderListAdapter
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.databinding.FragmentSelectriderListBinding
-import com.android.jared.linden.timingtrials.domain.TimeTrialSetup
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.viewdata.ITEM_RIDER
 import com.android.jared.linden.timingtrials.viewdata.ITEM_TYPE_EXTRA
 
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 /**
@@ -33,25 +33,26 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class SelectRidersFragment : Fragment() {
 
-    private val viewModel: SelectRidersViewModel by viewModel()
+    private lateinit var  viewModel: ISelectRidersViewModel
     private lateinit var adapter: SelectableRiderListAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
+        viewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.selectRidersViewModel
 
         viewManager = LinearLayoutManager(context)
         adapter = SelectableRiderListAdapter(requireContext())
-        viewModel.getAllRiders().observe(viewLifecycleOwner, Observer { riders ->
+        viewModel.allSelectableRiders.observe(viewLifecycleOwner, Observer { riders ->
             riders?.let {adapter.setRiders(it)}
         })
 
         adapter.editRider = ::editRider
 
         val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
-            riderHeading.selectableRider =
-                    SelectRidersViewModel.SelectableRiderViewWrapper(Rider("Name", "", "Club", 0))
+            lifecycleOwner = (this@SelectRidersFragment)
+            riderHeading.selectableRider =  SelectableRiderViewWrapper(Rider("Name", "", "Club", 0))
             riderHeading.checkBox.visibility =  View.INVISIBLE
             riderRecyclerView.adapter = adapter
             riderRecyclerView.layoutManager = viewManager

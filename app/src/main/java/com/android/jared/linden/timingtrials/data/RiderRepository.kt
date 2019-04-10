@@ -4,6 +4,8 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.jared.linden.timingtrials.data.source.RiderDao
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
 interface IRiderRepository {
@@ -30,8 +32,8 @@ interface IRiderRepository {
     @WorkerThread
     suspend fun insertOrUpdate(rider: Rider)
 }
-
-class RoomRiderRepository (private  val riderDao: RiderDao) : IRiderRepository {
+@Singleton
+class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : IRiderRepository {
 
     // Room executes all queries on a separate thread.
     // Observed LiveData will notify the observer when the data has changed.

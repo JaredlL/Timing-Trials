@@ -9,7 +9,7 @@ import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemSelectableRiderBinding
-import com.android.jared.linden.timingtrials.setup.SelectRidersViewModel
+import com.android.jared.linden.timingtrials.setup.SelectableRiderViewWrapper
 
 
 /**
@@ -76,7 +76,7 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
 
         var longPress = {(rider):Rider -> Unit}
 
-        fun bind(riderVm: SelectRidersViewModel.SelectableRiderViewWrapper){
+        fun bind(riderVm: SelectableRiderViewWrapper){
 
             binding.apply{
                 selectableRider = riderVm
@@ -89,7 +89,7 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
         }
     }
 
-    var mRiders: List<SelectRidersViewModel.SelectableRiderViewWrapper> = listOf()
+    var mRiders: List<SelectableRiderViewWrapper> = listOf()
     //var mSelected: ArrayList<Long> = arrayListOf()
     val layoutInflater = LayoutInflater.from(context)
 
@@ -112,7 +112,7 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
 
     var editRider = {(SelectableRiderViewWrapper):Rider -> Unit}
 
-    fun setRiders(newRiders: List<SelectRidersViewModel.SelectableRiderViewWrapper>){
+    fun setRiders(newRiders: List<SelectableRiderViewWrapper>){
         mRiders = newRiders
         notifyDataSetChanged()
     }

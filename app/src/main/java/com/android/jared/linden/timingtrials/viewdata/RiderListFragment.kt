@@ -15,7 +15,8 @@ import com.android.jared.linden.timingtrials.adapters.RiderListAdapter
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.databinding.FragmentRiderListBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
 
 const val SELECTABLE = "selectable"
 
@@ -28,7 +29,7 @@ class RiderListFragment : Fragment() {
         }
     }
 
-    private val viewModel: RiderListViewModel by viewModel()
+    private lateinit var viewModel: RiderListViewModel
     private lateinit var adapter: RiderListAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
 
@@ -37,13 +38,18 @@ class RiderListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
+        viewModel = getViewModel { injector.riderListViewModel() }
         viewManager = LinearLayoutManager(context)
         adapter = RiderListAdapter(requireContext()).apply { selectable = false }
-        viewModel.getAllRiders().observe(viewLifecycleOwner, Observer { riders ->
-            riders?.let {adapter.setRiders(it)}
-        })
+
 
         adapter.editRider = ::editRider
+
+        viewModel.mRiderList.observe(viewLifecycleOwner, Observer { riders ->
+            riders.let {
+                adapter.setRiders(it)
+            }
+        })
 
         val binding = DataBindingUtil.inflate<FragmentRiderListBinding>(inflater, R.layout.fragment_rider_list, container, false).apply {
             riderHeading.rider = Rider("First Name", "Surname", "Club", 0)
@@ -53,6 +59,7 @@ class RiderListFragment : Fragment() {
                 editRider(Rider.createBlank())
             }
         }
+
 
 
         return binding.root

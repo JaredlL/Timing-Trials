@@ -5,19 +5,23 @@ import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.IRiderRepository
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 
-class RiderViewModel(private val repository: IRiderRepository, riderId: Long): ViewModel() {
+class RiderViewModel @Inject constructor(private val repository: IRiderRepository): ViewModel() {
 
 
-    val rider: LiveData<Rider> = repository.getRider(riderId)
     val clubs: LiveData<List<String>> = repository.allClubs
     val mutableRider: MediatorLiveData<Rider> = MediatorLiveData()
 
+    fun initialise(riderId: Long){
+        if(mutableRider.value == null){
+            mutableRider.addSource(repository.getRider(riderId)){result: Rider ->
+                result.let { mutableRider.value = result
+                }
+            }
+        }
 
-
-    init{
-        mutableRider.addSource(rider){result: Rider -> result.let { mutableRider.value = result }}
     }
 
     fun addOrUpdate(){

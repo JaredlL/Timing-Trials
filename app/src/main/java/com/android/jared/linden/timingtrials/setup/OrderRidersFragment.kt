@@ -9,29 +9,29 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import android.graphics.drawable.NinePatchDrawable
-import androidx.core.content.ContextCompat
+
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.adapters.OrderableRiderListAdapter
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager
 import kotlinx.android.synthetic.main.fragment_order_riders.*
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class OrderRidersFragment : Fragment() {
 
-    private val viewModel: OrderRidersViewModel by sharedViewModel()
+    private lateinit var viewModel: IOrderRidersViewModel
     private lateinit var mAdapter: OrderableRiderListAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
 
+        viewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.orderRidersViewModel
 
-         mAdapter = OrderableRiderListAdapter(requireContext()).apply { onMove = {x,y -> viewModel.moveItem(x, y)} }
+        mAdapter = OrderableRiderListAdapter(requireContext()).apply { onMove = {x,y -> viewModel.moveItem(x, y)} }
 
         viewModel.getOrderableRiders().observe(viewLifecycleOwner, Observer { riders ->
             riders?.let {mAdapter.setRiders(riders)}

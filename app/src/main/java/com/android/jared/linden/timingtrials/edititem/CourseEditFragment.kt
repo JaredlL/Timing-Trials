@@ -10,8 +10,8 @@ import androidx.databinding.DataBindingUtil
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentCourseBinding
 import com.android.jared.linden.timingtrials.util.argument
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
 
 const val COURSE_ID_EXTRA = "course_id"
 
@@ -25,11 +25,12 @@ class CourseEditFragment : Fragment() {
     }
 
     private val courseId by argument<Long>(COURSE_ID_EXTRA)
-    private val courseViewModel: CourseViewModel by viewModel { parametersOf(courseId) }
+    private lateinit var courseViewModel: CourseViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
+        courseViewModel = getViewModel { injector.courseViewModel() }.apply { initialise(courseId) }
         val binding = DataBindingUtil.inflate<FragmentCourseBinding>(inflater, R.layout.fragment_course, container, false).apply {
             viewModel = courseViewModel
             lifecycleOwner = (this@CourseEditFragment)
@@ -37,6 +38,7 @@ class CourseEditFragment : Fragment() {
                 courseViewModel.addOrUpdate()
                 activity?.finish()
             }
+
         }
 
         return binding.root

@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.android.jared.linden.timingtrials.setup.SetupTimeTrialViewModel"/>
+            type="com.android.jared.linden.timingtrials.setup.ITimeTrialPropertiesViewModel"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -118,7 +118,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="32dp"
             android:inputType="number"
-            android:text="@{viewModel.interval}"
+            android:text="@={viewModel.interval}"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -172,7 +172,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="20dp"
-            android:entries="@{viewModel.availibleLaps}"
+            android:entries="@{viewModel.availableLaps}"
             android:selectedItemPosition="@={viewModel.selectedLapsPosition}"
             app:layout_constraintBottom_toTopOf="@+id/divider3"
             app:layout_constraintEnd_toEndOf="parent"

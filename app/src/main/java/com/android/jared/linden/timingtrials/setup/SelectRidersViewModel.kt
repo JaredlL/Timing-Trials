@@ -6,64 +6,76 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.BR
 import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.domain.TimeTrialSetup
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-
-class SelectRidersViewModel(private val timeTrialSetup: TimeTrialSetup) : ViewModel(){
-
-    private var parentJob = Job()
+import java.util.ArrayList
 
 
-    private val mRiderViewWrapperList: MediatorLiveData<List<SelectableRiderViewWrapper>> = MediatorLiveData()
+interface ISelectRidersViewModel{
+    var allSelectableRiders: LiveData<List<SelectableRiderViewWrapper>>
+}
+
+class SelectRidersViewModelImpl(private val ttSetup: TimeTrialSetupViewModel):ISelectRidersViewModel {
+
+
+    var mRiderViewWrapperList: MediatorLiveData<List<SelectableRiderViewWrapper>> = MediatorLiveData()
+    private fun selectedRiders() = ttSetup.timeTrial.value?.riders
+
+    override var allSelectableRiders: LiveData<List<SelectableRiderViewWrapper>> = mRiderViewWrapperList
 
     init {
-        mRiderViewWrapperList.addSource(timeTrialSetup.allRiders){ result: List<Rider>? ->
-          result?.let{ mRiderViewWrapperList.postValue( result.map {r ->
-              SelectableRiderViewWrapper(r).apply {
-                  onSelectionChanged = {r,s -> timeTrialSetup.riderSelectionChangeHandler(r,s)}
-                  getSelected = {r -> timeTrialSetup.riderIsSelected(r)}
-              }})
-          }
+        mRiderViewWrapperList.addSource(ttSetup.riderRepository.allRiders){ result: List<Rider>? ->
+            result?.let{ mRiderViewWrapperList.value = ( result.map {r ->
+                SelectableRiderViewWrapper(r).apply {
+                    onSelectionChanged = {r,s -> riderSelectionChangeHandler(r,s)}
+                    getSelected = {r -> riderIsSelected(r)}
+                }})
+            }
         }
-        mRiderViewWrapperList.addSource(timeTrialSetup.selectedOrderedRiders){
+        mRiderViewWrapperList.addSource(ttSetup.timeTrial){
             mRiderViewWrapperList.value?.forEach {
                 it.notifyCheckChanged()
             }
         }
     }
 
+    /**
+     * Need to remember order of ids were selected when a selection is changed
+     *
+     */
+    private fun riderSelectionChangeHandler(rider: Rider, sel:Boolean){
+        val oldList = selectedRiders()?.toMutableList()?: ArrayList()
+        val newList = ArrayList<Rider>()
+        oldList.forEach { r -> if(r.id != rider.id){newList.add(r)}}
 
-    fun getAllRiders(): LiveData<List<SelectableRiderViewWrapper>> {
-        return mRiderViewWrapperList
-    }
+        if(sel){newList.add(rider)}
 
-
-    override fun onCleared() {
-        super.onCleared()
-        parentJob.cancel()
-    }
-
-    class SelectableRiderViewWrapper(val rider: Rider): BaseObservable(){
-
-        var getSelected: (Rider) -> Boolean = { _ -> false}
-        var onSelectionChanged = { _: Rider, _:Boolean -> Unit}
-
-        fun notifyCheckChanged(){
-            notifyPropertyChanged(BR.riderIsSelected)
-        }
-
-        @Bindable
-        fun getRiderIsSelected():Boolean {
-            return getSelected(rider)
-        }
-        fun setRiderIsSelected(value:Boolean) {
-            onSelectionChanged(rider, value)
-            //notifyPropertyChanged(BR.riderIsSelected)
+        ttSetup.timeTrial.value = ttSetup.timeTrial.value?.apply {
+            riders = newList
         }
     }
 
+    private fun riderIsSelected(rider: Rider): Boolean{
+        return selectedRiders()?.map { r -> r.id }?.contains(rider.id) ?: false
+    }
+}
+
+
+class SelectableRiderViewWrapper(val rider: Rider): BaseObservable(){
+
+    var getSelected: (Rider) -> Boolean = { _ -> false}
+    var onSelectionChanged = { _: Rider, _:Boolean -> Unit}
+
+    fun notifyCheckChanged(){
+        notifyPropertyChanged(BR.riderIsSelected)
+    }
+
+    @Bindable
+    fun getRiderIsSelected():Boolean {
+        return getSelected(rider)
+    }
+    fun setRiderIsSelected(value:Boolean) {
+        onSelectionChanged(rider, value)
+        //notifyPropertyChanged(BR.riderIsSelected)
+    }
 }
 
 
