@@ -22,7 +22,7 @@ interface ITimeTrialPropertiesViewModel{
 
 }
 
-class TimeTrialPropertiesViewModelImpl(private val ttSetup: TimeTrialSetupViewModel): ITimeTrialPropertiesViewModel{
+class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITimeTrialPropertiesViewModel{
 
    override val timeTrial = ttSetup.timeTrial
     private fun timeTrialValue() = timeTrial.value

@@ -17,7 +17,7 @@ interface ISetupConformationViewModel{
     fun negativeFunction(): Boolean
 }
 
-class SetupConfirmationViewModel (private val ttSetup: TimeTrialSetupViewModel) : ISetupConformationViewModel{
+class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupConformationViewModel{
 
    override val timeTrial = ttSetup.timeTrial
 

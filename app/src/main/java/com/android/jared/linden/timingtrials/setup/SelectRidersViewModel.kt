@@ -13,7 +13,7 @@ interface ISelectRidersViewModel{
     var allSelectableRiders: LiveData<List<SelectableRiderViewWrapper>>
 }
 
-class SelectRidersViewModelImpl(private val ttSetup: TimeTrialSetupViewModel):ISelectRidersViewModel {
+class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRidersViewModel {
 
 
     var mRiderViewWrapperList: MediatorLiveData<List<SelectableRiderViewWrapper>> = MediatorLiveData()

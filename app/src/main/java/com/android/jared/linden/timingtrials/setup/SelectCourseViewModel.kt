@@ -13,7 +13,7 @@ interface ISelectCourseViewModel{
     var courseSelected: () -> Unit
 }
 
-class SelectCourseViewModelImpl(private val ttSetup: TimeTrialSetupViewModel): ISelectCourseViewModel{
+class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCourseViewModel{
 
 
     private fun selectedCourse() = ttSetup.timeTrial.value?.course

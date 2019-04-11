@@ -25,7 +25,7 @@ import com.android.jared.linden.timingtrials.util.injector
  * A fragment representing a list of Courses.
  * Activities containing this fragment MUST implement the
  */
-class CourseListFragment : Fragment() {
+class GenericListFragment : Fragment() {
 
 
     private lateinit var courseViewModel: CourseListViewModel
@@ -51,7 +51,7 @@ class CourseListFragment : Fragment() {
         }
 
         val binding = DataBindingUtil.inflate<FragmentCourseListBinding>(inflater, R.layout.fragment_course_list, container, false).apply{
-            lifecycleOwner = (this@CourseListFragment)
+            lifecycleOwner = (this@GenericListFragment)
             courseHeading.courseVm = heading
             courseHeading.checkBox.visibility = View.INVISIBLE
             courseRecyclerView.adapter = adapter
@@ -75,8 +75,8 @@ class CourseListFragment : Fragment() {
 
 
     companion object {
-        fun newInstance(): CourseListFragment {
-            return CourseListFragment()
+        fun newInstance(): GenericListFragment {
+            return GenericListFragment()
         }
     }
 }

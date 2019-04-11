@@ -17,7 +17,7 @@ interface ITimeTrialSetupViewModel{
     val setupConformationViewModel: ISetupConformationViewModel
 }
 
-class TimeTrialSetupViewModel @Inject constructor(
+class SetupViewModel @Inject constructor(
          val timeTrialRepository: ITimeTrialRepository,
          val riderRepository: IRiderRepository,
          val courseRepository: ICourseRepository

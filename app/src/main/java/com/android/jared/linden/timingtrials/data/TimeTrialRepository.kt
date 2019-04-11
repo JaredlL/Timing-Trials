@@ -18,6 +18,7 @@ interface ITimeTrialRepository{
     suspend fun delete(timeTrial: TimeTrial)
     fun getSetupTimeTrial(): LiveData<TimeTrial>
     fun getTimeTrialById(id: Long): LiveData<TimeTrial>
+    val allTimeTrials: LiveData<List<TimeTrial>>
 
 
 }
@@ -32,7 +33,7 @@ class RoomTimeTrialRepository @Inject constructor(private  val timeTrialDao: Tim
     }
 
 
-    val allTimeTrials: LiveData<List<TimeTrial>> = timeTrialDao.getAllTimeTrials()
+    override val allTimeTrials: LiveData<List<TimeTrial>> = timeTrialDao.getAllTimeTrials()
 
     // You must call this on a non-UI thread or your app will crash. So we're making this a
     // suspend function so the caller methods know this.

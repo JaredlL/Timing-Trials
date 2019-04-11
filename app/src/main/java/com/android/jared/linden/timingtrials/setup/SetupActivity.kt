@@ -10,10 +10,8 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import com.android.jared.linden.timingtrials.viewdata.ITEM_TYPE_EXTRA
 
 import kotlinx.android.synthetic.main.activity_setup.*
 import java.util.*
@@ -34,24 +32,24 @@ class SetupActivity : AppCompatActivity() {
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
     //private lateinit var riderListViewModel: RiderListViewModel
-    private lateinit var timeTrialViewModel: TimeTrialSetupViewModel
+    private lateinit var setupViewModel: SetupViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setup)
 
-        timeTrialViewModel = getViewModel { injector.timeTrialSetupViewModel() }
+        setupViewModel = getViewModel { injector.timeTrialSetupViewModel() }
 
 
         intent.getLongExtra(TIMETRIAL_ID_EXTRA, 0L).let {
-            timeTrialViewModel.initialise(it)
+            setupViewModel.initialise(it)
         }
 
 
 
-        timeTrialViewModel.timeTrialPropertiesViewModel.onBeginTt = {
+        setupViewModel.timeTrialPropertiesViewModel.onBeginTt = {
 
-            timeTrialViewModel.timeTrial.value?.let {
+            setupViewModel.timeTrial.value?.let {
                 if(it.riders.count() == 0){
                     Toast.makeText(this, "TT Needs at least 1 rider", Toast.LENGTH_LONG).show()
                     container.currentItem = 1
