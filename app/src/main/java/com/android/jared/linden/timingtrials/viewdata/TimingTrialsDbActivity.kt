@@ -15,6 +15,7 @@ const val ITEM_TYPE_EXTRA = "item_type"
 const val ITEM_ID_EXTRA = "item_id"
 const val ITEM_RIDER = "item_rider"
 const val ITEM_COURSE = "item_course"
+const val ITEM_TIMETRIAL = "item_timetrial"
 
 class TimingTrialsDbActivity : AppCompatActivity()  {
 
@@ -35,7 +36,7 @@ class TimingTrialsDbActivity : AppCompatActivity()  {
         dbcontainer.offscreenPageLimit = 2
 
         dbcontainer.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(dbtabs))
-        dbtabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(container))
+        dbtabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(dbcontainer))
 
     }
 
@@ -51,10 +52,10 @@ class TimingTrialsDbActivity : AppCompatActivity()  {
 
 
             when (position){
-                0 -> return RiderListFragment.newInstance()
-                1 -> return GenericListFragment.newInstance()
-                2 -> return RiderListFragment.newInstance()
-                else -> return RiderListFragment.newInstance()
+                0 -> return GenericListFragment.newInstance(ITEM_RIDER)
+                1 -> return GenericListFragment.newInstance(ITEM_COURSE)
+                2 -> return GenericListFragment.newInstance(ITEM_TIMETRIAL)
+                else -> return GenericListFragment.newInstance(ITEM_RIDER)
 
             }
         }

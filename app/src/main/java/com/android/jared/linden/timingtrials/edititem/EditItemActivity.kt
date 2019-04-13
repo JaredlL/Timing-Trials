@@ -25,7 +25,7 @@ class EditItemActivity : AppCompatActivity() {
         val frag: Fragment = when(dataType){
            ITEM_RIDER -> RiderEditFragment.newInstance(itemId)
            ITEM_COURSE -> CourseEditFragment.newInstance(itemId)
-           else -> RiderListFragment.newInstance()
+           else -> RiderEditFragment.newInstance(itemId)
         }
 
         val fragmentTransaction = supportFragmentManager.beginTransaction()

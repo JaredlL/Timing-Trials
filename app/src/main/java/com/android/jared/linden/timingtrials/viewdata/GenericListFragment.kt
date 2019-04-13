@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.startActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,11 +15,18 @@ import com.android.jared.linden.timingtrials.adapters.CourseListAdapter
 import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.*
 import com.android.jared.linden.timingtrials.data.Course
+import com.android.jared.linden.timingtrials.data.Rider
+import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.databinding.FragmentCourseListBinding
+import com.android.jared.linden.timingtrials.databinding.FragmentListGenericBinding
+import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
+import com.android.jared.linden.timingtrials.edititem.COURSE_ID_EXTRA
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
+import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import kotlinx.android.synthetic.main.fragment_course_list.*
 
 
 /**
@@ -28,44 +36,59 @@ import com.android.jared.linden.timingtrials.util.injector
 class GenericListFragment : Fragment() {
 
 
-    private lateinit var courseViewModel: CourseListViewModel
-    private lateinit var adapter: CourseListAdapter
+    private lateinit var listViewModel: ListViewModel
     private lateinit var viewManager: RecyclerView.LayoutManager
+    private lateinit var adapter: GenericListAdapter<out Any>
+    private lateinit var viewFactory: GenericViewHolderFactory<out Any>
+    private lateinit var title: View
+
+    private val itemType by argument<String>(ITEM_TYPE_EXTRA)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
 
-        courseViewModel = getViewModel { injector.courseListViewModel() }
+        listViewModel = getViewModel { injector.listViewModel() }
 
-        viewManager = LinearLayoutManager(context)
-        adapter = CourseListAdapter(requireContext())
-        adapter.editCourse = ::editCourse
-        courseViewModel.getAllCourses().observe(viewLifecycleOwner, Observer { courses ->
-            courses?.let {adapter.setCourses(it)}
-        })
-
-        val heading: CourseListViewWrapper = object: CourseListViewWrapper(Course("Course Name", 0.0, "CTT Name")){
-
-            override var convertedLengthString = "Distance"
+        when(itemType){
+            ITEM_RIDER -> {
+                viewFactory = RiderViewHolderFactory()
+                adapter = GenericListAdapter(requireContext(), viewFactory)
+                listViewModel.allRiders.observe(viewLifecycleOwner, Observer{res->
+                    res?.let {(adapter as? GenericListAdapter<Rider>)?.setItems(it)}
+                })
+            }
+            ITEM_COURSE -> {
+                viewFactory = CourseViewHolderFactory()
+                adapter = GenericListAdapter(requireContext(), viewFactory)
+                listViewModel.allCourses.observe(viewLifecycleOwner, Observer{res->
+                    res?.let {(adapter as? GenericListAdapter<CourseListViewWrapper>)?.setItems(it)}
+                })
+            }
+            ITEM_TIMETRIAL ->{
+                viewFactory = TimeTrialViewHolderFactory()
+                adapter = GenericListAdapter(requireContext(), viewFactory)
+                listViewModel.allTimeTrials.observe(viewLifecycleOwner, Observer{res->
+                    res?.let {(adapter as? GenericListAdapter<TimeTrial>)?.setItems(it)}
+                })
+            }
         }
 
-        val binding = DataBindingUtil.inflate<FragmentCourseListBinding>(inflater, R.layout.fragment_course_list, container, false).apply{
+
+        viewManager = LinearLayoutManager(context)
+
+        val binding = DataBindingUtil.inflate<FragmentListGenericBinding>(inflater, R.layout.fragment_list_generic, container, false).apply{
             lifecycleOwner = (this@GenericListFragment)
-            courseHeading.courseVm = heading
-            courseHeading.checkBox.visibility = View.INVISIBLE
-            courseRecyclerView.adapter = adapter
-            courseRecyclerView.layoutManager = viewManager
-            courseListFab.setOnClickListener {
-                editCourse(Course.createBlank())
-            }
+            listHeading.addView(viewFactory.createTitle(inflater, container))
+            genericRecyclerView.adapter = adapter
+            genericRecyclerView.layoutManager = viewManager
         }
 
         return binding.root
     }
 
 
-    private fun editCourse(course: Course){
+    private fun editItem(course: Course){
         val intent = Intent(context, EditItemActivity::class.java).apply {
             putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
             putExtra(ITEM_ID_EXTRA, course.id)
@@ -75,8 +98,9 @@ class GenericListFragment : Fragment() {
 
 
     companion object {
-        fun newInstance(): GenericListFragment {
-            return GenericListFragment()
+        fun newInstance(itemType: String): GenericListFragment {
+            val args = Bundle().apply { putString(ITEM_TYPE_EXTRA, itemType) }
+            return GenericListFragment().apply { arguments = args }
         }
     }
 }

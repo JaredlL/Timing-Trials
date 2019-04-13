@@ -6,8 +6,7 @@ import com.android.jared.linden.timingtrials.TestViewModel
 import com.android.jared.linden.timingtrials.edititem.CourseViewModel
 import com.android.jared.linden.timingtrials.edititem.RiderViewModel
 import com.android.jared.linden.timingtrials.setup.SetupViewModel
-import com.android.jared.linden.timingtrials.viewdata.CourseListViewModel
-import com.android.jared.linden.timingtrials.viewdata.RiderListViewModel
+import com.android.jared.linden.timingtrials.viewdata.ListViewModel
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -25,9 +24,7 @@ interface AppComponent{
         fun build(): AppComponent
     }
 
-    fun courseListViewModel(): CourseListViewModel
-
-    fun riderListViewModel(): RiderListViewModel
+    fun listViewModel(): ListViewModel
 
     fun riderViewModel(): RiderViewModel
 

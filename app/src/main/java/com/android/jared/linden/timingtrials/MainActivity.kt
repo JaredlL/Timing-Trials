@@ -8,7 +8,6 @@ import com.android.jared.linden.timingtrials.setup.*
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import com.android.jared.linden.timingtrials.viewdata.CourseListViewModel
 import com.android.jared.linden.timingtrials.viewdata.TimingTrialsDbActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
