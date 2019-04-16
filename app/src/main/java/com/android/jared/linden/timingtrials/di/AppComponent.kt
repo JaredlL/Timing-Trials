@@ -6,6 +6,7 @@ import com.android.jared.linden.timingtrials.TestViewModel
 import com.android.jared.linden.timingtrials.edititem.CourseViewModel
 import com.android.jared.linden.timingtrials.edititem.RiderViewModel
 import com.android.jared.linden.timingtrials.setup.SetupViewModel
+import com.android.jared.linden.timingtrials.timing.TimingViewModel
 import com.android.jared.linden.timingtrials.viewdata.ListViewModel
 import dagger.BindsInstance
 import dagger.Component
@@ -31,6 +32,8 @@ interface AppComponent{
     fun courseViewModel(): CourseViewModel
 
     fun timeTrialSetupViewModel(): SetupViewModel
+
+    fun timingViewModel(): TimingViewModel
 
     fun mainViewModel(): MainViewModel
 
