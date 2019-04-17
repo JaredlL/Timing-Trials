@@ -33,7 +33,7 @@ data class TimeTrial(var ttName: String,
 
 }
 
-//Todo: Use proper relational mapping, for now we siply store as JSON
+//Todo: Use proper relational mapping, for now we simply store as JSON
 
 @Entity(tableName = "timetrial_rider_table")
 data class TimeTrialRider(@PrimaryKey(autoGenerate = true)val id: Long,

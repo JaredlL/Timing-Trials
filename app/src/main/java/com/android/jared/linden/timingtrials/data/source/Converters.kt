@@ -2,6 +2,7 @@ package com.android.jared.linden.timingtrials.data.source
 
 import androidx.room.TypeConverter
 import com.android.jared.linden.timingtrials.data.Course
+import com.android.jared.linden.timingtrials.data.EventType
 import com.android.jared.linden.timingtrials.data.Rider
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -47,5 +48,13 @@ class Converters {
     @TypeConverter
     fun courseToString(course: Course?): String?{
         return course?.let { Gson().toJson(course)}
+    }
+
+    @TypeConverter fun intToEventType(eventId: Int): EventType?{
+        return EventType.fromInt(eventId)
+    }
+
+    @TypeConverter fun eventTypeToInt(eventType: EventType): Int{
+        return eventType.type
     }
 }
