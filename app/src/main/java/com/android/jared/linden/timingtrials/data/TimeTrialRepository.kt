@@ -19,8 +19,6 @@ interface ITimeTrialRepository{
     fun getSetupTimeTrial(): LiveData<TimeTrial>
     fun getTimeTrialById(id: Long): LiveData<TimeTrial>
     val allTimeTrials: LiveData<List<TimeTrial>>
-
-
 }
 
 @Singleton

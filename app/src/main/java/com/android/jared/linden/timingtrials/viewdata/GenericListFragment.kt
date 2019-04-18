@@ -30,7 +30,7 @@ import kotlinx.android.synthetic.main.fragment_course_list.*
 
 
 /**
- * A fragment representing a list of Courses.
+ * A fragment representing a eventList of Courses.
  * Activities containing this fragment MUST implement the
  */
 class GenericListFragment : Fragment() {

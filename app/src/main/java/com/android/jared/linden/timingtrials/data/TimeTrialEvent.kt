@@ -1,19 +1,22 @@
 package com.android.jared.linden.timingtrials.data
 
 import androidx.room.*
+import androidx.room.ForeignKey.CASCADE
 import com.android.jared.linden.timingtrials.data.source.Converters
 
-@Entity(tableName = "timetrialevent_table")
+@Entity(tableName = "timetrialevent_table",
+        foreignKeys = arrayOf(ForeignKey(entity =TimeTrial::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = CASCADE)))
 data class TimeTrialEvent(var timeTrialId: Long,
-                          var rider: Rider?,
+                          var riderId: Long?,
                           var timeStamp: Long,
                           @TypeConverters(Converters::class) var eventType: EventType,
                           @PrimaryKey(autoGenerate = true) var id: Long? = null)
 
-data class TimeTrialWithEvents(@Embedded var
-                               timeTrial: TimeTrial,
+
+data class TimeTrialWithEvents(@Embedded var timeTrial: TimeTrial,
                                @Relation(parentColumn = "id", entityColumn = "timeTrialId", entity = TimeTrialEvent::class)
-                               var list: List<TimeTrialEvent> = listOf())
+                               var eventList: List<TimeTrialEvent> = listOf())
+
 
 enum class EventType(val type: Int){
     EMPTY(0),
