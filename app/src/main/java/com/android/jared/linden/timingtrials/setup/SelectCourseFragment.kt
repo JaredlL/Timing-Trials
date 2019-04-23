@@ -2,17 +2,11 @@ package com.android.jared.linden.timingtrials.setup
 
 import android.app.Dialog
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import android.widget.RelativeLayout
-import android.widget.Toast
-import androidx.core.content.ContextCompat.startActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
@@ -37,7 +31,6 @@ class SelectCourseFragment : DialogFragment() {
                               savedInstanceState: Bundle?): View? {
 
         viewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.selectCourseViewModel
-
         viewManager = LinearLayoutManager(context)
         adapter = CourseListAdapter(requireContext())
         adapter.editCourse = ::editCourse

@@ -14,6 +14,7 @@ import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 
 import kotlinx.android.synthetic.main.activity_setup.*
+import org.threeten.bp.Instant
 import java.util.*
 
 const val TIMETRIAL_ID_EXTRA = "timetrial_id"
@@ -55,7 +56,7 @@ class SetupActivity : AppCompatActivity() {
                     container.currentItem = 1
                     return@let
                 }
-                if(it.startTime.before(Calendar.getInstance().time)){
+                if(it.startTime.isBefore(Instant.now())){
                     Toast.makeText(this, "TT must start in the future, select start time", Toast.LENGTH_LONG).show()
                     TimePickerFragment().show(supportFragmentManager, "timePicker")
                     return@let

@@ -1,5 +1,5 @@
 package com.android.jared.linden.timingtrials.data
 
-import java.util.*
+import org.threeten.bp.Instant
 
-class TimingEvent(val timeStamp: Date)
+class TimingEvent(val timeStamp: Instant)

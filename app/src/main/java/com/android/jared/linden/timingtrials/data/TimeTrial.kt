@@ -4,6 +4,9 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
+import java.time.temporal.TemporalAmount
 import java.util.*
 
 @Entity(tableName = "timetrial_table")
@@ -11,8 +14,8 @@ data class TimeTrial(var ttName: String,
                      var course: Course? = null,
                      var riders:List<Rider> = listOf(),
                      var laps: Int = 1,
-                     var interval:Int = 60,
-                     var startTime: Date,
+                     var interval:Duration = Duration.ofSeconds(60L),
+                     var startTime: Instant,
                      var isSetup: Boolean = false,
                      var isFinished: Boolean = false,
                      @PrimaryKey(autoGenerate = true) var id: Long? = null) {
@@ -20,12 +23,10 @@ data class TimeTrial(var ttName: String,
     companion object {
 
         fun createBlank(): TimeTrial {
-            val c = Calendar.getInstance()
-            c.add(Calendar.MINUTE, 10)
-            c.set(Calendar.SECOND, 0)
-            c.set(Calendar.MILLISECOND, 0)
+            val i = Instant.now()
+            i.plusSeconds(15*60)
 
-            return TimeTrial(ttName = "", course = null, riders = listOf(), laps = 1, interval = 60, startTime = c.time, isSetup = false, isFinished = false)
+            return TimeTrial(ttName = "", course = null, riders = listOf(), laps = 1, startTime = i, isSetup = false, isFinished = false)
         }
 
 

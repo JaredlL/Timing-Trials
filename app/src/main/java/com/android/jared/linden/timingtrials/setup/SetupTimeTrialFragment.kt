@@ -17,8 +17,12 @@ import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentSetupTimeTrialBinding
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import org.threeten.bp.*
+import org.threeten.bp.temporal.Temporal
+import org.threeten.bp.temporal.TemporalField
 
 import java.util.*
+import kotlin.math.min
 
 
 class SetupTimeTrialFragment : Fragment() {
@@ -89,17 +93,16 @@ class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener 
 
         timeTrialViewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.timeTrialPropertiesViewModel
 
-        val c = Calendar.getInstance()
+        var now = Instant.now()
         if(timeTrialViewModel.startTime.value != null){
-            c.time = timeTrialViewModel.startTime.value
+            now = timeTrialViewModel.startTime.value
         }
         else{
-            c.add(Calendar.MINUTE, 15)
-            c.set(Calendar.SECOND, 0)
-            c.set(Calendar.MILLISECOND, 0)
+            now.plusSeconds(15*60)
         }
-        val hour = c.get(Calendar.HOUR_OF_DAY)
-        val minute = c.get(Calendar.MINUTE)
+        val ldt = LocalDateTime.ofInstant(now, ZoneId.systemDefault())
+        val hour = ldt.hour
+        val minute = ldt.minute
 
         // Create a new instance of TimePickerDialog and return it
         return TimePickerDialog(activity, this, hour, minute, true)
@@ -107,11 +110,9 @@ class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener 
 
     override fun onTimeSet(view: TimePicker, hourOfDay: Int, minute: Int) {
         // Do something with the time chosen by the user
-        val c = Calendar.getInstance()
-        c.set(Calendar.HOUR_OF_DAY, hourOfDay)
-        c.set(Calendar.MINUTE, minute)
-        c.set(Calendar.SECOND, 0)
-        c.set(Calendar.MILLISECOND, 0)
-        timeTrialViewModel.startTime.value = c.time
+
+        val ldt = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault())
+        val ldt2 = LocalDateTime.of(ldt.year, ldt.month, ldt.dayOfMonth, hourOfDay, minute)
+        timeTrialViewModel.startTime.value = ldt2.atZone(ZoneId.systemDefault()).toInstant()
     }
 }

@@ -30,4 +30,5 @@
     <string name="courses">Courses</string>
     <string name="time_trials">TimeTrials</string>
     <string name="manage_riders">Manage Riders</string>
+    <string name="rider_passed">Rider Passed!</string>
 </resources>

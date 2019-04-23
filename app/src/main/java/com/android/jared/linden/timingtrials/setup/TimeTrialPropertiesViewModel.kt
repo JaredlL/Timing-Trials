@@ -3,7 +3,8 @@ package com.android.jared.linden.timingtrials.setup
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.util.ConverterUtils
-import java.util.*
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 
 
 interface ITimeTrialPropertiesViewModel{
@@ -12,7 +13,7 @@ interface ITimeTrialPropertiesViewModel{
     val timeTrialName: MutableLiveData<String>
     val startTimeString: LiveData<String>
     val courseName: LiveData<String>
-    val startTime: MutableLiveData<Date>
+    val startTime: MutableLiveData<Instant>
     val laps: MutableLiveData<String>
     val interval: MutableLiveData<String>
     val availableLaps: List<String>
@@ -77,9 +78,9 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
     private val intervalMediator = MediatorLiveData<String>().apply {
         addSource(interval) {interval->
             timeTrialValue()?.let { tt ->
-                interval.toIntOrNull()?.let{
-                    if(tt.interval != it){
-                        tt.interval = it
+                interval.toLongOrNull()?.let{
+                    if(tt.interval.seconds != it){
+                        tt.interval = Duration.ofSeconds(it)
                         ttSetup.timeTrial.value = tt
                     }
                 }
@@ -95,8 +96,8 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
         }
     }.also { it.observeForever {  } }
 
-    override val startTime = MutableLiveData<Date>()
-    private val startTimeMediator = MediatorLiveData<Date>().apply {
+    override val startTime = MutableLiveData<Instant>()
+    private val startTimeMediator = MediatorLiveData<Instant>().apply {
         addSource(ttSetup.timeTrial) {tt->
             tt?.let {
                 if (startTime.value != it.startTime) {
@@ -116,7 +117,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
     }.also { it.observeForever {  } }
 
     override val startTimeString: LiveData<String>  = Transformations.map(ttSetup.timeTrial){tt->
-        tt?.let { ConverterUtils.dateToTimeDisplayString(it.startTime)}
+        tt?.let { ConverterUtils.instantToSecondsDisplayString(it.startTime)}
     }
 
     override val availableLaps = 1.rangeTo(99).map { i -> i.toString() }

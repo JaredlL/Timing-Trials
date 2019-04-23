@@ -6,20 +6,30 @@ import com.android.jared.linden.timingtrials.data.EventType
 import com.android.jared.linden.timingtrials.data.Rider
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import java.util.*
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 
 class Converters {
 
-    //inline fun <reified T> Gson.fromJson(json: String) = this.fromJson<T>(json, object: TypeToken<T>() {}.type)
 
     @TypeConverter
-    fun fromTimestamp(value: Long?): Date? {
-        return value?.let { Date(it) }
+    fun instantFromTimestamp(value: Long?): Instant? {
+        return value?.let { Instant.ofEpochMilli(value) }
     }
 
     @TypeConverter
-    fun dateToTimestamp(date: Date?): Long? {
-        return date?.time
+    fun instantToTimestamp(instant: Instant?): Long? {
+        return instant?.toEpochMilli()
+    }
+
+    @TypeConverter
+    fun durationFromSeconds(value: Long?): Duration? {
+        return value?.let { Duration.ofSeconds(value) }
+    }
+
+    @TypeConverter
+    fun durationToLongSeconds(duration: Duration?): Long? {
+        return duration?.seconds
     }
 
 
