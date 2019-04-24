@@ -1,6 +1,8 @@
 package com.android.jared.linden.timingtrials.util
 
 import org.threeten.bp.Instant
+import org.threeten.bp.ZoneId
+import org.threeten.bp.format.DateTimeFormatter
 import java.text.Format
 import java.text.SimpleDateFormat
 import java.util.*
@@ -13,14 +15,14 @@ object ConverterUtils{
         return length * lengthDisplayUnitConversion
     }
 
-    fun instantToSecondsDisplayString(date: Instant): String{
-        val  f:Format = SimpleDateFormat("HH:mm:ss")
-        return (f.format(date))
+    fun instantToSecondsDisplayString(instant: Instant): String{
+        val  f:DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault())
+        return (f.format(instant))
     }
 
-    fun instantTenthsDisplayString(date: Instant): String{
-        val  f:Format = SimpleDateFormat("HH:mm:ss:S")
-        return (f.format(date))
+    fun instantTenthsDisplayString(instant: Instant): String{
+        val  f:DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss:S").withZone(ZoneId.systemDefault())
+        return (f.format(instant))
     }
 
 

@@ -12,12 +12,11 @@ import android.widget.Toast
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 
 import kotlinx.android.synthetic.main.activity_setup.*
 import org.threeten.bp.Instant
 import java.util.*
-
-const val TIMETRIAL_ID_EXTRA = "timetrial_id"
 
 class SetupActivity : AppCompatActivity() {
 
@@ -42,7 +41,7 @@ class SetupActivity : AppCompatActivity() {
         setupViewModel = getViewModel { injector.timeTrialSetupViewModel() }
 
 
-        intent.getLongExtra(TIMETRIAL_ID_EXTRA, 0L).let {
+        intent.getLongExtra(ITEM_ID_EXTRA, 0L).let {
             setupViewModel.initialise(it)
         }
 

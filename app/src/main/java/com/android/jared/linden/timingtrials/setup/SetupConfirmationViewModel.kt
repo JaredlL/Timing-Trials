@@ -33,7 +33,7 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
         if(tt.interval.isZero){
             "${tt?.riders?.count()} riders starting at 0 second intervals, mass start!"
         }else{
-            "${tt?.riders?.count()} riders starting at ${tt?.interval} second intervals"
+            "${tt?.riders?.count()} riders starting at ${tt?.interval?.seconds} second intervals"
         }
 
     }
@@ -84,7 +84,7 @@ class ResumeOldConfirmationViewModel (private val mainViewModel: MainViewModel) 
             if(tt.interval.isZero){
                 "${tt.riders.count()} riders starting at 0 second intervals, mass start!"
             }else{
-                "${tt.riders.count()} riders starting at ${tt.interval} second intervals"
+                "${tt.riders.count()} riders starting at ${tt.interval.seconds} second intervals"
             }
         }else{
             "null"
@@ -94,7 +94,7 @@ class ResumeOldConfirmationViewModel (private val mainViewModel: MainViewModel) 
     }
 
     override val startTime = Transformations.map(timeTrial){tt->
-        "First rider starting at ${tt?.let{ConverterUtils.instantToSecondsDisplayString(tt?.startTime)}}"
+        "First rider starting at ${tt?.let{ConverterUtils.instantToSecondsDisplayString(tt.startTime)}}"
 
     }
 

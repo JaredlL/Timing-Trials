@@ -13,7 +13,7 @@ import java.math.RoundingMode
 import javax.inject.Inject
 
 
-class CourseViewModel @Inject constructor(private val repository: ICourseRepository) : ObservableViewModel() {
+class CourseViewModel @Inject constructor(private val repository: ICourseRepository) :ViewModel() {
 
     val mutableCourse: MediatorLiveData<Course> = MediatorLiveData()
     val mutableLengthString: MutableLiveData<String> = MutableLiveData()

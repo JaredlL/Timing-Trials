@@ -17,6 +17,7 @@ interface TimeTrialEventDao {
 
     }
 
+    @Query("SELECT * from timetrial_table") fun getAllTimeTrialsEvents(): LiveData<List<TimeTrialWithEvents>>
 
     @Query("SELECT * FROM timetrial_table WHERE Id = :timeTrialId LIMIT 1") fun getTimeTrialEvents(timeTrialId: Long): LiveData<TimeTrialWithEvents>
 

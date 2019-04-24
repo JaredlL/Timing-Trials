@@ -16,6 +16,7 @@ import com.android.jared.linden.timingtrials.databinding.FragmentSetupConfirmati
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 
 
 class SetupConfirmationFragment : DialogFragment() {
@@ -46,7 +47,7 @@ class SetupConfirmationFragment : DialogFragment() {
             okButton.setOnClickListener {
                 if(confirmationViewModel.positiveFunction()){
                     val intent = Intent(requireActivity(), TimingActivity::class.java)
-                    intent.putExtra(TIMETRIAL_ID_EXTRA, confirmationViewModel.timeTrial.value?.id)
+                    intent.putExtra(ITEM_ID_EXTRA, confirmationViewModel.timeTrial.value?.id)
                     startActivity(intent)
                     this@SetupConfirmationFragment.dismiss()
                 }else{
@@ -91,7 +92,7 @@ class UseOldConfirmationFragment : DialogFragment() {
 
             okButton.setOnClickListener{
                 val intent = Intent(requireActivity(), SetupActivity::class.java)
-                intent.putExtra(TIMETRIAL_ID_EXTRA, confirmationViewModel.timeTrial.value?.id)
+                intent.putExtra(ITEM_ID_EXTRA, confirmationViewModel.timeTrial.value?.id)
                 startActivity(intent)
                 this@UseOldConfirmationFragment.dismiss()
             }

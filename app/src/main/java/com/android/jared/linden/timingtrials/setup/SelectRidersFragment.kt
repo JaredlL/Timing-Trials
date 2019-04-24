@@ -19,12 +19,7 @@ import com.android.jared.linden.timingtrials.adapters.SelectableRiderListAdapter
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
-import com.android.jared.linden.timingtrials.util.getViewModel
-import com.android.jared.linden.timingtrials.util.injector
-import com.android.jared.linden.timingtrials.viewdata.ITEM_ID_EXTRA
-import com.android.jared.linden.timingtrials.viewdata.ITEM_RIDER
-import com.android.jared.linden.timingtrials.viewdata.ITEM_TYPE_EXTRA
-
+import com.android.jared.linden.timingtrials.util.*
 
 
 /**

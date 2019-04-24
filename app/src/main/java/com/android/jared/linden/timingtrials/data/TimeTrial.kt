@@ -4,8 +4,8 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import org.threeten.bp.Duration
-import org.threeten.bp.Instant
+import org.threeten.bp.*
+import org.threeten.bp.temporal.ChronoUnit
 import java.time.temporal.TemporalAmount
 import java.util.*
 
@@ -23,10 +23,8 @@ data class TimeTrial(var ttName: String,
     companion object {
 
         fun createBlank(): TimeTrial {
-            val i = Instant.now()
-            i.plusSeconds(15*60)
-
-            return TimeTrial(ttName = "", course = null, riders = listOf(), laps = 1, startTime = i, isSetup = false, isFinished = false)
+            val instant = Instant.now().truncatedTo(ChronoUnit.MINUTES).plus(15, ChronoUnit.MINUTES)
+            return TimeTrial(ttName = "", course = null, riders = listOf(), laps = 1, startTime = instant, isSetup = false, isFinished = false)
         }
 
 

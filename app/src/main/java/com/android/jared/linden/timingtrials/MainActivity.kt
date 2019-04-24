@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.setup.*
 import com.android.jared.linden.timingtrials.timing.TimingActivity
+import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.TimingTrialsDbActivity
@@ -65,11 +66,13 @@ class MainActivity : AppCompatActivity() {
 
         button.setOnClickListener {
             val vm = getViewModel { injector.testViewModel() }
+            vm.insertTt()
             vm.medTimeTrial.observe(this, Observer {
-                vm.insertTt()
-                intent.putExtra(TIMETRIAL_ID_EXTRA, it.id)
-                val intent = Intent(this, TimingActivity::class.java)
-                startActivity(intent)
+                it.id?.let {
+                    val intent = Intent(this@MainActivity, TimingActivity::class.java).apply { putExtra(ITEM_ID_EXTRA, it)}
+                    startActivity(intent)
+                }
+
             })
 
         }

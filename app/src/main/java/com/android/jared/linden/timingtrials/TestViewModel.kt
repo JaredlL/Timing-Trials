@@ -37,6 +37,13 @@ class TestViewModel@Inject constructor(
                 if(timeTrial.riders.count() > 0){ medTimeTrial.value = timeTrial}
             }
             }
+
+        medTimeTrial.addSource(timeTrialRepository.getSetupTimeTrial()){res->
+            res?.let {
+                medTimeTrial.value = res
+            }
+
+        }
     }
 
     fun insertTt(){

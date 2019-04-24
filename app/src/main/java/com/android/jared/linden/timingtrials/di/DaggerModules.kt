@@ -3,10 +3,7 @@ package com.android.jared.linden.timingtrials.di
 import android.content.Context
 import androidx.room.Room
 import com.android.jared.linden.timingtrials.data.*
-import com.android.jared.linden.timingtrials.data.source.CourseDao
-import com.android.jared.linden.timingtrials.data.source.RiderDao
-import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
-import com.android.jared.linden.timingtrials.data.source.TimingTrialsDatabase
+import com.android.jared.linden.timingtrials.data.source.*
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +30,11 @@ class RoomDatabaseModule{
     fun timeTrialDao(db: TimingTrialsDatabase): TimeTrialDao{
         return db.timeTrialDao()
     }
+
+    @Provides @Singleton
+    fun timeTrialEventDao(db: TimingTrialsDatabase): TimeTrialEventDao{
+        return db.timeTrialEventDao()
+    }
 }
 
 @Module
@@ -53,5 +55,11 @@ class RepositoryModule {
     @Singleton
     fun timeTrialRepository(timeTrialDao: TimeTrialDao): ITimeTrialRepository {
         return RoomTimeTrialRepository(timeTrialDao)
+    }
+
+    @Provides
+    @Singleton
+    fun timetrialEventRepository(timeTrialEventDao: TimeTrialEventDao): ITimeTrialEventRepository {
+        return RoomTimeTrialEventRepository(timeTrialEventDao)
     }
 }

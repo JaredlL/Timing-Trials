@@ -16,9 +16,7 @@ import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.databinding.FragmentCourseListBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
-import com.android.jared.linden.timingtrials.util.getViewModel
-import com.android.jared.linden.timingtrials.util.injector
-import com.android.jared.linden.timingtrials.viewdata.*
+import com.android.jared.linden.timingtrials.util.*
 
 class SelectCourseFragment : DialogFragment() {
 
@@ -78,7 +76,7 @@ class SelectCourseFragment : DialogFragment() {
         dialog.setContentView(root)
 
         //dialog.window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         return dialog
     }
 

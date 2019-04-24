@@ -88,8 +88,8 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
         }
         addSource(ttSetup.timeTrial) {tt->
             tt?.let {
-                if (interval.value != it.interval.toString()) {
-                    interval.value = it.interval.toString()
+                if (interval.value != it.interval.seconds.toString()) {
+                    interval.value = it.interval.seconds.toString()
                 }
             }
 

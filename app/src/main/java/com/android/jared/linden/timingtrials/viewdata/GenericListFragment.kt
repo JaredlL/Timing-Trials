@@ -7,26 +7,18 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.startActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.android.jared.linden.timingtrials.adapters.CourseListAdapter
 import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.*
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.databinding.FragmentCourseListBinding
 import com.android.jared.linden.timingtrials.databinding.FragmentListGenericBinding
-import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
-import com.android.jared.linden.timingtrials.edititem.COURSE_ID_EXTRA
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
-import com.android.jared.linden.timingtrials.util.argument
-import com.android.jared.linden.timingtrials.util.getViewModel
-import com.android.jared.linden.timingtrials.util.injector
-import kotlinx.android.synthetic.main.fragment_course_list.*
+import com.android.jared.linden.timingtrials.util.*
 
 
 /**

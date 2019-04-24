@@ -6,18 +6,20 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-@Database(entities = [Rider::class, Course::class, TimeTrial::class], version = 9, exportSchema = false)
+@Database(entities = [Rider::class, Course::class, TimeTrial::class, TimeTrialEvent::class], version = 10, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 
     abstract fun riderDao() : RiderDao
     abstract fun courseDao(): CourseDao
     abstract fun timeTrialDao(): TimeTrialDao
+    abstract fun timeTrialEventDao(): TimeTrialEventDao
 
     companion object {
         @Volatile private var INSTANCE: TimingTrialsDatabase? = null
@@ -97,6 +99,8 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             riderDao.insert(Rider("Gordon", "Marcus", "Severn RC", 40))
             riderDao.insert(Rider("Joe", "Griffiths", "78 Degrees", 23))
             riderDao.insert(Rider("Matt", "Fratesi", "TORQ", 20))
+            riderDao.insert(Rider("Marcin", "Biablocki", "Nopinz", 35))
+            riderDao.insert(Rider("Geraint", "Thomas", "Sky", 31))
 
 
 

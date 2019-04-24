@@ -22,7 +22,7 @@ interface ITimeTrialRepository{
 }
 
 @Singleton
-class RoomTimeTrialRepository @Inject constructor(private  val timeTrialDao: TimeTrialDao): ITimeTrialRepository {
+class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: TimeTrialDao): ITimeTrialRepository {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
@@ -46,11 +46,6 @@ class RoomTimeTrialRepository @Inject constructor(private  val timeTrialDao: Tim
     override fun getSetupTimeTrial(): LiveData<TimeTrial> {
 
         return timeTrialDao.getSetupTimeTrial()
-        val c = Calendar.getInstance()
-        c.add(Calendar.MINUTE, 10)
-        c.set(Calendar.SECOND, 0)
-        c.set(Calendar.MILLISECOND, 0)
-        return MutableLiveData(TimeTrial("", startTime =  c.time))
     }
 
 

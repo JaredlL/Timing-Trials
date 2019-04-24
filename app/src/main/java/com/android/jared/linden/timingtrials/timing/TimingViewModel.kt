@@ -19,6 +19,8 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
     val timeString: MutableLiveData<String> = MutableLiveData()
     val statusString: MutableLiveData<String> = MutableLiveData()
 
+    val allTtWithEvent = timeTrialEventRepository.getAllTimeTrialEvents()
+
     private var riderStartTimes: SortedMap<Instant, Rider> = sortedMapOf()
     private var numberOfRiders = 0
 
@@ -38,8 +40,8 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
 
     fun initialise(timeTrialId: Long) {
         if (timeTrial.value == null && timeTrialId != 0L) {
-            timeTrialWithEvents.addSource(timeTrialEventRepository.getTimeTrialWithEvents(timeTrialId)) { tt ->
-                tt?.let {
+            timeTrialWithEvents.addSource(timeTrialEventRepository.getTimeTrialWithEvents(timeTrialId)) { result ->
+                result?.let {tt->
                     timeTrialWithEvents.value = tt
                     timeTrial.value =  tt.timeTrial
                     events.value = tt.eventList
