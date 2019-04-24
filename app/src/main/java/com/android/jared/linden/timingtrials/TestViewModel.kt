@@ -9,6 +9,7 @@ import com.android.jared.linden.timingtrials.data.ITimeTrialRepository
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.threeten.bp.Instant
 import javax.inject.Inject
 
 class TestViewModel@Inject constructor(
@@ -19,7 +20,10 @@ class TestViewModel@Inject constructor(
 
 
     val  medTimeTrial = MediatorLiveData<TimeTrial>()
-    val  timeTrial = TimeTrial.createBlank().apply { ttName = "Testing Timetrial" }
+    val  timeTrial = TimeTrial.createBlank().apply {
+        ttName = "Testing Timetrial"
+        startTime = Instant.now().plusSeconds(60)
+    }
 
     init {
 

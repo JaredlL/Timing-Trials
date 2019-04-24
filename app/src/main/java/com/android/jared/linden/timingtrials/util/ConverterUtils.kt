@@ -1,5 +1,6 @@
 package com.android.jared.linden.timingtrials.util
 
+import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
@@ -20,10 +21,16 @@ object ConverterUtils{
         return (f.format(instant))
     }
 
-    fun instantTenthsDisplayString(instant: Instant): String{
+    fun toTenthsDisplayString(instant: Instant): String{
         val  f:DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss:S").withZone(ZoneId.systemDefault())
         return (f.format(instant))
     }
+
+    fun toTenthsDisplayString(duration:Duration): String{
+        val milis = duration.toMillis()
+        return String.format("%d:%02d:%02d:%1d", milis / 3600000, (milis % 3600000) / 60000, (milis % 60000), milis/100)
+    }
+
 
 
 }

@@ -56,19 +56,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         button2.setOnClickListener {
-            val vm = getViewModel { injector.testViewModel() }
+            val tvm = getViewModel { injector.testViewModel() }
 
-            vm.medTimeTrial.observe(this, Observer {
-                vm.insertTt()
+            tvm.medTimeTrial.observe(this, Observer {
+                tvm.insertTt()
             })
 
         }
 
         button.setOnClickListener {
-            val vm = getViewModel { injector.testViewModel() }
-            vm.insertTt()
-            vm.medTimeTrial.observe(this, Observer {
+            val tvm = getViewModel { injector.testViewModel() }
+            tvm.insertTt()
+            tvm.medTimeTrial.observe(this, Observer {
                 it.id?.let {
+
                     val intent = Intent(this@MainActivity, TimingActivity::class.java).apply { putExtra(ITEM_ID_EXTRA, it)}
                     startActivity(intent)
                 }

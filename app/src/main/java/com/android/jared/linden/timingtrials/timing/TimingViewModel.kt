@@ -29,11 +29,13 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
             tt.eventList.filter { it.eventType == EventType.RIDER_FINISHED }.mapNotNull { tt.timeTrial.riders.find { r -> r.id == it.id }  }
         }?: listOf()
     }
+
     private fun getDepartedRiders(): List<Rider> {
         return timeTrialWithEvents.value?.let {tt->
             tt.eventList.filter { it.eventType == EventType.RIDER_STARTED}.mapNotNull { tt.timeTrial.riders.find { r -> r.id == it.id }  }
         }?: listOf()
     }
+
     private var ttIntervalSeconds: Int = 0
     private var timer: Timer = Timer()
     private val TIMER_PERIOD_MS = 50L
@@ -72,12 +74,14 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
             val now = Instant.now()
             val timeSinceTtStart = now.minusMillis(tt.timeTrial.startTime.toEpochMilli())
 
+            val timeDur: Duration = Duration.between(now, tt.timeTrial.startTime)
+
             val currentDeparted = getDepartedRiders()
-            val curentFinished = getFinishedRiders()
+            val currentFinished = getFinishedRiders()
 
             updateEvents(timeSinceTtStart, currentDeparted)
-            statusString.postValue(getStatusString(timeSinceTtStart, currentDeparted, curentFinished))
-            timeString.postValue(ConverterUtils.instantTenthsDisplayString(timeSinceTtStart))
+            statusString.postValue(getStatusString(timeSinceTtStart, currentDeparted, currentFinished))
+            timeString.postValue(ConverterUtils.toTenthsDisplayString(timeDur))
 
         }
     }
