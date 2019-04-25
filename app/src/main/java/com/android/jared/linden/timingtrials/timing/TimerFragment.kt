@@ -48,8 +48,8 @@ class TimerFragment : Fragment() {
 
 
         val binding =  DataBindingUtil.inflate<FragmentTimerBinding>(inflater, R.layout.fragment_timer, container, false).apply{
-            viewModel = timingViewModel
             lifecycleOwner = this@TimerFragment
+            viewModel = timingViewModel
         }
 
         return binding.root

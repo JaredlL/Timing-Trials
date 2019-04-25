@@ -27,8 +27,9 @@ object ConverterUtils{
     }
 
     fun toTenthsDisplayString(duration:Duration): String{
-        val milis = duration.toMillis()
-        return String.format("%d:%02d:%02d:%1d", milis / 3600000, (milis % 3600000) / 60000, (milis % 60000), milis/100)
+        val milis =Math.abs(duration.toMillis())
+        val secs = Math.abs(duration.seconds)
+        return String.format("%d:%02d:%02d:%1d", secs / 3600, (secs % 3600) / 60, (secs % 60),  (milis % 1000) / 100)
     }
 
 
