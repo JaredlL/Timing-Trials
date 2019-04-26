@@ -184,11 +184,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="@string/start_time"
+            android:text="@string/timetrial_to_start_at"
             app:layout_constraintBottom_toBottomOf="@+id/startTimeButton2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/startTimeButton2"
-            tools:text="First rider to start at" />
+            tools:text="TimeTrial  to start at" />
 
         <View
             android:id="@+id/divider5"

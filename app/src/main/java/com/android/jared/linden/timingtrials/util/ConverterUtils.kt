@@ -26,6 +26,12 @@ object ConverterUtils{
         return (f.format(instant))
     }
 
+    fun toTenthsDisplayString(miliseconds: Long): String{
+        val milis =Math.abs(miliseconds)
+        val secs =  (milis/1000)
+        return String.format("%d:%02d:%02d:%1d", secs / 3600, (secs % 3600) / 60, (secs % 60),  (milis % 1000) / 100)
+    }
+
     fun toTenthsDisplayString(duration:Duration): String{
         val milis =Math.abs(duration.toMillis())
         val secs = Math.abs(duration.seconds)

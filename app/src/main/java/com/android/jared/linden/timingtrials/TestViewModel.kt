@@ -23,7 +23,7 @@ class TestViewModel@Inject constructor(
     val  medTimeTrial = MediatorLiveData<TimeTrial>()
     val  timeTrial = TimeTrial.createBlank().apply {
         ttName = "Testing Timetrial"
-        startTime = Instant.now().truncatedTo(ChronoUnit.MINUTES).plusSeconds(60)
+        startTime = Instant.now().truncatedTo(ChronoUnit.MINUTES).plusSeconds(0)
     }
 
     init {

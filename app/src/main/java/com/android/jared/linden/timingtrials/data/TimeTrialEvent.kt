@@ -23,7 +23,7 @@ enum class EventType(val type: Int){
     EMPTY(0),
     TIMETRIAL_STARTED(1),
     RIDER_STARTED(2),
-    RIDER_LAPPED(3),
+    RIDER_PASSED(3),
     RIDER_FINISHED(4);
 
     companion object {
