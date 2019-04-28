@@ -20,11 +20,11 @@ object ConverterUtils{
         val  f:DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault())
         return (f.format(instant))
     }
-
-    fun toTenthsDisplayString(instant: Instant): String{
-        val  f:DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss:S").withZone(ZoneId.systemDefault())
-        return (f.format(instant))
-    }
+//
+//    fun toTenthsDisplayString(instant: Instant): String{
+//        val  f:DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss:S").withZone(ZoneId.systemDefault())
+//        return (f.format(instant))
+//    }
 
     fun toTenthsDisplayString(miliseconds: Long): String{
         val milis =Math.abs(miliseconds)

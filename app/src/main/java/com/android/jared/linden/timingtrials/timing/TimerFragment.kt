@@ -26,7 +26,6 @@ import kotlinx.android.synthetic.main.fragment_timer.*
 class TimerFragment : Fragment() {
 
     private val timeTrialId by argument<Long>(ITEM_ID_EXTRA)
-
     private lateinit var timingViewModel: TimingViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

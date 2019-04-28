@@ -3,9 +3,7 @@ package com.android.jared.linden.timingtrials.timing
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.util.ConverterUtils
-import org.threeten.bp.Duration
 import org.threeten.bp.Instant
-import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.ChronoUnit
 import java.util.*
 import javax.inject.Inject
@@ -14,26 +12,32 @@ import kotlin.collections.ArrayList
 class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTrialEventRepository) : ViewModel() {
 
     val timeTrialWithEvents: MediatorLiveData<TimeTrialWithEvents> = MediatorLiveData()
+    val riderStatus = Transformations.map(timeTrialWithEvents){
+        it?.let {
+
+        }
+    }
     val timeString: MutableLiveData<String> = MutableLiveData()
-    val timeString2: MutableLiveData<String> = MutableLiveData()
     val statusString: MutableLiveData<String> = MutableLiveData()
     val allTtWithEvent = timeTrialEventRepository.getAllTimeTrialEvents()
 
 
-    private var riderStartTimes: SortedMap<Instant, Rider> = sortedMapOf()
-    private var departedRidersCached = ArrayList<Rider>()
-    private var finishedRidersCached = ArrayList<Rider>()
+    private var riderStartTimes: SortedMap<Instant, RiderWithNumber> = sortedMapOf()
+    private var departedRidersCached = ArrayList<RiderWithNumber>()
+    private var finishedRidersCached = ArrayList<RiderWithNumber>()
     private var numberOfRiders = 0
 
-    private fun getFinishedRiders(): List<Rider> {
+    private var ridersWithNumbers: List<RiderWithNumber> = listOf()
+
+    private fun getFinishedRiders(): List<RiderWithNumber> {
         return timeTrialWithEvents.value?.let {tt->
-            tt.eventList.filter { it.eventType == EventType.RIDER_FINISHED }.mapNotNull {event-> tt.timeTrial.riders.firstOrNull { rider -> rider.id == event.riderId }  }
+            tt.eventList.filter { it.eventType == EventType.RIDER_FINISHED }.mapNotNull {event-> ridersWithNumbers.firstOrNull { rn -> rn.rider.id == event.riderId }  }
         }?: listOf()
     }
 
-    private fun getDepartedRiders(): List<Rider> {
+    private fun getDepartedRiders(): List<RiderWithNumber> {
         return timeTrialWithEvents.value?.let {tt->
-            tt.eventList.filter { it.eventType == EventType.RIDER_STARTED}.mapNotNull { event-> tt.timeTrial.riders.firstOrNull { rider -> rider.id == event.riderId }  }
+            tt.eventList.filter { it.eventType == EventType.RIDER_STARTED}.mapNotNull { event-> ridersWithNumbers.firstOrNull { rn -> rn.rider.id == event.riderId }  }
         }?: listOf()
     }
 
@@ -47,6 +51,7 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
             timeTrialWithEvents.addSource(timeTrialEventRepository.getTimeTrialWithEvents(timeTrialId)) { result ->
                 result?.let {tt->
                     timeTrialWithEvents.value = tt
+                    ridersWithNumbers = tt.timeTrial.riders.mapIndexed { index, rider -> RiderWithNumber(rider, index + 1) }
 
                     ttIntervalMilis = tt.timeTrial.interval.toMillis()
                     numberOfRiders = tt.timeTrial.riders.count()
@@ -60,7 +65,7 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
                     riderStartTimes = tt.timeTrial.riders.withIndex()
                             .associate { r -> Pair(
                                     tt.timeTrial.startTime.plusSeconds(0).plusSeconds(tt.timeTrial.interval.seconds * r.index).truncatedTo(ChronoUnit.SECONDS),
-                                    r.value) }.toSortedMap()
+                                    RiderWithNumber(r.value, r.index)) }.toSortedMap()
 
                     timer = Timer()
                     val task = object : TimerTask(){
@@ -89,19 +94,18 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
         timeTrialWithEvents.value?.let {tt->
             val now = Instant.now()
 
-            val dr: ArrayList<Rider> = departedRidersCached
-            val fr: ArrayList<Rider> = finishedRidersCached
+            val dr: ArrayList<RiderWithNumber> = departedRidersCached
+            val fr: ArrayList<RiderWithNumber> = finishedRidersCached
 
             updateEvents(now, dr)
 
             timeString.postValue(ConverterUtils.toTenthsDisplayString(now.toEpochMilli() - tt.timeTrial.startTime.toEpochMilli()))
-            timeString2.postValue(Calendar.getInstance().get(Calendar.SECOND).toString())
             statusString.postValue(getStatusString(now, dr, fr))
 
         }
     }
 
-    private fun updateEvents(currentTime: Instant, departed: List<Rider>){
+    private fun updateEvents(currentTime: Instant, departed: List<RiderWithNumber>){
         val startedRiders = riderStartTimes.headMap(currentTime)
         val newStartingRiders = startedRiders.values.subtract(departed).toList()
         if(newStartingRiders.isNotEmpty()){
@@ -109,7 +113,7 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
             timeTrialWithEvents.value?.let { tte->
                 departedRidersCached.addAll(newStartingRiders)
                 val newEvents = tte.eventList.toMutableList()
-                newEvents.addAll(newStartingRiders.map { TimeTrialEvent(tte.timeTrial.id?:0, it.id, currentTime, EventType.RIDER_STARTED) })
+                newEvents.addAll(newStartingRiders.map { TimeTrialEvent(tte.timeTrial.id?:0, it.rider.id, currentTime, EventType.RIDER_STARTED) })
                 tte.eventList = newEvents
                 timeTrialWithEvents.postValue(tte)
             }
@@ -117,7 +121,7 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
     }
 
 
-    private fun getStatusString(currentTime: Instant, departed: List<Rider>, finished: List<Rider>): String{
+    private fun getStatusString(currentTime: Instant, departed: List<RiderWithNumber>, finished: List<RiderWithNumber>): String{
 
         timeTrialWithEvents.value?.let { tte ->
 
@@ -139,28 +143,35 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
                 val nextStartRider = ridersToStart[nextStartInstant]
                 val number = riderStartTimes.map { r -> r.key }.indexOf(nextStartInstant) + 1
 
-                val milisToNextRider = (nextStartInstant.toEpochMilli() - currentTime.toEpochMilli())
-                nextStartRider?.let { rider->
-                    val riderstring = "($number) ${rider.firstName} ${rider.lastName}"
-                    return when(milisToNextRider){
-                      0L, in ttIntervalMilis - 3000..ttIntervalMilis ->
+                val millisToNextRider = (nextStartInstant.toEpochMilli() - currentTime.toEpochMilli())
+                nextStartRider?.let { rn->
+                    val riderString = "(${rn.number}) ${rn.rider.firstName} ${rn.rider.lastName}"
+                    return when(millisToNextRider){
+                      in ttIntervalMilis - 3000..ttIntervalMilis ->
                         {
-                            val lastRiderToStart = tte.timeTrial.riders.firstOrNull { it.id == departed.lastOrNull()?.id }
+                            val lastRiderToStart = tte.timeTrial.riders.firstOrNull { it.id == departed.lastOrNull()?.rider?.id }
                             if(lastRiderToStart != null){
                                  "(${lastRiderToStart.firstName} ${lastRiderToStart.lastName}) GO GO GO!!!"
                             }else{
-                                "Next rider is $riderstring"
+                                "Next rider is $riderString"
                             }
 
                         }
-                        in 1000..10000 ->
-                            "${rider.firstName} ${rider.lastName} - ${milisToNextRider/1000}!"
+                        in 0L..10000 -> {
+                            var x = millisToNextRider
+                            if(x > 1000){
+                                do{x /= 10} while (x > 9)
+                            }else{
+                                x = 0
+                            }
+                            "${rn.rider.firstName} ${rn.rider.lastName} - ${x+1}!"
+                            }
                         in 5..ttIntervalMilis/4 ->
-                            "$riderstring starts in ${ttIntervalMilis/4000} seconds!"
+                            "$riderString starts in ${ttIntervalMilis/4000} seconds!"
                         in ttIntervalMilis/4.. ttIntervalMilis/2 ->
-                            "$riderstring starts in ${ttIntervalMilis/2000} seconds"
+                            "$riderString starts in ${ttIntervalMilis/2000} seconds"
                         else ->
-                            "Next rider is $riderstring"
+                            "Next rider is $riderString"
                     }
                 }
                 return "NULL"
