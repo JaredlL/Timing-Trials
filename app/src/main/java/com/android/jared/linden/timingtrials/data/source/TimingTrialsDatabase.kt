@@ -3,16 +3,13 @@ package com.android.jared.linden.timingtrials.data.source
 import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.android.jared.linden.timingtrials.data.Course
-import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.data.TimeTrialEvent
+import com.android.jared.linden.timingtrials.data.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-@Database(entities = [Rider::class, Course::class, TimeTrial::class, TimeTrialEvent::class], version = 10, exportSchema = false)
+@Database(entities = [Rider::class, Course::class, TimeTrial::class, TimeTrialEvent::class, TimeTrialRider::class], version = 11, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 

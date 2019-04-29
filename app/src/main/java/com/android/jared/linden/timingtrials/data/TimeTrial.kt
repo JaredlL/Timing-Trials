@@ -1,15 +1,15 @@
 package com.android.jared.linden.timingtrials.data
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Relation
+import androidx.room.*
 import org.threeten.bp.*
 import org.threeten.bp.temporal.ChronoUnit
 import java.time.temporal.TemporalAmount
 import java.util.*
 
-@Entity(tableName = "timetrial_table")
+
+//Todo: Use proper relational mapping, for now we simply store as JSON
+
+@Entity(tableName = "timetrial_table", indices = [Index("id")])
 data class TimeTrial(var ttName: String,
                      var course: Course? = null,
                      var riders:List<Rider> = listOf(),
@@ -32,18 +32,5 @@ data class TimeTrial(var ttName: String,
 
 }
 
-//Todo: Use proper relational mapping, for now we simply store as JSON
 
-@Entity(tableName = "timetrial_rider_table")
-data class TimeTrialRider(@PrimaryKey(autoGenerate = true)val id: Long,
-                          val riderId: Long,
-                          val timeTrialId: Long)
 
-data class TimeTrialWithRiders(
-        @Embedded val timeTrial:TimeTrial,
-        @Relation(parentColumn = "id",
-                entityColumn = "timeTrialId",
-                entity = TimeTrialRider::class
-        ) val riderIdList: List<Long>
-
-)

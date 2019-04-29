@@ -26,4 +26,8 @@ interface TimeTrialDao {
 
     //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
     @Query("SELECT * FROM timetrial_table WHERE isSetup = 0 LIMIT 1") fun getSetupTimeTrial(): LiveData<TimeTrial>
+
+    @Query("SELECT * FROM timetrial_rider_table WHERE timeTrialId = :ttId")fun getTimeTrialEvents(timeTrialId: Long)
+
+
 }
