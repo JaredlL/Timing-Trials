@@ -8,16 +8,16 @@ import com.android.jared.linden.timingtrials.util.ConverterUtils
 
 class EventViewWrapper(var event: TimeTrialEvent, val timeTrialWithEvents: TimeTrialWithEvents){
 
-    val timeStampString = ConverterUtils.toTenthsDisplayString(event.timeStamp.toEpochMilli() - timeTrialWithEvents.timeTrial.startTime.toEpochMilli())
+    val timeStampString = ConverterUtils.toTenthsDisplayString(event.timeStamp.toEpochMilli() - timeTrialWithEvents.timeTrialDefinition.startTime.toEpochMilli())
 
-    private fun getRider(): Rider? = event.riderId?.let {  timeTrialWithEvents.timeTrial.riders.firstOrNull{rider -> rider.id == event.riderId}}
+    private fun getRider(): Rider? = event.riderId?.let {  timeTrialWithEvents.timeTrialDefinition.riders.firstOrNull{ rider -> rider.id == event.riderId}}
 
 
     private val riderName: String = getRider()?.let { "${it.firstName} ${it.lastName}" }?: "Null"
 
     val displayString: String = when(event.eventType){
         EventType.EMPTY -> "Empty Event"
-        EventType.TIMETRIAL_STARTED -> "TimeTrial Has Begun"
+        EventType.TIMETRIAL_STARTED -> "TimeTrialDefinition Has Begun"
         EventType.RIDER_STARTED -> "$riderName Has Started"
         EventType.RIDER_PASSED -> event.riderId?.let { "$riderName Has Passed"}?:"Assign Rider"
         EventType.RIDER_FINISHED -> "$riderName Has Finished"

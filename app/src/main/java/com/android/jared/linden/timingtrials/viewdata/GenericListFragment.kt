@@ -14,7 +14,7 @@ import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.*
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialDefinition
 import com.android.jared.linden.timingtrials.databinding.FragmentListGenericBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
@@ -61,7 +61,7 @@ class GenericListFragment : Fragment() {
                 viewFactory = TimeTrialViewHolderFactory()
                 adapter = GenericListAdapter(requireContext(), viewFactory)
                 listViewModel.allTimeTrials.observe(viewLifecycleOwner, Observer{res->
-                    res?.let {(adapter as? GenericListAdapter<TimeTrial>)?.setItems(it)}
+                    res?.let {(adapter as? GenericListAdapter<TimeTrialDefinition>)?.setItems(it)}
                 })
             }
         }

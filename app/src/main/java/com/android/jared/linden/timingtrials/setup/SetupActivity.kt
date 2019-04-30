@@ -16,7 +16,6 @@ import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 
 import kotlinx.android.synthetic.main.activity_setup.*
 import org.threeten.bp.Instant
-import java.util.*
 
 class SetupActivity : AppCompatActivity() {
 
@@ -49,7 +48,7 @@ class SetupActivity : AppCompatActivity() {
 
         setupViewModel.timeTrialPropertiesViewModel.onBeginTt = {
 
-            setupViewModel.timeTrial.value?.let {
+            setupViewModel.timeTrialDefinition.value?.let {
                 if(it.riders.count() == 0){
                     Toast.makeText(this, "TT Needs at least 1 rider", Toast.LENGTH_LONG).show()
                     container.currentItem = 1

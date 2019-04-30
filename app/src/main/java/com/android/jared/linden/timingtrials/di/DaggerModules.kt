@@ -31,10 +31,6 @@ class RoomDatabaseModule{
         return db.timeTrialDao()
     }
 
-    @Provides @Singleton
-    fun timeTrialEventDao(db: TimingTrialsDatabase): TimeTrialEventDao{
-        return db.timeTrialEventDao()
-    }
 }
 
 @Module
@@ -57,9 +53,4 @@ class RepositoryModule {
         return RoomTimeTrialRepository(timeTrialDao)
     }
 
-    @Provides
-    @Singleton
-    fun timetrialEventRepository(timeTrialEventDao: TimeTrialEventDao): ITimeTrialEventRepository {
-        return RoomTimeTrialEventRepository(timeTrialEventDao)
-    }
 }

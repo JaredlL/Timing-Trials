@@ -17,7 +17,6 @@ import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import kotlinx.android.synthetic.main.fragment_timer.*
 
 /**
  * A simple [Fragment] subclass.
@@ -41,11 +40,11 @@ class TimerFragment : Fragment() {
 
         })
 
-        timingViewModel.timeTrialWithEvents.observe(viewLifecycleOwner, Observer {
-            var name = it.timeTrial.ttName
+        timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer {
+            var name = it.timeTrialDefinition.ttName
         })
 
-        timingViewModel.timeTrialWithEvents.observe(viewLifecycleOwner, Observer {res->
+        timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
             res?.let {
                 adapter.setEvents(it.eventList.map {ev -> EventViewWrapper(ev, res) })
             }

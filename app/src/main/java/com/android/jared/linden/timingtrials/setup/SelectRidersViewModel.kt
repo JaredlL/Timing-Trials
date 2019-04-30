@@ -6,6 +6,7 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.BR
 import com.android.jared.linden.timingtrials.data.Rider
+import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import java.util.ArrayList
 
 
@@ -17,7 +18,7 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
 
 
     var mRiderViewWrapperList: MediatorLiveData<List<SelectableRiderViewWrapper>> = MediatorLiveData()
-    private fun selectedRiders() = ttSetup.timeTrial.value?.riders
+    private fun selectedRiders() = ttSetup.timeTrial.value?.riderList?.map { r -> r.rider }
 
     override var allSelectableRiders: LiveData<List<SelectableRiderViewWrapper>> = mRiderViewWrapperList
 
@@ -47,10 +48,10 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
         oldList.forEach { r -> if(r.id != rider.id){newList.add(r)}}
 
         if(sel){newList.add(rider)}
-
-        ttSetup.timeTrial.value = ttSetup.timeTrial.value?.apply {
-            riders = newList
+        ttSetup.timeTrial.value?.let {
+            ttSetup.timeTrial.value = ttSetup.timeTrial.value?.copy(riderList = newList.map { r-> TimeTrialRider(r, it.timeTrialDefinition.id) })
         }
+
     }
 
     private fun riderIsSelected(rider: Rider): Boolean{

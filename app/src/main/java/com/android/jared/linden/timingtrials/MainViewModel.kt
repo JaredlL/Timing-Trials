@@ -1,13 +1,10 @@
 package com.android.jared.linden.timingtrials
 
 import androidx.lifecycle.*
-import com.android.jared.linden.timingtrials.data.ICourseRepository
-import com.android.jared.linden.timingtrials.data.IRiderRepository
 import com.android.jared.linden.timingtrials.data.ITimeTrialRepository
 import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.setup.ISetupConformationViewModel
+import com.android.jared.linden.timingtrials.data.TimeTrialDefinition
 import com.android.jared.linden.timingtrials.setup.ResumeOldConfirmationViewModel
-import com.android.jared.linden.timingtrials.util.ConverterUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject

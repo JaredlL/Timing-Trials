@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.android.jared.linden.timingtrials.MainViewModel
 import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialDefinition
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import org.threeten.bp.Instant
 
@@ -20,25 +21,30 @@ interface ISetupConformationViewModel{
 class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupConformationViewModel{
 
    override val timeTrial = ttSetup.timeTrial
+    val timeTrialDefinition = Transformations.map(timeTrial){it.timeTrialDefinition}
 
-    override val title = Transformations.map(timeTrial){tt ->
+    override val title = Transformations.map(timeTrialDefinition){ tt ->
         "Starting ${tt?.ttName}"
     }
 
-    override val lapsCourse = Transformations.map(timeTrial){tt->
+    override val lapsCourse = Transformations.map(timeTrialDefinition){ tt->
         "${tt?.laps} laps of ${tt.course?.courseName}"
     }
 
-   override val ridersInterval = Transformations.map(timeTrial){tt->
-        if(tt.interval.isZero){
-            "${tt?.riders?.count()} riders starting at 0 second intervals, mass start!"
-        }else{
-            "${tt?.riders?.count()} riders starting at ${tt?.interval?.seconds} second intervals"
-        }
+   override val ridersInterval = Transformations.map(timeTrial){
+       it?.let {tt->
+           if(tt.timeTrialDefinition.interval == 0){
+               return@map "${tt.riderList?.count()} riders starting at 0 second intervals, mass start!"
+           }else{
+               return@map "${tt.riderList?.count()} riders starting at ${tt.timeTrialDefinition.interval} second intervals"
+           }
+       }
+       return@map "Null"
+
 
     }
 
-   override val startTime = Transformations.map(timeTrial){tt->
+   override val startTime = Transformations.map(timeTrialDefinition){ tt->
         "First rider starting at ${tt?.let{ConverterUtils.instantToSecondsDisplayString(tt.startTime)}}"
 
     }
@@ -46,11 +52,11 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
 
     override fun positiveFunction(): Boolean{
 
-        timeTrial.value?.let {
+        timeTrialDefinition.value?.let {
             return if(it.startTime.isAfter(Instant.now())){
 
                 it.isSetup = true
-                timeTrial.value = it
+                ttSetup.updateDefinition(it)
                 ttSetup.insertTt()
 
                 true
@@ -70,21 +76,22 @@ class ResumeOldConfirmationViewModel (private val mainViewModel: MainViewModel) 
 
 
     override val timeTrial = mainViewModel.timeTrial
+    val timeTrialDefinition = Transformations.map(timeTrial){it.timeTrialDefinition}
 
-    override val title = Transformations.map(timeTrial){tt ->
+    override val title = Transformations.map(timeTrialDefinition){ tt ->
         "Resume setting up previous ${tt?.ttName} ?"
     }
 
-    override val lapsCourse = Transformations.map(timeTrial){tt->
+    override val lapsCourse = Transformations.map(timeTrialDefinition){ tt->
         "${tt?.laps} laps of ${tt?.course?.courseName}"
     }
 
-    override val ridersInterval = Transformations.map(timeTrial){tt->
+    override val ridersInterval = Transformations.map(timeTrial){ tt->
         if(tt!= null) {
-            if(tt.interval.isZero){
-                "${tt.riders.count()} riders starting at 0 second intervals, mass start!"
+            if(tt.timeTrialDefinition.interval == 0){
+                "${tt.riderList.count()} riders starting at 0 second intervals, mass start!"
             }else{
-                "${tt.riders.count()} riders starting at ${tt.interval.seconds} second intervals"
+                "${tt.riderList.count()} riders starting at ${tt.timeTrialDefinition.interval} second intervals"
             }
         }else{
             "null"
@@ -93,7 +100,7 @@ class ResumeOldConfirmationViewModel (private val mainViewModel: MainViewModel) 
 
     }
 
-    override val startTime = Transformations.map(timeTrial){tt->
+    override val startTime = Transformations.map(timeTrialDefinition){ tt->
         "First rider starting at ${tt?.let{ConverterUtils.instantToSecondsDisplayString(tt.startTime)}}"
 
     }

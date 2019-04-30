@@ -18,11 +18,6 @@ import com.android.jared.linden.timingtrials.databinding.FragmentSetupTimeTrialB
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import org.threeten.bp.*
-import org.threeten.bp.temporal.Temporal
-import org.threeten.bp.temporal.TemporalField
-
-import java.util.*
-import kotlin.math.min
 
 
 class SetupTimeTrialFragment : Fragment() {
@@ -54,7 +49,7 @@ class SetupTimeTrialFragment : Fragment() {
 
         propsViewModel.timeTrialName.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
            if(it == ""){
-               propsViewModel.timeTrial.value?.let {tt->
+               propsViewModel.timeTrialDefinition.value?.let { tt->
                    if (tt.course == null){
                        showCourseFrag()
                    }

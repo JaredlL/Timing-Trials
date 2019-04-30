@@ -7,16 +7,15 @@ import com.android.jared.linden.timingtrials.data.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 
-@Database(entities = [Rider::class, Course::class, TimeTrial::class, TimeTrialEvent::class, TimeTrialRider::class], version = 11, exportSchema = false)
+@Database(entities = [Rider::class, Course::class, TimeTrialDefinition::class, TimeTrialEvent::class, TimeTrialRider::class], version = 12, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 
     abstract fun riderDao() : RiderDao
     abstract fun courseDao(): CourseDao
     abstract fun timeTrialDao(): TimeTrialDao
-    abstract fun timeTrialEventDao(): TimeTrialEventDao
+
 
     companion object {
         @Volatile private var INSTANCE: TimingTrialsDatabase? = null

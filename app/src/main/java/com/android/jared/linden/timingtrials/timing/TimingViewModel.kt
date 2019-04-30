@@ -9,35 +9,35 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTrialEventRepository) : ViewModel() {
+class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel() {
 
-    val timeTrialWithEvents: MediatorLiveData<TimeTrialWithEvents> = MediatorLiveData()
-    val riderStatus = Transformations.map(timeTrialWithEvents){
+    val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
+    val riderStatus = Transformations.map(timeTrial){
         it?.let {
 
         }
     }
     val timeString: MutableLiveData<String> = MutableLiveData()
     val statusString: MutableLiveData<String> = MutableLiveData()
-    val allTtWithEvent = timeTrialEventRepository.getAllTimeTrialEvents()
+    val allTtWithEvent = timeTrialRepository.allTimeTrialsDefinition
 
 
-    private var riderStartTimes: SortedMap<Instant, RiderWithNumber> = sortedMapOf()
-    private var departedRidersCached = ArrayList<RiderWithNumber>()
-    private var finishedRidersCached = ArrayList<RiderWithNumber>()
+    private var riderStartTimes: SortedMap<Int, TimeTrialRider> = timeTrial.value?.riderList?.let
+    private var departedRidersCached = ArrayList<TimeTrialRider>()
+    private var finishedRidersCached = ArrayList<TimeTrialRider>()
     private var numberOfRiders = 0
 
-    private var ridersWithNumbers: List<RiderWithNumber> = listOf()
+    //private var ridersWithNumbers: List<RiderWithNumber> = listOf()
 
-    private fun getFinishedRiders(): List<RiderWithNumber> {
-        return timeTrialWithEvents.value?.let {tt->
-            tt.eventList.filter { it.eventType == EventType.RIDER_FINISHED }.mapNotNull {event-> ridersWithNumbers.firstOrNull { rn -> rn.rider.id == event.riderId }  }
+    private fun getFinishedRiders(): List<TimeTrialRider> {
+        return timeTrial.value?.let { tt->
+            tt.eventList.filter { it.eventType == EventType.RIDER_FINISHED }.mapNotNull {event-> tt.riderList.firstOrNull { rn -> rn.rider.id == event.riderId }  }
         }?: listOf()
     }
 
-    private fun getDepartedRiders(): List<RiderWithNumber> {
-        return timeTrialWithEvents.value?.let {tt->
-            tt.eventList.filter { it.eventType == EventType.RIDER_STARTED}.mapNotNull { event-> ridersWithNumbers.firstOrNull { rn -> rn.rider.id == event.riderId }  }
+    private fun getDepartedRiders(): List<TimeTrialRider> {
+        return timeTrial.value?.let { tt->
+            tt.eventList.filter { it.eventType == EventType.RIDER_STARTED}.mapNotNull { event-> tt.riderList.firstOrNull { rn -> rn.rider.id == event.riderId }  }
         }?: listOf()
     }
 
@@ -47,14 +47,16 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
     private val TIMER_PERIOD_MS = 50L
 
     fun initialise(timeTrialId: Long) {
-        if (timeTrialWithEvents.value == null && timeTrialId != 0L) {
-            timeTrialWithEvents.addSource(timeTrialEventRepository.getTimeTrialWithEvents(timeTrialId)) { result ->
+        if (timeTrial.value == null && timeTrialId != 0L) {
+            timeTrial.addSource(timeTrialRepository.getTimeTrialById(timeTrialId)) { result ->
                 result?.let {tt->
-                    timeTrialWithEvents.value = tt
-                    ridersWithNumbers = tt.timeTrial.riders.mapIndexed { index, rider -> RiderWithNumber(rider, index + 1) }
+                    timeTrial.value = tt
+                    tt.riderList.forEachIndexed{ index, rider ->
+                        rider.number = index + 1
+                        rider.startTime = (tt.timeTrialDefinition.interval * (index + 1))
+                    }
 
-                    ttIntervalMilis = tt.timeTrial.interval.toMillis()
-                    numberOfRiders = tt.timeTrial.riders.count()
+                    ttIntervalMilis = (tt.timeTrialDefinition.interval * 1000).toLong()
 
                     departedRidersCached.clear()
                     finishedRidersCached.clear()
@@ -62,10 +64,7 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
                     departedRidersCached.addAll(getDepartedRiders())
                     finishedRidersCached.addAll(getFinishedRiders())
 
-                    riderStartTimes = tt.timeTrial.riders.withIndex()
-                            .associate { r -> Pair(
-                                    tt.timeTrial.startTime.plusSeconds(0).plusSeconds(tt.timeTrial.interval.seconds * r.index).truncatedTo(ChronoUnit.SECONDS),
-                                    RiderWithNumber(r.value, r.index)) }.toSortedMap()
+
 
                     timer = Timer()
                     val task = object : TimerTask(){
@@ -81,49 +80,49 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
 
     fun onRiderPassed(){
         val now = Instant.now()
-        timeTrialWithEvents.value?.let {tte->
+        timeTrial.value?.let { tte->
             val newEvents = tte.eventList.toMutableList()
-            newEvents.add(TimeTrialEvent(tte.timeTrial.id?:0, null, now, EventType.RIDER_PASSED))
+            newEvents.add(TimeTrialEvent(tte.timeTrialDefinition.id?:0, null, now, EventType.RIDER_PASSED))
             tte.eventList = newEvents
-            timeTrialWithEvents.postValue(tte)
+            timeTrial.postValue(tte)
         }
     }
 
 
     private fun updateLoop(){
-        timeTrialWithEvents.value?.let {tt->
+        timeTrial.value?.let { tt->
             val now = Instant.now()
 
-            val dr: ArrayList<RiderWithNumber> = departedRidersCached
-            val fr: ArrayList<RiderWithNumber> = finishedRidersCached
+            val dr: ArrayList<TimeTrialRider> = departedRidersCached
+            val fr: ArrayList<TimeTrialRider> = finishedRidersCached
 
             updateEvents(now, dr)
 
-            timeString.postValue(ConverterUtils.toTenthsDisplayString(now.toEpochMilli() - tt.timeTrial.startTime.toEpochMilli()))
+            timeString.postValue(ConverterUtils.toTenthsDisplayString(now.toEpochMilli() - tt.timeTrialDefinition.startTime.toEpochMilli()))
             statusString.postValue(getStatusString(now, dr, fr))
 
         }
     }
 
-    private fun updateEvents(currentTime: Instant, departed: List<RiderWithNumber>){
+    private fun updateEvents(currentTime: Instant, departed: List<TimeTrialRider>){
         val startedRiders = riderStartTimes.headMap(currentTime)
         val newStartingRiders = startedRiders.values.subtract(departed).toList()
         if(newStartingRiders.isNotEmpty()){
 
-            timeTrialWithEvents.value?.let { tte->
+            timeTrial.value?.let { tte->
                 departedRidersCached.addAll(newStartingRiders)
                 val newEvents = tte.eventList.toMutableList()
-                newEvents.addAll(newStartingRiders.map { TimeTrialEvent(tte.timeTrial.id?:0, it.rider.id, currentTime, EventType.RIDER_STARTED) })
+                newEvents.addAll(newStartingRiders.map { TimeTrialEvent(tte.timeTrialDefinition.id?:0, it.rider.id, currentTime, EventType.RIDER_STARTED) })
                 tte.eventList = newEvents
-                timeTrialWithEvents.postValue(tte)
+                timeTrial.postValue(tte)
             }
         }
     }
 
 
-    private fun getStatusString(currentTime: Instant, departed: List<RiderWithNumber>, finished: List<RiderWithNumber>): String{
+    private fun getStatusString(currentTime: Instant, departed: List<TimeTrialRider>, finished: List<TimeTrialRider>): String{
 
-        timeTrialWithEvents.value?.let { tte ->
+        timeTrial.value?.let { tte ->
 
 
 
@@ -135,7 +134,7 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
                 //If we are more than 1 min before TT start time
                 if(currentTime.plusSeconds(60).isBefore(ridersToStart.firstKey())){
                     //val dur = Duration.between(currentTime, ridersToStart.firstKey())
-                    return "TimeTrial starts at 00:00:0, First rider off 1 minute later"
+                    return "TimeTrialDefinition starts at 00:00:0, First rider off 1 minute later"
                 }
 
 
@@ -149,7 +148,7 @@ class TimingViewModel  @Inject constructor(val timeTrialEventRepository: ITimeTr
                     return when(millisToNextRider){
                       in ttIntervalMilis - 3000..ttIntervalMilis ->
                         {
-                            val lastRiderToStart = tte.timeTrial.riders.firstOrNull { it.id == departed.lastOrNull()?.rider?.id }
+                            val lastRiderToStart = tte.timeTrialDefinition.riders.firstOrNull { it.id == departed.lastOrNull()?.rider?.id }
                             if(lastRiderToStart != null){
                                  "(${lastRiderToStart.firstName} ${lastRiderToStart.lastName}) GO GO GO!!!"
                             }else{

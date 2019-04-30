@@ -33,19 +33,19 @@ class Converters {
     }
 
 
-    @TypeConverter
-    fun ridersFromString(ridersString:String?): List<Rider>?{
-        return ridersString?.let {
-            val riderListType = object : TypeToken<List<Rider>>() {}.type
-            Gson().fromJson<List<Rider>>(ridersString, riderListType)
-        }
-
-    }
-
-    @TypeConverter
-    fun ridersToString(riders: List<Rider>?): String?{
-        return riders?.let{Gson().toJson(riders)}
-    }
+//    @TypeConverter
+//    fun ridersFromString(ridersString:String?): List<Rider>?{
+//        return ridersString?.let {
+//            val riderListType = object : TypeToken<List<Rider>>() {}.type
+//            Gson().fromJson<List<Rider>>(ridersString, riderListType)
+//        }
+//
+//    }
+//
+//    @TypeConverter
+//    fun ridersToString(riders: List<Rider>?): String?{
+//        return riders?.let{Gson().toJson(riders)}
+//    }
 
     @TypeConverter
     fun courseFromString(courseString:String?): Course? {
