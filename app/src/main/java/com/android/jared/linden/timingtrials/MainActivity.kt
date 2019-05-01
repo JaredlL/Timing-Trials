@@ -26,8 +26,15 @@ class MainActivity : AppCompatActivity() {
         setupId = null
         val vm = getViewModel { injector.mainViewModel() }
         vm.timeTrial.observe(this, Observer {tt->
-            setupId = tt?.id
+            tt?.let {
+                setupId = tt.timeTrialDefinition.id
+            }
+
         })
+
+        val tvm = getViewModel { injector.testViewModel() }
+        var i = 1
+        tvm.medTimeTrial.observe(this, Observer { i++ })
 
         ma_butt_manageRiders.setOnClickListener{
             val intent = Intent(this@MainActivity, TimingTrialsDbActivity::class.java)
@@ -59,22 +66,17 @@ class MainActivity : AppCompatActivity() {
             val tvm = getViewModel { injector.testViewModel() }
 
             tvm.medTimeTrial.observe(this, Observer {
-                tvm.insertTt()
+                tvm.insertTt{Unit}
             })
 
         }
 
         button.setOnClickListener {
             val tvm = getViewModel { injector.testViewModel() }
-            tvm.insertTt()
-            tvm.medTimeTrial.observe(this, Observer {
-                it.id?.let {
-
-                    val intent = Intent(this@MainActivity, TimingActivity::class.java).apply { putExtra(ITEM_ID_EXTRA, it)}
-                    startActivity(intent)
-                }
-
-            })
+            tvm.insertTt {
+                val intent = Intent(this@MainActivity, TimingActivity::class.java).apply { putExtra(ITEM_ID_EXTRA, tvm.medTimeTrial.value?.timeTrialDefinition?.id)}
+                startActivity(intent)
+            }
 
         }
 

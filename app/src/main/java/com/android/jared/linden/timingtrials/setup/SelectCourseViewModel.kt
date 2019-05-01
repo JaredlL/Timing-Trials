@@ -17,8 +17,8 @@ class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCou
 
 
 
-    private val timeTrialDef = Transformations.map(ttSetup.timeTrial){it.timeTrialDefinition}
-    private val selectedCourse = timeTrialDef.value?.course
+    //private val timeTrialDef = Transformations.map(ttSetup.timeTrial){it.timeTrialDefinition}
+    private val selectedCourse = ttSetup.timeTrial.value?.timeTrialDefinition?.course
 
     private val mCourseWrapperList: LiveData<List<CourseListViewWrapper>>
             = Transformations.map(ttSetup.courseRepository.allCourses){ list -> list.map {course -> CourseListViewWrapper(course).apply {
@@ -37,7 +37,8 @@ class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCou
 
             val oldCourseName = selectedCourse?.courseName?: ""
 
-            timeTrialDef.value?.let { tt->
+            ttSetup.timeTrial.value?.let { ttd->
+                val tt = ttd.timeTrialDefinition
                 if(tt.ttName == ""){
                     val f = SimpleDateFormat("dd/MM/yy")
                     val c = Calendar.getInstance()

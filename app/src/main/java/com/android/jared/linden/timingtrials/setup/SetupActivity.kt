@@ -48,13 +48,13 @@ class SetupActivity : AppCompatActivity() {
 
         setupViewModel.timeTrialPropertiesViewModel.onBeginTt = {
 
-            setupViewModel.timeTrialDefinition.value?.let {
-                if(it.riders.count() == 0){
+            setupViewModel.timeTrial.value?.let {
+                if(it.riderList.count() == 0){
                     Toast.makeText(this, "TT Needs at least 1 rider", Toast.LENGTH_LONG).show()
                     container.currentItem = 1
                     return@let
                 }
-                if(it.startTime.isBefore(Instant.now())){
+                if(it.timeTrialDefinition.startTime.isBefore(Instant.now())){
                     Toast.makeText(this, "TT must start in the future, select start time", Toast.LENGTH_LONG).show()
                     TimePickerFragment().show(supportFragmentManager, "timePicker")
                     return@let

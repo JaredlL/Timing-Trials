@@ -55,15 +55,15 @@ class TestViewModel@Inject constructor(
         }
     }
 
-    fun insertTt(){
+    fun insertTt(callback: () -> Unit){
         viewModelScope.launch(Dispatchers.IO) {
            if(timeTrialRepository.getTimeTrialByName("Testing Timetrial") == null){
                medTimeTrial.value?.let {
                    val newTt = it.copy(timeTrialDefinition = it.timeTrialDefinition.copy(startTime = Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15)))
                    timeTrialRepository.insertOrUpdate(newTt)
+                   callback()
                }
            }
-
         }
     }
 

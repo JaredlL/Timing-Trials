@@ -1,16 +1,13 @@
 package com.android.jared.linden.timingtrials.ui
 
-import com.android.jared.linden.timingtrials.data.EventType
-import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.data.TimeTrialEvent
-import com.android.jared.linden.timingtrials.data.TimeTrialWithEvents
+import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 
-class EventViewWrapper(var event: TimeTrialEvent, val timeTrialWithEvents: TimeTrialWithEvents){
+class EventViewWrapper(var event: TimeTrialEvent, val timeTrialWithEvents: TimeTrial){
 
-    val timeStampString = ConverterUtils.toTenthsDisplayString(event.timeStamp.toEpochMilli() - timeTrialWithEvents.timeTrialDefinition.startTime.toEpochMilli())
+    val timeStampString = ConverterUtils.toTenthsDisplayString(event.timeStamp)
 
-    private fun getRider(): Rider? = event.riderId?.let {  timeTrialWithEvents.timeTrialDefinition.riders.firstOrNull{ rider -> rider.id == event.riderId}}
+    private fun getRider(): Rider? = event.riderId?.let {  timeTrialWithEvents.riderList.map { it.rider }.firstOrNull{ r -> r.id == event.riderId}}
 
 
     private val riderName: String = getRider()?.let { "${it.firstName} ${it.lastName}" }?: "Null"

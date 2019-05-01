@@ -35,14 +35,6 @@ class TimerFragment : Fragment() {
 
         val adapter = EventListAdapter(requireActivity())
         val viewManager = LinearLayoutManager(context)
-        timingViewModel.allTtWithEvent.observe(viewLifecycleOwner, Observer {
-            val i = it.count()
-
-        })
-
-        timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer {
-            var name = it.timeTrialDefinition.ttName
-        })
 
         timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
             res?.let {

@@ -47,7 +47,7 @@ class SetupConfirmationFragment : DialogFragment() {
             okButton.setOnClickListener {
                 if(confirmationViewModel.positiveFunction()){
                     val intent = Intent(requireActivity(), TimingActivity::class.java)
-                    intent.putExtra(ITEM_ID_EXTRA, confirmationViewModel.timeTrialDefinition.value?.id)
+                    intent.putExtra(ITEM_ID_EXTRA, confirmationViewModel.timeTrial.value?.timeTrialDefinition?.id)
                     startActivity(intent)
                     this@SetupConfirmationFragment.dismiss()
                 }else{
@@ -65,7 +65,7 @@ class SetupConfirmationFragment : DialogFragment() {
 
 class UseOldConfirmationFragment : DialogFragment() {
 
-    private lateinit var confirmationViewModel: ISetupConformationViewModel
+    //private lateinit var confirmationViewModel: ISetupConformationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,7 +76,7 @@ class UseOldConfirmationFragment : DialogFragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
 
-        confirmationViewModel = requireActivity().getViewModel { injector.mainViewModel() }.resumeOldViewModel
+       val confirmationViewModel = requireActivity().getViewModel { injector.mainViewModel() }.resumeOldViewModel
 
         confirmationViewModel.title.observe(viewLifecycleOwner, Observer { dialog?.setTitle(it) })
 

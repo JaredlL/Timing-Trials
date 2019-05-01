@@ -52,15 +52,15 @@ abstract class TimeTrialDao {
 
     @Query("SELECT * from timetrial_table ORDER BY startTime ASC") abstract fun getAllTimeTrials(): LiveData<List<TimeTrialDefinition>>
 
-    @Query("SELECT * FROM timetrial_table WHERE Id = :ttId LIMIT 1") abstract fun getTimeTrialById(ttId: Long): LiveData<TimeTrial>
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE Id = :ttId LIMIT 1") abstract fun getTimeTrialById(ttId: Long): LiveData<TimeTrial>
 
-    @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName LIMIT 1") abstract fun getTimeTrialByName(timeTrialName: String): TimeTrial?
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName LIMIT 1") abstract fun getTimeTrialByName(timeTrialName: String): TimeTrial?
 
     //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
-    @Query("SELECT * FROM timetrial_table WHERE isSetup = 0 LIMIT 1") abstract fun getSetupTimeTrial(): LiveData<TimeTrial>
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE isSetup = 0 LIMIT 1") abstract fun getSetupTimeTrial(): LiveData<TimeTrial>
 
 
-    @Query("SELECT * FROM timetrial_table WHERE Id = :timeTrialId LIMIT 1") abstract fun getFullTimeTrial(timeTrialId: Long): LiveData<TimeTrial>
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE Id = :timeTrialId LIMIT 1") abstract fun getFullTimeTrial(timeTrialId: Long): LiveData<TimeTrial>
 
 
     @Query("DELETE  FROM timetrial_event_table WHERE timeTrialId = :ttId") abstract fun _deleteTtEvents(ttId: Long)

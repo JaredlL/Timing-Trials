@@ -6,9 +6,9 @@ import androidx.room.*
         indices = [Index("timeTrialId")],
         foreignKeys = [ForeignKey(entity =TimeTrialDefinition::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = ForeignKey.CASCADE)])
 data class TimeTrialRider(@Embedded(prefix = "rider_") val rider: Rider,
-                          var timeTrialId: Long?,
+                          var timeTrialId: Long,
                           var number: Int? = null,
-                          var startTime: Int? = null,
+                          var startTime: Long? = null,
                           @PrimaryKey(autoGenerate = true) var id: Long? = null)
 
 

@@ -33,15 +33,15 @@ class RiderStatusFragment : Fragment() {
 
         timingViewModel = getViewModel { requireActivity().injector.timingViewModel() }.apply { initialise(timeTrialId) }
 
-        timingViewModel.allTtWithEvent.observe(viewLifecycleOwner, Observer {
+//        timingViewModel.allTtWithEvent.observe(viewLifecycleOwner, Observer {
+//
+//        })
 
-        })
+       // val adapter = RiderStatusAdapter(requireActivity())
+        //val viewManager = GridLayoutManager(context, 4)
 
-        val adapter = RiderStatusAdapter(requireActivity())
-        val viewManager = GridLayoutManager(context, 4)
-
-        riderStatuses.adapter = adapter
-        riderStatuses.layoutManager = viewManager
+        //riderStatuses.adapter = adapter
+        //riderStatuses.layoutManager = viewManager
         return inflater.inflate(R.layout.fragment_timer_rider_status, container, false)
     }
 

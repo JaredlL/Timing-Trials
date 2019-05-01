@@ -76,7 +76,7 @@ class ResumeOldConfirmationViewModel (private val mainViewModel: MainViewModel) 
 
 
     override val timeTrial = mainViewModel.timeTrial
-    val timeTrialDefinition = Transformations.map(timeTrial){it.timeTrialDefinition}
+    val timeTrialDefinition = Transformations.map(timeTrial){it?.timeTrialDefinition}
 
     override val title = Transformations.map(timeTrialDefinition){ tt ->
         "Resume setting up previous ${tt?.ttName} ?"
