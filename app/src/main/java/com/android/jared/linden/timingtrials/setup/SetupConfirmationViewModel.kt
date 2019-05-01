@@ -55,8 +55,7 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
         timeTrialDefinition.value?.let {
             return if(it.startTime.isAfter(Instant.now())){
 
-                it.isSetup = true
-                ttSetup.updateDefinition(it)
+                ttSetup.updateDefinition(it.copy(isSetup = true))
                 ttSetup.insertTt()
 
                 true

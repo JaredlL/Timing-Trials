@@ -26,7 +26,7 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
     var mStatus: List<RiderStatusViewWrapper> = listOf()
     val layoutInflater = LayoutInflater.from(context)
 
-    fun setEvents(newStatus: List<RiderStatusViewWrapper>){
+    fun setRiderStatus(newStatus: List<RiderStatusViewWrapper>){
         mStatus = newStatus
         notifyDataSetChanged()
     }

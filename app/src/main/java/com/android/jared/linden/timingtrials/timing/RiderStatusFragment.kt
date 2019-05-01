@@ -6,11 +6,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.databinding.FragmentTimerRiderStatusBinding
+import com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper
 import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
@@ -33,16 +36,21 @@ class RiderStatusFragment : Fragment() {
 
         timingViewModel = getViewModel { requireActivity().injector.timingViewModel() }.apply { initialise(timeTrialId) }
 
-//        timingViewModel.allTtWithEvent.observe(viewLifecycleOwner, Observer {
-//
-//        })
+        val adapter = RiderStatusAdapter(requireActivity())
+        val viewManager = GridLayoutManager(context, 4)
 
-       // val adapter = RiderStatusAdapter(requireActivity())
-        //val viewManager = GridLayoutManager(context, 4)
+        timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer {
+            adapter.setRiderStatus(it.riderList.map { r -> RiderStatusViewWrapper(r, it ) })
+        })
 
-        //riderStatuses.adapter = adapter
-        //riderStatuses.layoutManager = viewManager
-        return inflater.inflate(R.layout.fragment_timer_rider_status, container, false)
+        val binding = DataBindingUtil.inflate<FragmentTimerRiderStatusBinding>(inflater, R.layout.fragment_timer_rider_status, container, false).apply {
+            lifecycleOwner=this@RiderStatusFragment
+            riderStatuses.adapter = adapter
+            riderStatuses.layoutManager = viewManager
+        }
+
+
+        return binding.root
     }
 
     companion object {

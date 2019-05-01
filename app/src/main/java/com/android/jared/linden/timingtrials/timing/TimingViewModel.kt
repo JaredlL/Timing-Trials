@@ -17,7 +17,6 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     private var departedRidersIdsCached = ArrayList<Long>()
     private var finishedRidersIdsCached = ArrayList<Long>()
-    private var numberOfRiders = 0
 
 
     private fun getFinishedRiders(): List<TimeTrialRider> {
@@ -38,8 +37,8 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     private val TIMER_PERIOD_MS = 50L
 
     fun initialise(timeTrialId: Long) {
-        if (timeTrial.value == null && timeTrialId != 0L) {
-            timeTrial.addSource(timeTrialRepository.getTimeTrialById(timeTrialId)) { result ->
+        if (timeTrial.value == null) {
+            timeTrial.addSource(timeTrialRepository.getTimingTimeTrial()) { result ->
                 result?.let {tt->
                     timeTrial.value = tt
                     tt.riderList.forEachIndexed{ index, rider ->
@@ -169,7 +168,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
                 //return "NULL"
             }else{
-                return "${finishedRidersIdsCached.count()} riders have finished, ${numberOfRiders - finishedRidersIdsCached.count()} riders on course"
+                return "${finishedRidersIdsCached.count()} riders have finished, ${tte.riderList.count() - finishedRidersIdsCached.count()} riders on course"
             }
         }
         return "No TT Loaded"

@@ -45,6 +45,7 @@ class SetupViewModel @Inject constructor(
                     mutList.add(toPosition + 1, mutList[fromPosition])
                     mutList.removeAt(fromPosition)
                 }
+                mutList.forEachIndexed { index, timeTrialRider -> timeTrialRider.number = index + 1 }
 
                 timeTrial.value?.let {
                     it.riderList = mutList

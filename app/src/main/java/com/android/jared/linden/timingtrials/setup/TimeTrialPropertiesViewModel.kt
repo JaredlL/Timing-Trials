@@ -26,10 +26,12 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
 
    override val timeTrialDefinition = Transformations.map(ttSetup.timeTrial){it.timeTrialDefinition}
 
-    private val timeTrialValue = ttSetup.timeTrial.value?.timeTrialDefinition
+    //private val timeTrialValue = ttSetup.timeTrial.value?.timeTrialDefinition
 
     override val courseName: LiveData<String> = Transformations.map(ttSetup.timeTrial){tt->
-        tt?.let { it.timeTrialDefinition.course?.courseName }
+        tt?.let{
+            tt.timeTrialDefinition.course?.courseName
+        }
     }
 
 
@@ -43,7 +45,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
 
         }
         addSource(timeTrialName) { newName ->
-            timeTrialValue?.let {
+            ttSetup.timeTrial.value?.timeTrialDefinition?.let {
                 if(it.ttName != newName) {
                     it.ttName = newName
                     ttSetup.updateDefinition(it)
@@ -65,7 +67,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
         }
         addSource(laps) {laps->
             laps.toIntOrNull()?.let{newLaps ->
-                timeTrialValue?.let {tt->
+                timeTrialDefinition.value?.let {tt->
                 if(tt.laps != newLaps) {
                     tt.laps = newLaps
                     ttSetup.updateDefinition(tt)
@@ -77,7 +79,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
     override val interval = MutableLiveData<String>()
     private val intervalMediator = MediatorLiveData<String>().apply {
         addSource(interval) {interval->
-            timeTrialValue?.let { tt ->
+            timeTrialDefinition.value?.let { tt ->
                 interval.toIntOrNull()?.let{
                     if(tt.interval != it){
                         tt.interval = it
@@ -107,7 +109,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
 
         }
         addSource(startTime) {newStartTime->
-            timeTrialValue?.let {tt->
+            timeTrialDefinition.value?.let {tt->
                 if(tt.startTime != newStartTime) {
                     tt.startTime = newStartTime
                     ttSetup.updateDefinition(tt)
