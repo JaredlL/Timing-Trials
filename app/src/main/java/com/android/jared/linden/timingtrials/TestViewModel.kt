@@ -61,9 +61,11 @@ class TestViewModel@Inject constructor(
                medTimeTrial.value?.let {
                    val newTt = it.copy(timeTrialDefinition = it.timeTrialDefinition.copy(startTime = Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15)))
                    timeTrialRepository.insertOrUpdate(newTt)
-                   callback()
+                   //callback()
                }
+
            }
+            callback()
         }
     }
 

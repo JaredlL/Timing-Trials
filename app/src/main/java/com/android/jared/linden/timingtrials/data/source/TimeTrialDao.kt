@@ -35,10 +35,10 @@ abstract class TimeTrialDao {
             _deleteTtRiders(ttId)
 
             timeTrial.eventList.forEach { it.timeTrialId = ttId }
-            _insertAllTimeTrialRiders(timeTrial.riderList)
+            _insertAllEvents(timeTrial.eventList)
 
             timeTrial.riderList.forEach { it.timeTrialId = ttId }
-            _insertAllEvents(timeTrial.eventList)
+            _insertAllTimeTrialRiders(timeTrial.riderList)
         }
 
     }
@@ -49,6 +49,8 @@ abstract class TimeTrialDao {
     }
 
     @Query("DELETE FROM timetrial_table") abstract fun deleteAll()
+    @Query("DELETE FROM timetrial_rider_table") abstract fun deleteAllR()
+    @Query("DELETE FROM timetrial_event_table") abstract fun deleteAllE()
 
     @Query("SELECT * from timetrial_table ORDER BY startTime ASC") abstract fun getAllTimeTrials(): LiveData<List<TimeTrialDefinition>>
 

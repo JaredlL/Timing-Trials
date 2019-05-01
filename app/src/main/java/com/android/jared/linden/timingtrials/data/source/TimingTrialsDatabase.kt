@@ -8,7 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [Rider::class, Course::class, TimeTrialDefinition::class, TimeTrialEvent::class, TimeTrialRider::class], version = 12, exportSchema = false)
+@Database(entities = [Rider::class, Course::class, TimeTrialDefinition::class, TimeTrialEvent::class, TimeTrialRider::class], version = 13, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 
@@ -114,6 +114,8 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
 
         fun populateTt(timeTrialDao: TimeTrialDao, riderDao: RiderDao, courseDao: CourseDao){
 
+            timeTrialDao.deleteAllR()
+            timeTrialDao.deleteAllE()
             timeTrialDao.deleteAll()
         }
 

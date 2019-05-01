@@ -44,7 +44,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                     timeTrial.value = tt
                     tt.riderList.forEachIndexed{ index, rider ->
                         rider.number = index + 1
-                        rider.startTime = (tt.timeTrialDefinition.interval * (index + 1)).toLong()
+                        rider.startTime = (tt.timeTrialDefinition.interval * 1000 * (index + 1)).toLong()
                     }
 
                     ttIntervalMilis = (tt.timeTrialDefinition.interval * 1000).toLong()
