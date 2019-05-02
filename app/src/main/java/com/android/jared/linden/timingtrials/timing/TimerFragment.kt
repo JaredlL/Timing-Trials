@@ -24,14 +24,13 @@ import com.android.jared.linden.timingtrials.util.injector
  */
 class TimerFragment : Fragment() {
 
-    private val timeTrialId by argument<Long>(ITEM_ID_EXTRA)
     private lateinit var timingViewModel: TimingViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
 
-        timingViewModel = getViewModel { requireActivity().injector.timingViewModel() }.apply { initialise(timeTrialId) }
+        timingViewModel = getViewModel { requireActivity().injector.timingViewModel() }
 
         val adapter = EventListAdapter(requireActivity())
         val viewManager = LinearLayoutManager(context)
@@ -55,9 +54,8 @@ class TimerFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(ttId: Long): TimerFragment {
-            val args = Bundle().apply { putLong(ITEM_ID_EXTRA, ttId) }
-            return TimerFragment().apply { arguments = args }
+        fun newInstance(): TimerFragment {
+            return TimerFragment()
         }
     }
 

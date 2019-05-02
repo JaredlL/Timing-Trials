@@ -2,7 +2,7 @@ package com.android.jared.linden.timingtrials.data.source
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.android.jared.linden.timingtrials.data.TimeTrialDefinition
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialEvent
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.data.TimeTrial
@@ -10,17 +10,17 @@ import com.android.jared.linden.timingtrials.data.TimeTrial
 @Dao
 abstract class TimeTrialDao {
     @Insert
-    abstract fun insert(timeTrialDefinition: TimeTrialDefinition): Long
+    abstract fun insert(timeTrialHeader: TimeTrialHeader): Long
 
     @Update
-    abstract fun update(timeTrialDefinition: TimeTrialDefinition)
+    abstract fun update(timeTrialHeader: TimeTrialHeader)
 
     @Delete
-    abstract fun delete(timeTrialDefinition: TimeTrialDefinition)
+    abstract fun delete(timeTrialHeader: TimeTrialHeader)
 
     @Transaction @Insert
     fun insert(timeTrial: TimeTrial){
-        val id = insert(timeTrial.timeTrialDefinition)
+        val id = insert(timeTrial.timeTrialHeader)
         timeTrial.eventList.forEach { it.timeTrialId = id }
         _insertAllEvents(timeTrial.eventList)
         timeTrial.riderList.forEach { it.timeTrialId = id }
@@ -29,8 +29,8 @@ abstract class TimeTrialDao {
 
     @Transaction @Update
     fun update(timeTrial: TimeTrial){
-        timeTrial.timeTrialDefinition.id?.let { ttId->
-            update(timeTrial.timeTrialDefinition)
+        timeTrial.timeTrialHeader.id?.let { ttId->
+            update(timeTrial.timeTrialHeader)
             _deleteTtEvents(ttId)
             _deleteTtRiders(ttId)
 
@@ -45,14 +45,14 @@ abstract class TimeTrialDao {
 
     @Delete
     fun delete(timeTrial: TimeTrial){
-        delete(timeTrial.timeTrialDefinition)
+        delete(timeTrial.timeTrialHeader)
     }
 
     @Query("DELETE FROM timetrial_table") abstract fun deleteAll()
     @Query("DELETE FROM timetrial_rider_table") abstract fun deleteAllR()
     @Query("DELETE FROM timetrial_event_table") abstract fun deleteAllE()
 
-    @Query("SELECT * from timetrial_table ORDER BY startTime ASC") abstract fun getAllTimeTrials(): LiveData<List<TimeTrialDefinition>>
+    @Query("SELECT * from timetrial_table ORDER BY startTime ASC") abstract fun getAllTimeTrials(): LiveData<List<TimeTrialHeader>>
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE Id = :ttId LIMIT 1") abstract fun getTimeTrialById(ttId: Long): LiveData<TimeTrial>
 

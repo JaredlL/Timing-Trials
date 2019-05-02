@@ -27,9 +27,9 @@ class SetupViewModel @Inject constructor(
 
     val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
 
-    fun updateDefinition(ttDefinition: TimeTrialDefinition){
+    fun updateDefinition(ttHeader: TimeTrialHeader){
         timeTrial.value?.let {
-            timeTrial.value = it.copy(timeTrialDefinition = ttDefinition)
+            timeTrial.value = it.copy(timeTrialHeader = ttHeader)
         }
     }
 
@@ -113,7 +113,7 @@ class SetupViewModel @Inject constructor(
                         //Only keep riders which are still in the DB
                         val newList = oldSelected.filter { i -> (retainedIds.contains(i.key))}.values.toList()
                         ttdef.let {
-                            it.riderList = newList.map { r-> TimeTrialRider(r, it.timeTrialDefinition.id) }
+                            it.riderList = newList.map { r-> TimeTrialRider(r, it.timeTrialHeader.id) }
                             timeTrial.value = it
                         }
                     }

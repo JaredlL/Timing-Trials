@@ -22,21 +22,20 @@ class TimingActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        val itemId = intent.getLongExtra(ITEM_ID_EXTRA, 0)
 
         /**
          * Check if the fragemts already exist in child fragment manager
          * To make sure we do not recreate fragments unnecessarily
          */
 
-        supportFragmentManager.findFragmentByTag(TIMERTAG)?: TimerFragment.newInstance(itemId).also {
+        supportFragmentManager.findFragmentByTag(TIMERTAG)?: TimerFragment.newInstance().also {
             supportFragmentManager.beginTransaction().apply{
                 add(R.id.higherFrame, it, TIMERTAG)
                 commit()
             }
         }
 
-        supportFragmentManager.findFragmentByTag(STATUSTAG)?: RiderStatusFragment.newInstance(itemId).also {
+        supportFragmentManager.findFragmentByTag(STATUSTAG)?: RiderStatusFragment.newInstance().also {
             supportFragmentManager.beginTransaction().apply{
                 add(R.id.lowerFrame, it, STATUSTAG)
                 commit()

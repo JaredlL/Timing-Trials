@@ -11,7 +11,6 @@ import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.TimingTrialsDbActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         val vm = getViewModel { injector.mainViewModel() }
         vm.timeTrial.observe(this, Observer {tt->
             tt?.let {
-                setupId = tt.timeTrialDefinition.id
+                setupId = tt.timeTrialHeader.id
             }
 
         })
@@ -40,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
 
         ma_butt_begintt.setOnClickListener {
-            val intent = Intent(this@MainActivity, SetupActivity::class.java)
+
 
                 if(setupId != null){
 
@@ -51,7 +50,8 @@ class MainActivity : AppCompatActivity() {
                         confDialog.show(supportFragmentManager, "useold")
                     }
                 }else{
-                    startActivity(intent)
+                    val mIntent = Intent(this@MainActivity, SetupActivity::class.java)
+                    startActivity(mIntent)
                 }
 
 
@@ -73,8 +73,8 @@ class MainActivity : AppCompatActivity() {
 
             tvm.medTimeTrial.observe(this, Observer {
                 it?.let {tt->
-                    if(tt.riderList.count() > 0 && tt.timeTrialDefinition.course != null){
-                        val id = tt.timeTrialDefinition.id
+                    if(tt.riderList.count() > 0 && tt.timeTrialHeader.course != null){
+                        val id = tt.timeTrialHeader.id
                         if(id !=null){
                             val intent = Intent(this@MainActivity, TimingActivity::class.java).apply { putExtra(ITEM_ID_EXTRA, id) }
                             startActivity(intent)

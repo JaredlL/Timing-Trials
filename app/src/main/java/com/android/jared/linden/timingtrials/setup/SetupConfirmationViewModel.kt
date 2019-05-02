@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.android.jared.linden.timingtrials.MainViewModel
 import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.data.TimeTrialDefinition
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import org.threeten.bp.Instant
 
@@ -21,7 +20,7 @@ interface ISetupConformationViewModel{
 class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupConformationViewModel{
 
    override val timeTrial = ttSetup.timeTrial
-    val timeTrialDefinition = Transformations.map(timeTrial){it.timeTrialDefinition}
+    val timeTrialDefinition = Transformations.map(timeTrial){it.timeTrialHeader}
 
     override val title = Transformations.map(timeTrialDefinition){ tt ->
         "Starting ${tt?.ttName}"
@@ -33,10 +32,10 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
 
    override val ridersInterval = Transformations.map(timeTrial){
        it?.let {tt->
-           if(tt.timeTrialDefinition.interval == 0){
+           if(tt.timeTrialHeader.interval == 0){
                return@map "${tt.riderList?.count()} riders starting at 0 second intervals, mass start!"
            }else{
-               return@map "${tt.riderList?.count()} riders starting at ${tt.timeTrialDefinition.interval} second intervals"
+               return@map "${tt.riderList?.count()} riders starting at ${tt.timeTrialHeader.interval} second intervals"
            }
        }
        return@map "Null"
@@ -75,7 +74,7 @@ class ResumeOldConfirmationViewModel (private val mainViewModel: MainViewModel) 
 
 
     override val timeTrial = mainViewModel.timeTrial
-    val timeTrialDefinition = Transformations.map(timeTrial){it?.timeTrialDefinition}
+    val timeTrialDefinition = Transformations.map(timeTrial){it?.timeTrialHeader}
 
     override val title = Transformations.map(timeTrialDefinition){ tt ->
         "Resume setting up previous ${tt?.ttName} ?"
@@ -87,10 +86,10 @@ class ResumeOldConfirmationViewModel (private val mainViewModel: MainViewModel) 
 
     override val ridersInterval = Transformations.map(timeTrial){ tt->
         if(tt!= null) {
-            if(tt.timeTrialDefinition.interval == 0){
+            if(tt.timeTrialHeader.interval == 0){
                 "${tt.riderList.count()} riders starting at 0 second intervals, mass start!"
             }else{
-                "${tt.riderList.count()} riders starting at ${tt.timeTrialDefinition.interval} second intervals"
+                "${tt.riderList.count()} riders starting at ${tt.timeTrialHeader.interval} second intervals"
             }
         }else{
             "null"

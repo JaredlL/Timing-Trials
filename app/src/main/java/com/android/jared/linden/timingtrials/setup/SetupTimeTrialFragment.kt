@@ -49,7 +49,7 @@ class SetupTimeTrialFragment : Fragment() {
 
         propsViewModel.timeTrialName.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
            if(it == ""){
-               propsViewModel.timeTrialDefinition.value?.let { tt->
+               propsViewModel.timeTrialHeader.value?.let { tt->
                    if (tt.course == null){
                        showCourseFrag()
                    }

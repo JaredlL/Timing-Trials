@@ -17,10 +17,10 @@ class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCou
 
 
 
-    //private val timeTrialDef = Transformations.map(ttSetup.timeTrial){it.timeTrialDefinition}
-    //private val selectedCourse = ttSetup.timeTrial.value?.timeTrialDefinition?.course
+    //private val timeTrialDef = Transformations.map(ttSetup.timeTrial){it.timeTrialHeader}
+    //private val selectedCourse = ttSetup.timeTrial.value?.timeTrialHeader?.course
 
-    private fun selectedCourse(): Course? { return ttSetup.timeTrial.value?.timeTrialDefinition?.course }
+    private fun selectedCourse(): Course? { return ttSetup.timeTrial.value?.timeTrialHeader?.course }
 
     private val mCourseWrapperList: LiveData<List<CourseListViewWrapper>>
             = Transformations.map(ttSetup.courseRepository.allCourses){ list -> list.map {course -> CourseListViewWrapper(course).apply {
@@ -40,7 +40,7 @@ class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCou
             val oldCourseName = selectedCourse()?.courseName?: ""
 
             ttSetup.timeTrial.value?.let { ttd->
-                val tt = ttd.timeTrialDefinition
+                val tt = ttd.timeTrialHeader
                 if(tt.ttName == ""){
 
                     //Todo: Use Threeten

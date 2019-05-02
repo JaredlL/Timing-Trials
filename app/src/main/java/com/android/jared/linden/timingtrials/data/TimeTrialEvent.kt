@@ -6,7 +6,7 @@ import com.android.jared.linden.timingtrials.data.source.Converters
 
 @Entity(tableName = "timetrial_event_table",
         indices = [Index("timeTrialId")],
-        foreignKeys = [ForeignKey(entity =TimeTrialDefinition::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = CASCADE, deferred = true)])
+        foreignKeys = [ForeignKey(entity =TimeTrialHeader::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = CASCADE, deferred = true)])
 data class TimeTrialEvent(var timeTrialId: Long,
                           var riderId: Long?,
                           var timeStamp: Long,
@@ -14,7 +14,7 @@ data class TimeTrialEvent(var timeTrialId: Long,
                           @PrimaryKey(autoGenerate = true) var id: Long? = null)
 
 
-//data class TimeTrialWithEvents(@Embedded var timeTrialDefinition: TimeTrialDefinition,
+//data class TimeTrialWithEvents(@Embedded var timeTrialHeader: TimeTrialHeader,
 //                               @Relation(parentColumn = "id", entityColumn = "timeTrialId", entity = TimeTrialEvent::class)
 //                               var eventList: List<TimeTrialEvent> = listOf())
 

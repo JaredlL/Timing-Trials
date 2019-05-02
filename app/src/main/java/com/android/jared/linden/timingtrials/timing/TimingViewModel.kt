@@ -36,17 +36,16 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     private var timer: Timer = Timer()
     private val TIMER_PERIOD_MS = 50L
 
-    fun initialise(timeTrialId: Long) {
+    init {
         if (timeTrial.value == null) {
             timeTrial.addSource(timeTrialRepository.getTimingTimeTrial()) { result ->
                 result?.let {tt->
-                    timeTrial.value = tt
                     tt.riderList.forEachIndexed{ index, rider ->
                         rider.number = index + 1
-                        rider.startTime = (tt.timeTrialDefinition.interval * 1000 * (index + 1)).toLong()
+                        rider.startTime = (tt.timeTrialHeader.interval * 1000 * (index + 1)).toLong()
                     }
 
-                    ttIntervalMilis = (tt.timeTrialDefinition.interval * 1000).toLong()
+                    ttIntervalMilis = (tt.timeTrialHeader.interval * 1000).toLong()
 
                     departedRidersIdsCached.clear()
                     finishedRidersIdsCached.clear()
@@ -63,6 +62,8 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                         }
                     }
                     timer.scheduleAtFixedRate(task, 0L, TIMER_PERIOD_MS)
+
+                    timeTrial.value = tt
                 }
             }
         }
@@ -71,9 +72,9 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     fun onRiderPassed(){
 
         timeTrial.value?.let { tte->
-            val now = Instant.now().toEpochMilli() - tte.timeTrialDefinition.startTime.toEpochMilli()
+            val now = Instant.now().toEpochMilli() - tte.timeTrialHeader.startTime.toEpochMilli()
             val newEvents = tte.eventList.toMutableList()
-            newEvents.add(TimeTrialEvent(tte.timeTrialDefinition.id?:0, null, now, EventType.RIDER_PASSED))
+            newEvents.add(TimeTrialEvent(tte.timeTrialHeader.id?:0, null, now, EventType.RIDER_PASSED))
             tte.eventList = newEvents
             timeTrial.postValue(tte)
         }
@@ -83,7 +84,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     private fun updateLoop(){
         timeTrial.value?.let { tt->
             val now = Instant.now()
-            val millisSinceStart = now.toEpochMilli() - tt.timeTrialDefinition.startTime.toEpochMilli()
+            val millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toEpochMilli()
 
             //val dr: ArrayList<Long> = departedRidersIdsCached
             //val fr: ArrayList<Long> = finishedRidersIdsCached
@@ -93,7 +94,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
             updateEvents(millisSinceStart, nextRiderIndex)
 
-            timeString.postValue(ConverterUtils.toTenthsDisplayString(now.toEpochMilli() - tt.timeTrialDefinition.startTime.toEpochMilli()))
+            timeString.postValue(ConverterUtils.toTenthsDisplayString(now.toEpochMilli() - tt.timeTrialHeader.startTime.toEpochMilli()))
             statusString.postValue(getStatusString(millisSinceStart, nextRiderIndex))
 
         }
@@ -108,7 +109,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
                 departedRidersIdsCached.addAll(newStartingIds)
                 val newEvents = tte.eventList.toMutableList()
-                newEvents.addAll(newStartingIds.map { TimeTrialEvent(tte.timeTrialDefinition.id?:0, it, millisSinceStart, EventType.RIDER_STARTED) })
+                newEvents.addAll(newStartingIds.map { TimeTrialEvent(tte.timeTrialHeader.id?:0, it, millisSinceStart, EventType.RIDER_STARTED) })
                 tte.eventList = newEvents
                 timeTrial.postValue(tte)
 
@@ -129,7 +130,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                 //If we are more than 1 min before TT start time
                 if((millisSinceStart + 60000) < (stillToGo.first().startTime ?: 0)){
                     //val dur = Duration.between(currentTime, ridersToStart.firstKey())
-                    return "TimeTrialDefinition starts at 00:00:0, First rider off 1 minute later"
+                    return "TimeTrialHeader starts at 00:00:0, First rider off 1 minute later"
                 }
 
 

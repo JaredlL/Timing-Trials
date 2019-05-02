@@ -16,7 +16,7 @@ interface ITimeTrialRepository{
     fun getSetupTimeTrial(): LiveData<TimeTrial>
     fun getTimingTimeTrial(): LiveData<TimeTrial>
     fun getTimeTrialById(id: Long): LiveData<TimeTrial>
-    val allTimeTrialsDefinition: LiveData<List<TimeTrialDefinition>>
+    val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>>
 }
 
 @Singleton
@@ -29,7 +29,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     }
 
 
-    override val allTimeTrialsDefinition: LiveData<List<TimeTrialDefinition>> = timeTrialDao.getAllTimeTrials()
+    override val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>> = timeTrialDao.getAllTimeTrials()
 
     // You must call this on a non-UI thread or your app will crash. So we're making this a
     // suspend function so the caller methods know this.
@@ -73,7 +73,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun insertOrUpdate(timeTrial: TimeTrial){
-        val id = timeTrial.timeTrialDefinition.id ?: 0
+        val id = timeTrial.timeTrialHeader.id ?: 0
         if(id != 0L){
             timeTrialDao.update(timeTrial)
         }else{

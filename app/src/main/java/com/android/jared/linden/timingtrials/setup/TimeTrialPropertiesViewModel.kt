@@ -1,14 +1,14 @@
 package com.android.jared.linden.timingtrials.setup
 
 import androidx.lifecycle.*
-import com.android.jared.linden.timingtrials.data.TimeTrialDefinition
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import org.threeten.bp.Instant
 
 
 interface ITimeTrialPropertiesViewModel{
 
-    val timeTrialDefinition: LiveData<TimeTrialDefinition>
+    val timeTrialHeader: LiveData<TimeTrialHeader>
     val timeTrialName: MutableLiveData<String>
     val startTimeString: LiveData<String>
     val courseName: LiveData<String>
@@ -24,13 +24,13 @@ interface ITimeTrialPropertiesViewModel{
 
 class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITimeTrialPropertiesViewModel{
 
-   override val timeTrialDefinition = Transformations.map(ttSetup.timeTrial){it.timeTrialDefinition}
+   override val timeTrialHeader = Transformations.map(ttSetup.timeTrial){it.timeTrialHeader}
 
-    //private val timeTrialValue = ttSetup.timeTrial.value?.timeTrialDefinition
+    //private val timeTrialValue = ttSetup.timeTrial.value?.timeTrialHeader
 
     override val courseName: LiveData<String> = Transformations.map(ttSetup.timeTrial){tt->
         tt?.let{
-            tt.timeTrialDefinition.course?.courseName
+            tt.timeTrialHeader.course?.courseName
         }
     }
 
@@ -41,11 +41,11 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
     override val timeTrialName: MutableLiveData<String> = MutableLiveData("")
     private val nameMediator = MediatorLiveData<String>().apply {
         addSource(ttSetup.timeTrial) { tt->
-            tt?.timeTrialDefinition?.let { if(timeTrialName.value != it.ttName) timeTrialName.value = it.ttName }
+            tt?.timeTrialHeader?.let { if(timeTrialName.value != it.ttName) timeTrialName.value = it.ttName }
 
         }
         addSource(timeTrialName) { newName ->
-            ttSetup.timeTrial.value?.timeTrialDefinition?.let {
+            ttSetup.timeTrial.value?.timeTrialHeader?.let {
                 if(it.ttName != newName) {
                     it.ttName = newName
                     ttSetup.updateDefinition(it)
@@ -59,15 +59,15 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
     private val lapsMediator = MediatorLiveData<String>().apply {
         addSource(ttSetup.timeTrial) { tt->
             tt?.let {
-                if (laps.value != it.timeTrialDefinition.laps.toString()) {
-                    laps.value = it.timeTrialDefinition.laps.toString()
+                if (laps.value != it.timeTrialHeader.laps.toString()) {
+                    laps.value = it.timeTrialHeader.laps.toString()
                 }
             }
 
         }
         addSource(laps) {laps->
             laps.toIntOrNull()?.let{newLaps ->
-                timeTrialDefinition.value?.let {tt->
+                timeTrialHeader.value?.let { tt->
                 if(tt.laps != newLaps) {
                     tt.laps = newLaps
                     ttSetup.updateDefinition(tt)
@@ -79,7 +79,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
     override val interval = MutableLiveData<String>()
     private val intervalMediator = MediatorLiveData<String>().apply {
         addSource(interval) {interval->
-            timeTrialDefinition.value?.let { tt ->
+            timeTrialHeader.value?.let { tt ->
                 interval.toIntOrNull()?.let{
                     if(tt.interval != it){
                         tt.interval = it
@@ -90,8 +90,8 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
         }
         addSource(ttSetup.timeTrial) { tt->
             tt?.let {
-                if (interval.value != it.timeTrialDefinition.interval.toString()) {
-                    interval.value = it.timeTrialDefinition.interval.toString()
+                if (interval.value != it.timeTrialHeader.interval.toString()) {
+                    interval.value = it.timeTrialHeader.interval.toString()
                 }
             }
 
@@ -100,7 +100,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
 
     override val startTime = MutableLiveData<Instant>()
     private val startTimeMediator = MediatorLiveData<Instant>().apply {
-        addSource(timeTrialDefinition) { tt->
+        addSource(timeTrialHeader) { tt->
             tt?.let {
                 if (startTime.value != it.startTime) {
                     startTime.value = it.startTime
@@ -109,7 +109,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
 
         }
         addSource(startTime) {newStartTime->
-            timeTrialDefinition.value?.let {tt->
+            timeTrialHeader.value?.let { tt->
                 if(tt.startTime != newStartTime) {
                     tt.startTime = newStartTime
                     ttSetup.updateDefinition(tt)
@@ -118,7 +118,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
         }
     }.also { it.observeForever {  } }
 
-    override val startTimeString: LiveData<String>  = Transformations.map(timeTrialDefinition){ tt->
+    override val startTimeString: LiveData<String>  = Transformations.map(timeTrialHeader){ tt->
         tt?.let { ConverterUtils.instantToSecondsDisplayString(it.startTime)}
     }
 

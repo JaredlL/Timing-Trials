@@ -54,7 +54,7 @@ class SetupActivity : AppCompatActivity() {
                     container.currentItem = 1
                     return@let
                 }
-                if(it.timeTrialDefinition.startTime.isBefore(Instant.now())){
+                if(it.timeTrialHeader.startTime.isBefore(Instant.now())){
                     Toast.makeText(this, "TT must start in the future, select start time", Toast.LENGTH_LONG).show()
                     TimePickerFragment().show(supportFragmentManager, "timePicker")
                     return@let

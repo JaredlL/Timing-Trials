@@ -34,7 +34,7 @@ class RiderStatusFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
 
-        timingViewModel = getViewModel { requireActivity().injector.timingViewModel() }.apply { initialise(timeTrialId) }
+        timingViewModel = getViewModel { requireActivity().injector.timingViewModel() }
 
         val adapter = RiderStatusAdapter(requireActivity())
         val viewManager = GridLayoutManager(context, 4)
@@ -54,9 +54,8 @@ class RiderStatusFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(ttId: Long): RiderStatusFragment {
-            val args = Bundle().apply { putLong(ITEM_ID_EXTRA, ttId) }
-            return RiderStatusFragment().apply { arguments = args }
+        fun newInstance(): RiderStatusFragment {
+            return RiderStatusFragment()
         }
     }
 

@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.android.jared.linden.timingtrials.data.TimeTrialDefinition"/>
+            type="com.android.jared.linden.timingtrials.data.TimeTrialHeader"/>
     </data>
     <RelativeLayout
         android:layout_width="match_parent"

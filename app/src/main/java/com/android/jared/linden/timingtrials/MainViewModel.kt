@@ -3,7 +3,6 @@ package com.android.jared.linden.timingtrials
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.ITimeTrialRepository
 import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.data.TimeTrialDefinition
 import com.android.jared.linden.timingtrials.setup.ResumeOldConfirmationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

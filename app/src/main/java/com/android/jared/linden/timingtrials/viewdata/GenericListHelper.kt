@@ -7,7 +7,7 @@ import androidx.databinding.DataBindingUtil
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.data.TimeTrialDefinition
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemTimetrialBinding
@@ -84,10 +84,10 @@ class CourseViewHolderFactory: GenericViewHolderFactory<CourseListViewWrapper>()
 }
 
 
-class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHolder<TimeTrialDefinition, ListItemTimetrialBinding>(binding) {
+class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHolder<TimeTrialHeader, ListItemTimetrialBinding>(binding) {
     private val _binding = binding
 
-    override fun bind(vm: TimeTrialDefinition){
+    override fun bind(vm: TimeTrialHeader){
         _binding.apply{
             viewModel = vm
             executePendingBindings()
@@ -95,20 +95,20 @@ class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHol
     }
 }
 
-class TimeTrialViewHolderFactory: GenericViewHolderFactory<TimeTrialDefinition>() {
+class TimeTrialViewHolderFactory: GenericViewHolderFactory<TimeTrialHeader>() {
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
-        return createView(layoutInflator, parent, TimeTrialDefinition.createBlank().apply {
+        return createView(layoutInflator, parent, TimeTrialHeader.createBlank().apply {
             ttName = "Time Trial Name"
             course = Course.createBlank().apply { courseName = "Course Name" }
         })
     }
 
-    override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: TimeTrialDefinition): View {
+    override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: TimeTrialHeader): View {
         var binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false).apply { viewModel = data }
         return binding.root
     }
 
-    override fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?): GenericBaseHolder<TimeTrialDefinition, ListItemTimetrialBinding> {
+    override fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?): GenericBaseHolder<TimeTrialHeader, ListItemTimetrialBinding> {
         var binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false)
         return TimeTrialListViewHolder(binding)
     }

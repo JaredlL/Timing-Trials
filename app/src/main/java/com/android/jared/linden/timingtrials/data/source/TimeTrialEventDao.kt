@@ -8,7 +8,7 @@ import com.android.jared.linden.timingtrials.data.TimeTrialEvent
 //interface TimeTrialEventDao {
 //
 //    @Transaction fun updateTimeTrialEvents(ttWithEvents: TimeTrialWithEvents){
-//        ttWithEvents.timeTrialDefinition.id?.let {
+//        ttWithEvents.timeTrialHeader.id?.let {
 //            deleteTimeTrialsEvents(it)
 //            insertEvents(ttWithEvents.eventList)
 //        }

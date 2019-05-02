@@ -47,7 +47,7 @@ class SetupConfirmationFragment : DialogFragment() {
             okButton.setOnClickListener {
                 if(confirmationViewModel.positiveFunction()){
                     val intent = Intent(requireActivity(), TimingActivity::class.java)
-                    intent.putExtra(ITEM_ID_EXTRA, confirmationViewModel.timeTrial.value?.timeTrialDefinition?.id)
+                    intent.putExtra(ITEM_ID_EXTRA, confirmationViewModel.timeTrial.value?.timeTrialHeader?.id)
                     startActivity(intent)
                     this@SetupConfirmationFragment.dismiss()
                 }else{
