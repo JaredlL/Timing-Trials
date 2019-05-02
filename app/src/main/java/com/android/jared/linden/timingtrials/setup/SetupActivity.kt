@@ -119,11 +119,11 @@ class SetupActivity : AppCompatActivity() {
             // Return a PlaceholderFragment (defined as a static inner class below).
 
 
-            when (position){
-                0 -> return SetupTimeTrialFragment.newInstance()
-                1 -> return SelectRidersFragment.newInstance()
-                2 -> return OrderRidersFragment.newInstance()
-                else -> return SetupTimeTrialFragment.newInstance()
+           return when (position){
+                0 ->  SetupTimeTrialFragment.newInstance()
+                1 ->  SelectRidersFragment.newInstance()
+                2 ->  OrderRidersFragment.newInstance()
+                else ->  SetupTimeTrialFragment.newInstance()
 
             }
         }

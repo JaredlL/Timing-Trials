@@ -33,9 +33,9 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
    override val ridersInterval = Transformations.map(timeTrial){
        it?.let {tt->
            if(tt.timeTrialHeader.interval == 0){
-               return@map "${tt.riderList?.count()} riders starting at 0 second intervals, mass start!"
+               return@map "${tt.riderList.count()} riders starting at 0 second intervals, mass start!"
            }else{
-               return@map "${tt.riderList?.count()} riders starting at ${tt.timeTrialHeader.interval} second intervals"
+               return@map "${tt.riderList.count()} riders starting at ${tt.timeTrialHeader.interval} second intervals"
            }
        }
        return@map "Null"

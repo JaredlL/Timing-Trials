@@ -30,7 +30,7 @@ class SetupTimeTrialFragment : Fragment() {
 
         propsViewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.timeTrialPropertiesViewModel
 
-        val mAdapter = ArrayAdapter<String>(activity,R.layout.support_simple_spinner_dropdown_item, listOf("15", "30", "60", "90", "120"))
+        val mAdapter = ArrayAdapter<String>(requireContext(),R.layout.support_simple_spinner_dropdown_item, listOf("15", "30", "60", "90", "120"))
         val binding = DataBindingUtil.inflate<FragmentSetupTimeTrialBinding>(inflater, R.layout.fragment_setup_time_trial, container, false).apply {
             viewModel = propsViewModel
 

@@ -8,12 +8,17 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel() {
+interface IEventSelectionData{
+    var eventAwaitingSelection: Long?
+}
+
+class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel(), IEventSelectionData {
 
     val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
     val timeString: MutableLiveData<String> = MutableLiveData()
     val statusString: MutableLiveData<String> = MutableLiveData()
 
+    override var eventAwaitingSelection: Long? = null
 
     private var departedRidersIdsCached = ArrayList<Long>()
     private var finishedRidersIdsCached = ArrayList<Long>()

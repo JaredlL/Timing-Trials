@@ -76,8 +76,8 @@ class MainActivity : AppCompatActivity() {
                     if(tt.riderList.count() > 0 && tt.timeTrialHeader.course != null){
                         val id = tt.timeTrialHeader.id
                         if(id !=null){
-                            val intent = Intent(this@MainActivity, TimingActivity::class.java).apply { putExtra(ITEM_ID_EXTRA, id) }
-                            startActivity(intent)
+                            val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
+                            startActivity(tIntent)
                         }else{
                             tvm.insertTt()
                         }

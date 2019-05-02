@@ -5,4 +5,5 @@
     <color name="colorAccent">#D81B60</color>
     <color name="mainBackground">#242933</color>
     <color name="numberColor">#CDDC39</color>
+    <color name="eventButtonColor">#8BF780</color>
 </resources>

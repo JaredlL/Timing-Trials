@@ -51,11 +51,11 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Co
 
     var longPress = {(course): Course -> Unit}
 
-    override fun bind(vm: CourseListViewWrapper){
+    override fun bind(data: CourseListViewWrapper){
 
         _binding.apply{
-            courseVm = vm
-            courseLayout.setOnLongClickListener { longPress(vm.course)
+            courseVm = data
+            courseLayout.setOnLongClickListener { longPress(data.course)
                 true
             }
 
@@ -87,9 +87,9 @@ class CourseViewHolderFactory: GenericViewHolderFactory<CourseListViewWrapper>()
 class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHolder<TimeTrialHeader, ListItemTimetrialBinding>(binding) {
     private val _binding = binding
 
-    override fun bind(vm: TimeTrialHeader){
+    override fun bind(data: TimeTrialHeader){
         _binding.apply{
-            viewModel = vm
+            viewModel = data
             executePendingBindings()
         }
     }

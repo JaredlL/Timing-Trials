@@ -32,4 +32,6 @@
     <string name="manage_riders">Manage Riders</string>
     <string name="rider_passed">Rider Passed!</string>
     <string name="timetrial_to_start_at">TimeTrial to start at</string>
+    <string name="press_assign_rider">Press to assign number</string>
+    <string name="now_choose_rider">Now select number</string>
 </resources>

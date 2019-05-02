@@ -29,9 +29,9 @@ class TestViewModel@Inject constructor(
         medTimeTrial.value = timeTrial
 
         medTimeTrial.addSource(riderRepository.allRiders){res->
-            res?.let {res->
+            res?.let {ri->
                 medTimeTrial.value?.let {
-                    val copy = it.copy(riderList = res.filterIndexed { index, _ -> index%3 == 0 }.map { r-> TimeTrialRider(r, it.timeTrialHeader.id) })
+                    val copy = it.copy(riderList = ri.filterIndexed { index, _ -> index%3 == 0 }.map { r-> TimeTrialRider(r, it.timeTrialHeader.id) })
                     medTimeTrial.value = copy
                 }
             }
@@ -65,7 +65,8 @@ class TestViewModel@Inject constructor(
            if(timeTrialRepository.getTimeTrialByName("Testing Timetrial") == null){
                medTimeTrial.value?.let {
                    val newTt = it.copy(timeTrialHeader = it.timeTrialHeader.copy(
-                           startTime = Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15),
+                           startTime = Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(1),
+                           interval = 3,
                            isSetup = true
                    ))
                    timeTrialRepository.insertOrUpdate(newTt)
