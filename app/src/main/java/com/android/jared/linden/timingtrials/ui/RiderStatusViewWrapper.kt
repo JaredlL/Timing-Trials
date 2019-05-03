@@ -16,6 +16,12 @@ class RiderStatusViewWrapper(val rider: TimeTrialRider, val timeTrial: TimeTrial
 
     private val riderEvents = timeTrial.eventList.filter { it.riderId == rider.id }
 
+    var onPressedCallback: (TimeTrialRider) -> Unit ={}
+
+    fun onPressed(){
+        onPressedCallback(rider)
+    }
+
     fun riderStatus(): RiderStatus {
         var status = RiderStatus.NOT_STARTED
         if(riderEvents.any { it.eventType == EventType.RIDER_FINISHED }) return RiderStatus.FINISHED

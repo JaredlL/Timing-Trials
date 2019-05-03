@@ -13,6 +13,7 @@ import com.android.jared.linden.timingtrials.BR
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.EventType
+import com.android.jared.linden.timingtrials.data.TimeTrialEvent
 import com.android.jared.linden.timingtrials.databinding.FragmentTimerBinding
 import com.android.jared.linden.timingtrials.ui.EventViewWrapper
 import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
@@ -33,7 +34,7 @@ class TimerFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
 
-        timingViewModel = getViewModel { requireActivity().injector.timingViewModel() }
+        timingViewModel = requireActivity().getViewModel { injector.timingViewModel() }
 
         val adapter = EventListAdapter(requireActivity())
         val viewManager = LinearLayoutManager(context)
@@ -43,24 +44,33 @@ class TimerFragment : Fragment() {
                 val oldCount  = adapter.itemCount
                 val newList = (tt.eventList.map {ev -> EventViewWrapper(ev, res)})
 
+
+
+
+
+                adapter.setEvents(newList)
+
                 newList.forEach {evw->
 
                     evw.getSelected = {e -> timingViewModel.eventAwaitingSelection == e.timeStamp}
-
                     evw.onSelectionChanged = {e, b ->
-                        val old = timingViewModel.eventAwaitingSelection
-                        val new = e.timeStamp
-                        if(b) timingViewModel.eventAwaitingSelection = e.timeStamp
-                        else timingViewModel.eventAwaitingSelection = null
+                        val oldts = timingViewModel.eventAwaitingSelection
+                        if(b){
+                            timingViewModel.eventAwaitingSelection = e.timeStamp
+                        }else{
+                            if(oldts == e.timeStamp)timingViewModel.eventAwaitingSelection = null
+                        }
 
+                        newList.find { it.event.timeStamp == oldts }?.notifyPropertyChanged(BR.eventSelected)
                     }
+                    //evw.notifyPropertyChanged(BR.eventSelected)
                 }
-
-                adapter.setEvents(newList)
                 val newcount = adapter.itemCount
                 if(oldCount < newcount) eventRecyclerView?.scrollToPosition(newcount - 1)
             }
         })
+
+
 
 
         val binding =  DataBindingUtil.inflate<FragmentTimerBinding>(inflater, R.layout.fragment_timer, container, false).apply{

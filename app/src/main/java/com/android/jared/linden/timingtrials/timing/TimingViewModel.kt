@@ -85,6 +85,18 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         }
     }
 
+    fun onRiderPressed(ttRider: TimeTrialRider){
+        timeTrial.value?.let{tt->
+            eventAwaitingSelection?.let { eid->
+                val event = tt.eventList.find { it.timeStamp == eid }
+                event?.let {
+                    it.riderId = ttRider.rider.id
+                    timeTrial.value = tt
+                }
+            }
+        }
+    }
+
 
     private fun updateLoop(){
         timeTrial.value?.let { tt->

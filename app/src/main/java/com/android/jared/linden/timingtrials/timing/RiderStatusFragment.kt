@@ -34,13 +34,14 @@ class RiderStatusFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
 
-        timingViewModel = getViewModel { requireActivity().injector.timingViewModel() }
+        timingViewModel = requireActivity().getViewModel { injector.timingViewModel() }
 
         val adapter = RiderStatusAdapter(requireActivity())
         val viewManager = GridLayoutManager(context, 4)
 
-        timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer {
-            adapter.setRiderStatus(it.riderList.map { r -> RiderStatusViewWrapper(r, it ) })
+        timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer {tt->
+            val newList = tt.riderList.map { r -> RiderStatusViewWrapper(r, tt ).apply { onPressedCallback = { timingViewModel.onRiderPressed(rider)} }}
+            adapter.setRiderStatus(newList)
         })
 
         val binding = DataBindingUtil.inflate<FragmentTimerRiderStatusBinding>(inflater, R.layout.fragment_timer_rider_status, container, false).apply {
