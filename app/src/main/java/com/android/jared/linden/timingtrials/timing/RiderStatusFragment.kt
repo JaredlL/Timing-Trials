@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentTimerRiderStatusBinding
+import com.android.jared.linden.timingtrials.ui.RiderStatus
 import com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper
 import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.argument
@@ -40,7 +42,14 @@ class RiderStatusFragment : Fragment() {
         val viewManager = GridLayoutManager(context, 4)
 
         timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer {tt->
-            val newList = tt.riderList.map { r -> RiderStatusViewWrapper(r, tt ).apply { onPressedCallback = { timingViewModel.onRiderPressed(rider)} }}
+            val newList = tt.riderList.filter { r-> tt.getRiderStatus(r.rider.id?:0) != RiderStatus.FINISHED }.map { r -> RiderStatusViewWrapper(r, tt ).apply { onPressedCallback = {
+                 when(riderStatus()){
+                     RiderStatus.RIDING -> timingViewModel.onRiderPressed(rider)
+                     RiderStatus.FINISHED -> Unit
+                     RiderStatus.NOT_STARTED -> if(timingViewModel.eventAwaitingSelection != null) Toast.makeText(requireContext(), "This Rider Has Not Started", Toast.LENGTH_LONG).show()
+                 }
+
+            } }}
             adapter.setRiderStatus(newList)
         })
 

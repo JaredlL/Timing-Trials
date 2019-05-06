@@ -8,11 +8,11 @@ import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.timing.IEventSelectionData
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 
-class EventViewWrapper(var event: TimeTrialEvent, val timeTrialWithEvents: TimeTrial) : BaseObservable(){
+class EventViewWrapper(var event: TimeTrialEvent, val timeTrial: TimeTrial) : BaseObservable(){
 
     val timeStampString = ConverterUtils.toTenthsDisplayString(event.timeStamp)
 
-    private fun getRider(): TimeTrialRider? = event.riderId?.let {  timeTrialWithEvents.riderList.firstOrNull{ r -> r.rider.id == event.riderId}}
+    private fun getRider(): TimeTrialRider? = event.riderId?.let {  timeTrial.riderList.firstOrNull{ r -> r.rider.id == event.riderId}}
 
     var getSelected: (TimeTrialEvent) -> Boolean = { _ -> false}
     var onSelectionChanged = { e: TimeTrialEvent, b:Boolean -> Unit}
@@ -31,7 +31,14 @@ class EventViewWrapper(var event: TimeTrialEvent, val timeTrialWithEvents: TimeT
         EventType.EMPTY -> "Empty Event"
         EventType.TIMETRIAL_STARTED -> "TimeTrialHeader Has Begun"
         EventType.RIDER_STARTED -> "$riderName Has Started"
-        EventType.RIDER_PASSED -> event.riderId?.let { "$riderName Has Passed"}?:"Assign Rider"
-        EventType.RIDER_FINISHED -> "$riderName Has Finished"
+        EventType.RIDER_PASSED ->
+        {
+            event.riderId?.let { id->
+               return@let when(timeTrial.getRiderStatus(id)){
+                   RiderStatus.FINISHED -> "$riderName Finished"
+                   else -> "$riderName Has Passed"
+                }
+            }?:"Assign Rider"
+        }
     }
 }

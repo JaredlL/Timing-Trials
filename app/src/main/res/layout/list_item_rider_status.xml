@@ -6,10 +6,13 @@
         <variable
             name="viewModel"
             type="com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper"/>
+        <import type="android.view.View"/>
+        <import type="com.android.jared.linden.timingtrials.ui.RiderStatus"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
+        android:visibility="@{viewModel.riderStatus() == RiderStatus.FINISHED ? View.GONE : View.VISIBLE}"
         android:layout_height="wrap_content">
 
         <TextView

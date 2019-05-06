@@ -113,7 +113,7 @@ class SetupViewModel @Inject constructor(
                         //Only keep riders which are still in the DB
                         val newList = oldSelected.filter { i -> (retainedIds.contains(i.key))}.values.toList()
                         ttdef.let {
-                            it.riderList = newList.map { r-> TimeTrialRider(r, it.timeTrialHeader.id) }
+                            it.riderList = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id, index+1,(60 + index * it.timeTrialHeader.interval).toLong()) }
                             timeTrial.value = it
                         }
                     }

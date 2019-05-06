@@ -24,11 +24,11 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     private var finishedRidersIdsCached = ArrayList<Long>()
 
 
-    private fun getFinishedRiders(): List<TimeTrialRider> {
-        return timeTrial.value?.let { tt->
-            tt.eventList.filter { it.eventType == EventType.RIDER_FINISHED }.mapNotNull {event-> tt.riderList.firstOrNull { rn -> rn.rider.id == event.riderId }  }
-        }?: listOf()
-    }
+//    private fun getFinishedRiders(): List<TimeTrialRider> {
+//        return timeTrial.value?.let { tt->
+//            tt.eventList.filter { it.eventType == EventType.RIDER_PASSED }.mapNotNull {event-> tt.riderList.firstOrNull { rn -> rn.rider.id == event.riderId }  }
+//        }?: listOf()
+//    }
 
     private fun getDepartedRiders(): List<TimeTrialRider> {
         return timeTrial.value?.let { tt->
@@ -56,7 +56,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                     finishedRidersIdsCached.clear()
 
                     departedRidersIdsCached.addAll(getDepartedRiders().mapNotNull { it.rider.id })
-                    finishedRidersIdsCached.addAll(getFinishedRiders().mapNotNull { it.rider.id })
+                   // finishedRidersIdsCached.addAll(getFinishedRiders().mapNotNull { it.rider.id })
 
 
 

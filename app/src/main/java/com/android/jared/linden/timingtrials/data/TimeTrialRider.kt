@@ -8,7 +8,7 @@ import androidx.room.*
 data class TimeTrialRider(@Embedded(prefix = "rider_") val rider: Rider,
                           var timeTrialId: Long?,
                           var number: Int? = null,
-                          var startTime: Long? = null,
+                          var startTime: Long,
                           @PrimaryKey(autoGenerate = true) var id: Long? = null)
 
 

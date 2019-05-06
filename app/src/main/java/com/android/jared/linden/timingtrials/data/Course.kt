@@ -10,6 +10,7 @@ data class Course(
         var courseName: String,
         var length: Double = 0.0,
         var cttName: String = "",
+        var courseRecords: String= "",
         @PrimaryKey(autoGenerate = true) var id: Long? = null
 ) : Parcelable{
     companion object {
