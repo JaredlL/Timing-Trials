@@ -3,7 +3,7 @@ package com.android.jared.linden.timingtrials.edititem
 
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.data.IRiderRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
 import kotlinx.coroutines.*
 import javax.inject.Inject
 

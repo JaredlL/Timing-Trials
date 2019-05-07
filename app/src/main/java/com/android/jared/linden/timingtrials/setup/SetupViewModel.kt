@@ -2,6 +2,9 @@ package com.android.jared.linden.timingtrials.setup
 
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.*
+import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -18,9 +21,9 @@ interface ITimeTrialSetupViewModel{
 }
 
 class SetupViewModel @Inject constructor(
-         val timeTrialRepository: ITimeTrialRepository,
-         val riderRepository: IRiderRepository,
-         val courseRepository: ICourseRepository
+        val timeTrialRepository: ITimeTrialRepository,
+        val riderRepository: IRiderRepository,
+        val courseRepository: ICourseRepository
 ) : ViewModel(), ITimeTrialSetupViewModel{
 
 

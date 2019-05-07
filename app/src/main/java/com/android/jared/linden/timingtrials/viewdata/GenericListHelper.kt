@@ -33,7 +33,7 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, L
 
 class RiderViewHolderFactory: GenericViewHolderFactory<Rider>() {
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
-        return createView(layoutInflator, parent, Rider("Name", "", "Club", 0))
+        return createView(layoutInflator, parent, Rider("Name", "", "Club", 0, ""))
     }
 
     override fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?): GenericBaseHolder<Rider, ListItemRiderBinding> {

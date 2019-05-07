@@ -1,7 +1,9 @@
-package com.android.jared.linden.timingtrials.data
+package com.android.jared.linden.timingtrials.data.roomrepo
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
 import javax.inject.Inject
 import javax.inject.Singleton

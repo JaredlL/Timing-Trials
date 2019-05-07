@@ -8,8 +8,11 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.format.DateTimeFormatter
 
-class Converters {
+
+object Converters {
 
 
     @TypeConverter
@@ -33,19 +36,20 @@ class Converters {
     }
 
 
-//    @TypeConverter
-//    fun ridersFromString(ridersString:String?): List<Rider>?{
-//        return ridersString?.let {
-//            val riderListType = object : TypeToken<List<Rider>>() {}.type
-//            Gson().fromJson<List<Rider>>(ridersString, riderListType)
-//        }
-//
-//    }
-//
-//    @TypeConverter
-//    fun ridersToString(riders: List<Rider>?): String?{
-//        return riders?.let{Gson().toJson(riders)}
-//    }
+    private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+    @TypeConverter
+    @JvmStatic
+    fun toOffsetDateTime(value: String?): OffsetDateTime? {
+        return value?.let {
+            return formatter.parse(value, OffsetDateTime::from)
+        }
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromOffsetDateTime(date: OffsetDateTime?): String? {
+        return date?.format(formatter)
+    }
 
     @TypeConverter
     fun courseFromString(courseString:String?): Course? {

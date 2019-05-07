@@ -9,6 +9,8 @@ data class TimeTrialRider(@Embedded(prefix = "rider_") val rider: Rider,
                           var timeTrialId: Long?,
                           var number: Int? = null,
                           var startTime: Long,
+                          val partOfTeam: Boolean = false,
+                          var notes: String = "",
                           @PrimaryKey(autoGenerate = true) var id: Long? = null)
 
 

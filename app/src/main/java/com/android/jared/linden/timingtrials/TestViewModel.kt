@@ -4,6 +4,9 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.jared.linden.timingtrials.data.*
+import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant

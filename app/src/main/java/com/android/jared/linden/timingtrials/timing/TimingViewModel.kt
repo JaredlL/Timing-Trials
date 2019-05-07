@@ -2,6 +2,7 @@ package com.android.jared.linden.timingtrials.timing
 
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.*
+import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import org.threeten.bp.Instant
 import java.util.*

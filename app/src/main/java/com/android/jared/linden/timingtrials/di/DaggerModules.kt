@@ -1,8 +1,7 @@
 package com.android.jared.linden.timingtrials.di
 
 import android.content.Context
-import androidx.room.Room
-import com.android.jared.linden.timingtrials.data.*
+import com.android.jared.linden.timingtrials.data.roomrepo.*
 import com.android.jared.linden.timingtrials.data.source.*
 import dagger.Module
 import dagger.Provides

@@ -47,7 +47,7 @@ class SelectRidersFragment : Fragment() {
 
         val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
             lifecycleOwner = (this@SelectRidersFragment)
-            riderHeading.selectableRider =  SelectableRiderViewWrapper(Rider("Name", "", "Club", 0))
+            riderHeading.selectableRider =  SelectableRiderViewWrapper(Rider("Name", "", "Club", 0, ""))
             riderHeading.checkBox.visibility =  View.INVISIBLE
             riderRecyclerView.adapter = adapter
             riderRecyclerView.layoutManager = viewManager

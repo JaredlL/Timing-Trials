@@ -2,8 +2,7 @@ package com.android.jared.linden.timingtrials.edititem
 
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.Course
-import com.android.jared.linden.timingtrials.data.ICourseRepository
-import com.android.jared.linden.timingtrials.util.ObservableViewModel
+import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel

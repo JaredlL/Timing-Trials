@@ -7,14 +7,12 @@ import org.threeten.bp.*
 import org.threeten.bp.temporal.ChronoUnit
 
 
-//Todo: Use proper relational mapping, for now we simply store as JSON
-
 @Entity(tableName = "timetrial_table", indices = [Index("id")])
 data class TimeTrialHeader(var ttName: String,
                            var course: Course? = null,
                            var laps: Int = 1,
                            var interval:Int = 60,
-                           var startTime: Instant,
+                           var startTime: OffsetDateTime,
                            var isSetup: Boolean = false,
                            var isFinished: Boolean = false,
                            @PrimaryKey(autoGenerate = true) var id: Long? = null) {
@@ -22,7 +20,7 @@ data class TimeTrialHeader(var ttName: String,
     companion object {
         fun createBlank(): TimeTrialHeader {
             val instant = Instant.now().truncatedTo(ChronoUnit.MINUTES).plus(15, ChronoUnit.MINUTES)
-            return TimeTrialHeader(ttName = "", course = null, laps = 1, startTime = instant, isSetup = false, isFinished = false)
+            return TimeTrialHeader(ttName = "", course = null, laps = 1, startTime = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault()), isSetup = false, isFinished = false)
         }
 
 
