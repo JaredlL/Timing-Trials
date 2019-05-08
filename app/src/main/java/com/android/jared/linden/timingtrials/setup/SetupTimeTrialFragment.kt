@@ -90,7 +90,7 @@ class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener 
 
         var now = Instant.now()
         if(timeTrialViewModel.startTime.value != null){
-            now = timeTrialViewModel.startTime.value
+            now = timeTrialViewModel.startTime.value?.toInstant()
         }
         else{
             now.plusSeconds(15*60)
@@ -106,8 +106,9 @@ class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener 
     override fun onTimeSet(view: TimePicker, hourOfDay: Int, minute: Int) {
         // Do something with the time chosen by the user
 
+
         val ldt = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault())
         val ldt2 = LocalDateTime.of(ldt.year, ldt.month, ldt.dayOfMonth, hourOfDay, minute)
-        timeTrialViewModel.startTime.value = ldt2.atZone(ZoneId.systemDefault()).toInstant()
+        timeTrialViewModel.startTime.value = ZonedDateTime.of(ldt2, ZoneId.systemDefault()).toOffsetDateTime()
     }
 }

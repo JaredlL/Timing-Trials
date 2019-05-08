@@ -16,6 +16,7 @@ import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 
 import kotlinx.android.synthetic.main.activity_setup.*
 import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
 
 class SetupActivity : AppCompatActivity() {
 
@@ -54,7 +55,7 @@ class SetupActivity : AppCompatActivity() {
                     container.currentItem = 1
                     return@let
                 }
-                if(it.timeTrialHeader.startTime.isBefore(Instant.now())){
+                if(it.timeTrialHeader.startTime.isBefore(OffsetDateTime.now())){
                     Toast.makeText(this, "TT must start in the future, select start time", Toast.LENGTH_LONG).show()
                     TimePickerFragment().show(supportFragmentManager, "timePicker")
                     return@let

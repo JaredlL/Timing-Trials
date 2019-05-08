@@ -1,26 +1,11 @@
 package com.android.jared.linden.timingtrials.domain
 
 import android.os.Parcelable
+import com.android.jared.linden.timingtrials.data.Gender
 import kotlinx.android.parcel.Parcelize
 import org.threeten.bp.LocalDate
 
-enum class Gender{
-    UNKNOWN{
-        override fun gendarString(): String { return ""}
-    },
-    MALE{
-        override fun gendarString(): String { return "M"}
-    },
-    FEMALE{
-        override fun gendarString(): String { return "F"}
-    },
-    OTHER{
-        override fun gendarString(): String { return "O"}
-    };
 
-    abstract fun gendarString(): String
-
-}
 
 data class RiderCategoryStandard (val gender: Gender, val yob: Int){
 

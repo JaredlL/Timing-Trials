@@ -6,6 +6,7 @@ import com.android.jared.linden.timingtrials.MainViewModel
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
 
 interface ISetupConformationViewModel{
     val title: LiveData<String>
@@ -44,7 +45,7 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
     }
 
    override val startTime = Transformations.map(timeTrialDefinition){ tt->
-        "First rider starting at ${tt?.let{ConverterUtils.instantToSecondsDisplayString(tt.startTime)}}"
+        "First rider starting at ${tt?.let{ConverterUtils.instantToSecondsDisplayString(tt.startTime.toInstant())}}"
 
     }
 
@@ -52,7 +53,7 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
     override fun positiveFunction(): Boolean{
 
         timeTrialDefinition.value?.let {
-            return if(it.startTime.isAfter(Instant.now())){
+            return if(it.startTime.isAfter(OffsetDateTime.now())){
 
                 ttSetup.updateDefinition(it.copy(isSetup = true))
                 ttSetup.insertTt()
@@ -99,7 +100,7 @@ class ResumeOldConfirmationViewModel (private val mainViewModel: MainViewModel) 
     }
 
     override val startTime = Transformations.map(timeTrialDefinition){ tt->
-        "First rider starting at ${tt?.let{ConverterUtils.instantToSecondsDisplayString(tt.startTime)}}"
+        "First rider starting at ${tt?.let{ConverterUtils.instantToSecondsDisplayString(tt.startTime.toInstant())}}"
 
     }
 

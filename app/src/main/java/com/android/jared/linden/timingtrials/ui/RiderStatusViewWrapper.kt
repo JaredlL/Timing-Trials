@@ -15,7 +15,7 @@ class RiderStatusViewWrapper(val rider: TimeTrialRider, val timeTrial: TimeTrial
     val number: String = rider.number?.toString()?: "NaN"
 
 
-    private val riderEvents = timeTrial.eventList.filter { it.riderId == rider.rider.id }
+    //private val riderEvents = timeTrial.eventList.filter { it.riderId == rider.rider.id }
 
     var onPressedCallback: (TimeTrialRider) -> Unit ={}
 

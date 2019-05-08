@@ -30,7 +30,7 @@ class EventViewWrapper(var event: TimeTrialEvent, val timeTrial: TimeTrial) : Ba
     val displayString: String = when(event.eventType){
         EventType.EMPTY -> "Empty Event"
         EventType.TIMETRIAL_STARTED -> "TimeTrialHeader Has Begun"
-        EventType.RIDER_STARTED -> "$riderName Has Started"
+        EventType.RIDER_STARTED -> "$riderName Started"
         EventType.RIDER_PASSED ->
         {
             event.riderId?.let { id->

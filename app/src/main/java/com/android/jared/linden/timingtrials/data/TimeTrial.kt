@@ -53,6 +53,10 @@ data class TimeTrial(
         return status
     }
 
+    fun getUnfinishedRiders(): List<TimeTrialRider>{
+        return riderList.filter { r-> getRiderStatus(r.rider.id?:0) != RiderStatus.FINISHED }
+    }
+
     fun assignRiderToEvent(riderId: Long, eventTimestamp: Long): RiderAssignmentResult{
         val event = eventList.find { it.timeStamp == eventTimestamp }
         val timeTrialRider = riderList.find { r -> r.rider.id == riderId }
@@ -74,6 +78,14 @@ data class TimeTrial(
 
     fun addRidersAsTimeTrialRiders(riders: List<Rider>){
         riderList = riders.mapIndexed { index, rider -> TimeTrialRider(rider, timeTrialHeader.id, index + 1, (60 + index * timeTrialHeader.interval).toLong()) }
+    }
+
+    fun getDepartedRiders(): List<TimeTrialRider> {
+        return eventList.filter { it.eventType == EventType.RIDER_STARTED}.mapNotNull { event-> riderList.firstOrNull { rn -> rn.rider.id == event.riderId }  }
+    }
+
+    fun getFinishedRiders(): List<TimeTrialRider>{
+       return eventList.filter { it.eventType == EventType.RIDER_PASSED }.groupBy { it.riderId }.filter { it.value.count() == timeTrialHeader.laps }.keys.mapNotNull { riderList.find { r-> r.rider.id == it } }
     }
 
     companion object {

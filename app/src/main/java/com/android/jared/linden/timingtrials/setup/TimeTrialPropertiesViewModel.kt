@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
 
 
 interface ITimeTrialPropertiesViewModel{
@@ -12,7 +13,7 @@ interface ITimeTrialPropertiesViewModel{
     val timeTrialName: MutableLiveData<String>
     val startTimeString: LiveData<String>
     val courseName: LiveData<String>
-    val startTime: MutableLiveData<Instant>
+    val startTime: MutableLiveData<OffsetDateTime>
     val laps: MutableLiveData<String>
     val interval: MutableLiveData<String>
     val availableLaps: List<String>
@@ -98,8 +99,8 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
         }
     }.also { it.observeForever {  } }
 
-    override val startTime = MutableLiveData<Instant>()
-    private val startTimeMediator = MediatorLiveData<Instant>().apply {
+    override val startTime = MutableLiveData<OffsetDateTime>()
+    private val startTimeMediator = MediatorLiveData<OffsetDateTime>().apply {
         addSource(timeTrialHeader) { tt->
             tt?.let {
                 if (startTime.value != it.startTime) {
@@ -119,7 +120,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
     }.also { it.observeForever {  } }
 
     override val startTimeString: LiveData<String>  = Transformations.map(timeTrialHeader){ tt->
-        tt?.let { ConverterUtils.instantToSecondsDisplayString(it.startTime)}
+        tt?.let { ConverterUtils.instantToSecondsDisplayString(it.startTime.toInstant())}
     }
 
     override val availableLaps = 1.rangeTo(99).map { i -> i.toString() }

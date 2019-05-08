@@ -42,14 +42,14 @@ class RiderStatusFragment : Fragment() {
         val viewManager = GridLayoutManager(context, 4)
 
         timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer {tt->
-            val newList = tt.riderList.filter { r-> tt.getRiderStatus(r.rider.id?:0) != RiderStatus.FINISHED }.map { r -> RiderStatusViewWrapper(r, tt ).apply { onPressedCallback = {
-                 when(riderStatus()){
-                     RiderStatus.RIDING -> timingViewModel.onRiderPressed(rider)
-                     RiderStatus.FINISHED -> Unit
-                     RiderStatus.NOT_STARTED -> if(timingViewModel.eventAwaitingSelection != null) Toast.makeText(requireContext(), "This Rider Has Not Started", Toast.LENGTH_LONG).show()
-                 }
-
-            } }}
+            val newList = tt.getUnfinishedRiders().map { r -> RiderStatusViewWrapper(r, tt ).apply {
+                onPressedCallback = {
+                   timingViewModel.tryAssignRider(it).let {res->
+                       if(!res.succeeded) Toast.makeText(requireContext(), res.message, Toast.LENGTH_LONG).show()
+                   }
+                }
+            }
+            }
             adapter.setRiderStatus(newList)
         })
 

@@ -10,6 +10,8 @@ import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.ChronoUnit
 import javax.inject.Inject
 
@@ -23,7 +25,7 @@ class TestViewModel@Inject constructor(
     val  medTimeTrial = MediatorLiveData<TimeTrial>()
     val  timeTrial = TimeTrial.createBlank().apply {
         timeTrialHeader.ttName = "Testing Timetrial"
-        timeTrialHeader.startTime = Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15)
+        timeTrialHeader.startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault())
         timeTrialHeader.interval = 10
     }
 
@@ -69,7 +71,7 @@ class TestViewModel@Inject constructor(
            if(timeTrialRepository.getTimeTrialByName("Testing Timetrial") == null){
                medTimeTrial.value?.let {
                    val newTt = it.copy(timeTrialHeader = it.timeTrialHeader.copy(
-                           startTime = Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(1),
+                           startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(1), ZoneId.systemDefault()),
                            interval = 5,
                            isSetup = true
                    ))
