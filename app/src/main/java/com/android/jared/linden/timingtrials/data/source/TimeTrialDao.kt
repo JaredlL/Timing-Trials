@@ -21,9 +21,9 @@ abstract class TimeTrialDao {
     @Transaction @Insert
     fun insert(timeTrial: TimeTrial){
         val id = insert(timeTrial.timeTrialHeader)
-        timeTrial.eventList.forEach { it.timeTrialId = id }
+        timeTrial.eventList.map { it.copy(timeTrialId = id)}
         _insertAllEvents(timeTrial.eventList)
-        timeTrial.riderList.forEach { it.timeTrialId = id }
+        timeTrial.riderList.map { it.copy(timeTrialId = id)}
         _insertAllTimeTrialRiders(timeTrial.riderList)
     }
 
@@ -34,10 +34,10 @@ abstract class TimeTrialDao {
             _deleteTtEvents(ttId)
             _deleteTtRiders(ttId)
 
-            timeTrial.eventList.forEach { it.timeTrialId = ttId }
+            timeTrial.eventList.map { it.copy(timeTrialId = ttId)}
             _insertAllEvents(timeTrial.eventList)
 
-            timeTrial.riderList.forEach { it.timeTrialId = ttId }
+            timeTrial.riderList.map { it.copy(timeTrialId = ttId)}
             _insertAllTimeTrialRiders(timeTrial.riderList)
         }
 

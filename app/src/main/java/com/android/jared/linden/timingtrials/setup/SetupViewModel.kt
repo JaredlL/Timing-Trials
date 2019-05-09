@@ -48,11 +48,10 @@ class SetupViewModel @Inject constructor(
                     mutList.add(toPosition + 1, mutList[fromPosition])
                     mutList.removeAt(fromPosition)
                 }
-                mutList.forEachIndexed { index, timeTrialRider -> timeTrialRider.number = index + 1 }
 
                 timeTrial.value?.let {
-                    it.riderList = mutList
-                    timeTrial.value = it
+                    //it.riderList = mutList
+                    timeTrial.value = it.copy(riderList = mutList.mapIndexed { index, timeTrialRider -> timeTrialRider.copy(number = index + 1) })
                 }
             }
 
@@ -116,8 +115,9 @@ class SetupViewModel @Inject constructor(
                         //Only keep riders which are still in the DB
                         val newList = oldSelected.filter { i -> (retainedIds.contains(i.key))}.values.toList()
                         ttdef.let {
-                            it.riderList = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id, index+1,(60 + index * it.timeTrialHeader.interval).toLong()) }
-                            timeTrial.value = it
+                           // it.riderList = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id, index+1,(60 + index * it.timeTrialHeader.interval).toLong()) }
+                            val ml = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id, index+1,(60 + index * it.timeTrialHeader.interval).toLong()) }
+                            timeTrial.value = it.copy(riderList = ml)
                         }
                     }
                 }

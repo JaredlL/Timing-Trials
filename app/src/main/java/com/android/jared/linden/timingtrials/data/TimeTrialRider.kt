@@ -6,12 +6,12 @@ import androidx.room.*
         indices = [Index("timeTrialId")],
         foreignKeys = [ForeignKey(entity =TimeTrialHeader::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = ForeignKey.CASCADE, deferred = true)])
 data class TimeTrialRider(@Embedded(prefix = "rider_") val rider: Rider,
-                          var timeTrialId: Long?,
-                          var number: Int? = null,
-                          var startTime: Long,
+                          val timeTrialId: Long? = null,
+                          val number: Int? = null,
+                          val startTime: Long,
                           val partOfTeam: Boolean = false,
-                          var notes: String = "",
-                          @PrimaryKey(autoGenerate = true) var id: Long? = null)
+                          val notes: String = "",
+                          @PrimaryKey(autoGenerate = true) val id: Long? = null)
 
 
 

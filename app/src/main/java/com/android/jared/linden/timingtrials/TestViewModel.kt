@@ -23,11 +23,10 @@ class TestViewModel@Inject constructor(
 
 
     val  medTimeTrial = MediatorLiveData<TimeTrial>()
-    val  timeTrial = TimeTrial.createBlank().apply {
-        timeTrialHeader.ttName = "Testing Timetrial"
-        timeTrialHeader.startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault())
-        timeTrialHeader.interval = 10
-    }
+    val  timeTrial = TimeTrial.createBlank().copy(timeTrialHeader = TimeTrialHeader.createBlank()
+            .copy(ttName = "Testing Timetrial",
+                    startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
+                    interval = 10))
 
     init {
 

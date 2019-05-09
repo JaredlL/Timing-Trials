@@ -6,13 +6,13 @@ import org.threeten.bp.OffsetDateTime
 
 @Entity(tableName = "rider_table")
 data class Rider(
-        var firstName: String,
-        var lastName: String,
-        var club: String = "",
-        var dateOfBirth: OffsetDateTime,
-        var gender: Gender,
-        var personalBests: List<PersonalBest> = listOf(),
-        @PrimaryKey(autoGenerate = true) var id: Long? = null
+        val firstName: String,
+        val lastName: String,
+        val club: String = "",
+        val dateOfBirth: OffsetDateTime,
+        val gender: Gender,
+        val personalBests: List<PersonalBest> = listOf(),
+        @PrimaryKey(autoGenerate = true) val id: Long? = null
 )  {
 
 

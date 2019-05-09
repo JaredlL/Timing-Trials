@@ -48,8 +48,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
         addSource(timeTrialName) { newName ->
             ttSetup.timeTrial.value?.timeTrialHeader?.let {
                 if(it.ttName != newName) {
-                    it.ttName = newName
-                    ttSetup.updateDefinition(it)
+                    ttSetup.updateDefinition(it.copy(ttName = newName))
                 }
             }
         }
@@ -70,8 +69,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
             laps.toIntOrNull()?.let{newLaps ->
                 timeTrialHeader.value?.let { tt->
                 if(tt.laps != newLaps) {
-                    tt.laps = newLaps
-                    ttSetup.updateDefinition(tt)
+                    ttSetup.updateDefinition(tt.copy(laps = newLaps))
                 }
             }}
         }
@@ -83,8 +81,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
             timeTrialHeader.value?.let { tt ->
                 interval.toIntOrNull()?.let{
                     if(tt.interval != it){
-                        tt.interval = it
-                        ttSetup.updateDefinition(tt)
+                        ttSetup.updateDefinition(tt.copy(interval = it))
                     }
                 }
             }
@@ -112,8 +109,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
         addSource(startTime) {newStartTime->
             timeTrialHeader.value?.let { tt->
                 if(tt.startTime != newStartTime) {
-                    tt.startTime = newStartTime
-                    ttSetup.updateDefinition(tt)
+                    ttSetup.updateDefinition(tt.copy(startTime = newStartTime))
                 }
             }
         }

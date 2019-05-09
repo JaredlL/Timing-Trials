@@ -17,6 +17,9 @@ class CourseViewModel @Inject constructor(private val repository: ICourseReposit
     val mutableCourse: MediatorLiveData<Course> = MediatorLiveData()
     val mutableLengthString: MutableLiveData<String> = MutableLiveData()
 
+    val courseName = MutableLiveData("")
+    val cttName = MutableLiveData("")
+
     private val distances = listOf(
             DistanceViewModel("Miles", (1 / 1609.34)),
             DistanceViewModel("KM", (1 / 1000.0))
@@ -44,6 +47,8 @@ class CourseViewModel @Inject constructor(private val repository: ICourseReposit
             mutableCourse.addSource(repository.getCourse(courseId)){result: Course ->
                 result.let {
                     mutableCourse.value = result
+                    courseName.value = result.courseName
+                    cttName.value = result.cttName
                     updateLengthString(result.length)
                 }
             }
@@ -57,10 +62,15 @@ class CourseViewModel @Inject constructor(private val repository: ICourseReposit
         viewModelScope.launch(Dispatchers.IO) {
 
             mutableCourse.value?.let {
-                mutableLengthString.value?.toDoubleOrNull()?.apply {
-                    it.length = this / distances[selectedItemPosition].conversion
-                }
-                repository.insertOrUpdate(it)
+
+                val cName = courseName.value?:""
+                val cttname = cttName.value?:""
+
+                val len = mutableLengthString.value?.toDoubleOrNull()?.apply {
+                    this / distances[selectedItemPosition].conversion
+                }?:0.0
+
+                repository.insertOrUpdate(it.copy(courseName = cName, cttName = cttname, length = len))
             }
         }
     }

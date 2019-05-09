@@ -8,14 +8,14 @@ import org.threeten.bp.temporal.ChronoUnit
 
 
 @Entity(tableName = "timetrial_table", indices = [Index("id")])
-data class TimeTrialHeader(var ttName: String,
-                           var course: Course? = null,
-                           var laps: Int = 1,
-                           var interval:Int = 60,
-                           var startTime: OffsetDateTime,
-                           var isSetup: Boolean = false,
-                           var isFinished: Boolean = false,
-                           @PrimaryKey(autoGenerate = true) var id: Long? = null) {
+data class TimeTrialHeader(val ttName: String,
+                           val course: Course? = null,
+                           val laps: Int = 1,
+                           val interval:Int = 60,
+                           val startTime: OffsetDateTime,
+                           val isSetup: Boolean = false,
+                           val isFinished: Boolean = false,
+                           @PrimaryKey(autoGenerate = true) val id: Long? = null) {
 
     companion object {
         fun createBlank(): TimeTrialHeader {
@@ -32,9 +32,9 @@ data class TimeTrialHeader(var ttName: String,
 data class TimeTrial(
         @Embedded val timeTrialHeader: TimeTrialHeader,
         @Relation(parentColumn = "id", entityColumn = "timeTrialId", entity = TimeTrialRider::class)
-        var riderList: List<TimeTrialRider> = listOf(),
+        val riderList: List<TimeTrialRider> = listOf(),
         @Relation(parentColumn = "id", entityColumn = "timeTrialId", entity = TimeTrialEvent::class)
-        var eventList: List<TimeTrialEvent> = listOf()
+        val eventList: List<TimeTrialEvent> = listOf()
 ){
 
     fun getRiderStatus(riderId: Long): RiderStatus{
@@ -57,27 +57,8 @@ data class TimeTrial(
         return riderList.filter { r-> getRiderStatus(r.rider.id?:0) != RiderStatus.FINISHED }
     }
 
-    fun assignRiderToEvent(riderId: Long, eventTimestamp: Long): RiderAssignmentResult{
-        val event = eventList.find { it.timeStamp == eventTimestamp }
-        val timeTrialRider = riderList.find { r -> r.rider.id == riderId }
-
-        if(event != null && timeTrialRider!=null && event.eventType == EventType.RIDER_PASSED){
-            if(event.timeStamp <= timeTrialRider.startTime) return RiderAssignmentResult(false, "Rider must have started")
-           return when(getRiderStatus(riderId)){
-                RiderStatus.NOT_STARTED -> RiderAssignmentResult(false, "This rider has not started")
-                RiderStatus.FINISHED -> RiderAssignmentResult(false, "Rider has already finished")
-                RiderStatus.RIDING -> {
-                    event.riderId = riderId
-                    RiderAssignmentResult(true, "Success")
-                }
-            }
-        }else{
-            return RiderAssignmentResult(false, "Error")
-        }
-    }
-
-    fun addRidersAsTimeTrialRiders(riders: List<Rider>){
-        riderList = riders.mapIndexed { index, rider -> TimeTrialRider(rider, timeTrialHeader.id, index + 1, (60 + index * timeTrialHeader.interval).toLong()) }
+    fun addRidersAsTimeTrialRiders(riders: List<Rider>): TimeTrial{
+        return this.copy(riderList =  riders.mapIndexed { index, rider -> TimeTrialRider(rider, timeTrialHeader.id, index + 1, (60 + index * timeTrialHeader.interval).toLong()) })
     }
 
     fun getDepartedRiders(): List<TimeTrialRider> {
@@ -87,6 +68,8 @@ data class TimeTrial(
     fun getFinishedRiders(): List<TimeTrialRider>{
        return eventList.filter { it.eventType == EventType.RIDER_PASSED }.groupBy { it.riderId }.filter { it.value.count() == timeTrialHeader.laps }.keys.mapNotNull { riderList.find { r-> r.rider.id == it } }
     }
+
+
 
     companion object {
         fun createBlank(): TimeTrial {

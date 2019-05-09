@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewCompat.jumpDrawablesToCurrentState
 import androidx.databinding.DataBindingUtil
@@ -20,6 +21,7 @@ import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.util.*
+import kotlinx.android.synthetic.main.fragment_selectrider_list.*
 
 
 /**
@@ -47,7 +49,7 @@ class SelectRidersFragment : Fragment() {
 
         val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
             lifecycleOwner = (this@SelectRidersFragment)
-            riderHeading.selectableRider =  SelectableRiderViewWrapper(Rider.createBlank().apply { firstName = "Name"; club = "Club"})
+            riderHeading.selectableRider =  SelectableRiderViewWrapper(Rider.createBlank().copy( firstName = "Name", club = "Club"))
             riderHeading.checkBox.visibility =  View.INVISIBLE
             riderRecyclerView.adapter = adapter
             riderRecyclerView.layoutManager = viewManager
@@ -58,7 +60,9 @@ class SelectRidersFragment : Fragment() {
         }
 
         viewModel.allSelectableRiders.observe(viewLifecycleOwner, Observer { riders ->
-            riders?.let {adapter.setRiders(it)}
+            riders?.let{
+                adapter.setRiders(it)
+            }
             view?.jumpDrawablesToCurrentState()
         })
 

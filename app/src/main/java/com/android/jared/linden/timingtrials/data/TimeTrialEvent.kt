@@ -7,11 +7,11 @@ import com.android.jared.linden.timingtrials.data.source.Converters
 @Entity(tableName = "timetrial_event_table",
         indices = [Index("timeTrialId")],
         foreignKeys = [ForeignKey(entity =TimeTrialHeader::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = CASCADE, deferred = true)])
-data class TimeTrialEvent(var timeTrialId: Long,
-                          var riderId: Long?,
-                          var timeStamp: Long,
-                          @TypeConverters(Converters::class) var eventType: EventType,
-                          @PrimaryKey(autoGenerate = true) var id: Long? = null)
+data class TimeTrialEvent(val timeTrialId: Long,
+                          val riderId: Long?,
+                          val timeStamp: Long,
+                          @TypeConverters(Converters::class) val eventType: EventType,
+                          @PrimaryKey(autoGenerate = true) val id: Long? = null)
 
 
 //data class TimeTrialWithEvents(@Embedded var timeTrialHeader: TimeTrialHeader,

@@ -33,7 +33,7 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, L
 
 class RiderViewHolderFactory: GenericViewHolderFactory<Rider>() {
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
-        return createView(layoutInflator, parent, Rider.createBlank().apply { firstName = "Name"; club = "Club" })
+        return createView(layoutInflator, parent, Rider.createBlank().copy ( firstName = "Name", club = "Club" ))
     }
 
     override fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?): GenericBaseHolder<Rider, ListItemRiderBinding> {
@@ -97,10 +97,10 @@ class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHol
 
 class TimeTrialViewHolderFactory: GenericViewHolderFactory<TimeTrialHeader>() {
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
-        return createView(layoutInflator, parent, TimeTrialHeader.createBlank().apply {
-            ttName = "Time Trial Name"
-            course = Course.createBlank().apply { courseName = "Course Name" }
-        })
+        return createView(layoutInflator, parent, TimeTrialHeader.createBlank().copy(
+            ttName = "Time Trial Name",
+            course = Course.createBlank().copy( courseName = "Course Name" )
+        ))
     }
 
     override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: TimeTrialHeader): View {
