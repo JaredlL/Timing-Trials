@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import org.threeten.bp.OffsetDateTime
 
+
 @Entity(tableName = "rider_table")
 data class Rider(
         val firstName: String,
@@ -17,6 +18,7 @@ data class Rider(
 
 
     companion object {
+
         fun createBlank() = Rider("", "", "", OffsetDateTime.now().minusYears(20), Gender.UNKNOWN)
     }
     //val fullName = "$firstName $lastName"

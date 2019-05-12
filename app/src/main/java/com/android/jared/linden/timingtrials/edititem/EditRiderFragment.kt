@@ -17,18 +17,18 @@ import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 
-class RiderEditFragment : Fragment() {
+class EditRiderFragment : Fragment() {
 
     companion object {
-        fun newInstance(riderId: Long): RiderEditFragment {
+        fun newInstance(riderId: Long): EditRiderFragment {
             val args = Bundle().apply { putLong(ITEM_ID_EXTRA, riderId) }
-            return RiderEditFragment().apply { arguments = args }
+            return EditRiderFragment().apply { arguments = args }
         }
     }
 
     //private lateinit var riderViewModel:
     private val riderId by argument<Long>(ITEM_ID_EXTRA)
-    private lateinit var riderViewModel: RiderViewModel
+    private lateinit var riderViewModel: EditRiderViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -44,7 +44,7 @@ class RiderEditFragment : Fragment() {
 
         val binding = DataBindingUtil.inflate<FragmentRiderBinding>(inflater, R.layout.fragment_rider, container, false).apply {
             viewModel = riderViewModel
-            lifecycleOwner = (this@RiderEditFragment)
+            lifecycleOwner = (this@EditRiderFragment)
             autoCompleteClub.setAdapter(mAdapter)
             editRiderFab.setOnClickListener {
                 if(riderViewModel.mutableRider.value?.firstName != ""){

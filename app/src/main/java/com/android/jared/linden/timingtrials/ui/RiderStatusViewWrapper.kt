@@ -24,7 +24,7 @@ class RiderStatusViewWrapper(val rider: TimeTrialRider, val timeTrial: TimeTrial
     }
 
    fun riderStatus(): RiderStatus {
-       return  timeTrial.getRiderStatus(rider.rider.id?:0)
+       return  timeTrial.helper.getRiderStatus(rider.rider.id?:0)
     }
 
 

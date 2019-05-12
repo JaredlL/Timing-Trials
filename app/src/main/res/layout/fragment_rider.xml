@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.android.jared.linden.timingtrials.edititem.RiderViewModel"/>
+            type="com.android.jared.linden.timingtrials.edititem.EditRiderViewModel"/>
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

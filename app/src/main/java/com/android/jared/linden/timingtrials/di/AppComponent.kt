@@ -3,8 +3,8 @@ package com.android.jared.linden.timingtrials.di
 import android.content.Context
 import com.android.jared.linden.timingtrials.MainViewModel
 import com.android.jared.linden.timingtrials.TestViewModel
-import com.android.jared.linden.timingtrials.edititem.CourseViewModel
-import com.android.jared.linden.timingtrials.edititem.RiderViewModel
+import com.android.jared.linden.timingtrials.edititem.EditCourseViewModel
+import com.android.jared.linden.timingtrials.edititem.EditRiderViewModel
 import com.android.jared.linden.timingtrials.setup.SetupViewModel
 import com.android.jared.linden.timingtrials.timing.TimingViewModel
 import com.android.jared.linden.timingtrials.viewdata.ListViewModel
@@ -27,9 +27,9 @@ interface AppComponent{
 
     fun listViewModel(): ListViewModel
 
-    fun riderViewModel(): RiderViewModel
+    fun riderViewModel(): EditRiderViewModel
 
-    fun courseViewModel(): CourseViewModel
+    fun courseViewModel(): EditCourseViewModel
 
     fun timeTrialSetupViewModel(): SetupViewModel
 

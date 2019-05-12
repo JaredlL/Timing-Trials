@@ -31,13 +31,12 @@ class TestViewModel@Inject constructor(
     init {
 
         medTimeTrial.value = timeTrial
-
         medTimeTrial.addSource(riderRepository.allRiders){res->
             res?.let {ri->
                 medTimeTrial.value?.let {
                     //val copy = it.copy(riderList = ri.filterIndexed { index, _ -> index%1 == 0 }.mapIndexed { index, rider -> TimeTrialRider(rider, it.timeTrialHeader.id, index+1,(60 + index * it.timeTrialHeader.interval).toLong()) })
-                    it.addRidersAsTimeTrialRiders(ri.filterIndexed{index, _ -> index%1 == 0})
-                    medTimeTrial.value = it
+                    val new = it.helper.addRidersAsTimeTrialRiders(ri.filterIndexed{index, _ -> index%1 == 0})
+                    medTimeTrial.value = new
                 }
             }
         }

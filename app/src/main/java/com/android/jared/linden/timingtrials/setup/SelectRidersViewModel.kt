@@ -50,7 +50,7 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
         if(sel){newList.add(rider)}
 
         ttSetup.timeTrial.value?.let {
-            ttSetup.timeTrial.value = it.addRidersAsTimeTrialRiders(newList)
+            ttSetup.timeTrial.value = it.helper.addRidersAsTimeTrialRiders(newList)
         }
 
     }

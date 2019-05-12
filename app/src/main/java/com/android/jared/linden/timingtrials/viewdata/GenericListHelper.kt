@@ -1,5 +1,6 @@
 package com.android.jared.linden.timingtrials.viewdata
 
+import android.icu.lang.UCharacter.GraphemeClusterBreak.L
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,12 +18,12 @@ import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
 class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, ListItemRiderBinding>(binding) {
 
     private val _binding = binding
-    var longPress = {(rider):Rider -> Unit}
+    //override var onLongPress : (id:Long) -> Unit = {}
     override fun bind(data: Rider){
 
         _binding.apply{
             rider = data
-            riderLayout.setOnLongClickListener { longPress(data)
+            riderLayout.setOnLongClickListener { onLongPress(data.id?:0L)
                 true
             }
 
@@ -49,13 +50,13 @@ class RiderViewHolderFactory: GenericViewHolderFactory<Rider>() {
 class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<CourseListViewWrapper, ListItemCourseBinding>(binding) {
     private val _binding = binding
 
-    var longPress = {(course): Course -> Unit}
+    //override var onLongPress = {course: CourseListViewWrapper -> Unit}
 
     override fun bind(data: CourseListViewWrapper){
 
         _binding.apply{
             courseVm = data
-            courseLayout.setOnLongClickListener { longPress(data.course)
+            courseLayout.setOnLongClickListener { onLongPress(data.course.id?:0L)
                 true
             }
 
@@ -86,6 +87,7 @@ class CourseViewHolderFactory: GenericViewHolderFactory<CourseListViewWrapper>()
 
 class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHolder<TimeTrialHeader, ListItemTimetrialBinding>(binding) {
     private val _binding = binding
+    //override var onLongPress = {(rider):TimeTrialHeader -> Unit}
 
     override fun bind(data: TimeTrialHeader){
         _binding.apply{

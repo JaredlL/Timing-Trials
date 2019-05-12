@@ -42,7 +42,7 @@ class RiderStatusFragment : Fragment() {
         val viewManager = GridLayoutManager(context, 4)
 
         timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer {tt->
-            val newList = tt.getUnfinishedRiders().map { r -> RiderStatusViewWrapper(r, tt ).apply {
+            val newList = tt.helper.unfinishedRiders.map { r -> RiderStatusViewWrapper(r, tt ).apply {
                 onPressedCallback = {
                    timingViewModel.tryAssignRider(it).let {res->
                        if(!res.succeeded) Toast.makeText(requireContext(), res.message, Toast.LENGTH_LONG).show()

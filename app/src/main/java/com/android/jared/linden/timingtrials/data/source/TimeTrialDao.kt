@@ -21,10 +21,9 @@ abstract class TimeTrialDao {
     @Transaction @Insert
     fun insert(timeTrial: TimeTrial){
         val id = insert(timeTrial.timeTrialHeader)
-        timeTrial.eventList.map { it.copy(timeTrialId = id)}
-        _insertAllEvents(timeTrial.eventList)
-        timeTrial.riderList.map { it.copy(timeTrialId = id)}
-        _insertAllTimeTrialRiders(timeTrial.riderList)
+        //timeTrial.eventList.map { it.copy(timeTrialId = id)}
+        _insertAllEvents( timeTrial.eventList.map { it.copy(timeTrialId = id)})
+        _insertAllTimeTrialRiders(timeTrial.riderList.map { it.copy(timeTrialId = id)})
     }
 
     @Transaction @Update

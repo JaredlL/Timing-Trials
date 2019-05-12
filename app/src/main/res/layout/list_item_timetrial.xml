@@ -8,6 +8,7 @@
             type="com.android.jared.linden.timingtrials.data.TimeTrialHeader"/>
     </data>
     <RelativeLayout
+        android:id="@+id/timetrial_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

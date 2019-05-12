@@ -22,7 +22,7 @@ import com.android.jared.linden.timingtrials.util.*
 
 
 /**
- * A fragment representing a eventList of Courses.
+ * A fragment representing a list of items.
  * Activities containing this fragment MUST implement the
  */
 class GenericListFragment : Fragment() {
@@ -66,6 +66,7 @@ class GenericListFragment : Fragment() {
             }
         }
 
+        adapter.itemLongPress = { itemId -> editItem(itemId)}
 
         viewManager = LinearLayoutManager(context)
 
@@ -80,10 +81,10 @@ class GenericListFragment : Fragment() {
     }
 
 
-    private fun editItem(course: Course){
+    private fun editItem(itemId: Long){
         val intent = Intent(context, EditItemActivity::class.java).apply {
-            putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
-            putExtra(ITEM_ID_EXTRA, course.id)
+            putExtra(ITEM_ID_EXTRA, itemId)
+            putExtra(ITEM_TYPE_EXTRA, itemType)
         }
         startActivity(intent)
     }

@@ -3,6 +3,7 @@ package com.android.jared.linden.timingtrials.edititem
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
+import com.android.jared.linden.timingtrials.util.createLink
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -12,18 +13,19 @@ import java.math.RoundingMode
 import javax.inject.Inject
 
 
-class CourseViewModel @Inject constructor(private val repository: ICourseRepository) :ViewModel() {
+class EditCourseViewModel @Inject constructor(private val repository: ICourseRepository) :ViewModel() {
 
     val mutableCourse: MediatorLiveData<Course> = MediatorLiveData()
     val mutableLengthString: MutableLiveData<String> = MutableLiveData()
 
-    val courseName = MutableLiveData("")
-    val cttName = MutableLiveData("")
+
 
     private val distances = listOf(
             DistanceViewModel("Miles", (1 / 1609.34)),
             DistanceViewModel("KM", (1 / 1000.0))
     )
+
+    val lengthUnits = distances.map { d -> d.name }
 
     private fun updateLengthString(newLength: Double){
         if(newLength > 0){
@@ -33,7 +35,16 @@ class CourseViewModel @Inject constructor(private val repository: ICourseReposit
         }
     }
 
-    val lengthUnits = distances.map { d -> d.name }
+    val courseName = MutableLiveData<String>("").createLink(
+            mutableCourse,
+            {new -> mutableCourse.value?.let { Pair(it.courseName, it.copy(courseName = new)) }},
+            {mutableCourse.value?.courseName?:"" })
+
+    val cttName = MutableLiveData<String>("").createLink(
+            mutableCourse,
+            {new -> mutableCourse.value?.let { Pair(it.cttName, it.copy(cttName = new)) }},
+            {mutableCourse.value?.cttName?:"" })
+
 
     var selectedItemPosition = 0
     set(value){
@@ -47,9 +58,6 @@ class CourseViewModel @Inject constructor(private val repository: ICourseReposit
             mutableCourse.addSource(repository.getCourse(courseId)){result: Course ->
                 result.let {
                     mutableCourse.value = result
-                    courseName.value = result.courseName
-                    cttName.value = result.cttName
-                    updateLengthString(result.length)
                 }
             }
         }
@@ -58,19 +66,18 @@ class CourseViewModel @Inject constructor(private val repository: ICourseReposit
 
 
 
+
+
     fun addOrUpdate(){
         viewModelScope.launch(Dispatchers.IO) {
 
             mutableCourse.value?.let {
 
-                val cName = courseName.value?:""
-                val cttname = cttName.value?:""
-
                 val len = mutableLengthString.value?.toDoubleOrNull()?.apply {
                     this / distances[selectedItemPosition].conversion
                 }?:0.0
 
-                repository.insertOrUpdate(it.copy(courseName = cName, cttName = cttname, length = len))
+                repository.insertOrUpdate(it)
             }
         }
     }

@@ -34,7 +34,7 @@ class EventViewWrapper(var event: TimeTrialEvent, val timeTrial: TimeTrial) : Ba
         EventType.RIDER_PASSED ->
         {
             event.riderId?.let { id->
-               return@let when(timeTrial.getRiderStatus(id)){
+               return@let when(timeTrial.helper.getRiderStatus(id)){
                    RiderStatus.FINISHED -> "$riderName Finished"
                    else -> "$riderName Has Passed"
                 }
