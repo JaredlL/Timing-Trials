@@ -57,21 +57,22 @@ class RiderStatusFragment : Fragment() {
             adapter.setRiderStatus(newList)
         })
 
-        viewResultsButton.setOnClickListener {
-            val ttId = timingViewModel.timeTrial.value?.timeTrialHeader?.id
-            timingViewModel.finishTt()
-            val resultIntent = Intent(requireActivity(), TimingTrialsDbActivity::class.java)
-            resultIntent.putExtra(ITEM_ID_EXTRA, ttId)
-            resultIntent.putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
-            startActivity(resultIntent)
-            activity?.finish()
-        }
+
 
         val binding = DataBindingUtil.inflate<FragmentTimerRiderStatusBinding>(inflater, R.layout.fragment_timer_rider_status, container, false).apply {
             lifecycleOwner=this@RiderStatusFragment
             viewResultsButton.visibility = View.GONE
             riderStatuses.adapter = adapter
             riderStatuses.layoutManager = viewManager
+            viewResultsButton.setOnClickListener {
+                val ttId = timingViewModel.timeTrial.value?.timeTrialHeader?.id
+                timingViewModel.finishTt()
+                val resultIntent = Intent(requireActivity(), TimingTrialsDbActivity::class.java)
+                resultIntent.putExtra(ITEM_ID_EXTRA, ttId)
+                resultIntent.putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
+                startActivity(resultIntent)
+                activity?.finish()
+            }
         }
 
 

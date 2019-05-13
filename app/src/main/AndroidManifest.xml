@@ -10,6 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".result.ResultActivity"></activity>
         <activity
             android:name=".timing.TimingActivity"
             android:label="@string/title_activity_timing"
@@ -22,7 +23,7 @@
         <activity
             android:name=".setup.SetupActivity"
             android:label="@string/title_activity_setup"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">
