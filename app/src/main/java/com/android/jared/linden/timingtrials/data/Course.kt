@@ -1,17 +1,16 @@
 package com.android.jared.linden.timingtrials.data
 
-import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.android.parcel.Parcelize
 
-@Entity(tableName = "course_table") @Parcelize
+@Entity(tableName = "course_table")
 data class Course(
-        var courseName: String,
-        var length: Double = 0.0,
-        var cttName: String = "",
-        @PrimaryKey(autoGenerate = true) var id: Long? = null
-) : Parcelable{
+        val courseName: String,
+        val length: Double = 0.0,
+        val cttName: String = "",
+        val courseRecords: List<CourseRecord> = listOf(),
+        @PrimaryKey(autoGenerate = true) val id: Long? = null
+) {
     companion object {
         fun createBlank() = Course("", 0.0, "")
     }

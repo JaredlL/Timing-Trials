@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.android.jared.linden.timingtrials.edititem.CourseViewModel"/>
+            type="com.android.jared.linden.timingtrials.edititem.EditCourseViewModel"/>
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -31,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapSentences"
-                android:text="@={viewModel.mutableCourse.courseName}"
+                android:text="@={viewModel.courseName}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -90,7 +90,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapSentences"
-                android:text="@={viewModel.mutableCourse.cttName}"
+                android:text="@={viewModel.cttName}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView8" />
 

@@ -12,9 +12,11 @@ import android.widget.Toast
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 
 import kotlinx.android.synthetic.main.activity_setup.*
-import java.util.*
+import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
 
 class SetupActivity : AppCompatActivity() {
 
@@ -30,42 +32,30 @@ class SetupActivity : AppCompatActivity() {
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
     //private lateinit var riderListViewModel: RiderListViewModel
-    private lateinit var timeTrialViewModel: TimeTrialSetupViewModel
+    private lateinit var setupViewModel: SetupViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setup)
 
-        timeTrialViewModel = getViewModel { injector.timeTrialSetupViewModel() }
-
-        /**
-         * Check if there is a previous tt to et up
-         */
-        timeTrialViewModel.originalTimeTrial.observe(this, androidx.lifecycle.Observer { tt->
-            tt?.let {
-                if(timeTrialViewModel.timeTrial.value == null){
-                    val useOldDialog: UseOldConfirmationFragment = supportFragmentManager
-                            .findFragmentByTag("useold") as? UseOldConfirmationFragment ?: UseOldConfirmationFragment()
-
-                    if(useOldDialog.dialog?.isShowing != true){
-                        useOldDialog.show(supportFragmentManager, "useold")
-                    }
-
-                }
-
-            }
-        })
+        setupViewModel = getViewModel { injector.timeTrialSetupViewModel() }
 
 
-        timeTrialViewModel.timeTrialPropertiesViewModel.onBeginTt = {
+        intent.getLongExtra(ITEM_ID_EXTRA, 0L).let {
+            setupViewModel.initialise(it)
+        }
 
-            timeTrialViewModel.timeTrial.value?.let {
-                if(it.riders.count() == 0){
+
+
+        setupViewModel.timeTrialPropertiesViewModel.onBeginTt = {
+
+            setupViewModel.timeTrial.value?.let {
+                if(it.riderList.count() == 0){
                     Toast.makeText(this, "TT Needs at least 1 rider", Toast.LENGTH_LONG).show()
                     container.currentItem = 1
                     return@let
                 }
-                if(it.startTime.before(Calendar.getInstance().time)){
+                if(it.timeTrialHeader.startTime.isBefore(OffsetDateTime.now())){
                     Toast.makeText(this, "TT must start in the future, select start time", Toast.LENGTH_LONG).show()
                     TimePickerFragment().show(supportFragmentManager, "timePicker")
                     return@let
@@ -96,6 +86,7 @@ class SetupActivity : AppCompatActivity() {
 
 
     }
+
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -129,11 +120,11 @@ class SetupActivity : AppCompatActivity() {
             // Return a PlaceholderFragment (defined as a static inner class below).
 
 
-            when (position){
-                0 -> return SetupTimeTrialFragment.newInstance()
-                1 -> return SelectRidersFragment.newInstance()
-                2 -> return OrderRidersFragment.newInstance()
-                else -> return SetupTimeTrialFragment.newInstance()
+           return when (position){
+                0 ->  SetupTimeTrialFragment.newInstance()
+                1 ->  SelectRidersFragment.newInstance()
+                2 ->  OrderRidersFragment.newInstance()
+                else ->  SetupTimeTrialFragment.newInstance()
 
             }
         }

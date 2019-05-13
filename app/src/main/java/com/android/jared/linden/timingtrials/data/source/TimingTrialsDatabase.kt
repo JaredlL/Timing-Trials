@@ -3,21 +3,20 @@ package com.android.jared.linden.timingtrials.data.source
 import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.android.jared.linden.timingtrials.data.Course
-import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
+import org.threeten.bp.OffsetDateTime
 
-@Database(entities = [Rider::class, Course::class, TimeTrial::class], version = 9, exportSchema = false)
+@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, TimeTrialEvent::class, TimeTrialRider::class], version = 17, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 
     abstract fun riderDao() : RiderDao
     abstract fun courseDao(): CourseDao
     abstract fun timeTrialDao(): TimeTrialDao
+
 
     companion object {
         @Volatile private var INSTANCE: TimingTrialsDatabase? = null
@@ -67,39 +66,46 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             // Start the app with a clean database every time.
             // Not needed if you only populate on creation.
             riderDao.deleteAll()
-            riderDao.insert(Rider("Jared", "Linden", "RDFCC", 28))
-            riderDao.insert(Rider("Adam", "Taylor", "RDFCC", 42))
-            riderDao.insert(Rider("John", "Linden", "RDFCC", 42))
-            riderDao.insert(Rider("Lauren", "Johnston", "Avid", 25, gender = "Female"))
-            riderDao.insert(Rider("Steve", "Beal", "VeloVitesse", 42))
-            riderDao.insert(Rider("Earl", "Smith", "RDFCC", 42))
-            riderDao.insert(Rider("Jo", "Jago", "Performance Cycles", 39, gender = "Female"))
-            riderDao.insert(Rider("Dave", "Pearce", "RDFCC", 42))
-            riderDao.insert(Rider("Craig ", "Buffry", "RDFCC", 42))
-            riderDao.insert(Rider("Collin", "Parry", "RDFCC", 36))
-            riderDao.insert(Rider("Rob", "Borek", "Forever Pedalling", 23))
-            riderDao.insert(Rider("Michelle ", "Lee", "RDFCC", 23, gender = "Female"))
-            riderDao.insert(Rider("Pfeiffer", "Georgi", "Sunweb", 18, gender = "Female"))
-            riderDao.insert(Rider("Bob", "Parry", "RDFCC", 70))
-            riderDao.insert(Rider("Megan", "Dickerson", "Bristol South CC", 24, gender = "Female"))
-            riderDao.insert(Rider("Lucy", "Gadd", "On Form", 18, gender = "Female"))
-            riderDao.insert(Rider("Louise", "Hart", "Ross", 29, gender = "Female"))
-            riderDao.insert(Rider("Dave", "Bucknall", "RDFCC", 40))
-            riderDao.insert(Rider("Rob", "Hussey", "RDFCC", 40))
-            riderDao.insert(Rider("Paul", "Jones", "RDFCC", 40))
-            riderDao.insert(Rider("Bradley", "Wiggins", "RDFCC", 40))
-            riderDao.insert(Rider("Lance", "Armstrong", "Postal", 45))
-            riderDao.insert(Rider("Tom", "Knight", "Ross", 50))
-            riderDao.insert(Rider("Paul", "Stephens", "Ross", 50))
-            riderDao.insert(Rider("Richard", "Harrington", "Ross", 50))
-            riderDao.insert(Rider("Phil", "Sims", "Newport", 50))
-            riderDao.insert(Rider("Jon", "Morris", "Chepstow CC", 50))
-            riderDao.insert(Rider("Gordon", "Marcus", "Severn RC", 40))
-            riderDao.insert(Rider("Joe", "Griffiths", "78 Degrees", 23))
-            riderDao.insert(Rider("Matt", "Fratesi", "TORQ", 20))
+            riderDao.insert(createBaseRider("Jared", "Linden", "RDFCC", 1990, Gender.MALE))
+            riderDao.insert(createBaseRider("Adam", "Taylor", "RDFCC", 1976, Gender.MALE))
+            riderDao.insert(createBaseRider("John", "Linden", "RDFCC", 1955, Gender.MALE))
+            riderDao.insert(createBaseRider("Lauren", "Johnston", "Avid", 1993, Gender.FEMALE))
+            riderDao.insert(createBaseRider("Steve", "Beal", "VeloVitesse", 1976, Gender.MALE))
+            riderDao.insert(createBaseRider("Earl", "Smith", "RDFCC", 1976, Gender.MALE))
+            riderDao.insert(createBaseRider("Jo", "Jago", "Performance Cycles", 1979, Gender.FEMALE))
+            riderDao.insert(createBaseRider("Dave", "Pearce", "RDFCC", 1977, Gender.MALE))
+            riderDao.insert(createBaseRider("Craig ", "Buffry", "RDFCC", 1992, Gender.MALE))
+            riderDao.insert(createBaseRider("Collin", "Parry", "RDFCC", 1975, Gender.MALE))
+            riderDao.insert(createBaseRider("Rob", "Borek", "Forever Pedalling", 1992, Gender.MALE))
+            riderDao.insert(createBaseRider("Michelle ", "Lee", "RDFCC", 1980, Gender.FEMALE))
+            riderDao.insert(createBaseRider("Pfeiffer", "Georgi", "Sunweb", 1996, Gender.FEMALE))
+            riderDao.insert(createBaseRider("Bob", "Parry", "RDFCC", 1949, Gender.MALE))
+            riderDao.insert(createBaseRider("Megan", "Dickerson", "Bristol South CC", 1993, Gender.FEMALE))
+            riderDao.insert(createBaseRider("Lucy", "Gadd", "On Form", 1997, Gender.FEMALE))
+            riderDao.insert(createBaseRider("Louise", "Hart", "Ross", 1987, Gender.FEMALE))
+            riderDao.insert(createBaseRider("Dave", "Bucknall", "RDFCC", 1970, Gender.MALE))
+            riderDao.insert(createBaseRider("Rob", "Hussey", "RDFCC", 1975, Gender.MALE))
+            riderDao.insert(createBaseRider("Paul", "Jones", "RDFCC", 1975, Gender.MALE))
+            riderDao.insert(createBaseRider("Bradley", "Wiggins", "RDFCC", 1980, Gender.MALE))
+            riderDao.insert(createBaseRider("Lance", "Armstrong", "Postal", 1975, Gender.MALE))
+            riderDao.insert(createBaseRider("Tom", "Knight", "Ross", 1960, Gender.MALE))
+            riderDao.insert(createBaseRider("Paul", "Stephens", "Ross", 1965, Gender.MALE))
+            riderDao.insert(createBaseRider("Richard", "Harrington", "Ross", 1965, Gender.MALE))
+            riderDao.insert(createBaseRider("Phil", "Sims", "Newport", 1968, Gender.MALE))
+            riderDao.insert(createBaseRider("Jon", "Morris", "Chepstow CC", 1976, Gender.MALE))
+            riderDao.insert(createBaseRider("Gordon", "Marcus", "Severn RC", 1970, Gender.MALE))
+            riderDao.insert(createBaseRider("Joe", "Griffiths", "78 Degrees", 1992, Gender.MALE))
+            riderDao.insert(createBaseRider("Matt", "Fratesi", "TORQ", 1996, Gender.MALE))
+            riderDao.insert(createBaseRider("Marcin", "Biablocki", "Nopinz", 1983, Gender.MALE))
+            riderDao.insert(createBaseRider("Geraint", "Thomas", "Sky", 1988, Gender.MALE))
 
 
 
+        }
+
+        fun createBaseRider(fname:String, lname:String, club:String, dob:Int, gender: Gender):Rider{
+            val bd: OffsetDateTime = OffsetDateTime.now().minusYears((2019 - dob).toLong())
+            return Rider(fname, lname, club, bd, gender)
         }
 
         fun populateCourses(courseDao: CourseDao){
@@ -114,8 +120,9 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
 
         fun populateTt(timeTrialDao: TimeTrialDao, riderDao: RiderDao, courseDao: CourseDao){
 
+            timeTrialDao.deleteAllR()
+            timeTrialDao.deleteAllE()
             timeTrialDao.deleteAll()
-            timeTrialDao.insert(TimeTrial.createBlank().apply { ttName = "New TT" })
         }
 
     }

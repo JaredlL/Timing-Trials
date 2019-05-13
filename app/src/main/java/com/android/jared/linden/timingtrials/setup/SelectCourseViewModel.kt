@@ -13,10 +13,14 @@ interface ISelectCourseViewModel{
     var courseSelected: () -> Unit
 }
 
-class SelectCourseViewModelImpl(private val ttSetup: TimeTrialSetupViewModel): ISelectCourseViewModel{
+class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCourseViewModel{
 
 
-    private fun selectedCourse() = ttSetup.timeTrial.value?.course
+
+    //private val timeTrialDef = Transformations.map(ttSetup.timeTrial){it.timeTrialHeader}
+    //private val selectedCourse = ttSetup.timeTrial.value?.timeTrialHeader?.course
+
+    private fun selectedCourse(): Course? { return ttSetup.timeTrial.value?.timeTrialHeader?.course }
 
     private val mCourseWrapperList: LiveData<List<CourseListViewWrapper>>
             = Transformations.map(ttSetup.courseRepository.allCourses){ list -> list.map {course -> CourseListViewWrapper(course).apply {
@@ -35,23 +39,28 @@ class SelectCourseViewModelImpl(private val ttSetup: TimeTrialSetupViewModel): I
 
             val oldCourseName = selectedCourse()?.courseName?: ""
 
-            ttSetup.timeTrial.value?.let {tt->
+            ttSetup.timeTrial.value?.let { ttd->
+                val tt = ttd.timeTrialHeader
                 if(tt.ttName == ""){
+
+                    //Todo: Use Threeten
                     val f = SimpleDateFormat("dd/MM/yy")
                     val c = Calendar.getInstance()
                     val formatString = f.format(c.time)
 
-                    ttSetup.timeTrial.value = ttSetup.timeTrial.value.apply {
-                        tt.ttName = course.courseName + " " + formatString
-                        tt.course = course
-                    }
+                    ttSetup.updateDefinition(tt.copy(ttName = course.courseName + " " + formatString, course = course))
+
                 }else if( oldCourseName != ""  && tt.ttName.contains(oldCourseName, false)){
 
                     val oldTtName = tt.ttName
-                    ttSetup.timeTrial.value = ttSetup.timeTrial.value.apply {
-                        tt.ttName = oldTtName.replace(oldCourseName, course.courseName)
-                        tt.course = course
-                    }
+                   val newDef = tt.copy(
+                        ttName = oldTtName.replace(oldCourseName, course.courseName),
+                        course = course)
+
+                    ttSetup.updateDefinition(newDef)
+                }
+                else{
+                    ttSetup.updateDefinition(tt.copy(course = course))
                 }
             }
 

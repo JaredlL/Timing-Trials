@@ -37,7 +37,7 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
     var editCourse = {(course):Course -> Unit}
 
 
-    override fun onBindViewHolder(holder: CourseListAdapter.CourseViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CourseViewHolder, position: Int) {
         mCourses.get(position).let { course ->
             with(holder){
                 itemView.tag = course
@@ -56,7 +56,7 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseListAdapter.CourseViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseViewHolder {
 
         val binding: ListItemCourseBinding = DataBindingUtil.inflate(layoutInflater, R.layout.list_item_course, parent, false)
         return CourseViewHolder(binding)

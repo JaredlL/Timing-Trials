@@ -22,7 +22,17 @@
     <string name="last_name">Last Name</string>
     <string name="club">Club</string>
     <string name="begin_tt">Begin TT!</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="title_activity_timing">TimingActivity</string>
+    <string name="start_tt">Start TT</string>
+    <string name="riders">Riders</string>
+    <string name="courses">Courses</string>
+    <string name="time_trials">TimeTrials</string>
+    <string name="manage_riders">Manage Riders</string>
+    <string name="rider_passed">Rider Passed!</string>
+    <string name="timetrial_to_start_at">TimeTrial to start at</string>
+    <string name="press_assign_rider">Press to assign number</string>
+    <string name="now_choose_rider">Now select number</string>
+    <string name="view_results">View Results</string>
 </resources>

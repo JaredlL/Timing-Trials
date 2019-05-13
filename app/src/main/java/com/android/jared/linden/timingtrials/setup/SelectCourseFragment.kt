@@ -2,17 +2,11 @@ package com.android.jared.linden.timingtrials.setup
 
 import android.app.Dialog
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import android.widget.RelativeLayout
-import android.widget.Toast
-import androidx.core.content.ContextCompat.startActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.MediatorLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
@@ -22,9 +16,7 @@ import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.databinding.FragmentCourseListBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
-import com.android.jared.linden.timingtrials.util.getViewModel
-import com.android.jared.linden.timingtrials.util.injector
-import com.android.jared.linden.timingtrials.viewdata.*
+import com.android.jared.linden.timingtrials.util.*
 
 class SelectCourseFragment : DialogFragment() {
 
@@ -37,7 +29,6 @@ class SelectCourseFragment : DialogFragment() {
                               savedInstanceState: Bundle?): View? {
 
         viewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.selectCourseViewModel
-
         viewManager = LinearLayoutManager(context)
         adapter = CourseListAdapter(requireContext())
         adapter.editCourse = ::editCourse
@@ -85,7 +76,7 @@ class SelectCourseFragment : DialogFragment() {
         dialog.setContentView(root)
 
         //dialog.window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         return dialog
     }
 

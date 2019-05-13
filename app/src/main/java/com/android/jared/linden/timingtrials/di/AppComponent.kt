@@ -1,20 +1,15 @@
 package com.android.jared.linden.timingtrials.di
 
 import android.content.Context
-import com.android.jared.linden.timingtrials.MainActivity
-import com.android.jared.linden.timingtrials.TimingTrialsApplication
-import com.android.jared.linden.timingtrials.data.source.CourseDao
-import com.android.jared.linden.timingtrials.data.source.RiderDao
-import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
-import com.android.jared.linden.timingtrials.data.source.TimingTrialsDatabase
-import com.android.jared.linden.timingtrials.edititem.CourseViewModel
-import com.android.jared.linden.timingtrials.edititem.RiderViewModel
-import com.android.jared.linden.timingtrials.setup.TimeTrialSetupViewModel
-import com.android.jared.linden.timingtrials.viewdata.CourseListViewModel
-import com.android.jared.linden.timingtrials.viewdata.RiderListViewModel
+import com.android.jared.linden.timingtrials.MainViewModel
+import com.android.jared.linden.timingtrials.TestViewModel
+import com.android.jared.linden.timingtrials.edititem.EditCourseViewModel
+import com.android.jared.linden.timingtrials.edititem.EditRiderViewModel
+import com.android.jared.linden.timingtrials.setup.SetupViewModel
+import com.android.jared.linden.timingtrials.timing.TimingViewModel
+import com.android.jared.linden.timingtrials.viewdata.ListViewModel
 import dagger.BindsInstance
 import dagger.Component
-import dagger.Subcomponent
 import javax.inject.Singleton
 
 @Singleton
@@ -30,15 +25,19 @@ interface AppComponent{
         fun build(): AppComponent
     }
 
-    fun courseListViewModel(): CourseListViewModel
+    fun listViewModel(): ListViewModel
 
-    fun riderListViewModel(): RiderListViewModel
+    fun riderViewModel(): EditRiderViewModel
 
-    fun riderViewModel(): RiderViewModel
+    fun courseViewModel(): EditCourseViewModel
 
-    fun courseViewModel(): CourseViewModel
+    fun timeTrialSetupViewModel(): SetupViewModel
 
-    fun timeTrialSetupViewModel(): TimeTrialSetupViewModel
+    fun timingViewModel(): TimingViewModel
+
+    fun mainViewModel(): MainViewModel
+
+    fun testViewModel(): TestViewModel
 
 }
 

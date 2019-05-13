@@ -1,18 +1,19 @@
 package com.android.jared.linden.timingtrials.setup
 
 import androidx.lifecycle.*
-import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.util.ConverterUtils
-import java.util.*
+import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
 
 
 interface ITimeTrialPropertiesViewModel{
 
-    val timeTrial: LiveData<TimeTrial>
+    val timeTrialHeader: LiveData<TimeTrialHeader>
     val timeTrialName: MutableLiveData<String>
     val startTimeString: LiveData<String>
     val courseName: LiveData<String>
-    val startTime: MutableLiveData<Date>
+    val startTime: MutableLiveData<OffsetDateTime>
     val laps: MutableLiveData<String>
     val interval: MutableLiveData<String>
     val availableLaps: List<String>
@@ -22,30 +23,32 @@ interface ITimeTrialPropertiesViewModel{
 
 }
 
-class TimeTrialPropertiesViewModelImpl(private val ttSetup: TimeTrialSetupViewModel): ITimeTrialPropertiesViewModel{
+class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITimeTrialPropertiesViewModel{
 
-   override val timeTrial = ttSetup.timeTrial
-    private fun timeTrialValue() = timeTrial.value
+   override val timeTrialHeader = Transformations.map(ttSetup.timeTrial){it.timeTrialHeader}
 
-    override val courseName: LiveData<String> = Transformations.map(ttSetup.timeTrial){
-        it.course?.courseName
+    //private val timeTrialValue = ttSetup.timeTrial.value?.timeTrialHeader
+
+    override val courseName: LiveData<String> = Transformations.map(ttSetup.timeTrial){tt->
+        tt?.let{
+            tt.timeTrialHeader.course?.courseName
+        }
     }
 
 
     /**
-     * Best way i have found to perform a custom action on livedata set
+     * To perform a custom action on livedata set
      */
-    override val timeTrialName: MutableLiveData<String> = MutableLiveData()
+    override val timeTrialName: MutableLiveData<String> = MutableLiveData("")
     private val nameMediator = MediatorLiveData<String>().apply {
-        addSource(ttSetup.timeTrial) {tt->
-            tt?.let { if(timeTrialName.value != it.ttName) timeTrialName.value = it.ttName }
+        addSource(ttSetup.timeTrial) { tt->
+            tt?.timeTrialHeader?.let { if(timeTrialName.value != it.ttName) timeTrialName.value = it.ttName }
 
         }
         addSource(timeTrialName) { newName ->
-            timeTrialValue()?.let {
+            ttSetup.timeTrial.value?.timeTrialHeader?.let {
                 if(it.ttName != newName) {
-                    it.ttName = newName
-                    ttSetup.timeTrial.value = it
+                    ttSetup.updateDefinition(it.copy(ttName = newName))
                 }
             }
         }
@@ -54,20 +57,19 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: TimeTrialSetupViewMo
 
     override val laps = MutableLiveData<String>()
     private val lapsMediator = MediatorLiveData<String>().apply {
-        addSource(ttSetup.timeTrial) {tt->
+        addSource(ttSetup.timeTrial) { tt->
             tt?.let {
-                if (laps.value != it.laps.toString()) {
-                    laps.value = it.laps.toString()
+                if (laps.value != it.timeTrialHeader.laps.toString()) {
+                    laps.value = it.timeTrialHeader.laps.toString()
                 }
             }
 
         }
         addSource(laps) {laps->
             laps.toIntOrNull()?.let{newLaps ->
-                timeTrialValue()?.let {tt->
+                timeTrialHeader.value?.let { tt->
                 if(tt.laps != newLaps) {
-                    tt.laps = newLaps
-                    ttSetup.timeTrial.value = tt
+                    ttSetup.updateDefinition(tt.copy(laps = newLaps))
                 }
             }}
         }
@@ -76,28 +78,27 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: TimeTrialSetupViewMo
     override val interval = MutableLiveData<String>()
     private val intervalMediator = MediatorLiveData<String>().apply {
         addSource(interval) {interval->
-            timeTrialValue()?.let { tt ->
+            timeTrialHeader.value?.let { tt ->
                 interval.toIntOrNull()?.let{
                     if(tt.interval != it){
-                        tt.interval = it
-                        ttSetup.timeTrial.value = tt
+                        ttSetup.updateDefinition(tt.copy(interval = it))
                     }
                 }
             }
         }
-        addSource(ttSetup.timeTrial) {tt->
+        addSource(ttSetup.timeTrial) { tt->
             tt?.let {
-                if (interval.value != it.interval.toString()) {
-                    interval.value = it.interval.toString()
+                if (interval.value != it.timeTrialHeader.interval.toString()) {
+                    interval.value = it.timeTrialHeader.interval.toString()
                 }
             }
 
         }
     }.also { it.observeForever {  } }
 
-    override val startTime = MutableLiveData<Date>()
-    private val startTimeMediator = MediatorLiveData<Date>().apply {
-        addSource(ttSetup.timeTrial) {tt->
+    override val startTime = MutableLiveData<OffsetDateTime>()
+    private val startTimeMediator = MediatorLiveData<OffsetDateTime>().apply {
+        addSource(timeTrialHeader) { tt->
             tt?.let {
                 if (startTime.value != it.startTime) {
                     startTime.value = it.startTime
@@ -106,17 +107,16 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: TimeTrialSetupViewMo
 
         }
         addSource(startTime) {newStartTime->
-            timeTrialValue()?.let {tt->
+            timeTrialHeader.value?.let { tt->
                 if(tt.startTime != newStartTime) {
-                    tt.startTime = newStartTime
-                    ttSetup.timeTrial.value = tt
+                    ttSetup.updateDefinition(tt.copy(startTime = newStartTime))
                 }
             }
         }
     }.also { it.observeForever {  } }
 
-    override val startTimeString: LiveData<String>  = Transformations.map(ttSetup.timeTrial){tt->
-        tt?.let { ConverterUtils.dateToTimeDisplayString(it.startTime)}
+    override val startTimeString: LiveData<String>  = Transformations.map(timeTrialHeader){ tt->
+        tt?.let { ConverterUtils.instantToSecondsDisplayString(it.startTime.toInstant())}
     }
 
     override val availableLaps = 1.rangeTo(99).map { i -> i.toString() }

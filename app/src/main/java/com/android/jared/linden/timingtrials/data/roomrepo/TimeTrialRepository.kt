@@ -1,10 +1,10 @@
-package com.android.jared.linden.timingtrials.data
+package com.android.jared.linden.timingtrials.data.roomrepo
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,16 +12,26 @@ interface ITimeTrialRepository{
 
     suspend fun insert(timeTrial: TimeTrial)
     suspend fun insertOrUpdate(timeTrial: TimeTrial)
-    suspend fun update(rider: TimeTrial)
+    suspend fun update(timeTrial: TimeTrial)
+    suspend fun getTimeTrialByName(name: String): TimeTrial?
+    suspend fun delete(timeTrial: TimeTrial)
     fun getSetupTimeTrial(): LiveData<TimeTrial>
-
+    fun getTimingTimeTrial(): LiveData<TimeTrial>
+    fun getTimeTrialById(id: Long): LiveData<TimeTrial>
+    val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>>
 }
 
 @Singleton
-class RoomTimeTrialRepository @Inject constructor(private  val timeTrialDao: TimeTrialDao): ITimeTrialRepository {
+class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: TimeTrialDao): ITimeTrialRepository {
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun getTimeTrialByName(name: String): TimeTrial? {
+        return timeTrialDao.getTimeTrialByName(name)
+    }
 
 
-    val allTimeTrials: LiveData<List<TimeTrial>> = timeTrialDao.gatAllTimeTrials()
+    override val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>> = timeTrialDao.getAllTimeTrials()
 
     // You must call this on a non-UI thread or your app will crash. So we're making this a
     // suspend function so the caller methods know this.
@@ -36,36 +46,36 @@ class RoomTimeTrialRepository @Inject constructor(private  val timeTrialDao: Tim
     override fun getSetupTimeTrial(): LiveData<TimeTrial> {
 
         return timeTrialDao.getSetupTimeTrial()
-        val c = Calendar.getInstance()
-        c.add(Calendar.MINUTE, 10)
-        c.set(Calendar.SECOND, 0)
-        c.set(Calendar.MILLISECOND, 0)
-        return MutableLiveData(TimeTrial("", startTime =  c.time))
+    }
+
+    override fun getTimingTimeTrial(): LiveData<TimeTrial> {
+
+        return timeTrialDao.getTimingTimeTrial()
     }
 
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    override suspend fun update(rider: TimeTrial) {
-        timeTrialDao.update(rider)
+    override suspend fun update(timeTrial: TimeTrial) {
+        timeTrialDao.update(timeTrial)
     }
 
 
-    fun getTimeTrial(timeTrialId: Long) : LiveData<TimeTrial> {
-       return timeTrialDao.getTimeTrialById(timeTrialId)
+   override fun getTimeTrialById(id: Long) : LiveData<TimeTrial> {
+       return timeTrialDao.getTimeTrialById(id)
     }
 
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun delete(timeTrial: TimeTrial) {
+    override suspend fun delete(timeTrial: TimeTrial) {
         timeTrialDao.delete(timeTrial)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun insertOrUpdate(timeTrial: TimeTrial){
-        val id = timeTrial.id ?: 0
+        val id = timeTrial.timeTrialHeader.id ?: 0
         if(id != 0L){
             timeTrialDao.update(timeTrial)
         }else{

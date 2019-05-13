@@ -1,8 +1,9 @@
-package com.android.jared.linden.timingtrials.data
+package com.android.jared.linden.timingtrials.data.roomrepo
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.source.RiderDao
 import javax.inject.Inject
 import javax.inject.Singleton

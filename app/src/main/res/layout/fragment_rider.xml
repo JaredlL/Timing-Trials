@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.android.jared.linden.timingtrials.edititem.RiderViewModel"/>
+            type="com.android.jared.linden.timingtrials.edititem.EditRiderViewModel"/>
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -31,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapSentences"
-                android:text="@={viewModel.mutableRider.firstName}"
+                android:text="@={viewModel.firstName}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -48,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapSentences"
-                android:text="@={viewModel.mutableRider.lastName}"
+                android:text="@={viewModel.lastName}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
@@ -65,7 +65,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapSentences"
-                android:text="@={viewModel.mutableRider.club}"
+                android:text="@={viewModel.club}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
