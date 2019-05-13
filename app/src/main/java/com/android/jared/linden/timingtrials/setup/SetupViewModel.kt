@@ -116,7 +116,7 @@ class SetupViewModel @Inject constructor(
                         val newList = oldSelected.filter { i -> (retainedIds.contains(i.key))}.values.toList()
                         ttdef.let {
                            // it.riderList = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id, index+1,(60 + index * it.timeTrialHeader.interval).toLong()) }
-                            val ml = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id?:0L, index+1,(60 + index * it.timeTrialHeader.interval).toLong()) }
+                            val ml = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id?:0L, index+1) }
                             timeTrial.value = it.copy(riderList = ml)
                         }
                     }
