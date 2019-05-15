@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.setup.*
 import com.android.jared.linden.timingtrials.timing.TimingActivity
-import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.TimingTrialsDbActivity
@@ -17,6 +16,7 @@ class MainActivity : AppCompatActivity() {
 
 
     var setupId: Long? = null
+    var inProgressId: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,16 +59,26 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        button2.setOnClickListener {
+        createSetupButton.setOnClickListener {
             val tvm = getViewModel { injector.testViewModel() }
 
             tvm.medTimeTrial.observe(this, Observer {
-                tvm.insertTt()
+                it?.let {tt->
+                    if(tt.riderList.count() > 0 && tt.timeTrialHeader.course != null){
+                        val id = tt.timeTrialHeader.id
+                        if(id !=null){
+                            val tIntent = Intent(this@MainActivity, SetupActivity::class.java)
+                            startActivity(tIntent)
+                        }else{
+                            tvm.insertSetupTt()
+                        }
+                    }
+                }
             })
 
         }
 
-        button.setOnClickListener {
+        createTimingButton.setOnClickListener {
             val tvm = getViewModel { injector.testViewModel() }
 
             tvm.medTimeTrial.observe(this, Observer {
@@ -79,17 +89,34 @@ class MainActivity : AppCompatActivity() {
                             val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
                             startActivity(tIntent)
                         }else{
-                            tvm.insertTt()
+                            tvm.insertTimingTt()
                         }
-
-
                     }
-
-
                 }
             })
 
-            //tvm.insertTt()
+            //tvm.insertTimingTt()
+
+        }
+
+        createFinishedButton.setOnClickListener {
+            val tvm = getViewModel { injector.testViewModel() }
+
+            tvm.medTimeTrial.observe(this, Observer {
+                it?.let {tt->
+                    if(tt.riderList.count() > 0 && tt.timeTrialHeader.course != null){
+                        val id = tt.timeTrialHeader.id
+                        if(id !=null){
+                            val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
+                            startActivity(tIntent)
+                        }else{
+                            tvm.insertTimingTt()
+                        }
+                    }
+                }
+            })
+
+            //tvm.insertTimingTt()
 
         }
 

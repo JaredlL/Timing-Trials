@@ -101,4 +101,12 @@ class Converters {
     @TypeConverter fun gendarToInt(gender: Gender): Int{
         return gender.ordinal
     }
+
+    @TypeConverter fun intToStatus(statusInt: Int): TimeTrialStatus?{
+        return TimeTrialStatus.fromInt(statusInt)
+    }
+
+    @TypeConverter fun statusToInt(status: TimeTrialStatus): Int{
+        return status.ordinal
+    }
 }

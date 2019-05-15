@@ -2,6 +2,7 @@ package com.android.jared.linden.timingtrials.domain
 
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.ui.RiderStatus
+import java.lang.Exception
 import java.util.*
 
 class TimeTrialHelper(val timeTrial: TimeTrial){
@@ -27,6 +28,10 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
         }else{
             return RiderAssignmentResult(false, "Error", timeTrial)
         }
+    }
+
+    fun getRiderById(id: Long?): TimeTrialRider?{
+        return timeTrial.riderList.asSequence().firstOrNull { it.rider.id == id }
     }
 
     fun getRiderStatus(riderId: Long): RiderStatus{
@@ -64,4 +69,11 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
     val riderStartTimes: SortedMap<Long, TimeTrialRider> by lazy {
         timeTrial.riderList.asSequence().associateBy({(timeTrial.timeTrialHeader.firstRiderStartOffset + it.startTimeOffset + it.number * timeTrial.timeTrialHeader.interval)* 1000L}, {it}).toSortedMap()
     }
+
+    val results: List<Result> by lazy {
+        timeTrial.eventList.asSequence().groupBy { it.riderId }.mapNotNull { riderEvents ->
+            getRiderById(riderEvents.key)?.let { Result(it, riderEvents.value.asSequence().sortedBy { it.timeStamp }.zipWithNext{a, b -> b.timeStamp - a.timeStamp }.toList()) }
+        }
+    }
 }
+

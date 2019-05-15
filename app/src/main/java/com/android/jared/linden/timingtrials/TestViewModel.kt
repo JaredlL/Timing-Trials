@@ -64,7 +64,7 @@ class TestViewModel@Inject constructor(
         }
     }
 
-    fun insertTt(){
+    fun insertTimingTt(){
         viewModelScope.launch(Dispatchers.IO) {
            if(timeTrialRepository.getTimeTrialByName("Testing Timetrial") == null){
                medTimeTrial.value?.let {
@@ -72,13 +72,49 @@ class TestViewModel@Inject constructor(
                            startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(1), ZoneId.systemDefault()),
                            firstRiderStartOffset = 0,
                            interval = 2,
-                           isSetup = true
+                           status = TimeTrialStatus.IN_PROGRESS
                    ))
                    timeTrialRepository.insertOrUpdate(newTt)
                    //callback()
                }
 
            }
+        }
+    }
+
+    fun insertSetupTt(){
+        viewModelScope.launch(Dispatchers.IO) {
+            if(timeTrialRepository.getTimeTrialByName("Testing Timetrial") == null){
+                medTimeTrial.value?.let {
+                    val newTt = it.copy(timeTrialHeader = it.timeTrialHeader.copy(
+                            startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(60), ZoneId.systemDefault()),
+                            firstRiderStartOffset = 0,
+                            interval = 2,
+                            status = TimeTrialStatus.SETTING_UP
+                    ))
+                    timeTrialRepository.insertOrUpdate(newTt)
+                    //callback()
+                }
+
+            }
+        }
+    }
+
+    fun insertFinishedTt(){
+        viewModelScope.launch(Dispatchers.IO) {
+            if(timeTrialRepository.getTimeTrialByName("Testing Timetrial") == null){
+                medTimeTrial.value?.let {
+                    val newTt = it.copy(timeTrialHeader = it.timeTrialHeader.copy(
+                            startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).minusSeconds(180), ZoneId.systemDefault()),
+                            firstRiderStartOffset = 0,
+                            interval = 2,
+                            status = TimeTrialStatus.FINISHED
+                    ))
+                    timeTrialRepository.insertOrUpdate(newTt)
+                    //callback()
+                }
+
+            }
         }
     }
 

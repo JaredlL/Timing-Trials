@@ -60,28 +60,40 @@
         app:layout_constraintTop_toBottomOf="@+id/trials_gif" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/createSetupButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_marginStart="125dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="125dp"
-        android:text="Test"
+        android:text="Create Setup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ma_butt_manageRiders" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/createTimingButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_marginStart="125dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="125dp"
-        android:text="Test2"
+        android:text="Create Timing"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button2"/>
+        app:layout_constraintTop_toBottomOf="@+id/createSetupButton" />
+
+    <Button
+        android:id="@+id/createFinishedButton"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="125dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="125dp"
+        android:text="Create Finished"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/createTimingButton" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

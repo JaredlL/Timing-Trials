@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.android.jared.linden.timingtrials.MainViewModel
 import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
@@ -55,7 +56,7 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
         timeTrialDefinition.value?.let {
             return if(it.startTime.isAfter(OffsetDateTime.now())){
 
-                ttSetup.updateDefinition(it.copy(isSetup = true))
+                ttSetup.updateDefinition(it.copy(status = TimeTrialStatus.IN_PROGRESS))
                 ttSetup.insertTt()
 
                 true

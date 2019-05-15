@@ -16,26 +16,17 @@ data class TimeTrialHeader(val ttName: String,
                            val interval:Int = 60,
                            val startTime: OffsetDateTime,
                            val firstRiderStartOffset: Int = 60,
-                           val isSetup: Boolean = false,
-                           val isFinished: Boolean = false,
+                           val status: TimeTrialStatus = TimeTrialStatus.SETTING_UP,
                            @PrimaryKey(autoGenerate = true) val id: Long? = null) {
 
     companion object {
         fun createBlank(): TimeTrialHeader {
             val instant = Instant.now().truncatedTo(ChronoUnit.MINUTES).plus(15, ChronoUnit.MINUTES)
-            return TimeTrialHeader(ttName = "", course = null, laps = 1, startTime = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault()), isSetup = false, isFinished = false)
+            return TimeTrialHeader(ttName = "", course = null, startTime = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault()))
         }
 
 
     }
-
-}
-
-
-interface ITimeTrial {
-    val timeTrialHeader: TimeTrialHeader
-    val riderList: List<TimeTrialRider>
-    val eventList: List<TimeTrialEvent>
 
 }
 
