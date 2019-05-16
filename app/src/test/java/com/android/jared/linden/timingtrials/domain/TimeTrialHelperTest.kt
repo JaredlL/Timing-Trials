@@ -2,6 +2,7 @@ package com.android.jared.linden.timingtrials.domain
 
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
+import com.android.jared.linden.timingtrials.testutils.createTestTimeTrial
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -14,11 +15,14 @@ class TimeTrialHelperTest {
 
     @Test
     fun getRiderById() {
+
+        val tt = createTestTimeTrial()
+        val rider = tt.helper.getRiderById(3)
+        assertEquals(rider?.rider?.firstName, "Lauren" )
+
     }
 
-    @Test
-    fun getSparseRiderStartTimes() {
-    }
+
 
     @Test
     fun getResults() {

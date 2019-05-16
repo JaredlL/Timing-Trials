@@ -1,5 +1,6 @@
 package com.android.jared.linden.timingtrials.testutils
 
+import androidx.core.util.size
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.source.TimingTrialsDatabase
 import org.threeten.bp.Instant
@@ -7,28 +8,41 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.ChronoUnit
 
-fun createTestTimeTrial(): TimeTrial {
-    val header = TimeTrialHeader.createBlank()
+
+
+fun createTestTimeTrial(): TimeTrial{
+    val new = TimeTrial(createTestHeader(), listOf(), listOf()).helper.addRidersAsTimeTrialRiders(createRiderList())
+    return createMockEvents(new)
+}
+
+fun createTestHeader(): TimeTrialHeader {
+    return TimeTrialHeader.createBlank()
                 .copy(ttName = "Testing Timetrial",
                         startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.MINUTES).minusSeconds(300), ZoneId.systemDefault()),
                         laps = 1,
+                        firstRiderStartOffset = 60,
                         course = createTestCourse(),
                         interval = 30,
                         id = 20913)
 
-    val timeTrial1 = TimeTrial.createBlank().copy(timeTrialHeader = header)
-    val timeTrial = timeTrial1.helper.addRidersAsTimeTrialRiders(createRiderList())
-
-
 }
 
-fun createMockEvents(timeTrial: TimeTrial):List<TimeTrialEvent>{
+fun createMockEvents(timeTrial: TimeTrial):TimeTrial{
 
     val mutEvents = mutableListOf<TimeTrialEvent>()
     val startTimes = timeTrial.helper.sparseRiderStartTimes
-    for (ttRider in timeTrial.riderList){
+    var i = 0
+    while (i <= startTimes.size) {
+        val riderId = startTimes.valueAt(i).id
+        val time = startTimes.keyAt(i)
+        val startEvent = TimeTrialEvent(20913, riderId, time, EventType.RIDER_STARTED)
+        mutEvents.add(startEvent)
+        val finEvent = TimeTrialEvent(20913, riderId, time + 100L, EventType.RIDER_PASSED)
+        mutEvents.add(finEvent)
 
+        i++
     }
+    return timeTrial.copy(eventList = mutEvents)
 }
 
 fun createTestCourse():Course{
@@ -48,5 +62,5 @@ fun createRiderList():List<Rider>{
     mList.add(TimingTrialsDatabase.createBaseRider("Craig ", "Buffry", "RDFCC", 1992, Gender.MALE))
     mList.add(TimingTrialsDatabase.createBaseRider("Collin", "Parry", "RDFCC", 1975, Gender.MALE))
     mList.add(TimingTrialsDatabase.createBaseRider("Rob", "Borek", "Forever Pedalling", 1992, Gender.MALE))
-    return mList.mapIndexed { index, rider ->  rider.copy(id = index * 13L) }
+    return mList.mapIndexed { index, rider ->  rider.copy(id = index * 1L) }
 }

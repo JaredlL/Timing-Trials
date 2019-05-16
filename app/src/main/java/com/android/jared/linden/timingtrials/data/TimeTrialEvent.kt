@@ -21,9 +21,8 @@ data class TimeTrialEvent(val timeTrialId: Long,
 
 enum class EventType(val type: Int){
     EMPTY(0),
-    TIMETRIAL_STARTED(1),
-    RIDER_STARTED(2),
-    RIDER_PASSED(3);
+    RIDER_STARTED(1),
+    RIDER_PASSED(2);
 
     companion object {
         private val map = values().associateBy(EventType::type)

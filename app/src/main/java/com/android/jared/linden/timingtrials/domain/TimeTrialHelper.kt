@@ -1,10 +1,14 @@
 package com.android.jared.linden.timingtrials.domain
 
 import android.util.LongSparseArray
+import androidx.core.util.size
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.ui.RiderStatus
 import java.lang.Exception
 import java.util.*
+import java.nio.file.Files.size
+
+
 
 class TimeTrialHelper(val timeTrial: TimeTrial){
 
@@ -14,9 +18,17 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
 
         if(event != null && timeTrialRider!=null && event.eventType == EventType.RIDER_PASSED){
 
-            val ridersWhoStartedBeforeEvent = riderStartTimes.headMap(eventTimestamp)
+            //val ridersWhoStartedBeforeEvent = riderStartTimes.headMap(eventTimestamp)
+            val index = sparseRiderStartTimes.indexOfKey(eventTimestamp)
+            val unStartedIndexes = if(index >= 0){ index }else{ Math.abs(index) - 1 }
+            var i = unStartedIndexes
+            while (i < sparseRiderStartTimes.size) {
+                val obj = sparseRiderStartTimes.valueAt(i)
+                if(obj.rider.id == riderId) return RiderAssignmentResult(false, "Rider must have started", timeTrial)
+                i++
+            }
 
-            if(!ridersWhoStartedBeforeEvent.values.asSequence().map { it.rider.id }.contains(riderId)) return RiderAssignmentResult(false, "Rider must have started", timeTrial)
+            //if(!ridersWhoStartedBeforeEvent.values.asSequence().map { it.rider.id }.contains(riderId)) return RiderAssignmentResult(false, "Rider must have started", timeTrial)
             return when(getRiderStatus(riderId)){
                 RiderStatus.NOT_STARTED -> RiderAssignmentResult(false, "This rider has not started", timeTrial)
                 RiderStatus.FINISHED -> RiderAssignmentResult(false, "Rider has already finished", timeTrial)
@@ -56,7 +68,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
     }
 
     fun addRidersAsTimeTrialRiders(riders: List<Rider>): TimeTrial{
-        return timeTrial.copy(riderList =  riders.asSequence().mapIndexed { index, rider -> TimeTrialRider(rider, timeTrial.timeTrialHeader.id?:0L, index + 1) }.toList())
+        return timeTrial.copy(riderList =  riders.asSequence().mapIndexed { index, rider -> TimeTrialRider(rider, timeTrial.timeTrialHeader.id?:0L, number = index + 1) }.toList())
     }
 
     val departedRidersFromEvents: List<TimeTrialRider> by lazy {
@@ -67,17 +79,21 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
         timeTrial.eventList.asSequence().filter { it.eventType == EventType.RIDER_PASSED }.groupBy { it.riderId }.filter { it.value.count() == timeTrial.timeTrialHeader.laps }.keys.mapNotNull { timeTrial.riderList.find { r-> r.rider.id == it } }
     }
 
-    val riderStartTimes: SortedMap<Long, TimeTrialRider> by lazy {
-        timeTrial.riderList.asSequence().associateBy({(timeTrial.timeTrialHeader.firstRiderStartOffset + it.startTimeOffset + it.number * timeTrial.timeTrialHeader.interval)* 1000L}, {it}).toSortedMap()
-    }
+//    val riderStartTimes: SortedMap<Long, TimeTrialRider> by lazy {
+//        timeTrial.riderList.asSequence().associateBy({(timeTrial.timeTrialHeader.firstRiderStartOffset + it.startTimeOffset + it.number * timeTrial.timeTrialHeader.interval)* 1000L}, {it}).toSortedMap()
+//    }
 
     val sparseRiderStartTimes: LongSparseArray<TimeTrialRider> by lazy {
         val arr = LongSparseArray<TimeTrialRider>(timeTrial.riderList.size)
         timeTrial.riderList.forEach { r->
-            arr.append((timeTrial.timeTrialHeader.firstRiderStartOffset + r.startTimeOffset + r.number * timeTrial.timeTrialHeader.interval)* 1000L, r)
+            arr.append(getRiderStartTime(r), r)
         }
         return@lazy arr
         //timeTrial.riderList.asSequence().associateBy({(timeTrial.timeTrialHeader.firstRiderStartOffset + it.startTimeOffset + it.number * timeTrial.timeTrialHeader.interval)* 1000L}, {it}).toSortedMap()
+    }
+
+     fun getRiderStartTime(rider: TimeTrialRider): Long{
+        return (timeTrial.timeTrialHeader.firstRiderStartOffset + rider.startTimeOffset + rider.number * timeTrial.timeTrialHeader.interval)* 1000L
     }
 
     val results: List<Result> by lazy {
