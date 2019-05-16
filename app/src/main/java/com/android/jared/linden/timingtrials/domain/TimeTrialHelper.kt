@@ -1,5 +1,6 @@
 package com.android.jared.linden.timingtrials.domain
 
+import android.util.LongSparseArray
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.ui.RiderStatus
 import java.lang.Exception
@@ -68,6 +69,15 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
 
     val riderStartTimes: SortedMap<Long, TimeTrialRider> by lazy {
         timeTrial.riderList.asSequence().associateBy({(timeTrial.timeTrialHeader.firstRiderStartOffset + it.startTimeOffset + it.number * timeTrial.timeTrialHeader.interval)* 1000L}, {it}).toSortedMap()
+    }
+
+    val sparseRiderStartTimes: LongSparseArray<TimeTrialRider> by lazy {
+        val arr = LongSparseArray<TimeTrialRider>(timeTrial.riderList.size)
+        timeTrial.riderList.forEach { r->
+            arr.append((timeTrial.timeTrialHeader.firstRiderStartOffset + r.startTimeOffset + r.number * timeTrial.timeTrialHeader.interval)* 1000L, r)
+        }
+        return@lazy arr
+        //timeTrial.riderList.asSequence().associateBy({(timeTrial.timeTrialHeader.firstRiderStartOffset + it.startTimeOffset + it.number * timeTrial.timeTrialHeader.interval)* 1000L}, {it}).toSortedMap()
     }
 
     val results: List<Result> by lazy {

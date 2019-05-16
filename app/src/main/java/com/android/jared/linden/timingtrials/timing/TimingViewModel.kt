@@ -160,6 +160,8 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         val ridersWhoShouldHaveStarted = tte.helper.riderStartTimes.headMap(millisSinceStart)
         val nextRiderStart = tte.helper.riderStartTimes.tailMap(millisSinceStart)
 
+        val ss = tte.helper.sparseRiderStartTimes.indexOfKey(millisSinceStart)
+
         if(nextRiderStart.isNotEmpty()){
 
             //If we are more than 1 min before TT start time

@@ -58,9 +58,9 @@ abstract class TimeTrialDao {
     @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName LIMIT 1") abstract fun getTimeTrialByName(timeTrialName: String): TimeTrial?
 
     //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
-    @Transaction @Query("SELECT * FROM timetrial_table WHERE isSetup = 0 LIMIT 1") abstract fun getSetupTimeTrial(): LiveData<TimeTrial>
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE status = 0 LIMIT 1") abstract fun getSetupTimeTrial(): LiveData<TimeTrial>
 
-    @Transaction @Query("SELECT * FROM timetrial_table WHERE isSetup = 1 AND isFinished = 0 LIMIT 1") abstract fun getTimingTimeTrial(): LiveData<TimeTrial>
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE status = 1 LIMIT 1") abstract fun getTimingTimeTrial(): LiveData<TimeTrial>
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE Id = :timeTrialId LIMIT 1") abstract fun getFullTimeTrial(timeTrialId: Long): LiveData<TimeTrial>
 

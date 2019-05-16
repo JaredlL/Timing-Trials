@@ -23,10 +23,10 @@ enum class Gender{
 
 }
 
-enum class TimeTrialStatus{
-    SETTING_UP,
-    IN_PROGRESS,
-    FINISHED;
+enum class TimeTrialStatus(val type: Int){
+    SETTING_UP(0),
+    IN_PROGRESS(1),
+    FINISHED(2);
 
     companion object {
         private val map = values().associateBy(TimeTrialStatus::ordinal)

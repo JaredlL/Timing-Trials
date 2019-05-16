@@ -16,7 +16,6 @@
             android:id="@+id/timeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{event.timeStampString}"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/text1"
             app:layout_constraintStart_toStartOf="parent"
