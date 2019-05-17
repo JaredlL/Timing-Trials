@@ -4,8 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import com.android.jared.linden.timingtrials.result.ResultActivity
 import com.android.jared.linden.timingtrials.setup.*
 import com.android.jared.linden.timingtrials.timing.TimingActivity
+import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
+import com.android.jared.linden.timingtrials.util.ITEM_TYPE_EXTRA
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.TimingTrialsDbActivity
@@ -83,14 +86,13 @@ class MainActivity : AppCompatActivity() {
 
             tvm.medTimeTrial.observe(this, Observer {
                 it?.let {tt->
-                    if(tt.riderList.count() > 0 && tt.timeTrialHeader.course != null){
+                    if(tt.riderList.isNotEmpty() && tt.timeTrialHeader.course != null){
                         val id = tt.timeTrialHeader.id
-                        if(id !=null){
+
+                            tvm.insertTimingTt()
                             val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
                             startActivity(tIntent)
-                        }else{
-                            tvm.insertTimingTt()
-                        }
+
                     }
                 }
             })
@@ -104,14 +106,12 @@ class MainActivity : AppCompatActivity() {
 
             tvm.medTimeTrial.observe(this, Observer {
                 it?.let {tt->
-                    if(tt.riderList.count() > 0 && tt.timeTrialHeader.course != null){
+                    if(tt.riderList.isNotEmpty() && tt.timeTrialHeader.course != null){
                         val id = tt.timeTrialHeader.id
-                        if(id !=null){
-                            val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
-                            startActivity(tIntent)
-                        }else{
-                            tvm.insertTimingTt()
-                        }
+                        tvm.insertFinishedTt()
+                        val tIntent = Intent(this@MainActivity, ResultActivity::class.java).apply { putExtra(ITEM_ID_EXTRA, id) }
+                        startActivity(tIntent)
+                        tvm.medTimeTrial.removeObservers(this)
                     }
                 }
             })

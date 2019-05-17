@@ -1,16 +1,25 @@
 package com.android.jared.linden.timingtrials.ui
 
-import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.data.TimeTrialRider
 
-class ResultViewWrapper(val rider: TimeTrialRider, val timeTrial: TimeTrial){
+import com.android.jared.linden.timingtrials.data.TimeTrialResult
+import com.android.jared.linden.timingtrials.util.ConverterUtils
 
-    val number: String = rider.number.toString()
+data class ResultViewWrapper(val result: TimeTrialResult){
 
-    var onPressedCallback: (TimeTrialRider) -> Unit ={}
+    val resultsRow: List<ResultCell>
 
-    fun onPressed(){
-        onPressedCallback(rider)
+    init {
+        val mutList = mutableListOf<ResultCell>()
+        val first = ResultCell("${result.timeTrialRider.rider.firstName} ${result.timeTrialRider.rider.lastName}")
+        mutList.add(first)
+        if(result.splits.size > 1){
+            mutList.addAll(result.splits.map { ResultCell(ConverterUtils.toTenthsDisplayString(it)) })
+        }
+        mutList.add(ResultCell(ConverterUtils.toTenthsDisplayString(result.totalTime)))
+        resultsRow = mutList
     }
 
 }
+
+data class ResultCell(val contents: String)
+

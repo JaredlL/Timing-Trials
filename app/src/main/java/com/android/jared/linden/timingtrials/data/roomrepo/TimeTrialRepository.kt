@@ -17,6 +17,7 @@ interface ITimeTrialRepository{
     suspend fun delete(timeTrial: TimeTrial)
     fun getSetupTimeTrial(): LiveData<TimeTrial>
     fun getTimingTimeTrial(): LiveData<TimeTrial>
+    fun getLiveTimeTrialByName(name:String): LiveData<TimeTrial>
     fun getTimeTrialById(id: Long): LiveData<TimeTrial>
     val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>>
 }
@@ -51,6 +52,11 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     override fun getTimingTimeTrial(): LiveData<TimeTrial> {
 
         return timeTrialDao.getTimingTimeTrial()
+    }
+
+    override fun getLiveTimeTrialByName(name:String): LiveData<TimeTrial> {
+
+        return timeTrialDao.getLiveTimeTrialByName(name)
     }
 
 

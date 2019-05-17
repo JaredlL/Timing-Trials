@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentTimerRiderStatusBinding
+import com.android.jared.linden.timingtrials.result.ResultActivity
 import com.android.jared.linden.timingtrials.ui.RiderStatus
 import com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper
 import com.android.jared.linden.timingtrials.util.*
@@ -67,7 +68,7 @@ class RiderStatusFragment : Fragment() {
             viewResultsButton.setOnClickListener {
                 val ttId = timingViewModel.timeTrial.value?.timeTrialHeader?.id
                 timingViewModel.finishTt()
-                val resultIntent = Intent(requireActivity(), TimingTrialsDbActivity::class.java)
+                val resultIntent = Intent(requireActivity(), ResultActivity::class.java)
                 resultIntent.putExtra(ITEM_ID_EXTRA, ttId)
                 resultIntent.putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
                 startActivity(resultIntent)

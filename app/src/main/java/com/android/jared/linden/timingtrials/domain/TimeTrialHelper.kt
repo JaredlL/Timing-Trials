@@ -4,10 +4,7 @@ import android.util.LongSparseArray
 import androidx.core.util.size
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.ui.RiderStatus
-import java.lang.Exception
 import java.util.*
-import java.nio.file.Files.size
-
 
 
 class TimeTrialHelper(val timeTrial: TimeTrial){
@@ -79,9 +76,9 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
         timeTrial.eventList.asSequence().filter { it.eventType == EventType.RIDER_PASSED }.groupBy { it.riderId }.filter { it.value.count() == timeTrial.timeTrialHeader.laps }.keys.mapNotNull { timeTrial.riderList.find { r-> r.rider.id == it } }
     }
 
-//    val riderStartTimes: SortedMap<Long, TimeTrialRider> by lazy {
-//        timeTrial.riderList.asSequence().associateBy({(timeTrial.timeTrialHeader.firstRiderStartOffset + it.startTimeOffset + it.number * timeTrial.timeTrialHeader.interval)* 1000L}, {it}).toSortedMap()
-//    }
+    val riderStartTimes: SortedMap<Long, TimeTrialRider> by lazy {
+        timeTrial.riderList.asSequence().associateBy({getRiderStartTime(it)}, {it}).toSortedMap()
+    }
 
     val sparseRiderStartTimes: LongSparseArray<TimeTrialRider> by lazy {
         val arr = LongSparseArray<TimeTrialRider>(timeTrial.riderList.size)
@@ -96,9 +93,9 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
         return (timeTrial.timeTrialHeader.firstRiderStartOffset + rider.startTimeOffset + rider.number * timeTrial.timeTrialHeader.interval)* 1000L
     }
 
-    val results: List<Result> by lazy {
+    val results: List<TimeTrialResult> by lazy {
         timeTrial.eventList.asSequence().groupBy { it.riderId }.mapNotNull { riderEvents ->
-            getRiderById(riderEvents.key)?.let { Result(it, riderEvents.value.asSequence().sortedBy { it.timeStamp }.zipWithNext{a, b -> b.timeStamp - a.timeStamp }.toList()) }
+            getRiderById(riderEvents.key)?.let { TimeTrialResult(it, riderEvents.value.asSequence().sortedBy { it.timeStamp }.zipWithNext{ a, b -> b.timeStamp - a.timeStamp }.toList()) }
         }
     }
 }
