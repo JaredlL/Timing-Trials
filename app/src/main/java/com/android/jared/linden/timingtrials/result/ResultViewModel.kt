@@ -10,6 +10,8 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
 
    val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
 
+    val resultSettings: MutableLiveData<ResultDisplaySettings> = MutableLiveData()
+
     fun initialise(timeTrialId: Long){
         timeTrial.addSource(timeTrialRepository.getTimeTrialById(timeTrialId)){
             timeTrial.value = it

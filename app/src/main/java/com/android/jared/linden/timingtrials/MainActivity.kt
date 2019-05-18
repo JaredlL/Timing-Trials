@@ -8,7 +8,6 @@ import com.android.jared.linden.timingtrials.result.ResultActivity
 import com.android.jared.linden.timingtrials.setup.*
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
-import com.android.jared.linden.timingtrials.util.ITEM_TYPE_EXTRA
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.TimingTrialsDbActivity
@@ -27,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         setupId = null
         val vm = getViewModel { injector.mainViewModel() }
-        vm.timeTrial.observe(this, Observer {tt->
+        vm.setupTimeTrial.observe(this, Observer { tt->
             tt?.let {
                 setupId = tt.timeTrialHeader.id
             }

@@ -17,6 +17,8 @@ import android.graphics.drawable.Drawable
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 
 
 class ResultActivity : AppCompatActivity() {
@@ -37,7 +39,19 @@ class ResultActivity : AppCompatActivity() {
             res?.let {tt->
                 val newRes = tt.helper.results.asSequence().map { res -> ResultViewWrapper(res) }.sortedBy { it.result.totalTime }.toList()
                 if(newRes.isNotEmpty()){
-                    viewManager.spanCount = newRes.first().resultsRow.size
+                    val rowLength = newRes.first().resultsRow.size
+
+                    viewManager.spanCount = rowLength + 2
+                    viewManager.spanSizeLookup = (object : GridLayoutManager.SpanSizeLookup(){
+                        override fun getSpanSize(position: Int): Int {
+                           return if (position.rem(rowLength) == 0 || position.rem(rowLength) == 1) {
+                                2
+                            }else {
+                                1
+                            }
+
+                        }
+                    })
                     adapter.setResults(newRes)
                 }
 
@@ -46,11 +60,11 @@ class ResultActivity : AppCompatActivity() {
 
         resultRecyclerView.layoutManager = viewManager
         resultRecyclerView.adapter = adapter
-        resultRecyclerView.addItemDecoration(SpacesItemDecoration(0))
+        resultRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
 
 
-        viewManager.spanSizeLookup = SizeSpanLookup{
-            
+
+
         }
 
 
@@ -58,22 +72,23 @@ class ResultActivity : AppCompatActivity() {
 
     }
 
-}
+
 
 class SpacesItemDecoration(private val space: Int) : RecyclerView.ItemDecoration() {
 
    override fun getItemOffsets(outRect: Rect, view: View,
                        parent: RecyclerView, state: RecyclerView.State) {
-        outRect.left = space
-        outRect.right = space
+        //outRect.left = space
+        //outRect.right = space
         outRect.bottom = space
+        view.background = ColorDrawable(Color.BLACK)
 
         // Add top margin only for the first item to avoid double space between items
-        if (parent.getChildLayoutPosition(view) == 0) {
-            outRect.top = space
-        } else {
-            outRect.top = 0
-        }
+//        if (parent.getChildLayoutPosition(view) == 0) {
+//          //  outRect.top = space
+//        } else {
+//          //  outRect.top = 0
+//        }
     }
 }
 

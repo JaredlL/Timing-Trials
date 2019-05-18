@@ -8,8 +8,8 @@
 //
 //interface ITimeTrialEventRepository{
 //
-//    suspend fun updateTimeTrialEvents(timeTrial: TimeTrialWithEvents)
-//    fun getTimeTrial(timeTrialId: Long): LiveData<TimeTrialWithEvents>
+//    suspend fun updateTimeTrialEvents(setupTimeTrial: TimeTrialWithEvents)
+//    fun getSetupTimeTrial(timeTrialId: Long): LiveData<TimeTrialWithEvents>
 //    fun getAllTimeTrialEvents(): LiveData<List<TimeTrialWithEvents>>
 //
 //}
@@ -18,7 +18,7 @@
 //class RoomTimeTrialEventRepository @Inject  constructor(private val timeTrialEventDao: TimeTrialEventDao) : ITimeTrialEventRepository{
 //
 //
-//    override fun getTimeTrial(timeTrialId: Long): LiveData<TimeTrialWithEvents> {
+//    override fun getSetupTimeTrial(timeTrialId: Long): LiveData<TimeTrialWithEvents> {
 //        return timeTrialEventDao.getTimeTrialEvents(timeTrialId)
 //    }
 //
@@ -28,8 +28,8 @@
 //
 //
 //    @WorkerThread
-//    override suspend fun updateTimeTrialEvents(timeTrial: TimeTrialWithEvents) {
-//        timeTrialEventDao.updateTimeTrialEvents(timeTrial)
+//    override suspend fun updateTimeTrialEvents(setupTimeTrial: TimeTrialWithEvents) {
+//        timeTrialEventDao.updateTimeTrialEvents(setupTimeTrial)
 //    }
 //
 //}

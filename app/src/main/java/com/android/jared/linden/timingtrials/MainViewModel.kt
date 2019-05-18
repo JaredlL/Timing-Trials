@@ -12,7 +12,9 @@ import javax.inject.Inject
 
 class MainViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel() {
 
-    var timeTrial = timeTrialRepository.getSetupTimeTrial()
+    val setupTimeTrial = timeTrialRepository.getSetupTimeTrial()
+
+    val timingTimeTrial = timeTrialRepository.getTimingTimeTrial()
 
     val resumeOldViewModel: ResumeOldConfirmationViewModel = ResumeOldConfirmationViewModel(this)
 

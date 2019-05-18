@@ -23,8 +23,10 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
             _binding.apply {
                 content = status
 
-                if(position.rem(rowLength) == 0){
+                if(position.rem(rowLength) == 0 || position < rowLength){
                     resultTextView.typeface = Typeface.DEFAULT_BOLD
+                }else{
+                    resultTextView.typeface = Typeface.DEFAULT
                 }
                 executePendingBindings()
             }
@@ -66,10 +68,13 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
         rowLength = first.resultsRow.size
         val headRow = mutableListOf<String>()
         headRow.add("Rider")
+        headRow.add("Club")
+        headRow.add("Category")
+        headRow.add("Total Time")
         if(first.result.splits.size > 1){
             first.result.splits.forEachIndexed { index, _ -> if(index - 1 <first.result.splits.size) headRow.add("Split ${index + 1}") }
         }
-        headRow.add("Total Time")
+
         headRow.addAll(newResults.flatMap { it.resultsRow.map { res -> res.contents } })
         mResults = headRow
         notifyDataSetChanged()

@@ -131,8 +131,8 @@ class TestViewModel@Inject constructor(
 
 
 //                var i = 0
-//                while(i < timeTrial.timeTrialHeader.laps){
-//                    events.add(TimeTrialEvent(timeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key + 500 + i * 333, EventType.RIDER_PASSED))
+//                while(i < setupTimeTrial.timeTrialHeader.laps){
+//                    events.add(TimeTrialEvent(setupTimeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key + 500 + i * 333, EventType.RIDER_PASSED))
 //                    i++
 //                }
 

@@ -17,8 +17,8 @@ class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCou
 
 
 
-    //private val timeTrialDef = Transformations.map(ttSetup.timeTrial){it.timeTrialHeader}
-    //private val selectedCourse = ttSetup.timeTrial.value?.timeTrialHeader?.course
+    //private val timeTrialDef = Transformations.map(ttSetup.setupTimeTrial){it.timeTrialHeader}
+    //private val selectedCourse = ttSetup.setupTimeTrial.value?.timeTrialHeader?.course
 
     private fun selectedCourse(): Course? { return ttSetup.timeTrial.value?.timeTrialHeader?.course }
 

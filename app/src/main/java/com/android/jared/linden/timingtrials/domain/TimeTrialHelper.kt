@@ -25,7 +25,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
                 i++
             }
 
-            //if(!ridersWhoStartedBeforeEvent.values.asSequence().map { it.rider.id }.contains(riderId)) return RiderAssignmentResult(false, "Rider must have started", timeTrial)
+            //if(!ridersWhoStartedBeforeEvent.values.asSequence().map { it.rider.id }.contains(riderId)) return RiderAssignmentResult(false, "Rider must have started", setupTimeTrial)
             return when(getRiderStatus(riderId)){
                 RiderStatus.NOT_STARTED -> RiderAssignmentResult(false, "This rider has not started", timeTrial)
                 RiderStatus.FINISHED -> RiderAssignmentResult(false, "Rider has already finished", timeTrial)
@@ -86,7 +86,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
             arr.append(getRiderStartTime(r), r)
         }
         return@lazy arr
-        //timeTrial.riderList.asSequence().associateBy({(timeTrial.timeTrialHeader.firstRiderStartOffset + it.startTimeOffset + it.number * timeTrial.timeTrialHeader.interval)* 1000L}, {it}).toSortedMap()
+        //setupTimeTrial.riderList.asSequence().associateBy({(setupTimeTrial.timeTrialHeader.firstRiderStartOffset + it.startTimeOffset + it.number * setupTimeTrial.timeTrialHeader.interval)* 1000L}, {it}).toSortedMap()
     }
 
      fun getRiderStartTime(rider: TimeTrialRider): Long{
