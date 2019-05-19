@@ -33,6 +33,14 @@ class MainActivity : AppCompatActivity() {
 
         })
 
+        vm.timingTimeTrial.observe(this, Observer { tt->
+            tt?.let {
+                val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
+                startActivity(tIntent)
+                vm.timingTimeTrial.removeObservers(this)
+            }
+        })
+
 
         ma_butt_manageRiders.setOnClickListener{
             val intent = Intent(this@MainActivity, TimingTrialsDbActivity::class.java)
@@ -67,13 +75,8 @@ class MainActivity : AppCompatActivity() {
             tvm.medTimeTrial.observe(this, Observer {
                 it?.let {tt->
                     if(tt.riderList.count() > 0 && tt.timeTrialHeader.course != null){
-                        val id = tt.timeTrialHeader.id
-                        if(id !=null){
-                            val tIntent = Intent(this@MainActivity, SetupActivity::class.java)
-                            startActivity(tIntent)
-                        }else{
-                            tvm.insertSetupTt()
-                        }
+                        tvm.insertSetupTt()
+                        tvm.medTimeTrial.removeObservers(this)
                     }
                 }
             })
@@ -87,11 +90,8 @@ class MainActivity : AppCompatActivity() {
                 it?.let {tt->
                     if(tt.riderList.isNotEmpty() && tt.timeTrialHeader.course != null){
                         val id = tt.timeTrialHeader.id
-
                             tvm.insertTimingTt()
-                            val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
-                            startActivity(tIntent)
-
+                        tvm.medTimeTrial.removeObservers(this)
                     }
                 }
             })

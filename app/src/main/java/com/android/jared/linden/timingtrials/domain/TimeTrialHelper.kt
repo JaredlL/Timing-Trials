@@ -90,12 +90,12 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
     }
 
      fun getRiderStartTime(rider: TimeTrialRider): Long{
-        return (timeTrial.timeTrialHeader.firstRiderStartOffset + rider.startTimeOffset + rider.number * timeTrial.timeTrialHeader.interval)* 1000L
+        return (timeTrial.timeTrialHeader.firstRiderStartOffset + rider.startTimeOffset + rider.number - 1 * timeTrial.timeTrialHeader.interval)* 1000L
     }
 
     val results: List<TimeTrialResult> by lazy {
         timeTrial.eventList.asSequence().groupBy { it.riderId }.mapNotNull { riderEvents ->
-            getRiderById(riderEvents.key)?.let { TimeTrialResult(it, riderEvents.value.asSequence().sortedBy { it.timeStamp }.zipWithNext{ a, b -> b.timeStamp - a.timeStamp }.toList()) }
+            getRiderById(riderEvents.key)?.let { TimeTrialResult(it, riderEvents.value.asSequence().sortedBy { it.timeStamp }.zipWithNext{ a, b -> b.timeStamp - a.timeStamp }.toList(), timeTrial) }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.android.jared.linden.timingtrials.data
 
 import androidx.room.*
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
 
 
 @Entity(tableName = "timetrial_rider_table",
@@ -15,8 +16,8 @@ data class TimeTrialRider(@Embedded(prefix = "rider_") val rider: Rider,
                           val notes: String = "",
                           @PrimaryKey(autoGenerate = true) val id: Long? = null){
 
-    fun getCategory(): RiderCategoryStandard{
-        return RiderCategoryStandard(rider.gender, rider.dateOfBirth.year)
+    fun getCategory(time: OffsetDateTime): RiderCategoryStandard{
+        return RiderCategoryStandard(rider.gender, time.year - rider.dateOfBirth.year)
     }
 }
 

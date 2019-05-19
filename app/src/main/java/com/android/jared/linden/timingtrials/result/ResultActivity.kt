@@ -44,7 +44,7 @@ class ResultActivity : AppCompatActivity() {
                     viewManager.spanCount = rowLength + 2
                     viewManager.spanSizeLookup = (object : GridLayoutManager.SpanSizeLookup(){
                         override fun getSpanSize(position: Int): Int {
-                           return if (position.rem(rowLength) == 0 || position.rem(rowLength) == 1) {
+                           return if (position.rem(rowLength) == 0 || position.rem(rowLength) == 2) {
                                 2
                             }else {
                                 1
@@ -61,8 +61,6 @@ class ResultActivity : AppCompatActivity() {
         resultRecyclerView.layoutManager = viewManager
         resultRecyclerView.adapter = adapter
         resultRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
-
-
 
 
         }

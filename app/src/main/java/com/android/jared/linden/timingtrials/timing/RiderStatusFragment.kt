@@ -44,9 +44,10 @@ class RiderStatusFragment : Fragment() {
         timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer {tt->
             val newList = tt.helper.unfinishedRiders.map { r -> RiderStatusViewWrapper(r, tt ).apply {
                 onPressedCallback = {
-                   timingViewModel.tryAssignRider(it).let {res->
-                       if(!res.succeeded && res.message != "Null") Toast.makeText(requireContext(), res.message, Toast.LENGTH_LONG).show()
-                   }
+                    timingViewModel.tryAssignRider(it)
+//                   timingViewModel.tryAssignRider(it).let {res->
+//                       if(!res.succeeded && res.message != "Null") Toast.makeText(requireContext(), res.message, Toast.LENGTH_LONG).show()
+//                   }
                 }
             }
             }

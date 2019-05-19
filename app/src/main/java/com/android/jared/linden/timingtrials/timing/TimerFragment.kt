@@ -39,6 +39,8 @@ class TimerFragment : Fragment() {
         val adapter = EventListAdapter(requireActivity())
         val viewManager = LinearLayoutManager(context)
 
+
+
         timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
             res?.let {tt->
                 val oldCount  = adapter.itemCount
@@ -50,14 +52,14 @@ class TimerFragment : Fragment() {
 
                     evw.getSelected = {e -> timingViewModel.eventAwaitingSelection == e.timeStamp}
                     evw.onSelectionChanged = {e, b ->
-                        val oldts = timingViewModel.eventAwaitingSelection
+                        val oldTimestamp = timingViewModel.eventAwaitingSelection
                         if(b){
                             timingViewModel.eventAwaitingSelection = e.timeStamp
                         }else{
-                            if(oldts == e.timeStamp)timingViewModel.eventAwaitingSelection = null
+                            if(oldTimestamp == e.timeStamp)timingViewModel.eventAwaitingSelection = null
                         }
 
-                        newList.find { it.event.timeStamp == oldts }?.notifyPropertyChanged(BR.eventSelected)
+                        newList.find { it.event.timeStamp == oldTimestamp }?.notifyPropertyChanged(BR.eventSelected)
                     }
                     //evw.notifyPropertyChanged(BR.eventSelected)
                 }

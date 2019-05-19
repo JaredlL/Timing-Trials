@@ -108,7 +108,7 @@ class TestViewModel@Inject constructor(
                             startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).minusSeconds(180), ZoneId.systemDefault()),
                             firstRiderStartOffset = 0,
                             interval = 10,
-                            laps = 15,
+                            laps = 2,
                             status = TimeTrialStatus.FINISHED
                     ))
                     val withEvents = addFakeEvents(newTt)

@@ -61,17 +61,24 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         }
     }
 
+    var showMessage: (String) -> Unit = {}
+
     fun onRiderPassed(){
 
         currentTt?.let { tte->
             val now = Instant.now().toEpochMilli() - tte.timeTrialHeader.startTime.toInstant().toEpochMilli()
-            val newEvents = tte.eventList.toMutableList()
-            newEvents.add(TimeTrialEvent(tte.timeTrialHeader.id?:0, null, now, EventType.RIDER_PASSED))
-            currentTt = tte.copy(eventList = newEvents)
+            if (tte.helper.riderStartTimes.firstKey() > now){
+                showMessage("First rider has not started yet")
+            }else{
+                val newEvents = tte.eventList.toMutableList()
+                newEvents.add(TimeTrialEvent(tte.timeTrialHeader.id?:0, null, now, EventType.RIDER_PASSED))
+                currentTt = tte.copy(eventList = newEvents)
+            }
+
         }
     }
 
-    fun tryAssignRider(ttRider: TimeTrialRider): RiderAssignmentResult{
+    fun tryAssignRider(ttRider: TimeTrialRider){
         timeTrial.value?.let{tt->
             ttRider.rider.id?.let {riderId->
                 eventAwaitingSelection?.let { eid->
@@ -81,13 +88,18 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                     {
                         currentTt = res.tt
                         eventAwaitingSelection = null
+                    }else{
+                        showMessage(res.message)
                     }
-                    return res
+
+                    //return res
                 }
             }
-            return RiderAssignmentResult(false, "Null", tt)
+            //showMessage("Null")
+            //return RiderAssignmentResult(false, "Null", tt)
         }
-        return RiderAssignmentResult(false, "Null", TimeTrial.createBlank())
+        //showMessage("Null")
+        //return RiderAssignmentResult(false, "Null", TimeTrial.createBlank())
     }
 
 
@@ -224,7 +236,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
             //return "NULL"
         }else{
-            return "${tte.helper.finishedRidersFromEvents.count()} riders have finished, ${tte.riderList.count() - tte.helper.finishedRidersFromEvents.count()} riders on course"
+            return "${tte.helper.finishedRidersFromEvents.size} riders have finished, ${tte.riderList.size - tte.helper.finishedRidersFromEvents.size} riders on course"
         }
 
     }

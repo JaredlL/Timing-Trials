@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.jared.linden.timingtrials">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
     <application
         android:name=".TimingTrialsApplication"
         android:allowBackup="true"
@@ -34,6 +36,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".viewdata.TimingTrialsDbActivity" />
+        <service android:name=".timing.TimingService" />
+
         <activity
             android:name=".edititem.EditItemActivity"
             android:label="@string/title_activity_edit_item" />

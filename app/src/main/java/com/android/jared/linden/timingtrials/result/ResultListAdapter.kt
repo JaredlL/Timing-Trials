@@ -68,9 +68,10 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
         rowLength = first.resultsRow.size
         val headRow = mutableListOf<String>()
         headRow.add("Rider")
-        headRow.add("Club")
         headRow.add("Category")
+        headRow.add("Club")
         headRow.add("Total Time")
+
         if(first.result.splits.size > 1){
             first.result.splits.forEachIndexed { index, _ -> if(index - 1 <first.result.splits.size) headRow.add("Split ${index + 1}") }
         }
