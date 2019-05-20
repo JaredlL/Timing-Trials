@@ -17,6 +17,7 @@ import com.android.jared.linden.timingtrials.ui.EventViewWrapper
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_timer.*
+import org.threeten.bp.Instant
 
 /**
  * A simple [Fragment] subclass.
@@ -36,13 +37,16 @@ class TimerFragment : Fragment() {
         val viewManager = LinearLayoutManager(context)
 
 
+        timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer {
 
-        timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
-            res?.let {tt->
+        })
+
+        timingViewModel.timeLine.observe(viewLifecycleOwner, Observer { res->
+            res?.let {tl->
                 val oldCount  = adapter.itemCount
-                val newList = (tt.eventList.map {ev -> EventViewWrapper(ev, res)})
+                val newList = tl.timeLine.map { ev -> EventViewWrapper(ev, res.timeTrial)}
 
-                adapter.setEvents(newList)
+                adapter.setEvents(newList.toList())
 
                 newList.forEach {evw->
 

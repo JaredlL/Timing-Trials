@@ -4,6 +4,7 @@ import androidx.core.util.size
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
+import com.android.jared.linden.timingtrials.domain.TimeLine
 import com.android.jared.linden.timingtrials.domain.TimeTrialHelper
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import kotlinx.coroutines.*
@@ -18,6 +19,7 @@ interface IEventSelectionData{
 class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel(), IEventSelectionData {
 
     val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
+    val timeLine: MutableLiveData<TimeLine> = MutableLiveData()
     val timeString: MutableLiveData<String> = MutableLiveData()
     val statusString: MutableLiveData<String> = MutableLiveData()
 
@@ -66,7 +68,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                 showMessage("First rider has not started yet")
             }else{
                 val newEvents = tte.eventList.toMutableList()
-                newEvents.add(RiderPassedEvent(tte.timeTrialHeader.id?:0, null, now, EventType.RIDER_PASSED))
+                newEvents.add(RiderPassedEvent(timeTrialId = tte.timeTrialHeader.id?:0, riderId = null, timeStamp =  now))
                 currentTt = tte.copy(eventList = newEvents)
             }
 
@@ -104,7 +106,6 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             val millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli()
 
 
-            currentTt = updateEvents(millisSinceStart, tt)
 
 
             val newTimeString = ConverterUtils.toTenthsDisplayString(now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli())
@@ -121,52 +122,65 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             }
 
             if(timeTrial.value != currentTt){
-                timeTrial.postValue(currentTt)
+                currentTt?.let { ctt->
+                    timeTrial.postValue(ctt)
+                    timeLine.postValue(TimeLine(ctt, millisSinceStart ))
+                }
+
             }
 
+            timeLine.value?.let {tl->
+               if(!tl.isValidForTimeStamp(millisSinceStart)){
+                   currentTt?.let {
+                       timeLine.postValue(TimeLine(it, millisSinceStart))
+                   }
 
-        }
-    }
-
-    private fun updateEventsMap(millisSinceStart: Long, tt: TimeTrial): TimeTrial{
-
-        val ridersWhoShouldHaveStarted = tt.helper.riderStartTimes.headMap(millisSinceStart)
-        val started = tt.helper.departedRidersFromEvents.asSequence().map { it.rider.id }
-        val newStartingIds = ridersWhoShouldHaveStarted.asSequence().filter { !started.contains(it.value.rider.id) }
-        val newEvents = newStartingIds.map { RiderPassedEvent(tt.timeTrialHeader.id?:0, it.value.rider.id, it.key, EventType.RIDER_STARTED) }.toList()
-
-        if(newEvents.isNotEmpty()){ return tt.copy(eventList = tt.eventList.plus(newEvents)) }
-        return  tt
-
-    }
-
-
-
-    private fun updateEvents(millisSinceStart: Long, tt: TimeTrial): TimeTrial{
-
-        //val ridersWhoShouldHaveStarted = tt.helper.riderStartTimes.headMap(millisSinceStart)
-        val sparse = tt.helper.sparseRiderStartTimes
-        val index = sparse.indexOfKey(millisSinceStart)
-        val startedIndexes = if(index >= 0){ index }else{ Math.abs(index) - 2 }
-        val shouldHaveStartedIds = mutableSetOf<Long>()
-
-        val rsList = sequence {
-            var i = 0
-            while (i <= startedIndexes) {
-                val obj = sparse.valueAt(i)
-                obj.rider.id?.let { yield(it) }
-                i++
+               }
             }
+
         }
 
-        val started =  tt.eventList.asSequence().filter { it.eventType == EventType.RIDER_STARTED}.mapNotNull { it.riderId }
-        val newStartingIds = rsList.minus(started)
-        val newEvents = newStartingIds.map { id -> tt.helper.getRiderById(id)}.mapNotNull { it?.let {ttr->  RiderPassedEvent(tt.timeTrialHeader.id?:0, ttr.rider.id, tt.helper.getRiderStartTime(ttr), EventType.RIDER_STARTED) }  }.toList()
-
-        if(newEvents.isNotEmpty()){ return tt.copy(eventList = tt.eventList.plus(newEvents)) }
-        return  tt
-
     }
+
+//    private fun updateEventsMap(millisSinceStart: Long, tt: TimeTrial): TimeTrial{
+//
+//        val ridersWhoShouldHaveStarted = tt.helper.riderStartTimes.headMap(millisSinceStart)
+//        val started = tt.helper.departedRidersFromEvents.asSequence().map { it.rider.id }
+//        val newStartingIds = ridersWhoShouldHaveStarted.asSequence().filter { !started.contains(it.value.rider.id) }
+//        val newEvents = newStartingIds.map { RiderPassedEvent(tt.timeTrialHeader.id?:0, it.value.rider.id, it.key, EventType.RIDER_STARTED) }.toList()
+//
+//        if(newEvents.isNotEmpty()){ return tt.copy(eventList = tt.eventList.plus(newEvents)) }
+//        return  tt
+//
+//    }
+
+
+
+//    private fun updateEvents(millisSinceStart: Long, tt: TimeTrial): TimeTrial{
+//
+//        //val ridersWhoShouldHaveStarted = tt.helper.riderStartTimes.headMap(millisSinceStart)
+//        val sparse = tt.helper.sparseRiderStartTimes
+//        val index = sparse.indexOfKey(millisSinceStart)
+//        val startedIndexes = if(index >= 0){ index }else{ Math.abs(index) - 2 }
+//        val shouldHaveStartedIds = mutableSetOf<Long>()
+//
+//        val rsList = sequence {
+//            var i = 0
+//            while (i <= startedIndexes) {
+//                val obj = sparse.valueAt(i)
+//                obj.rider.id?.let { yield(it) }
+//                i++
+//            }
+//        }
+//
+//        val started =  tt.eventList.asSequence().filter { it.eventType == EventType.RIDER_STARTED}.mapNotNull { it.riderId }
+//        val newStartingIds = rsList.minus(started)
+//        val newEvents = newStartingIds.map { id -> tt.helper.getRiderById(id)}.mapNotNull { it?.let {ttr->  RiderPassedEvent(tt.timeTrialHeader.id?:0, ttr.rider.id, tt.helper.getRiderStartTime(ttr), EventType.RIDER_STARTED) }  }.toList()
+//
+//        if(newEvents.isNotEmpty()){ return tt.copy(eventList = tt.eventList.plus(newEvents)) }
+//        return  tt
+//
+//    }
 
     fun finishTt(){
         timer.cancel()

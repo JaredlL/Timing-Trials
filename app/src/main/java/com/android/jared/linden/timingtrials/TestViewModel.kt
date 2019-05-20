@@ -120,11 +120,11 @@ class TestViewModel@Inject constructor(
     fun addFakeEvents(timeTrial: TimeTrial): TimeTrial{
         val events = mutableListOf<RiderPassedEvent>()
         timeTrial.helper.riderStartTimes.forEach {
-            events.add(RiderPassedEvent(timeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key, EventType.RIDER_STARTED))
+            //events.add(RiderPassedEvent(timeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key))
 
 
             for(i in 1..timeTrial.timeTrialHeader.laps){
-                events.add(RiderPassedEvent(timeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key + 5000 * i * Random.nextLong(5, 10), EventType.RIDER_PASSED))
+                events.add(RiderPassedEvent(timeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key + 5000 * i * Random.nextLong(5, 10)))
             }
 
 

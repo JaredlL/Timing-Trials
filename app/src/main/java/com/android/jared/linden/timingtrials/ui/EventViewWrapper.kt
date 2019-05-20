@@ -30,12 +30,11 @@ class EventViewWrapper(var event: ITimelineEvent, val timeTrial: TimeTrial) : Ba
         TimelineEventType.RIDER_STARTED -> "$riderName Started"
         TimelineEventType.RIDER_PASSED ->
         {
-            if(event.riderId == null){
+            if(event.riderId != null){
                 "$riderName Has Passed"
             }else{
                 "Assign Rider"
             }
         }
-        TimelineEventType.RIDER_FINISHED -> "$riderName Finished"
     }
 }

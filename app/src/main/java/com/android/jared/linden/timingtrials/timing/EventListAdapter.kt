@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.EventType
 import com.android.jared.linden.timingtrials.databinding.ListItemEventButtonBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemEventTextBinding
+import com.android.jared.linden.timingtrials.domain.TimelineEventType
 import com.android.jared.linden.timingtrials.ui.EventViewWrapper
 
 class EventListAdapter internal constructor(val context:Context): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
@@ -82,7 +82,7 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
 
     override fun getItemViewType(position: Int): Int {
         val ev = mEvents[position].event
-        return if (ev.eventType == EventType.RIDER_PASSED && ev.riderId == null) R.layout.list_item_event_button else R.layout.list_item_event_text
+        return if (ev.eventType == TimelineEventType.RIDER_PASSED && ev.riderId == null) R.layout.list_item_event_button else R.layout.list_item_event_text
         //return mEvents[position].event.eventType.ordinal
     }
 

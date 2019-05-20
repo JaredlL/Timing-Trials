@@ -39,6 +39,7 @@ data class TimeTrial(
     @Ignore
     val helper = TimeTrialHelper(this)
 
+
     companion object {
         fun createBlank(): TimeTrial {
             return TimeTrial(TimeTrialHeader.createBlank())
