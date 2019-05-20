@@ -12,12 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.jared.linden.timingtrials.BR
 
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.EventType
-import com.android.jared.linden.timingtrials.data.TimeTrialEvent
 import com.android.jared.linden.timingtrials.databinding.FragmentTimerBinding
 import com.android.jared.linden.timingtrials.ui.EventViewWrapper
-import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
-import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_timer.*

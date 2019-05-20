@@ -32,10 +32,10 @@ class TimingService : Service(){
 
         val task = object : TimerTask(){
             override fun run() {
-                updateLoop()
+                //updateLoop()
             }
         }
-        timer.scheduleAtFixedRate(task, 0L, TIMER_PERIOD_MS)
+        //timer.scheduleAtFixedRate(task, 0L, TIMER_PERIOD_MS)
 
     }
 

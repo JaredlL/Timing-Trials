@@ -1,10 +1,9 @@
 package com.android.jared.linden.timingtrials.domain
 
 
-import androidx.test.runner.AndroidJUnit4
 import com.android.jared.linden.timingtrials.data.EventType
 import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.data.TimeTrialEvent
+import com.android.jared.linden.timingtrials.data.RiderPassedEvent
 import com.android.jared.linden.timingtrials.testutils.AndroidTestObjects
 
 
@@ -20,42 +19,47 @@ class AndroidTimeTrialHelperTest{
     @Test
     fun getSparseRiderStartTimes() {
         val tt = AndroidTestObjects.createTestTimeTrial()
-        val expected = (tt.timeTrialHeader.firstRiderStartOffset + 4 * tt.timeTrialHeader.interval) * 1000L
+        val expected = (tt.timeTrialHeader.firstRiderStartOffset + (tt.timeTrialHeader.interval * 3)) * 1000L
         val time = tt.helper.sparseRiderStartTimes
         val ind = time.get(expected)
         val dex = time.indexOfKey(expected)
-        assertEquals(ind.rider.firstName, "Lauren")
-        assertEquals(dex, 3)
+        assertEquals( 3, dex)
+        assertEquals("Lauren", ind.rider.firstName)
+
     }
 
     @Test
     fun getSparseIndexes() {
         val tt = AndroidTestObjects.createTestTimeTrial()
-        val current = (tt.timeTrialHeader.firstRiderStartOffset + 4 * tt.timeTrialHeader.interval) * 1000L + 300
+        val current = (tt.timeTrialHeader.firstRiderStartOffset + (4 * tt.timeTrialHeader.interval)) * 1000L + 300
         val time = tt.helper.sparseRiderStartTimes
         val ind = time.indexOfKey(current)
-        assertEquals(ind, -5)
+        assertEquals(-6, ind)
 
         val abs = Math.abs(ind) - 1
         val nextIndex = tt.helper.sparseRiderStartTimes.keyAt(abs)
         val nextRider = tt.helper.sparseRiderStartTimes[nextIndex]
-        assertEquals(nextRider.rider.firstName, "Steve")
+        assertEquals("Earl", nextRider.rider.firstName)
 
         val prevIndex = tt.helper.sparseRiderStartTimes.keyAt(abs - 1)
         val prevRider = tt.helper.sparseRiderStartTimes[prevIndex]
-        assertEquals(prevRider.rider.firstName, "Lauren")
+        assertEquals("Steve", prevRider.rider.firstName)
     }
 
     @Test
     fun assignRiderToEvent(){
-        val tt = AndroidTestObjects.createTestTimeTrial()
+        var tt = AndroidTestObjects.createTestTimeTrial()
+
+        val eveList1 = tt.eventList.filterNot { it.riderId == 5L && it.eventType == EventType.RIDER_PASSED }
+
+        tt = tt.copy(eventList = eveList1)
 
 
 
         //Number 6 Earl Smith, index = 5
-        val rider6StartTime = (tt.timeTrialHeader.firstRiderStartOffset + 6 * tt.timeTrialHeader.interval) * 1000L
+        val rider6StartTime = (tt.timeTrialHeader.firstRiderStartOffset + 5 * tt.timeTrialHeader.interval) * 1000L
 
-        val eventToTry = TimeTrialEvent(eventType = EventType.RIDER_PASSED, riderId = null, timeStamp = rider6StartTime + 30, id = 99, timeTrialId = tt.timeTrialHeader.id?:0)
+        val eventToTry = RiderPassedEvent(eventType = EventType.RIDER_PASSED, riderId = null, timeStamp = rider6StartTime + 30, id = 99, timeTrialId = tt.timeTrialHeader.id?:0)
         val updated = insertEvent(eventToTry, tt)
 
         val res = updated.helper.assignRiderToEvent(riderId =  5L, eventTimestamp =  eventToTry.timeStamp)
@@ -76,7 +80,7 @@ class AndroidTimeTrialHelperTest{
 
     }
 
-    fun insertEvent(event: TimeTrialEvent, tt: TimeTrial): TimeTrial{
+    fun insertEvent(event: RiderPassedEvent, tt: TimeTrial): TimeTrial{
         val mutList = tt.eventList.toMutableList()
         mutList.add(event.copy(timeTrialId = tt.timeTrialHeader.id?:0))
         return tt.copy(eventList = mutList)

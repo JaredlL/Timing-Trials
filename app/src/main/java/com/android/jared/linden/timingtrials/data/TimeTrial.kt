@@ -1,12 +1,9 @@
 package com.android.jared.linden.timingtrials.data
 
 import androidx.room.*
-import com.android.jared.linden.timingtrials.domain.RiderAssignmentResult
 import com.android.jared.linden.timingtrials.domain.TimeTrialHelper
-import com.android.jared.linden.timingtrials.ui.RiderStatus
 import org.threeten.bp.*
 import org.threeten.bp.temporal.ChronoUnit
-import java.util.*
 
 
 @Entity(tableName = "timetrial_table", indices = [Index("id")])
@@ -34,8 +31,8 @@ data class TimeTrial(
         @Embedded val timeTrialHeader: TimeTrialHeader,
         @Relation(parentColumn = "id", entityColumn = "timeTrialId", entity = TimeTrialRider::class)
         val riderList: List<TimeTrialRider> = listOf(),
-        @Relation(parentColumn = "id", entityColumn = "timeTrialId", entity = TimeTrialEvent::class)
-        val eventList: List<TimeTrialEvent> = listOf()
+        @Relation(parentColumn = "id", entityColumn = "timeTrialId", entity = RiderPassedEvent::class)
+        val eventList: List<RiderPassedEvent> = listOf()
 ) {
 
 

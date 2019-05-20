@@ -28,23 +28,23 @@ object AndroidTestObjects{
 
     fun createMockEvents(timeTrial: TimeTrial):TimeTrial{
 
-        val mutEvents = mutableListOf<TimeTrialEvent>()
+        val mutEvents = mutableListOf<RiderPassedEvent>()
         val startTimes = timeTrial.helper.sparseRiderStartTimes
         var i = 0
         while (i < startTimes.size) {
             val riderId = startTimes.valueAt(i).rider.id
             val time = startTimes.keyAt(i)
-            val startEvent = TimeTrialEvent(20913, riderId, time, EventType.RIDER_STARTED)
+            val startEvent = RiderPassedEvent(20913, riderId, time, EventType.RIDER_STARTED)
             mutEvents.add(startEvent)
-            val finEvent = TimeTrialEvent(20913, riderId, time + 10000L, EventType.RIDER_PASSED)
+            val finEvent = RiderPassedEvent(20913, riderId, time + 10000L, EventType.RIDER_PASSED)
             mutEvents.add(finEvent)
 
             i++
         }
 //        for (ttRider in startTimes){
-//            val startEvent = TimeTrialEvent(20913, ttRider.value.id, ttRider.key, EventType.RIDER_STARTED)
+//            val startEvent = RiderPassedEvent(20913, ttRider.value.id, ttRider.key, EventType.RIDER_STARTED)
 //            mutEvents.add(startEvent)
-//            val finEvent = TimeTrialEvent(20913, ttRider.value.id, ttRider.key + 100L, EventType.RIDER_PASSED)
+//            val finEvent = RiderPassedEvent(20913, ttRider.value.id, ttRider.key + 100L, EventType.RIDER_PASSED)
 //            mutEvents.add(finEvent)
 //        }
         return timeTrial.copy(eventList = mutEvents)

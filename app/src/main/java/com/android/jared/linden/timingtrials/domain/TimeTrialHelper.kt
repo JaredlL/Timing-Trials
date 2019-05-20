@@ -44,13 +44,13 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
         return timeTrial.riderList.asSequence().firstOrNull { it.rider.id == id }
     }
 
-    fun getRiderStatus(riderId: Long): RiderStatus{
+    fun getRiderStatus(riderId: Long, timeStap: Long): RiderStatus{
 
         val status = RiderStatus.NOT_STARTED
-        val riderEvents = timeTrial.eventList.filter { it.riderId == riderId }
+        val riderEvents = timeTrial.eventList.asSequence().filter { it.riderId == riderId }
 
 
-        if(riderEvents.asSequence().any { it.eventType == EventType.RIDER_STARTED }){
+        if(riderEvents.any { it.eventType == EventType.RIDER_STARTED }){
             val num = riderEvents.filter { it.eventType == EventType.RIDER_PASSED }.count()
             if(num> 0){
                 return if(num == timeTrial.timeTrialHeader.laps)  RiderStatus.FINISHED else RiderStatus.RIDING
@@ -68,12 +68,8 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
         return timeTrial.copy(riderList =  riders.asSequence().mapIndexed { index, rider -> TimeTrialRider(rider, timeTrial.timeTrialHeader.id?:0L, number = index + 1) }.toList())
     }
 
-    val departedRidersFromEvents: List<TimeTrialRider> by lazy {
-        timeTrial.eventList.asSequence().filter { it.eventType == EventType.RIDER_STARTED}.mapNotNull { event-> timeTrial.riderList.firstOrNull { rn -> rn.rider.id == event.riderId }  }.toList()
-    }
-
     val finishedRidersFromEvents: List<TimeTrialRider> by lazy {
-        timeTrial.eventList.asSequence().filter { it.eventType == EventType.RIDER_PASSED }.groupBy { it.riderId }.filter { it.value.count() == timeTrial.timeTrialHeader.laps }.keys.mapNotNull { timeTrial.riderList.find { r-> r.rider.id == it } }
+        timeTrial.eventList.asSequence().groupBy { it.riderId }.filter { it.value.count() == timeTrial.timeTrialHeader.laps }.keys.mapNotNull { timeTrial.riderList.find { r-> r.rider.id == it } }
     }
 
     val riderStartTimes: SortedMap<Long, TimeTrialRider> by lazy {
@@ -90,12 +86,25 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
     }
 
      fun getRiderStartTime(rider: TimeTrialRider): Long{
-        return (timeTrial.timeTrialHeader.firstRiderStartOffset + rider.startTimeOffset + rider.number - 1 * timeTrial.timeTrialHeader.interval)* 1000L
+        return (timeTrial.timeTrialHeader.firstRiderStartOffset + rider.startTimeOffset + (timeTrial.timeTrialHeader.interval * (rider.number - 1))) * 1000L
+    }
+
+    fun getStartedRiders(timeStamp: Long): Sequence<TimeTrialRider>{
+        return sequence {
+            val index = sparseRiderStartTimes.indexOfKey(timeStamp)
+            val startedIndexes = if(index >= 0){ index }else{ Math.abs(index) - 2 }
+            var i = 0
+            while (i <= startedIndexes) {
+                val obj = sparseRiderStartTimes.valueAt(i)
+                obj?.let { yield(it) }
+                i++
+            }
+        }
     }
 
     val results: List<TimeTrialResult> by lazy {
         timeTrial.eventList.asSequence().groupBy { it.riderId }.mapNotNull { riderEvents ->
-            getRiderById(riderEvents.key)?.let { TimeTrialResult(it, riderEvents.value.asSequence().sortedBy { it.timeStamp }.zipWithNext{ a, b -> b.timeStamp - a.timeStamp }.toList(), timeTrial) }
+            getRiderById(riderEvents.key)?.let { TimeTrialResult(it, riderEvents.value.asSequence().sortedBy {ev-> ev.timeStamp }.zipWithNext{ a, b -> b.timeStamp - a.timeStamp }.toList(), timeTrial) }
         }
     }
 }

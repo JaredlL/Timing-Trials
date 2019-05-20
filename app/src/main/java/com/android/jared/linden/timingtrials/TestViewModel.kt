@@ -7,9 +7,7 @@ import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
 import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
 import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
@@ -120,19 +118,19 @@ class TestViewModel@Inject constructor(
     }
 
     fun addFakeEvents(timeTrial: TimeTrial): TimeTrial{
-        val events = mutableListOf<TimeTrialEvent>()
+        val events = mutableListOf<RiderPassedEvent>()
         timeTrial.helper.riderStartTimes.forEach {
-            events.add(TimeTrialEvent(timeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key, EventType.RIDER_STARTED))
+            events.add(RiderPassedEvent(timeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key, EventType.RIDER_STARTED))
 
 
             for(i in 1..timeTrial.timeTrialHeader.laps){
-                events.add(TimeTrialEvent(timeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key + 5000 * i * Random.nextLong(5, 10), EventType.RIDER_PASSED))
+                events.add(RiderPassedEvent(timeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key + 5000 * i * Random.nextLong(5, 10), EventType.RIDER_PASSED))
             }
 
 
 //                var i = 0
 //                while(i < setupTimeTrial.timeTrialHeader.laps){
-//                    events.add(TimeTrialEvent(setupTimeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key + 500 + i * 333, EventType.RIDER_PASSED))
+//                    events.add(RiderPassedEvent(setupTimeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key + 500 + i * 333, EventType.RIDER_PASSED))
 //                    i++
 //                }
 

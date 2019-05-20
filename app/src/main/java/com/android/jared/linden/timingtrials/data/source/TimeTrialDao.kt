@@ -3,7 +3,7 @@ package com.android.jared.linden.timingtrials.data.source
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
-import com.android.jared.linden.timingtrials.data.TimeTrialEvent
+import com.android.jared.linden.timingtrials.data.RiderPassedEvent
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.data.TimeTrial
 
@@ -71,7 +71,7 @@ abstract class TimeTrialDao {
 
     @Query("DELETE  FROM timetrial_rider_table WHERE timeTrialId = :ttId") abstract fun _deleteTtRiders(ttId: Long)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE) abstract fun _insertAllEvents(events: List<TimeTrialEvent>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) abstract fun _insertAllEvents(events: List<RiderPassedEvent>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) abstract fun _insertAllTimeTrialRiders(riders: List<TimeTrialRider>)
 

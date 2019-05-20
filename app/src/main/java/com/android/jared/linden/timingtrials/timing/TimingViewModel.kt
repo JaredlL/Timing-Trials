@@ -4,17 +4,12 @@ import androidx.core.util.size
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
-import com.android.jared.linden.timingtrials.domain.RiderAssignmentResult
 import com.android.jared.linden.timingtrials.domain.TimeTrialHelper
 import com.android.jared.linden.timingtrials.util.ConverterUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 interface IEventSelectionData{
     var eventAwaitingSelection: Long?
@@ -71,7 +66,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                 showMessage("First rider has not started yet")
             }else{
                 val newEvents = tte.eventList.toMutableList()
-                newEvents.add(TimeTrialEvent(tte.timeTrialHeader.id?:0, null, now, EventType.RIDER_PASSED))
+                newEvents.add(RiderPassedEvent(tte.timeTrialHeader.id?:0, null, now, EventType.RIDER_PASSED))
                 currentTt = tte.copy(eventList = newEvents)
             }
 
@@ -138,7 +133,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         val ridersWhoShouldHaveStarted = tt.helper.riderStartTimes.headMap(millisSinceStart)
         val started = tt.helper.departedRidersFromEvents.asSequence().map { it.rider.id }
         val newStartingIds = ridersWhoShouldHaveStarted.asSequence().filter { !started.contains(it.value.rider.id) }
-        val newEvents = newStartingIds.map { TimeTrialEvent(tt.timeTrialHeader.id?:0, it.value.rider.id, it.key, EventType.RIDER_STARTED) }.toList()
+        val newEvents = newStartingIds.map { RiderPassedEvent(tt.timeTrialHeader.id?:0, it.value.rider.id, it.key, EventType.RIDER_STARTED) }.toList()
 
         if(newEvents.isNotEmpty()){ return tt.copy(eventList = tt.eventList.plus(newEvents)) }
         return  tt
@@ -153,17 +148,20 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         val sparse = tt.helper.sparseRiderStartTimes
         val index = sparse.indexOfKey(millisSinceStart)
         val startedIndexes = if(index >= 0){ index }else{ Math.abs(index) - 2 }
-        val shouldHaveStartedIds = mutableListOf<Long>()
-        var i = 0
-        while (i <= startedIndexes) {
-            val obj = sparse.valueAt(i)
-            obj.rider.id?.let { shouldHaveStartedIds.add(it) }
-            i++
+        val shouldHaveStartedIds = mutableSetOf<Long>()
+
+        val rsList = sequence {
+            var i = 0
+            while (i <= startedIndexes) {
+                val obj = sparse.valueAt(i)
+                obj.rider.id?.let { yield(it) }
+                i++
+            }
         }
 
-        val started = tt.helper.departedRidersFromEvents.asSequence().map { it.rider.id }
-        val newStartingIds = shouldHaveStartedIds.asSequence().filter { !started.contains(it) }
-        val newEvents = newStartingIds.map { id -> tt.helper.getRiderById(id)}.mapNotNull { it?.let {ttr->  TimeTrialEvent(tt.timeTrialHeader.id?:0, ttr.rider.id, tt.helper.getRiderStartTime(ttr), EventType.RIDER_STARTED) }  }.toList()
+        val started =  tt.eventList.asSequence().filter { it.eventType == EventType.RIDER_STARTED}.mapNotNull { it.riderId }
+        val newStartingIds = rsList.minus(started)
+        val newEvents = newStartingIds.map { id -> tt.helper.getRiderById(id)}.mapNotNull { it?.let {ttr->  RiderPassedEvent(tt.timeTrialHeader.id?:0, ttr.rider.id, tt.helper.getRiderStartTime(ttr), EventType.RIDER_STARTED) }  }.toList()
 
         if(newEvents.isNotEmpty()){ return tt.copy(eventList = tt.eventList.plus(newEvents)) }
         return  tt

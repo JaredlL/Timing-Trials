@@ -29,15 +29,15 @@ fun createTestHeader(): TimeTrialHeader {
 
 fun createMockEvents(timeTrial: TimeTrial):TimeTrial{
 
-    val mutEvents = mutableListOf<TimeTrialEvent>()
+    val mutEvents = mutableListOf<RiderPassedEvent>()
     val startTimes = timeTrial.helper.sparseRiderStartTimes
     var i = 0
     while (i <= startTimes.size) {
         val riderId = startTimes.valueAt(i).id
         val time = startTimes.keyAt(i)
-        val startEvent = TimeTrialEvent(20913, riderId, time, EventType.RIDER_STARTED)
+        val startEvent = RiderPassedEvent(20913, riderId, time, EventType.RIDER_STARTED)
         mutEvents.add(startEvent)
-        val finEvent = TimeTrialEvent(20913, riderId, time + 100L, EventType.RIDER_PASSED)
+        val finEvent = RiderPassedEvent(20913, riderId, time + 100L, EventType.RIDER_PASSED)
         mutEvents.add(finEvent)
 
         i++

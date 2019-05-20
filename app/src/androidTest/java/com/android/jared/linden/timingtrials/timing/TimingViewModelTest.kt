@@ -2,7 +2,7 @@ package com.android.jared.linden.timingtrials.timing
 
 import com.android.jared.linden.timingtrials.data.EventType
 import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.data.TimeTrialEvent
+import com.android.jared.linden.timingtrials.data.RiderPassedEvent
 import com.android.jared.linden.timingtrials.testutils.AndroidTestObjects
 import org.junit.Assert.*
 import org.junit.Test
@@ -40,7 +40,7 @@ class TimingViewModelTest{
 
         val started = tt.helper.departedRidersFromEvents.asSequence().map { it.rider.id }
         val newStartingIds = shouldHaveStartedIds.asSequence().filter { !started.contains(it) }
-        val newEvents = newStartingIds.map { id -> tt.helper.getRiderById(id)}.mapNotNull { it?.let {ttr->  TimeTrialEvent(tt.timeTrialHeader.id?:0, ttr.rider.id, tt.helper.getRiderStartTime(ttr), EventType.RIDER_STARTED) }  }.toList()
+        val newEvents = newStartingIds.map { id -> tt.helper.getRiderById(id)}.mapNotNull { it?.let {ttr->  RiderPassedEvent(tt.timeTrialHeader.id?:0, ttr.rider.id, tt.helper.getRiderStartTime(ttr), EventType.RIDER_STARTED) }  }.toList()
 
         if(newEvents.isNotEmpty()){ return tt.copy(eventList = tt.eventList.plus(newEvents)) }
         return  tt
