@@ -45,6 +45,8 @@ class TimeLine(val timeTrial: TimeTrial, val timeStamp: Long)
     val index = timeTrial.helper.sparseRiderStartTimes.indexOfKey(timeStamp)
 
     val timeLine: List<ITimelineEvent> by lazy {
+        val eventMap = timeTrial.eventList.groupBy { it.riderId }
+        fds
         (timeTrial.riderList.asSequence().map {ttr -> StartEvent(timeTrial.helper.getRiderStartTime(ttr), ttr.rider.id) } + timeTrial.eventList.asSequence().map { PassEvent(it) }).sortedBy { it.timeStamp }.takeWhile { it.timeStamp < timeStamp }.toList()
     }
 }

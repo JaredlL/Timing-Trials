@@ -38,7 +38,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
     }
 
     val finishedRidersFromEvents: List<TimeTrialRider> by lazy {
-        timeTrial.eventList.asSequence().groupBy { it.riderId }.filter { it.value.count() == timeTrial.timeTrialHeader.laps }.keys.mapNotNull { getRiderById(it) }
+        timeTrial.eventList.asSequence().groupBy { it.riderId }.filter { it.value.size == timeTrial.timeTrialHeader.laps }.keys.mapNotNull { getRiderById(it) }
     }
 
     val unFinishedRidersFromEvents: List<TimeTrialRider> by lazy {

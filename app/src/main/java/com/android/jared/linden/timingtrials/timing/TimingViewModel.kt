@@ -24,6 +24,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     val statusString: MutableLiveData<String> = MutableLiveData()
 
     private var currentTt: TimeTrial? = null
+    private var currentTimeLine: TimeLine? = null
     private var currentTimeString = ""
     private var currentStatusString = ""
 
@@ -43,6 +44,9 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
                         currentTt = tt
                         ttIntervalMilis = (tt.timeTrialHeader.interval * 1000).toLong()
+                        timeTrial.value = tt
+                        currentTimeLine = TimeLine(tt, Instant.now().toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli())
+                        timeLine.value = currentTimeLine
 
                         val task = object : TimerTask(){
                             override fun run() {
@@ -50,7 +54,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                             }
                         }
                         timer.scheduleAtFixedRate(task, 0L, TIMER_PERIOD_MS)
-                        timeTrial.value = tt
+
                     }
                 }
 
@@ -128,8 +132,10 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
             if(timeTrial.value != currentTt){
                 currentTt?.let { ctt->
+                    System.out.println("LINDENJ -> Update TT & TimeLine")
                     timeTrial.postValue(ctt)
-                    timeLine.postValue(TimeLine(ctt, millisSinceStart ))
+                    currentTimeLine = TimeLine(ctt, millisSinceStart )
+                    timeLine.postValue(currentTimeLine)
                 }
 
             }
@@ -137,7 +143,9 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             timeLine.value?.let {tl->
                if(!tl.isValidForTimeStamp(millisSinceStart)){
                    currentTt?.let {
-                       timeLine.postValue(TimeLine(it, millisSinceStart))
+                       System.out.println("LINDENJ -> Update TimeLine")
+                       currentTimeLine = TimeLine(it, millisSinceStart )
+                       timeLine.postValue(currentTimeLine)
                    }
 
                }
@@ -145,8 +153,8 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             val endtime = System.currentTimeMillis() - startts
             looptime += endtime
             iters ++
-            if(iters == 100){
-                System.out.println("LINDENJ -> Time for 100 loops =  $looptime")
+            if(iters == 1000){
+                System.out.println("LINDENJ -> Time for 1000 loops =  $looptime")
                 looptime = 0
                 iters = 0
             }
