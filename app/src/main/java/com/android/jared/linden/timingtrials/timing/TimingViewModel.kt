@@ -32,7 +32,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     private var ttIntervalMilis: Long = 0
     private val timer: Timer = Timer()
-    private val TIMER_PERIOD_MS = 25L
+    private val TIMER_PERIOD_MS = 50L
 
     init {
         if (timeTrial.value == null) {
@@ -99,9 +99,14 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         //return RiderAssignmentResult(false, "Null", TimeTrial.createBlank())
     }
 
+    var iters =0
+    var looptime = 0L
 
     private fun updateLoop(){
         currentTt?.let { tt->
+
+            val startts = System.currentTimeMillis()
+
             val now = Instant.now()
             val millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli()
 
@@ -137,10 +142,20 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
                }
             }
+            val endtime = System.currentTimeMillis() - startts
+            looptime += endtime
+            iters ++
+            if(iters == 100){
+                System.out.println("LINDENJ -> Time for 100 loops =  $looptime")
+                looptime = 0
+                iters = 0
+            }
 
         }
 
     }
+
+
 
 //    private fun updateEventsMap(millisSinceStart: Long, tt: TimeTrial): TimeTrial{
 //

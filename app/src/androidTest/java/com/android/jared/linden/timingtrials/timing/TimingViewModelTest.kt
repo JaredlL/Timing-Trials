@@ -1,50 +1,118 @@
 package com.android.jared.linden.timingtrials.timing
 
-import com.android.jared.linden.timingtrials.data.EventType
+import android.os.Debug
+import android.util.Log
+import androidx.core.util.size
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.RiderPassedEvent
+import com.android.jared.linden.timingtrials.domain.TimeLine
 import com.android.jared.linden.timingtrials.testutils.AndroidTestObjects
+import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Test
+import org.threeten.bp.Instant
 
 class TimingViewModelTest{
 
     @Test
-    fun updateEventsTest() {
+    fun getStatusStringTest() {
 
-        val testTt = AndroidTestObjects.createTestTimeTrial()
-        val withoutEvents = testTt.copy(eventList = listOf())
+        val tt = AndroidTestObjects.createTestTimeTrial()
 
-        val timeLaterThan3Riders = (testTt.timeTrialHeader.firstRiderStartOffset + testTt.timeTrialHeader.interval * 3) * 1000L + 100
+        val now = Instant.now()
+        var millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli()
+
+        Debug.startMethodTracing("Predict")
+
+        var start = System.currentTimeMillis()
+        var sString = getStatusString(millisSinceStart, tt)
+        var tll = TimeLine(tt, millisSinceStart)
+        var tl = tll.timeLine.last().eventType.name
+        var tot = System.currentTimeMillis() - start
+        System.out.println(tot.toString())
 
 
-        val addStarts = updateEvents(timeLaterThan3Riders, withoutEvents)
 
-        assertEquals(3, addStarts.eventList.size)
+        millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli()
+        start = System.currentTimeMillis()
+        sString = getStatusString(millisSinceStart, tt)
+        tl = tll.timeLine.last().eventType.name
+        tot = System.currentTimeMillis() - start
+        System.out.println(tot.toString())
+
+        millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli()
+        start = System.currentTimeMillis()
+        sString = getStatusString(millisSinceStart, tt)
+        tl = tll.timeLine.last().eventType.name
+        tot = System.currentTimeMillis() - start
+        System.out.println(tot.toString())
+
+
+        Debug.stopMethodTracing()
+
 
     }
 
+    private fun getStatusString(millisSinceStart: Long, tte: TimeTrial): String{
 
-    private fun updateEvents(millisSinceStart: Long, tt: TimeTrial): TimeTrial{
-
-        val sparse = tt.helper.sparseRiderStartTimes
+        val ttIntervalMilis: Long = tte.timeTrialHeader.interval * 1000L
+        val sparse = tte.helper.sparseRiderStartTimes
         val index = sparse.indexOfKey(millisSinceStart)
-        val startedIndexes = if(index >= 0){ index }else{ Math.abs(index) - 2 }
-        val shouldHaveStartedIds = mutableListOf<Long>()
-        var i = 0
-        while (i <= startedIndexes) {
-            val obj = sparse.valueAt(i)
-            obj.rider.id?.let { shouldHaveStartedIds.add(it) }
-            i++
+        val prevIndex = if(index >= 0){ index }else{ Math.abs(index) - 2 }
+        val nextIndex = prevIndex + 1
+
+        //val ridersWhoShouldHaveStarted = tte.helper.riderStartTimes.headMap(millisSinceStart)
+        //val nextRiderStart = tte.helper.riderStartTimes.tailMap(millisSinceStart)
+
+        val ss = tte.helper.sparseRiderStartTimes.indexOfKey(millisSinceStart)
+
+        if(nextIndex < tte.helper.sparseRiderStartTimes.size){
+
+            //If we are more than 1 min before TT start time
+            val nextStartMilli = sparse.keyAt(nextIndex)
+            if((nextStartMilli - millisSinceStart) > 60000){
+                return "TimeTrial starts at 0:00:00:0"
+            }
+
+            val nextStartRider = sparse.valueAt(nextIndex)
+            val millisToNextRider = (nextStartMilli - millisSinceStart)
+
+            val riderString = "(${nextStartRider.number}) ${nextStartRider.rider.firstName} ${nextStartRider.rider.lastName}"
+            return when(millisToNextRider){
+                in ttIntervalMilis - 3000..ttIntervalMilis ->
+                {
+                    if(prevIndex >= 0){
+                        val prevRider = sparse.valueAt(prevIndex)
+                        "(${prevRider.rider.firstName} ${prevRider.rider.lastName}) GO GO GO!!!"
+                    }else{
+                        "Next rider is $riderString"
+                    }
+
+                }
+                in 0L..10000 -> {
+                    var x = millisToNextRider
+                    if(x > 1000){
+                        do{x /= 10} while (x > 9)
+                    }else{
+                        x = 0
+                    }
+                    "${nextStartRider.rider.firstName} ${nextStartRider.rider.lastName} - ${x+1}!"
+                }
+                in 5..ttIntervalMilis/4 ->
+                    "$riderString starts in ${ttIntervalMilis/4000} seconds!"
+                in ttIntervalMilis/4.. ttIntervalMilis/2 ->
+                    "$riderString starts in ${ttIntervalMilis/2000} seconds"
+                else ->
+                    "Next rider is $riderString"
+            }
+
+            //return "NULL"
+        }else{
+            return "${tte.helper.finishedRidersFromEvents.size} riders have finished, ${tte.riderList.size - tte.helper.finishedRidersFromEvents.size} riders on course"
         }
 
-        val started = tt.helper.departedRidersFromEvents.asSequence().map { it.rider.id }
-        val newStartingIds = shouldHaveStartedIds.asSequence().filter { !started.contains(it) }
-        val newEvents = newStartingIds.map { id -> tt.helper.getRiderById(id)}.mapNotNull { it?.let {ttr->  RiderPassedEvent(tt.timeTrialHeader.id?:0, ttr.rider.id, tt.helper.getRiderStartTime(ttr), EventType.RIDER_STARTED) }  }.toList()
-
-        if(newEvents.isNotEmpty()){ return tt.copy(eventList = tt.eventList.plus(newEvents)) }
-        return  tt
-
     }
+
+
 
 }

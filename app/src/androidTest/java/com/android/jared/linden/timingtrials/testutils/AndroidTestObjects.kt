@@ -3,6 +3,7 @@ package com.android.jared.linden.timingtrials.testutils
 import androidx.core.util.size
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.source.TimingTrialsDatabase
+import com.android.jared.linden.timingtrials.domain.TimeLine
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
@@ -34,9 +35,7 @@ object AndroidTestObjects{
         while (i < startTimes.size) {
             val riderId = startTimes.valueAt(i).rider.id
             val time = startTimes.keyAt(i)
-            val startEvent = RiderPassedEvent(20913, riderId, time, EventType.RIDER_STARTED)
-            mutEvents.add(startEvent)
-            val finEvent = RiderPassedEvent(20913, riderId, time + 10000L, EventType.RIDER_PASSED)
+            val finEvent = RiderPassedEvent(20913, riderId, time + 10000L)
             mutEvents.add(finEvent)
 
             i++

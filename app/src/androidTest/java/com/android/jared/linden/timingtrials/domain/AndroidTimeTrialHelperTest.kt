@@ -1,7 +1,6 @@
 package com.android.jared.linden.timingtrials.domain
 
 
-import com.android.jared.linden.timingtrials.data.EventType
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.RiderPassedEvent
 import com.android.jared.linden.timingtrials.testutils.AndroidTestObjects
@@ -50,7 +49,7 @@ class AndroidTimeTrialHelperTest{
     fun assignRiderToEvent(){
         var tt = AndroidTestObjects.createTestTimeTrial()
 
-        val eveList1 = tt.eventList.filterNot { it.riderId == 5L && it.eventType == EventType.RIDER_PASSED }
+        val eveList1 = tt.eventList.filterNot { it.riderId == 5L }
 
         tt = tt.copy(eventList = eveList1)
 
@@ -59,7 +58,7 @@ class AndroidTimeTrialHelperTest{
         //Number 6 Earl Smith, index = 5
         val rider6StartTime = (tt.timeTrialHeader.firstRiderStartOffset + 5 * tt.timeTrialHeader.interval) * 1000L
 
-        val eventToTry = RiderPassedEvent(eventType = EventType.RIDER_PASSED, riderId = null, timeStamp = rider6StartTime + 30, id = 99, timeTrialId = tt.timeTrialHeader.id?:0)
+        val eventToTry = RiderPassedEvent( riderId = null, timeStamp = rider6StartTime + 30, id = 99, timeTrialId = tt.timeTrialHeader.id?:0)
         val updated = insertEvent(eventToTry, tt)
 
         val res = updated.helper.assignRiderToEvent(riderId =  5L, eventTimestamp =  eventToTry.timeStamp)
@@ -70,7 +69,7 @@ class AndroidTimeTrialHelperTest{
         val res2 = updated.helper.assignRiderToEvent(riderId =  7L, eventTimestamp =  eventToTry.timeStamp)
         assertEquals("Rider has already finished", res2.message)
 
-        val newEvs = updated.eventList.filterNot { it.riderId == 7L && it.eventType == EventType.RIDER_PASSED }
+        val newEvs = updated.eventList.filterNot { it.riderId == 7L }
         val updated2 = updated.copy(eventList = newEvs)
 
         val res3 = updated2.helper.assignRiderToEvent(riderId =  7L, eventTimestamp =  eventToTry.timeStamp)
