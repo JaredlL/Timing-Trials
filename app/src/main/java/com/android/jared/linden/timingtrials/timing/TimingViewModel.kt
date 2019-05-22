@@ -153,8 +153,8 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             val endtime = System.currentTimeMillis() - startts
             looptime += endtime
             iters ++
-            if(iters == 1000){
-                System.out.println("LINDENJ -> Time for 1000 loops =  $looptime")
+            if(iters == 100){
+                System.out.println("LINDENJ -> Time for 100 loops =  $looptime")
                 looptime = 0
                 iters = 0
             }

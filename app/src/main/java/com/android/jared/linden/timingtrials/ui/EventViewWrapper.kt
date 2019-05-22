@@ -7,7 +7,7 @@ import com.android.jared.linden.timingtrials.domain.ITimelineEvent
 import com.android.jared.linden.timingtrials.domain.TimelineEventType
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 
-class EventViewWrapper(var event: ITimelineEvent, val timeTrial: TimeTrial) : BaseObservable(){
+class EventViewWrapper(val event: ITimelineEvent, val timeTrial: TimeTrial) : BaseObservable(){
 
     val timeStampString = ConverterUtils.toTenthsDisplayString(event.timeStamp)
 
@@ -28,6 +28,7 @@ class EventViewWrapper(var event: ITimelineEvent, val timeTrial: TimeTrial) : Ba
 
     val displayString: String = when(event.eventType){
         TimelineEventType.RIDER_STARTED -> "$riderName Started"
+        TimelineEventType.RIDER_FINISHED -> "$riderName Finished"
         TimelineEventType.RIDER_PASSED ->
         {
             if(event.riderId != null){

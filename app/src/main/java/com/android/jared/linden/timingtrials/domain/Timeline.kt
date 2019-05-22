@@ -23,10 +23,17 @@ data class PassEvent(val riderPassedEvent: RiderPassedEvent): ITimelineEvent{
    override val riderId: Long? = riderPassedEvent.riderId
 }
 
+data class FinishEvent(val riderPassedEvent: RiderPassedEvent): ITimelineEvent{
+    override val timeStamp: Long = riderPassedEvent.timeStamp
+    override val eventType: TimelineEventType = TimelineEventType.RIDER_FINISHED
+    override val riderId: Long? = riderPassedEvent.riderId
+}
+
 
 enum class TimelineEventType(type:Int){
     RIDER_STARTED(0),
-    RIDER_PASSED(1)
+    RIDER_PASSED(1),
+    RIDER_FINISHED(2)
 
 }
 
@@ -45,8 +52,7 @@ class TimeLine(val timeTrial: TimeTrial, val timeStamp: Long)
     val index = timeTrial.helper.sparseRiderStartTimes.indexOfKey(timeStamp)
 
     val timeLine: List<ITimelineEvent> by lazy {
-        val eventMap = timeTrial.eventList.groupBy { it.riderId }
-        fds
-        (timeTrial.riderList.asSequence().map {ttr -> StartEvent(timeTrial.helper.getRiderStartTime(ttr), ttr.rider.id) } + timeTrial.eventList.asSequence().map { PassEvent(it) }).sortedBy { it.timeStamp }.takeWhile { it.timeStamp < timeStamp }.toList()
+
+        (timeTrial.riderList.asSequence().map {ttr -> StartEvent(timeTrial.helper.getRiderStartTime(ttr), ttr.rider.id) } + timeTrial.helper.riderEventMap.asSequence().flatMap { rep -> rep.value.asSequence().mapIndexed { index, riderPassedEvent -> if(index < timeTrial.timeTrialHeader.laps || riderPassedEvent.riderId == null){PassEvent(riderPassedEvent)} else{FinishEvent(riderPassedEvent)} } }).sortedBy { it.timeStamp }.takeWhile { it.timeStamp < timeStamp }.toList()
     }
 }

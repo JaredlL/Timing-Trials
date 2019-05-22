@@ -38,15 +38,19 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
     }
 
     val finishedRidersFromEvents: List<TimeTrialRider> by lazy {
-        timeTrial.eventList.asSequence().groupBy { it.riderId }.filter { it.value.size == timeTrial.timeTrialHeader.laps }.keys.mapNotNull { getRiderById(it) }
+        riderEventMap.filter { it.value.size == timeTrial.timeTrialHeader.laps }.keys.mapNotNull { getRiderById(it) }
     }
 
     val unFinishedRidersFromEvents: List<TimeTrialRider> by lazy {
-        ( timeTrial.riderList.asSequence().map { it.rider.id } - timeTrial.eventList.asSequence().groupBy { it.riderId }.filter { it.value.size == timeTrial.timeTrialHeader.laps }.keys.mapNotNull { it }).mapNotNull { getRiderById(it) }.toList()
+        timeTrial.riderList.filter { !riderEventMap.containsKey(it.id) || riderEventMap[it.id]?.size?:0 < timeTrial.timeTrialHeader.laps }
     }
 
     val riderStartTimes: SortedMap<Long, TimeTrialRider> by lazy {
         timeTrial.riderList.asSequence().associateBy({getRiderStartTime(it)}, {it}).toSortedMap()
+    }
+
+    val riderEventMap: Map<Long, List<RiderPassedEvent>> by lazy {
+        timeTrial.eventList.groupBy { it.riderId?:0 }
     }
 
 
@@ -61,6 +65,10 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
 
      fun getRiderStartTime(rider: TimeTrialRider): Long{
         return (timeTrial.timeTrialHeader.firstRiderStartOffset + rider.startTimeOffset + (timeTrial.timeTrialHeader.interval * (rider.number - 1))) * 1000L
+    }
+
+    val results2: List<TimeTrialResult> by lazy {
+        riderEventMap.mapNotNull { rek -> getRiderById(rek.key)?.let { rider -> TimeTrialResult(rider, rek.value.zipWithNext{a, b -> b.timeStamp - a.timeStamp}, timeTrial) }  }
     }
 
     val results: List<TimeTrialResult> by lazy {
