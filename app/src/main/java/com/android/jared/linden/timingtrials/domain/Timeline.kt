@@ -51,8 +51,10 @@ class TimeLine(val timeTrial: TimeTrial, val timeStamp: Long)
 
     val index = timeTrial.helper.sparseRiderStartTimes.indexOfKey(timeStamp)
 
-    val timeLine: List<ITimelineEvent> by lazy {
+    val timeLine: List<ITimelineEvent> =
+        (timeTrial.riderList.asSequence()
+                .map {ttr -> StartEvent(timeTrial.helper.getRiderStartTime(ttr), ttr.rider.id) } + timeTrial.helper.riderEventMap.asSequence()
+                .flatMap { rep -> rep.value.asSequence().mapIndexed { index, riderPassedEvent -> if(index + 1 < timeTrial.timeTrialHeader.laps || riderPassedEvent.riderId == null){PassEvent(riderPassedEvent)} else{FinishEvent(riderPassedEvent)} } })
+                .sortedBy { it.timeStamp }.takeWhile { it.timeStamp < timeStamp }.toList()
 
-        (timeTrial.riderList.asSequence().map {ttr -> StartEvent(timeTrial.helper.getRiderStartTime(ttr), ttr.rider.id) } + timeTrial.helper.riderEventMap.asSequence().flatMap { rep -> rep.value.asSequence().mapIndexed { index, riderPassedEvent -> if(index < timeTrial.timeTrialHeader.laps || riderPassedEvent.riderId == null){PassEvent(riderPassedEvent)} else{FinishEvent(riderPassedEvent)} } }).sortedBy { it.timeStamp }.takeWhile { it.timeStamp < timeStamp }.toList()
-    }
 }

@@ -12,34 +12,65 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.util.ConverterUtils
+import com.android.jared.linden.timingtrials.util.ConverterUtils.toSecondsDisplayString
+import org.threeten.bp.Instant
 import java.util.*
 
 const val NOTIFICATION_ID = 2
 
 class TimingService : Service(){
 
-    private val timer: Timer = Timer()
+    private var timer: Timer = Timer()
     private val TIMER_PERIOD_MS = 25L
     private lateinit var notificationManager: NotificationManager
 
     override fun onBind(intent: Intent?): IBinder? {
+
         return binder
     }
+
+    fun startTiming(tt: TimeTrial){
+        if(timeTrial?.timeTrialHeader?.id != tt.timeTrialHeader.id){
+            timeTrial = tt
+            timer = Timer()
+            val task = object : TimerTask(){
+                override fun run() {
+                    val now = Instant.now()
+                    val millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli()
+                    val secs = toSecondsDisplayString(millisSinceStart)
+                    if(prevString != secs){
+                        updateNotificationTitle(tt.timeTrialHeader.ttName, secs)
+                        prevString = secs
+                    }
+                    timerTick.invoke(millisSinceStart)
+                }
+            }
+            timer.scheduleAtFixedRate(task, 0L, TIMER_PERIOD_MS)
+        }
+
+    }
+
+    fun stop(){
+        timer.cancel()
+        stopForeground(true)
+        stopSelf()
+    }
+
 
     override fun onCreate() {
         setInForeground()
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val task = object : TimerTask(){
-            override fun run() {
-                //updateLoop()
-            }
-        }
-        //timer.scheduleAtFixedRate(task, 0L, TIMER_PERIOD_MS)
+
 
     }
 
-    val binder: IBinder = TimingServiceBinder()
+    var timerTick: (Long) -> Unit = {}
+    var timeTrial: TimeTrial? = null
+
+    private val binder: IBinder = TimingServiceBinder()
 
 
 
@@ -49,6 +80,7 @@ class TimingService : Service(){
         }
     }
 
+    var prevString = ""
     fun updateNotificationTitle(newTitle:String, newContentText:String){
 
         val not = getNotification().setContentTitle(newTitle).setContentText(newContentText).build()

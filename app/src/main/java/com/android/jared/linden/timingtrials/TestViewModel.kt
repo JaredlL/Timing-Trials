@@ -40,7 +40,7 @@ class TestViewModel@Inject constructor(
             res?.let {ri->
                 medTimeTrial.value?.let {
                     //val copy = it.copy(riderList = ri.filterIndexed { index, _ -> index%1 == 0 }.mapIndexed { index, rider -> TimeTrialRider(rider, it.timeTrialHeader.id, index+1,(60 + index * it.timeTrialHeader.interval).toLong()) })
-                    val new = it.helper.addRidersAsTimeTrialRiders(ri.filterIndexed{index, _ -> index%4 == 0})
+                    val new = it.helper.addRidersAsTimeTrialRiders(ri.filterIndexed{index, _ -> index%1 == 0})
                     medTimeTrial.value = new
                 }
             }

@@ -25,7 +25,8 @@ class TimingActivity : AppCompatActivity() {
     private val TIMERTAG = "timing_tag"
     private val STATUSTAG = "status_tag"
 
-    private lateinit var mService: TimingService
+    private var mService: TimingService? = null
+    private lateinit var viewModel: TimingViewModel
     private var mBound: Boolean = false
 
     private val connection = object : ServiceConnection {
@@ -34,15 +35,17 @@ class TimingActivity : AppCompatActivity() {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             val binder = service as TimingService.TimingServiceBinder
             mService = binder.getService()
-            mBound = true
+           // mBound = true
+            Toast.makeText(this@TimingActivity, "Service Connected", Toast.LENGTH_SHORT).show()
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
             mBound = false
+            Toast.makeText(this@TimingActivity, "Service DISCONNECTD", Toast.LENGTH_SHORT).show()
         }
     }
 
-    var prevRemoved: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_timing)
@@ -50,25 +53,27 @@ class TimingActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val viewModel = getViewModel { injector.timingViewModel() }
+        viewModel = getViewModel { injector.timingViewModel() }
 
         viewModel.showMessage = {msg -> Toast.makeText(this, msg, Toast.LENGTH_LONG).show()}
 
-        val serviceIntent = Intent(this, TimingService::class.java).also { intent -> bindService(intent, connection, Context.BIND_AUTO_CREATE) }
-        val service = startService(serviceIntent)
+        mBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)
+//        val serviceIntent = Intent(applicationContext, TimingService::class.java).also { intent ->
+//            mBound = bindService(intent, connection, Context.BIND_AUTO_CREATE)
+//           // mBound = true
+//        }
+
+        //startService(serviceIntent)
 
 
-        viewModel.timeString.observe(this, Observer {
-            val removed = it.subSequence(0, it.length - 2).toString()
-            if(prevRemoved!= removed){
-                mService.updateNotificationTitle(viewModel.timeTrial.value?.timeTrialHeader?.ttName?:"", removed)
+
+        viewModel.timeTrial.observe(this, Observer {tt->
+            tt?.let {
+                mService?.timerTick = { ts -> viewModel.updateLoop(ts)}
+                mService?.startTiming(tt)
             }
-            prevRemoved = removed
-
 
         })
-
-
 
 
 
@@ -93,8 +98,24 @@ class TimingActivity : AppCompatActivity() {
         }
     }
 
+    var prevBackPress = 0L
     override fun onBackPressed() {
-        moveTaskToBack(true)
+        if(System.currentTimeMillis() > prevBackPress + 2000){
+            Toast.makeText(this, "Tap again to exit", Toast.LENGTH_SHORT).show()
+            prevBackPress = System.currentTimeMillis()
+        }else{
+            if(mBound){
+
+                applicationContext.unbindService(connection)
+                mService?.stop()
+                mBound = false
+
+            }
+
+            viewModel.discardTt()
+
+            finish()
+        }
     }
 
 }

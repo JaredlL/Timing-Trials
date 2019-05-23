@@ -31,9 +31,9 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     override var eventAwaitingSelection: Long? = null
 
 
-    private var ttIntervalMilis: Long = 0
-    private val timer: Timer = Timer()
-    private val TIMER_PERIOD_MS = 50L
+    //private var ttIntervalMilis: Long = 0
+    //private val timer: Timer = Timer()
+   // private val TIMER_PERIOD_MS = 50L
 
     init {
         if (timeTrial.value == null) {
@@ -43,17 +43,17 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                     result?.let {tt->
 
                         currentTt = tt
-                        ttIntervalMilis = (tt.timeTrialHeader.interval * 1000).toLong()
+                        //ttIntervalMilis = (tt.timeTrialHeader.interval * 1000).toLong()
                         timeTrial.value = tt
                         currentTimeLine = TimeLine(tt, Instant.now().toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli())
                         timeLine.value = currentTimeLine
 
-                        val task = object : TimerTask(){
-                            override fun run() {
-                                updateLoop()
-                            }
-                        }
-                        timer.scheduleAtFixedRate(task, 0L, TIMER_PERIOD_MS)
+//                        val task = object : TimerTask(){
+//                            override fun run() {
+//                                updateLoop()
+//                            }
+//                        }
+//                        timer.scheduleAtFixedRate(task, 0L, TIMER_PERIOD_MS)
 
                     }
                 }
@@ -106,18 +106,18 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     var iters =0
     var looptime = 0L
 
-    private fun updateLoop(){
+    fun updateLoop(millisSinceStart: Long){
         currentTt?.let { tt->
 
             val startts = System.currentTimeMillis()
-
-            val now = Instant.now()
-            val millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli()
-
-
+//
+//            val now = Instant.now()
+//            val millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli()
 
 
-            val newTimeString = ConverterUtils.toTenthsDisplayString(now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli())
+
+
+            val newTimeString = ConverterUtils.toTenthsDisplayString(millisSinceStart)
             if(currentTimeString != newTimeString){
                 currentTimeString = newTimeString
                 timeString.postValue(newTimeString)
@@ -206,11 +206,20 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 //    }
 
     fun finishTt(){
-        timer.cancel()
+        //timer.cancel()
         viewModelScope.launch(Dispatchers.IO) {
             timeTrial.value?.let {
                 val headerCopy = it.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED)
                 timeTrialRepository.insertOrUpdate(it.copy(timeTrialHeader = headerCopy))
+            }
+        }
+    }
+
+    fun discardTt(){
+        //timer.cancel()
+        viewModelScope.launch(Dispatchers.IO) {
+            timeTrial.value?.let {
+                timeTrialRepository.delete(it)
             }
         }
     }
@@ -226,7 +235,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
         val ridersWhoShouldHaveStarted = tte.helper.riderStartTimes.headMap(millisSinceStart)
         val nextRiderStart = tte.helper.riderStartTimes.tailMap(millisSinceStart)
-
+        val ttIntervalMilis = (tte.timeTrialHeader.interval * 1000L)
         val ss = tte.helper.sparseRiderStartTimes.indexOfKey(millisSinceStart)
 
         if(nextRiderStart.isNotEmpty()){
@@ -283,7 +292,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         val index = sparse.indexOfKey(millisSinceStart)
         val prevIndex = if(index >= 0){ index }else{ Math.abs(index) - 2 }
         val nextIndex = prevIndex + 1
-
+        val ttIntervalMilis = (tte.timeTrialHeader.interval * 1000L)
         //val ridersWhoShouldHaveStarted = tte.helper.riderStartTimes.headMap(millisSinceStart)
         //val nextRiderStart = tte.helper.riderStartTimes.tailMap(millisSinceStart)
 

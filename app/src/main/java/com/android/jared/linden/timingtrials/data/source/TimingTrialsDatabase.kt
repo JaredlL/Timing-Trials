@@ -98,6 +98,11 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             riderDao.insert(createBaseRider("Matt", "Fratesi", "TORQ", 1996, Gender.MALE))
             riderDao.insert(createBaseRider("Marcin", "Biablocki", "Nopinz", 1983, Gender.MALE))
             riderDao.insert(createBaseRider("Geraint", "Thomas", "Sky", 1988, Gender.MALE))
+            riderDao.insert(createBaseRider("Peter", "Sagan", "Bora", 1970, Gender.MALE))
+            riderDao.insert(createBaseRider("Tom", "Sharp", "BRC", 1992, Gender.MALE))
+            riderDao.insert(createBaseRider("Felix", "Young", "Avid Sport", 1996, Gender.MALE))
+            riderDao.insert(createBaseRider("John", "Russell", "BRC", 1983, Gender.MALE))
+            riderDao.insert(createBaseRider("Andy", "Edwards", "BRC", 1988, Gender.MALE))
 
 
 

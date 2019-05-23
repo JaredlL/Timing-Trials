@@ -68,7 +68,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
     }
 
     val results2: List<TimeTrialResult> by lazy {
-        riderEventMap.mapNotNull { rek -> getRiderById(rek.key)?.let { rider -> TimeTrialResult(rider, rek.value.zipWithNext{a, b -> b.timeStamp - a.timeStamp}, timeTrial) }  }
+       riderEventMap.mapNotNull { rek -> getRiderById(rek.key)?.let { rider -> TimeTrialResult(rider, (listOf(getRiderStartTime(rider)) + rek.value.map { it.timeStamp }).zipWithNext{a, b -> b - a}, timeTrial) }  }
     }
 
     val results: List<TimeTrialResult> by lazy {
