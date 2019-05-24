@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter
 import android.widget.TimePicker
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.Observer
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentSetupTimeTrialBinding
@@ -47,7 +48,7 @@ class SetupTimeTrialFragment : Fragment() {
 
         }
 
-        propsViewModel.timeTrialName.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+        propsViewModel.timeTrialName.observe(viewLifecycleOwner, Observer {
            if(it == ""){
                propsViewModel.timeTrialHeader.value?.let { tt->
                    if (tt.course == null){

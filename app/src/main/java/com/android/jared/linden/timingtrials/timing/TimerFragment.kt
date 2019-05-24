@@ -12,15 +12,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.jared.linden.timingtrials.BR
 
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.EventType
-import com.android.jared.linden.timingtrials.data.TimeTrialEvent
 import com.android.jared.linden.timingtrials.databinding.FragmentTimerBinding
 import com.android.jared.linden.timingtrials.ui.EventViewWrapper
-import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
-import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_timer.*
+import org.threeten.bp.Instant
 
 /**
  * A simple [Fragment] subclass.
@@ -39,30 +36,33 @@ class TimerFragment : Fragment() {
         val adapter = EventListAdapter(requireActivity())
         val viewManager = LinearLayoutManager(context)
 
-        timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
-            res?.let {tt->
+        timingViewModel.timeLine.observe(viewLifecycleOwner, Observer { res->
+            res?.let {tl->
                 val oldCount  = adapter.itemCount
-                val newList = (tt.eventList.map {ev -> EventViewWrapper(ev, res)})
+                val newList = tl.timeLine.map { ev -> EventViewWrapper(ev, res.timeTrial)}
 
-                adapter.setEvents(newList)
+                adapter.setEvents(newList.toList())
 
                 newList.forEach {evw->
 
                     evw.getSelected = {e -> timingViewModel.eventAwaitingSelection == e.timeStamp}
                     evw.onSelectionChanged = {e, b ->
-                        val oldts = timingViewModel.eventAwaitingSelection
+                        val oldTimestamp = timingViewModel.eventAwaitingSelection
                         if(b){
                             timingViewModel.eventAwaitingSelection = e.timeStamp
                         }else{
-                            if(oldts == e.timeStamp)timingViewModel.eventAwaitingSelection = null
+                            if(oldTimestamp == e.timeStamp)timingViewModel.eventAwaitingSelection = null
                         }
 
-                        newList.find { it.event.timeStamp == oldts }?.notifyPropertyChanged(BR.eventSelected)
+                        newList.find { it.event.timeStamp == oldTimestamp }?.notifyPropertyChanged(BR.eventSelected)
                     }
                     //evw.notifyPropertyChanged(BR.eventSelected)
                 }
                 val newcount = adapter.itemCount
                 if(oldCount < newcount) eventRecyclerView?.scrollToPosition(newcount - 1)
+            }
+            if(res == null){
+                textView18.text = "TT is null"
             }
         })
 

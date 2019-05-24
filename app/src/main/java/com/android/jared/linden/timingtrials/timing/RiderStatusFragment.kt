@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentTimerRiderStatusBinding
+import com.android.jared.linden.timingtrials.result.ResultActivity
 import com.android.jared.linden.timingtrials.ui.RiderStatus
 import com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper
 import com.android.jared.linden.timingtrials.util.*
@@ -40,15 +41,16 @@ class RiderStatusFragment : Fragment() {
         val adapter = RiderStatusAdapter(requireActivity())
         val viewManager = GridLayoutManager(context, 4)
 
-        timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer {tt->
-            val newList = tt.helper.unfinishedRiders.map { r -> RiderStatusViewWrapper(r, tt ).apply {
+        timingViewModel.timeLine.observe(viewLifecycleOwner, Observer {tt->
+            val newList = tt.timeTrial.riderList.asSequence().filter { tt.getRiderStatus(it) != RiderStatus.FINISHED }.map { r -> RiderStatusViewWrapper(r, tt ).apply {
                 onPressedCallback = {
-                   timingViewModel.tryAssignRider(it).let {res->
-                       if(!res.succeeded && res.message != "Null") Toast.makeText(requireContext(), res.message, Toast.LENGTH_LONG).show()
-                   }
+                    timingViewModel.tryAssignRider(it)
+//                   timingViewModel.tryAssignRider(it).let {res->
+//                       if(!res.succeeded && res.message != "Null") Toast.makeText(requireContext(), res.message, Toast.LENGTH_LONG).show()
+//                   }
                 }
             }
-            }
+            }.toList()
             if (newList.isNotEmpty()){
                 viewResultsButton.visibility = View.GONE
             }else{
@@ -57,21 +59,21 @@ class RiderStatusFragment : Fragment() {
             adapter.setRiderStatus(newList)
         })
 
-        viewResultsButton.setOnClickListener {
-            val ttId = timingViewModel.timeTrial.value?.timeTrialHeader?.id
-            timingViewModel.finishTt()
-            val resultIntent = Intent(requireActivity(), TimingTrialsDbActivity::class.java)
-            resultIntent.putExtra(ITEM_ID_EXTRA, ttId)
-            resultIntent.putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
-            startActivity(resultIntent)
-            activity?.finish()
-        }
+
 
         val binding = DataBindingUtil.inflate<FragmentTimerRiderStatusBinding>(inflater, R.layout.fragment_timer_rider_status, container, false).apply {
             lifecycleOwner=this@RiderStatusFragment
             viewResultsButton.visibility = View.GONE
             riderStatuses.adapter = adapter
             riderStatuses.layoutManager = viewManager
+            viewResultsButton.setOnClickListener {
+                val ttId = timingViewModel.timeTrial.value?.timeTrialHeader?.id
+                timingViewModel.finishTt()
+                val resultIntent = Intent(requireActivity(), ResultActivity::class.java)
+                resultIntent.putExtra(ITEM_ID_EXTRA, ttId)
+                startActivity(resultIntent)
+                activity?.finish()
+            }
         }
 
 

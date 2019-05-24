@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import com.android.jared.linden.timingtrials.result.ResultActivity
 import com.android.jared.linden.timingtrials.setup.*
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
@@ -17,6 +18,26 @@ class MainActivity : AppCompatActivity() {
 
 
     var setupId: Long? = null
+    var inProgressId: Long? = null
+
+
+    fun setDefaultSetupClickListner(){
+        ma_butt_begintt.text = getString(R.string.start_tt)
+        ma_butt_begintt.setOnClickListener {
+            if(setupId != null){
+
+                val confDialog: UseOldConfirmationFragment = supportFragmentManager
+                        .findFragmentByTag("useold") as? UseOldConfirmationFragment ?: UseOldConfirmationFragment()
+
+                if(confDialog.dialog?.isShowing != true){
+                    confDialog.show(supportFragmentManager, "useold")
+                }
+            }else{
+                val mIntent = Intent(this@MainActivity, SetupActivity::class.java)
+                startActivity(mIntent)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,11 +45,23 @@ class MainActivity : AppCompatActivity() {
 
         setupId = null
         val vm = getViewModel { injector.mainViewModel() }
-        vm.timeTrial.observe(this, Observer {tt->
+        vm.setupTimeTrial.observe(this, Observer { tt->
             tt?.let {
                 setupId = tt.timeTrialHeader.id
             }
 
+        })
+
+        vm.timingTimeTrial.observe(this, Observer { tt->
+            if(tt != null) {
+                ma_butt_begintt.setOnClickListener {
+                    val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
+                    startActivity(tIntent)
+                }
+                ma_butt_begintt.text = "Resume ${tt.timeTrialHeader.ttName}"
+            }else{
+                setDefaultSetupClickListner()
+            }
         })
 
 
@@ -38,60 +71,38 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        ma_butt_begintt.setOnClickListener {
 
 
-                if(setupId != null){
+        createSetupButton.setOnClickListener {
+            val tvm = getViewModel { injector.testViewModel() }
+            tvm.insertSetupTt()
 
-                    val confDialog: UseOldConfirmationFragment = supportFragmentManager
-                            .findFragmentByTag("useold") as? UseOldConfirmationFragment ?: UseOldConfirmationFragment()
 
-                    if(confDialog.dialog?.isShowing != true){
-                        confDialog.show(supportFragmentManager, "useold")
-                    }
-                }else{
-                    val mIntent = Intent(this@MainActivity, SetupActivity::class.java)
+        }
+
+        createTimingButton.setOnClickListener {
+            val tvm = getViewModel { injector.testViewModel() }
+            tvm.insertTimingTt()
+            val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
+            startActivity(tIntent)
+
+        }
+
+        createFinishedButton.setOnClickListener {
+            val tvm = getViewModel { injector.testViewModel() }
+            tvm.insertFinishedTt()
+            tvm.newId.observe(this, Observer {res->
+                res?.let {
+                    val mIntent = Intent(this@MainActivity, ResultActivity::class.java)
+                    mIntent.putExtra(ITEM_ID_EXTRA, it)
                     startActivity(mIntent)
+                    tvm.newId.removeObservers(this)
                 }
 
-
-
-
-        }
-
-        button2.setOnClickListener {
-            val tvm = getViewModel { injector.testViewModel() }
-
-            tvm.medTimeTrial.observe(this, Observer {
-                tvm.insertTt()
             })
 
         }
-
-        button.setOnClickListener {
-            val tvm = getViewModel { injector.testViewModel() }
-
-            tvm.medTimeTrial.observe(this, Observer {
-                it?.let {tt->
-                    if(tt.riderList.count() > 0 && tt.timeTrialHeader.course != null){
-                        val id = tt.timeTrialHeader.id
-                        if(id !=null){
-                            val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
-                            startActivity(tIntent)
-                        }else{
-                            tvm.insertTt()
-                        }
-
-
-                    }
-
-
-                }
-            })
-
-            //tvm.insertTt()
-
-        }
+        setDefaultSetupClickListner()
 
 
 

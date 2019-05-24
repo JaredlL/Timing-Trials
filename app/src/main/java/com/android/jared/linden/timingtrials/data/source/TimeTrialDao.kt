@@ -3,7 +3,7 @@ package com.android.jared.linden.timingtrials.data.source
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
-import com.android.jared.linden.timingtrials.data.TimeTrialEvent
+import com.android.jared.linden.timingtrials.data.RiderPassedEvent
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.data.TimeTrial
 
@@ -19,12 +19,14 @@ abstract class TimeTrialDao {
     abstract fun delete(timeTrialHeader: TimeTrialHeader)
 
     @Transaction @Insert
-    fun insert(timeTrial: TimeTrial){
+    fun insert(timeTrial: TimeTrial): Long{
         val id = insert(timeTrial.timeTrialHeader)
-        //timeTrial.eventList.map { it.copy(timeTrialId = id)}
+        //setupTimeTrial.eventList.map { it.copy(timeTrialId = id)}
         _insertAllEvents( timeTrial.eventList.map { it.copy(timeTrialId = id)})
         _insertAllTimeTrialRiders(timeTrial.riderList.map { it.copy(timeTrialId = id)})
+        return id
     }
+
 
     @Transaction @Update
     fun update(timeTrial: TimeTrial){
@@ -57,10 +59,14 @@ abstract class TimeTrialDao {
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName LIMIT 1") abstract fun getTimeTrialByName(timeTrialName: String): TimeTrial?
 
-    //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
-    @Transaction @Query("SELECT * FROM timetrial_table WHERE isSetup = 0 LIMIT 1") abstract fun getSetupTimeTrial(): LiveData<TimeTrial>
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName LIMIT 1") abstract fun getLiveTimeTrialByName(timeTrialName: String): LiveData<TimeTrial>
 
-    @Transaction @Query("SELECT * FROM timetrial_table WHERE isSetup = 1 AND isFinished = 0 LIMIT 1") abstract fun getTimingTimeTrial(): LiveData<TimeTrial>
+    //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE status = 0 LIMIT 1") abstract fun getSetupTimeTrial(): LiveData<TimeTrial>
+
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE status = 0 LIMIT 1") abstract suspend fun getSetupTimeTrialSuspend(): TimeTrial?
+
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE status = 1 LIMIT 1") abstract fun getTimingTimeTrial(): LiveData<TimeTrial>
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE Id = :timeTrialId LIMIT 1") abstract fun getFullTimeTrial(timeTrialId: Long): LiveData<TimeTrial>
 
@@ -69,7 +75,7 @@ abstract class TimeTrialDao {
 
     @Query("DELETE  FROM timetrial_rider_table WHERE timeTrialId = :ttId") abstract fun _deleteTtRiders(ttId: Long)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE) abstract fun _insertAllEvents(events: List<TimeTrialEvent>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) abstract fun _insertAllEvents(events: List<RiderPassedEvent>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) abstract fun _insertAllTimeTrialRiders(riders: List<TimeTrialRider>)
 

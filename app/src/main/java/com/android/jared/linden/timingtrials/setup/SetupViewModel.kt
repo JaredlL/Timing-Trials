@@ -28,18 +28,57 @@ class SetupViewModel @Inject constructor(
 
 
 
-    val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
+    //val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
+
+    //var syncTt: TimeTrial? = null
+    val timeTrial = MediatorLiveData<TimeTrial>().apply { addSource(timeTrialRepository.getSetupTimeTrial()) { res ->
+        if (res != null) {
+            if(value != res){
+                value = res
+            }
+
+        } else {
+            updateTimeTrial(TimeTrial.createBlank())
+        }
+    }
+    }
+
+    val riderMed = MediatorLiveData<Rider>()
+
+    fun updateTimeTrial(newtt: TimeTrial){
+        //timeTrial.value = newtt
+        if(timeTrial.value != newtt){
+            timeTrial.value = newtt
+            viewModelScope.launch(Dispatchers.IO) {
+                timeTrialRepository.insertOrUpdate(newtt)
+            }
+        }
+
+    }
+
+//    fun updateUiTimeTrial(newtt: TimeTrial){
+//        //timeTrial.value = newtt
+//        if(syncTt != newtt){
+//            timeTrial.value = newtt
+//            syncTt = newtt
+//            viewModelScope.launch(Dispatchers.IO) {
+//                timeTrialRepository.insertOrUpdate(newtt)
+//                syncTt = newtt
+//            }
+//        }
+//
+//    }
 
     fun updateDefinition(ttHeader: TimeTrialHeader){
         timeTrial.value?.let {
-            timeTrial.value = it.copy(timeTrialHeader = ttHeader)
+            updateTimeTrial(it.copy(timeTrialHeader = ttHeader))
         }
     }
 
     override val orderRidersViewModel: IOrderRidersViewModel = object: IOrderRidersViewModel {
         override fun moveItem(fromPosition: Int, toPosition: Int) {
             timeTrial.value?.let { tt->
-                val mutList = tt.riderList.toMutableList()
+                val mutList = tt.riderList.map { it.rider }.toMutableList()
 
                 if(fromPosition > toPosition){
                     mutList.add(toPosition, mutList[fromPosition])
@@ -49,15 +88,17 @@ class SetupViewModel @Inject constructor(
                     mutList.removeAt(fromPosition)
                 }
 
-                timeTrial.value?.let {
+                //Collections.swap(mutList, fromPosition, toPosition)
+
+
                     //it.riderList = mutList
-                    timeTrial.value = it.copy(riderList = mutList.mapIndexed { index, timeTrialRider -> timeTrialRider.copy(number = index + 1) })
-                }
+                updateTimeTrial( tt.helper.addRidersAsTimeTrialRiders(mutList))
+
             }
 
 
         }
-        override fun getOrderableRiders(): LiveData<List<Rider>> = Transformations.map(timeTrial){it.riderList.map { r -> r.rider }}
+        override fun getOrderableRiders(): LiveData<List<RiderLight>> = Transformations.map(timeTrial){it.riderList.map { r -> r.rider }}
     }
 
     override val selectCourseViewModel: ISelectCourseViewModel = SelectCourseViewModelImpl(this)
@@ -73,19 +114,16 @@ class SetupViewModel @Inject constructor(
 
     fun initialise(timeTrialId: Long){
         if(timeTrial.value == null){
-            if(timeTrialId == 0L){
-                timeTrial.value = TimeTrial.createBlank()
-            }else{
-                timeTrial.addSource(timeTrialRepository.getTimeTrialById(timeTrialId)){ tt->
-                    if(tt == null){
-                        timeTrial.value = TimeTrial.createBlank()
-                    }else{
-                        timeTrial.value = tt
-                    }
-                }
+
+//                timeTrial.addSource(timeTrialRepository.getSetupTimeTrial()){ tt->
+//                    if(tt == null){
+//                        timeTrial.value = TimeTrial.createBlank()
+//                    }else{
+//                        timeTrial.value = tt
+//                    }
+//                }
             }
 
-        }
     }
 
 
@@ -95,13 +133,13 @@ class SetupViewModel @Inject constructor(
          * Need to remember which ids were selected when a rider is added/removed
          * Also need to update selected riders if they are modfied in the DB
          */
-        timeTrial.addSource(riderRepository.allRiders) { result: List<Rider>? ->
+        timeTrial.addSource(riderRepository.allRidersLight) { result: List<RiderLight>? ->
             result?.let {newRiders->
                 timeTrial.value?.let {ttdef->
                     val currentSelected = ttdef.riderList.map { r -> r.rider }
                     if(currentSelected.count() > 0){
 
-                        val oldSelected: LinkedHashMap<Long, Rider> =  LinkedHashMap(currentSelected.associateBy { r -> r.id ?: 0 })
+                        val oldSelected: LinkedHashMap<Long, RiderLight> =  LinkedHashMap(currentSelected.associateBy { r -> r.id ?: 0 })
                         val retainedIds: MutableSet<Long> = mutableSetOf()
                         newRiders.forEach{rider ->
                             rider.id?.let {id ->
@@ -117,12 +155,10 @@ class SetupViewModel @Inject constructor(
                         ttdef.let {
                            // it.riderList = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id, index+1,(60 + index * it.timeTrialHeader.interval).toLong()) }
                             val ml = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id?:0L, index+1) }
-                            timeTrial.value = it.copy(riderList = ml)
+                            updateTimeTrial(it.copy(riderList = ml))
                         }
                     }
                 }
-
-
             }
         }
     }

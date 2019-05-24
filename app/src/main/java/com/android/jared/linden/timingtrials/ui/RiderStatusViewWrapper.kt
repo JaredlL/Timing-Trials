@@ -1,21 +1,16 @@
 package com.android.jared.linden.timingtrials.ui
 
-
-import android.graphics.Color
-import com.android.jared.linden.timingtrials.data.EventType
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
+import com.android.jared.linden.timingtrials.domain.TimeLine
 
 enum class RiderStatus {
     NOT_STARTED, RIDING, FINISHED
 }
 
-class RiderStatusViewWrapper(val rider: TimeTrialRider, val timeTrial: TimeTrial){
+class RiderStatusViewWrapper(val rider: TimeTrialRider, val timeLine: TimeLine){
 
-    val number: String = rider.number?.toString()?: "NaN"
-
-
-    //private val riderEvents = timeTrial.eventList.filter { it.riderId == rider.rider.id }
+    val number: String = rider.number.toString()
 
     var onPressedCallback: (TimeTrialRider) -> Unit ={}
 
@@ -24,9 +19,6 @@ class RiderStatusViewWrapper(val rider: TimeTrialRider, val timeTrial: TimeTrial
     }
 
    fun riderStatus(): RiderStatus {
-       return  timeTrial.helper.getRiderStatus(rider.rider.id?:0)
+       return  timeLine.getRiderStatus(rider)
     }
-
-
-
 }

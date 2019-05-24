@@ -3,6 +3,7 @@ package com.android.jared.linden.timingtrials.data.source
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.android.jared.linden.timingtrials.data.Rider
+import com.android.jared.linden.timingtrials.data.RiderLight
 
 @Dao
 interface RiderDao {
@@ -19,6 +20,10 @@ interface RiderDao {
     @Query("DELETE FROM rider_table") fun deleteAll()
 
     @Query("SELECT * from rider_table ORDER BY firstName COLLATE NOCASE ASC") fun getAllRiders(): LiveData<List<Rider>>
+
+    @Query("SELECT firstName,lastName,club,dateOfBirth,gender,id  from rider_table ORDER BY firstName COLLATE NOCASE ASC") fun getAllRidersLight(): LiveData<List<RiderLight>>
+
+    @Query  ("SELECT firstName,lastName,club,dateOfBirth,gender,id  from rider_table ORDER BY firstName COLLATE NOCASE ASC") suspend fun getAllRidersLightSuspend(): List<RiderLight>
 
     @Query("SELECT DISTINCT club from rider_table") fun getAllClubs(): LiveData<List<String>>
 

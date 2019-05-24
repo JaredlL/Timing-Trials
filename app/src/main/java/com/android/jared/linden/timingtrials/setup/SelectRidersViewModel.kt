@@ -6,6 +6,7 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.BR
 import com.android.jared.linden.timingtrials.data.Rider
+import com.android.jared.linden.timingtrials.data.RiderLight
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import java.util.ArrayList
 
@@ -23,7 +24,7 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
     override var allSelectableRiders: LiveData<List<SelectableRiderViewWrapper>> = mRiderViewWrapperList
 
     init {
-        mRiderViewWrapperList.addSource(ttSetup.riderRepository.allRiders){ result: List<Rider>? ->
+        mRiderViewWrapperList.addSource(ttSetup.riderRepository.allRidersLight){ result: List<RiderLight>? ->
             result?.let{ mRiderViewWrapperList.value = ( result.map {r ->
                 SelectableRiderViewWrapper(r).apply {
                     onSelectionChanged = {r,s -> riderSelectionChangeHandler(r,s)}
@@ -42,29 +43,52 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
      * Need to remember order of ids were selected when a selection is changed
      *
      */
-    private fun riderSelectionChangeHandler(rider: Rider, sel:Boolean){
-        val oldList = selectedRiders()?.toMutableList()?: ArrayList()
-        val newList = ArrayList<Rider>()
-        oldList.forEach { r -> if(r.id != rider.id){newList.add(r)}}
+    private fun riderSelectionChangeHandler(rider: RiderLight, sel:Boolean){
 
-        if(sel){newList.add(rider)}
 
-        ttSetup.timeTrial.value?.let {
-            ttSetup.timeTrial.value = it.helper.addRidersAsTimeTrialRiders(newList)
+        ttSetup.timeTrial.value?.let{tt->
+            val containsRider = tt.riderList.asSequence().map { it.rider.id }.contains(rider.id)
+            if(sel && !containsRider){
+                val newList = tt.riderList.map { it.rider } + rider
+                ttSetup.updateTimeTrial(tt.helper.addRidersAsTimeTrialRiders(newList))
+            }else if(!sel && containsRider){
+                val newList = tt.riderList.filter { it.rider.id != rider.id}
+                ttSetup.updateTimeTrial(tt.copy(riderList = newList))
+            }
+
         }
 
+//        val oldList = selectedRiders()?.toMutableList()?: ArrayList()
+//        val newList = ArrayList<RiderLight>()
+//        oldList.forEach { r ->
+//            if(r.id != rider.id) {
+//                newList.add(r)
+//            }
+//        }
+//
+//        if(sel){newList.add(rider)}
+//
+//        if (oldList.map { it.id } != newList.map { it.id }){
+//            ttSetup.timeTrial.value?.let {
+//                val updated = it.helper.addRidersAsTimeTrialRiders(newList)
+//                if(it != updated){
+//                    ttSetup.updateTimeTrial(it.helper.addRidersAsTimeTrialRiders(newList))
+//                }
+//
+//            }
+//        }
     }
 
-    private fun riderIsSelected(rider: Rider): Boolean{
+    private fun riderIsSelected(rider: RiderLight): Boolean{
         return selectedRiders()?.map { r -> r.id }?.contains(rider.id) ?: false
     }
 }
 
 
-class SelectableRiderViewWrapper(val rider: Rider): BaseObservable(){
+class SelectableRiderViewWrapper(val rider: RiderLight): BaseObservable(){
 
-    var getSelected: (Rider) -> Boolean = { _ -> false}
-    var onSelectionChanged = { _: Rider, _:Boolean -> Unit}
+    var getSelected: (RiderLight) -> Boolean = { _ -> false}
+    var onSelectionChanged = { _: RiderLight, _:Boolean -> Unit}
 
     fun notifyCheckChanged(){
         notifyPropertyChanged(BR.riderIsSelected)

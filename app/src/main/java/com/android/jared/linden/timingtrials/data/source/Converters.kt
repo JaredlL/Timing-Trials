@@ -86,13 +86,6 @@ class Converters {
         return course?.let { Gson().toJson(course)}
     }
 
-    @TypeConverter fun intToEventType(eventId: Int): EventType?{
-        return EventType.fromInt(eventId)
-    }
-
-    @TypeConverter fun eventTypeToInt(eventType: EventType): Int{
-        return eventType.type
-    }
 
     @TypeConverter fun intToGendar(gendarInt: Int): Gender?{
         return Gender.fromInt(gendarInt)
@@ -100,5 +93,13 @@ class Converters {
 
     @TypeConverter fun gendarToInt(gender: Gender): Int{
         return gender.ordinal
+    }
+
+    @TypeConverter fun intToStatus(statusInt: Int): TimeTrialStatus?{
+        return TimeTrialStatus.fromInt(statusInt)
+    }
+
+    @TypeConverter fun statusToInt(status: TimeTrialStatus): Int{
+        return status.ordinal
     }
 }

@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.course.courseName}"
+            android:text="@{viewModel.status.toString()}"
             android:layout_centerInParent="true"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"

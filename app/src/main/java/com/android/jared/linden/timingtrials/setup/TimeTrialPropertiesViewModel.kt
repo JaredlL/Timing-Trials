@@ -27,7 +27,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
 
    override val timeTrialHeader = Transformations.map(ttSetup.timeTrial){it.timeTrialHeader}
 
-    //private val timeTrialValue = ttSetup.timeTrial.value?.timeTrialHeader
+    //private val timeTrialValue = ttSetup.setupTimeTrial.value?.timeTrialHeader
 
     override val courseName: LiveData<String> = Transformations.map(ttSetup.timeTrial){tt->
         tt?.let{

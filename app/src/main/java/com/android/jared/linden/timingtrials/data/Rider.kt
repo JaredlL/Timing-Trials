@@ -1,5 +1,6 @@
 package com.android.jared.linden.timingtrials.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import org.threeten.bp.OffsetDateTime
@@ -16,34 +17,26 @@ data class Rider(
         @PrimaryKey(autoGenerate = true) val id: Long? = null
 )  {
 
+    fun toRiderLight():RiderLight {
+        return RiderLight(firstName, lastName, club, dateOfBirth, gender, id)
+    }
 
     companion object {
 
         fun createBlank() = Rider("", "", "", OffsetDateTime.now().minusYears(20), Gender.UNKNOWN)
+
+
     }
     //val fullName = "$firstName $lastName"
 }
 
+data class RiderLight(
+        @ColumnInfo(name = "firstName") val firstName: String,
+        @ColumnInfo(name = "lastName") val lastName: String,
+        @ColumnInfo(name = "club") val club: String = "",
+        @ColumnInfo(name = "dateOfBirth") val dateOfBirth: OffsetDateTime,
+        @ColumnInfo(name = "gender") val gender: Gender,
+        @ColumnInfo(name = "id") val id: Long? = null
+)
 
-enum class Gender{
-    UNKNOWN{
-        override fun gendarString(): String { return ""}
-    },
-    MALE{
-        override fun gendarString(): String { return "M"}
-    },
-    FEMALE{
-        override fun gendarString(): String { return "F"}
-    },
-    OTHER{
-        override fun gendarString(): String { return "O"}
-    };
 
-    abstract fun gendarString(): String
-
-    companion object {
-        private val map = Gender.values().associateBy(Gender::ordinal)
-        fun fromInt(type: Int) = map[type]
-    }
-
-}

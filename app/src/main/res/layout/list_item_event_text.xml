@@ -22,9 +22,9 @@
             android:layout_marginStart="8dp"
             android:text="@{event.timeStampString}"
             android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/button4"
+            app:layout_constraintBottom_toBottomOf="@+id/text1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/button4"
+            app:layout_constraintTop_toTopOf="@+id/text1"
             tools:text="00:01:53:2" />
 
         <View
@@ -40,7 +40,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/button4"
+            android:id="@+id/text1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
