@@ -7,6 +7,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.Rider
+import com.android.jared.linden.timingtrials.data.RiderLight
 import com.android.jared.linden.timingtrials.databinding.ListItemOrderableRiderBinding
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange
@@ -28,7 +29,7 @@ class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<Orderab
 
     inner class OrderableRiderViewHolder(val binding: ListItemOrderableRiderBinding): AbstractDraggableItemViewHolder(binding.root){
 
-        fun bind(rd:Rider, position: Int){
+        fun bind(rd:RiderLight, position: Int){
             binding.apply {
                 rider = rd
                 pos = position + 1
@@ -37,10 +38,10 @@ class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<Orderab
     }
 
     private val layoutInflater = LayoutInflater.from(context)
-    private var mRiders: List<Rider> = listOf()
+    private var mRiders: List<RiderLight> = listOf()
     var onMove: (from:Int, to:Int) -> Unit = {_,_ -> Unit}
 
-    fun setRiders(newRiders: List<Rider>){
+    fun setRiders(newRiders: List<RiderLight>){
         mRiders = newRiders
         notifyDataSetChanged()
     }

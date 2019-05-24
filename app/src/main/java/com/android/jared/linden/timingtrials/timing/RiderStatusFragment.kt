@@ -71,7 +71,6 @@ class RiderStatusFragment : Fragment() {
                 timingViewModel.finishTt()
                 val resultIntent = Intent(requireActivity(), ResultActivity::class.java)
                 resultIntent.putExtra(ITEM_ID_EXTRA, ttId)
-                resultIntent.putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
                 startActivity(resultIntent)
                 activity?.finish()
             }

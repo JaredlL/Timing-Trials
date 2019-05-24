@@ -33,7 +33,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
         return timeTrial.riderList.asSequence().firstOrNull { it.rider.id == id }
     }
 
-    fun addRidersAsTimeTrialRiders(riders: List<Rider>): TimeTrial{
+    fun addRidersAsTimeTrialRiders(riders: List<RiderLight>): TimeTrial{
         return timeTrial.copy(riderList =  riders.asSequence().mapIndexed { index, rider -> TimeTrialRider(rider, timeTrial.timeTrialHeader.id?:0L, number = index + 1) }.toList())
     }
 
@@ -67,11 +67,11 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
         return (timeTrial.timeTrialHeader.firstRiderStartOffset + rider.startTimeOffset + (timeTrial.timeTrialHeader.interval * (rider.number - 1))) * 1000L
     }
 
-    val results2: List<TimeTrialResult> by lazy {
+    val results: List<TimeTrialResult> by lazy {
        riderEventMap.mapNotNull { rek -> getRiderById(rek.key)?.let { rider -> TimeTrialResult(rider, (listOf(getRiderStartTime(rider)) + rek.value.map { it.timeStamp }).zipWithNext{a, b -> b - a}, timeTrial) }  }
     }
 
-    val results: List<TimeTrialResult> by lazy {
+    val results2: List<TimeTrialResult> by lazy {
         timeTrial.eventList.asSequence().groupBy { it.riderId }.mapNotNull { riderEvents ->
             getRiderById(riderEvents.key)?.let { TimeTrialResult(it, riderEvents.value.asSequence().sortedBy {ev-> ev.timeStamp }.zipWithNext{ a, b -> b.timeStamp - a.timeStamp }.toList(), timeTrial) }
         }

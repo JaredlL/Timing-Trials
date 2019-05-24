@@ -19,6 +19,7 @@ import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 
 import kotlinx.android.synthetic.main.activity_timing.*
+import java.lang.Exception
 
 class TimingActivity : AppCompatActivity() {
 
@@ -37,6 +38,7 @@ class TimingActivity : AppCompatActivity() {
             mService = binder.getService()
            // mBound = true
             Toast.makeText(this@TimingActivity, "Service Connected", Toast.LENGTH_SHORT).show()
+            onBound()
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
@@ -45,6 +47,20 @@ class TimingActivity : AppCompatActivity() {
         }
     }
 
+    fun onBound(){
+        viewModel.timeTrial.observe(this, Observer {tt->
+            tt?.let {
+                mService?.currentTt = tt
+                //if(mService == null) throw Exception("WHY IS THIS NUll")
+            }
+        })
+        mService?.timerTick =::tick
+        mService?.startTiming()
+    }
+
+    private fun tick(timeStamp: Long){
+         viewModel.updateLoop(timeStamp)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,24 +74,6 @@ class TimingActivity : AppCompatActivity() {
         viewModel.showMessage = {msg -> Toast.makeText(this, msg, Toast.LENGTH_LONG).show()}
 
         mBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)
-//        val serviceIntent = Intent(applicationContext, TimingService::class.java).also { intent ->
-//            mBound = bindService(intent, connection, Context.BIND_AUTO_CREATE)
-//           // mBound = true
-//        }
-
-        //startService(serviceIntent)
-
-
-
-        viewModel.timeTrial.observe(this, Observer {tt->
-            tt?.let {
-                mService?.timerTick = { ts -> viewModel.updateLoop(ts)}
-                mService?.startTiming(tt)
-            }
-
-        })
-
-
 
         /**
          * Check if the fragemts already exist in child fragment manager

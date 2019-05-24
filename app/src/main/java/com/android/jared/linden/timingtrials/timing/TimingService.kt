@@ -11,12 +11,16 @@ import android.os.Build.VERSION_CODES.N
 import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import com.android.jared.linden.timingtrials.util.ConverterUtils.toSecondsDisplayString
 import org.threeten.bp.Instant
 import java.util.*
+import android.R.string.cancel
+import android.app.NotificationManager
+import android.R
+
+
 
 const val NOTIFICATION_ID = 2
 
@@ -31,29 +35,39 @@ class TimingService : Service(){
         return binder
     }
 
-    fun startTiming(tt: TimeTrial){
-        if(timeTrial?.timeTrialHeader?.id != tt.timeTrialHeader.id){
-            timeTrial = tt
+    var timerTick: (Long) -> Unit = {}
+    var currentTt: TimeTrial? = null
+
+    fun startTiming(){
+
+            timer.cancel()
+        System.out.println("JAREDMSG -> Creating Timer")
             timer = Timer()
             val task = object : TimerTask(){
                 override fun run() {
-                    val now = Instant.now()
-                    val millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli()
-                    val secs = toSecondsDisplayString(millisSinceStart)
-                    if(prevString != secs){
-                        updateNotificationTitle(tt.timeTrialHeader.ttName, secs)
-                        prevString = secs
+
+                    currentTt?.let {
+                        val now = Instant.now()
+                        val millisSinceStart = now.toEpochMilli() - it.timeTrialHeader.startTime.toInstant().toEpochMilli()
+                        val secs = toSecondsDisplayString(millisSinceStart)
+                        if(prevString != secs){
+                            updateNotificationTitle(it.timeTrialHeader.ttName, secs)
+                            prevString = secs
+                        }
+                        timerTick.invoke(millisSinceStart)
                     }
-                    timerTick.invoke(millisSinceStart)
+
                 }
             }
             timer.scheduleAtFixedRate(task, 0L, TIMER_PERIOD_MS)
         }
 
-    }
+
 
     fun stop(){
+        System.out.println("JAREDMSG -> Ending Service")
         timer.cancel()
+        notificationManager.cancel(NOTIFICATION_ID)
         stopForeground(true)
         stopSelf()
     }
@@ -62,13 +76,9 @@ class TimingService : Service(){
     override fun onCreate() {
         setInForeground()
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-
-
     }
 
-    var timerTick: (Long) -> Unit = {}
-    var timeTrial: TimeTrial? = null
+
 
     private val binder: IBinder = TimingServiceBinder()
 
@@ -107,7 +117,7 @@ class TimingService : Service(){
 
     private fun getNotification():NotificationCompat.Builder{
         val timingIntent = PendingIntent.getActivity(this, 0,Intent(this, TimingActivity::class.java), 0)
-        return NotificationCompat.Builder(this, "timing_service").setSmallIcon(R.drawable.ic_dashboard_black_24dp)
+        return NotificationCompat.Builder(this, "timing_service").setSmallIcon(com.android.jared.linden.timingtrials.R.drawable.ic_dashboard_black_24dp)
                 .setTicker("TimingTrials")
                 .setContentText("TimeTrial in progress")
                 .setContentIntent(timingIntent)

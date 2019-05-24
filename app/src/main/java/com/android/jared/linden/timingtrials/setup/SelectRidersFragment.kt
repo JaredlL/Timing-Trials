@@ -18,6 +18,7 @@ import com.android.jared.linden.timingtrials.R
 
 import com.android.jared.linden.timingtrials.adapters.SelectableRiderListAdapter
 import com.android.jared.linden.timingtrials.data.Rider
+import com.android.jared.linden.timingtrials.data.RiderLight
 import com.android.jared.linden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.util.*
@@ -49,13 +50,13 @@ class SelectRidersFragment : Fragment() {
 
         val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
             lifecycleOwner = (this@SelectRidersFragment)
-            riderHeading.selectableRider =  SelectableRiderViewWrapper(Rider.createBlank().copy( firstName = "Name", club = "Club"))
+            riderHeading.selectableRider =  SelectableRiderViewWrapper(Rider.createBlank().copy( firstName = "Name", club = "Club").toRiderLight())
             riderHeading.checkBox.visibility =  View.INVISIBLE
             riderRecyclerView.adapter = adapter
             riderRecyclerView.layoutManager = viewManager
 
             riderListFab.setOnClickListener {
-                editRider(Rider.createBlank())
+                editRider(Rider.createBlank().toRiderLight())
             }
         }
 
@@ -70,7 +71,7 @@ class SelectRidersFragment : Fragment() {
         return binding.root
     }
 
-    private fun editRider(rider: Rider){
+    private fun editRider(rider: RiderLight){
         val intent = Intent(context, EditItemActivity::class.java).apply {
             putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
             putExtra(ITEM_ID_EXTRA, rider.id)

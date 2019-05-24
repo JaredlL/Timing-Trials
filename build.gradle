@@ -34,7 +34,7 @@ ext {
     ktxVersion = '1.0.1'
     materialVersion = '1.1.0-alpha06'
     activityVersion = '1.0.0-alpha08'
-    fragmentVersion = '1.1.0-alpha08'
+    fragmentVersion = '1.1.0-alpha09'
     coreVersion = '1.2.0-alpha01'
 
     advRecyclerVersion='1.0.0'

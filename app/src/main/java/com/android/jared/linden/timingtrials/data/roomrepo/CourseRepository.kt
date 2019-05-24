@@ -12,6 +12,8 @@ interface ICourseRepository {
 
     val allCourses: LiveData<List<Course>>
 
+    suspend fun getAllCoursesSuspend(): List<Course>
+
     fun getCourse(courseId: Long) : LiveData<Course>
 
     fun getFirst() : LiveData<Course>
@@ -45,6 +47,10 @@ class RoomCourseRepository @Inject constructor(private val courseDao: CourseDao)
             0L ->  MutableLiveData<Course>(Course.createBlank())
             else ->  courseDao.getCourseById(courseId)
         }
+    }
+
+    override suspend fun getAllCoursesSuspend(): List<Course> {
+        return courseDao.getAllCoursesSuspend()
     }
 
     override fun getFirst() : LiveData<Course> {

@@ -7,6 +7,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.Rider
+import com.android.jared.linden.timingtrials.data.RiderLight
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemSelectableRiderBinding
 import com.android.jared.linden.timingtrials.setup.SelectableRiderViewWrapper
@@ -23,7 +24,7 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
 
     inner class SelectableRiderViewHolder(val binding: ListItemSelectableRiderBinding): RecyclerView.ViewHolder(binding.root) {
 
-        var longPress = {(rider):Rider -> Unit}
+        var longPress = {(rider): RiderLight -> Unit}
 
         fun bind(riderVm: SelectableRiderViewWrapper){
 
@@ -59,7 +60,7 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
         }
     }
 
-    var editRider = {(SelectableRiderViewWrapper):Rider -> Unit}
+    var editRider = {(SelectableRiderViewWrapper):RiderLight -> Unit}
 
     fun setRiders(newRiders: List<SelectableRiderViewWrapper>){
         mRiders = newRiders

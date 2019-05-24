@@ -36,11 +36,6 @@ class TimerFragment : Fragment() {
         val adapter = EventListAdapter(requireActivity())
         val viewManager = LinearLayoutManager(context)
 
-
-        timingViewModel.timeTrial.observe(viewLifecycleOwner, Observer {
-
-        })
-
         timingViewModel.timeLine.observe(viewLifecycleOwner, Observer { res->
             res?.let {tl->
                 val oldCount  = adapter.itemCount
@@ -65,6 +60,9 @@ class TimerFragment : Fragment() {
                 }
                 val newcount = adapter.itemCount
                 if(oldCount < newcount) eventRecyclerView?.scrollToPosition(newcount - 1)
+            }
+            if(res == null){
+                textView18.text = "TT is null"
             }
         })
 

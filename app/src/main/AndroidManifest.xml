@@ -16,7 +16,7 @@
         <activity
             android:name=".timing.TimingActivity"
             android:label="@string/title_activity_timing"
-            android:launchMode="singleTop"
+            android:launchMode="singleInstance"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

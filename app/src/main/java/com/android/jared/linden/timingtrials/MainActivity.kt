@@ -20,6 +20,25 @@ class MainActivity : AppCompatActivity() {
     var setupId: Long? = null
     var inProgressId: Long? = null
 
+
+    fun setDefaultSetupClickListner(){
+        ma_butt_begintt.text = getString(R.string.start_tt)
+        ma_butt_begintt.setOnClickListener {
+            if(setupId != null){
+
+                val confDialog: UseOldConfirmationFragment = supportFragmentManager
+                        .findFragmentByTag("useold") as? UseOldConfirmationFragment ?: UseOldConfirmationFragment()
+
+                if(confDialog.dialog?.isShowing != true){
+                    confDialog.show(supportFragmentManager, "useold")
+                }
+            }else{
+                val mIntent = Intent(this@MainActivity, SetupActivity::class.java)
+                startActivity(mIntent)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -34,10 +53,14 @@ class MainActivity : AppCompatActivity() {
         })
 
         vm.timingTimeTrial.observe(this, Observer { tt->
-            tt?.let {
-                val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
-                startActivity(tIntent)
-                vm.timingTimeTrial.removeObservers(this)
+            if(tt != null) {
+                ma_butt_begintt.setOnClickListener {
+                    val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
+                    startActivity(tIntent)
+                }
+                ma_butt_begintt.text = "Resume ${tt.timeTrialHeader.ttName}"
+            }else{
+                setDefaultSetupClickListner()
             }
         })
 
@@ -48,76 +71,38 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        ma_butt_begintt.setOnClickListener {
 
-
-                if(setupId != null){
-
-                    val confDialog: UseOldConfirmationFragment = supportFragmentManager
-                            .findFragmentByTag("useold") as? UseOldConfirmationFragment ?: UseOldConfirmationFragment()
-
-                    if(confDialog.dialog?.isShowing != true){
-                        confDialog.show(supportFragmentManager, "useold")
-                    }
-                }else{
-                    val mIntent = Intent(this@MainActivity, SetupActivity::class.java)
-                    startActivity(mIntent)
-                }
-
-
-
-
-        }
 
         createSetupButton.setOnClickListener {
             val tvm = getViewModel { injector.testViewModel() }
+            tvm.insertSetupTt()
 
-            tvm.medTimeTrial.observe(this, Observer {
-                it?.let {tt->
-                    if(tt.riderList.count() > 0 && tt.timeTrialHeader.course != null){
-                        tvm.insertSetupTt()
-                        tvm.medTimeTrial.removeObservers(this)
-                    }
-                }
-            })
 
         }
 
         createTimingButton.setOnClickListener {
             val tvm = getViewModel { injector.testViewModel() }
-
-            tvm.medTimeTrial.observe(this, Observer {
-                it?.let {tt->
-                    if(tt.riderList.isNotEmpty() && tt.timeTrialHeader.course != null){
-                        val id = tt.timeTrialHeader.id
-                            tvm.insertTimingTt()
-                        tvm.medTimeTrial.removeObservers(this)
-                    }
-                }
-            })
-
-            //tvm.insertTimingTt()
+            tvm.insertTimingTt()
+            val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
+            startActivity(tIntent)
 
         }
 
         createFinishedButton.setOnClickListener {
             val tvm = getViewModel { injector.testViewModel() }
-
-            tvm.medTimeTrial.observe(this, Observer {
-                it?.let {tt->
-                    if(tt.riderList.isNotEmpty() && tt.timeTrialHeader.course != null){
-                        val id = tt.timeTrialHeader.id
-                        tvm.insertFinishedTt()
-                        val tIntent = Intent(this@MainActivity, ResultActivity::class.java).apply { putExtra(ITEM_ID_EXTRA, id) }
-                        startActivity(tIntent)
-                        tvm.medTimeTrial.removeObservers(this)
-                    }
+            tvm.insertFinishedTt()
+            tvm.newId.observe(this, Observer {res->
+                res?.let {
+                    val mIntent = Intent(this@MainActivity, ResultActivity::class.java)
+                    mIntent.putExtra(ITEM_ID_EXTRA, it)
+                    startActivity(mIntent)
+                    tvm.newId.removeObservers(this)
                 }
+
             })
 
-            //tvm.insertTimingTt()
-
         }
+        setDefaultSetupClickListner()
 
 
 

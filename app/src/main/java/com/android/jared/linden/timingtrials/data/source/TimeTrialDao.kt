@@ -19,12 +19,14 @@ abstract class TimeTrialDao {
     abstract fun delete(timeTrialHeader: TimeTrialHeader)
 
     @Transaction @Insert
-    fun insert(timeTrial: TimeTrial){
+    fun insert(timeTrial: TimeTrial): Long{
         val id = insert(timeTrial.timeTrialHeader)
         //setupTimeTrial.eventList.map { it.copy(timeTrialId = id)}
         _insertAllEvents( timeTrial.eventList.map { it.copy(timeTrialId = id)})
         _insertAllTimeTrialRiders(timeTrial.riderList.map { it.copy(timeTrialId = id)})
+        return id
     }
+
 
     @Transaction @Update
     fun update(timeTrial: TimeTrial){
@@ -61,6 +63,8 @@ abstract class TimeTrialDao {
 
     //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
     @Transaction @Query("SELECT * FROM timetrial_table WHERE status = 0 LIMIT 1") abstract fun getSetupTimeTrial(): LiveData<TimeTrial>
+
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE status = 0 LIMIT 1") abstract suspend fun getSetupTimeTrialSuspend(): TimeTrial?
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE status = 1 LIMIT 1") abstract fun getTimingTimeTrial(): LiveData<TimeTrial>
 

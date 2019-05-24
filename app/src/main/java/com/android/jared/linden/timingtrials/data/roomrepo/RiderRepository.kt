@@ -4,6 +4,7 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.jared.linden.timingtrials.data.Rider
+import com.android.jared.linden.timingtrials.data.RiderLight
 import com.android.jared.linden.timingtrials.data.source.RiderDao
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,6 +13,10 @@ import javax.inject.Singleton
 interface IRiderRepository {
 
     val allRiders: LiveData<List<Rider>>
+
+    val allRidersLight: LiveData<List<RiderLight>>
+
+    suspend fun allRidersLightSuspend():List<RiderLight>
 
     val allClubs: LiveData<List<String>>
 
@@ -40,7 +45,13 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
     // Observed LiveData will notify the observer when the data has changed.
     override val allRiders: LiveData<List<Rider>> = riderDao.getAllRiders()
 
+    override val allRidersLight: LiveData<List<RiderLight>> = riderDao.getAllRidersLight()
+
     override val allClubs: LiveData<List<String>> = riderDao.getAllClubs()
+
+    override suspend fun allRidersLightSuspend(): List<RiderLight> {
+        return riderDao.getAllRidersLightSuspend()
+    }
 
     // You must call this on a non-UI thread or your app will crash. So we're making this a
     // suspend function so the caller methods know this.
