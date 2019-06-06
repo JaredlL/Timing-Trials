@@ -38,7 +38,7 @@ class TestViewModel@Inject constructor(
 
                 val timeTrial = TimeTrial.createBlank().copy(timeTrialHeader = TimeTrialHeader.createBlank()
                         .copy(ttName = "Timing Timetrial",
-                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
+                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(5), ZoneId.systemDefault()),
                                 firstRiderStartOffset = 0,
                                 interval = 2,
                                 course = courses[2],
@@ -47,7 +47,7 @@ class TestViewModel@Inject constructor(
 
 
 
-                val newTt = timeTrial.helper.addRidersAsTimeTrialRiders(rList)
+                val newTt = timeTrial.helper.addRidersAsTimeTrialRiders(rList.filterIndexed { index, _ -> index%10 == 0 })
 
                 timeTrialRepository.insertOrUpdate(newTt)
             }

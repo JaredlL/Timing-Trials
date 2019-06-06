@@ -40,13 +40,6 @@ class SetupActivity : AppCompatActivity() {
 
         setupViewModel = getViewModel { injector.timeTrialSetupViewModel() }
 
-
-        intent.getLongExtra(ITEM_ID_EXTRA, 0L).let {
-            setupViewModel.initialise(it)
-        }
-
-
-
         setupViewModel.timeTrialPropertiesViewModel.onBeginTt = {
 
             setupViewModel.timeTrial.value?.let {

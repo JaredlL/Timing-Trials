@@ -16,6 +16,7 @@ interface ISetupConformationViewModel{
     val timeTrial: LiveData<TimeTrial>
     fun positiveFunction(): Boolean
     fun negativeFunction(): Boolean
+    fun insertTt(tt: TimeTrial)
 }
 
 class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupConformationViewModel{
@@ -49,14 +50,16 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
 
     }
 
+    override fun insertTt(tt: TimeTrial) {
+        ttSetup.updateTimeTrial(tt)
+    }
+
 
     override fun positiveFunction(): Boolean{
 
         timeTrialDefinition.value?.let {
             return if(it.startTime.isAfter(OffsetDateTime.now())){
-
                 ttSetup.updateDefinition(it.copy(status = TimeTrialStatus.IN_PROGRESS))
-                ttSetup.insertTt()
 
                 true
             }else{
@@ -97,6 +100,9 @@ class ResumeOldConfirmationViewModel (private val mainViewModel: MainViewModel) 
         }
 
 
+    }
+
+    override fun insertTt(tt: TimeTrial) {
     }
 
     override val startTime = Transformations.map(timeTrialDefinition){ tt->

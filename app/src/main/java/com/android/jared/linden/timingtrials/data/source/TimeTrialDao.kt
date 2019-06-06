@@ -2,10 +2,7 @@ package com.android.jared.linden.timingtrials.data.source
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.android.jared.linden.timingtrials.data.TimeTrialHeader
-import com.android.jared.linden.timingtrials.data.RiderPassedEvent
-import com.android.jared.linden.timingtrials.data.TimeTrialRider
-import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.*
 
 @Dao
 abstract class TimeTrialDao {
@@ -18,8 +15,13 @@ abstract class TimeTrialDao {
     @Delete
     abstract fun delete(timeTrialHeader: TimeTrialHeader)
 
-    @Transaction @Insert
-    fun insert(timeTrial: TimeTrial): Long{
+    @Transaction
+    open suspend fun insert(timeTrial: TimeTrial): Long{
+        val uncom = getAllUncompleteTimeTrial()
+        if(timeTrial.timeTrialHeader.status != TimeTrialStatus.FINISHED){
+            uncom.forEach { delete(it) }
+        }
+
         val id = insert(timeTrial.timeTrialHeader)
         //setupTimeTrial.eventList.map { it.copy(timeTrialId = id)}
         _insertAllEvents( timeTrial.eventList.map { it.copy(timeTrialId = id)})
@@ -28,10 +30,15 @@ abstract class TimeTrialDao {
     }
 
 
-    @Transaction @Update
-    fun update(timeTrial: TimeTrial){
+    @Transaction
+    open suspend fun update(timeTrial: TimeTrial){
         timeTrial.timeTrialHeader.id?.let { ttId->
-            update(timeTrial.timeTrialHeader)
+
+            val uncom = getAllUncompleteTimeTrial()
+            if(timeTrial.timeTrialHeader.status != TimeTrialStatus.FINISHED){
+                uncom.filter { it.id != ttId }.forEach { delete(it) }
+            }
+
             _deleteTtEvents(ttId)
             _deleteTtRiders(ttId)
 
@@ -40,6 +47,7 @@ abstract class TimeTrialDao {
 
             timeTrial.riderList.map { it.copy(timeTrialId = ttId)}
             _insertAllTimeTrialRiders(timeTrial.riderList)
+            update(timeTrial.timeTrialHeader)
         }
 
     }
@@ -65,6 +73,9 @@ abstract class TimeTrialDao {
     @Transaction @Query("SELECT * FROM timetrial_table WHERE status = 0 LIMIT 1") abstract fun getSetupTimeTrial(): LiveData<TimeTrial>
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE status = 0 LIMIT 1") abstract suspend fun getSetupTimeTrialSuspend(): TimeTrial?
+
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE status != 2") abstract suspend fun getAllUncompleteTimeTrial(): List<TimeTrialHeader>
+
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE status = 1 LIMIT 1") abstract fun getTimingTimeTrial(): LiveData<TimeTrial>
 

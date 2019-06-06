@@ -30,7 +30,7 @@ ext {
     lifecycleVersion = '2.2.0-alpha01'
     lifecycleExtVersion = '2.2.0-alpha01'
     recyclerViewVersion = '1.1.0-alpha05'
-    coroutinesVersion = "1.1.1"
+    coroutinesVersion = '1.2.1'
     ktxVersion = '1.0.1'
     materialVersion = '1.1.0-alpha06'
     activityVersion = '1.0.0-alpha08'
@@ -39,7 +39,7 @@ ext {
 
     advRecyclerVersion='1.0.0'
     gsonVersion='2.8.5'
-    daggerVersion= '2.22.1'
+    daggerVersion= '2.23.1'
 }
 
 task clean(type: Delete) {

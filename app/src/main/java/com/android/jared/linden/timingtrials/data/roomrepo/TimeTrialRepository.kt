@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -53,7 +54,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     override suspend fun getSetupTimeTrialSuspend(): TimeTrial {
 
         val tt = timeTrialDao.getSetupTimeTrialSuspend()
-       return if(tt == null){
+        return if(tt == null){
            val newtt = TimeTrial.createBlank()
            val id = insertOrUpdate(newtt)
            return timeTrialDao.getSetupTimeTrialSuspend()?: newtt.copy(timeTrialHeader = newtt.timeTrialHeader.copy(id = id))
@@ -95,6 +96,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun insertOrUpdate(timeTrial: TimeTrial): Long{
+        System.out.println("JAREDMSG -> Inserting ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
         val id = timeTrial.timeTrialHeader.id ?: 0
         return if(id != 0L){
             timeTrialDao.update(timeTrial)
