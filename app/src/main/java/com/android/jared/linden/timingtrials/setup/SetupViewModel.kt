@@ -5,7 +5,9 @@ import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
 import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
 import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
+import com.jakewharton.threetenabp.AndroidThreeTen.init
 import kotlinx.coroutines.*
+import java.lang.Exception
 import java.util.*
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentLinkedDeque
@@ -28,17 +30,26 @@ class SetupViewModel @Inject constructor(
 ) : ViewModel(), ITimeTrialSetupViewModel{
 
 
-    val timeTrial = MediatorLiveData<TimeTrial>().apply { addSource(timeTrialRepository.getSetupTimeTrial()) { res ->
-        if (res != null) {
-            if(!isCorotineAlive.get() && value != res){
-                System.out.println("JAREDMSG -> Updating Livedata with ${res.timeTrialHeader.id} ${res.timeTrialHeader.ttName}")
-                value = res
+    val timeTrial = MediatorLiveData<TimeTrial>().apply { addSource(timeTrialRepository.getNonFinishedTimeTrial()) { res ->
+//        val settingUp = res?.firstOrNull{it.timeTrialHeader.status == TimeTrialStatus.SETTING_UP}
+//        val timing = res?.firstOrNull{it.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS}
+        val settingUp = res?.firstOrNull()
+        if (res?.size?:0 > 1) throw Exception("Multiple non finished TTs in DB")
+        if (settingUp != null) {
+            if(!isCorotineAlive.get() && value != settingUp){
+                System.out.println("JAREDMSG -> Updating Livedata with ${settingUp.timeTrialHeader.id} ${settingUp.timeTrialHeader.ttName}")
+                value = settingUp
             }
-        } else {
+        }else{
+            viewModelScope.launch(Dispatchers.IO) {
+                timeTrialRepository.insert(TimeTrial.createBlank())
+            }
             //updateTimeTrial(TimeTrial.createBlank())
         }
     }
     }
+
+
 
     var queue = ConcurrentLinkedQueue<TimeTrial>()
     var isCorotineAlive = AtomicBoolean()
@@ -57,7 +68,7 @@ class SetupViewModel @Inject constructor(
                         while (queue.peek() != null){
                             ttToInsert = queue.poll()
                         }
-                        timeTrialRepository.insertOrUpdate(ttToInsert)
+                        timeTrialRepository.update(ttToInsert)
                     }
                     isCorotineAlive.set(false)
                 }

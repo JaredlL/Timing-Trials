@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.OneShotPreDrawListener.add
 import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.setup.SelectCourseFragment
 import com.android.jared.linden.timingtrials.setup.SetupTimeTrialFragment
 import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
@@ -49,13 +50,44 @@ class TimingActivity : AppCompatActivity() {
 
     fun onBound(){
         viewModel.timeTrial.observe(this, Observer {tt->
-            tt?.let {
-                mService?.currentTt = tt
-                //if(mService == null) throw Exception("WHY IS THIS NUll")
+
+            if(tt == null){
+                if(mBound){
+                    applicationContext.unbindService(connection)
+                    mService?.stop()
+                    mBound = false
+                }
+                finish()
+            }else{
+                when(tt.timeTrialHeader.status){
+                    TimeTrialStatus.SETTING_UP -> {
+                        if(mBound){
+                            applicationContext.unbindService(connection)
+                            mService?.stop()
+                            mBound = false
+                        }
+
+                        finish()
+                    }
+                    TimeTrialStatus.IN_PROGRESS -> {
+                        mService?.currentTt = tt
+                        if(mService == null) throw Exception("SERVICE IS NULL, BUT WHY")
+                        mService?.timerTick =::tick
+                        mService?.startTiming()
+                    }
+                    TimeTrialStatus.FINISHED -> {
+                        if(mBound){
+                            applicationContext.unbindService(connection)
+                            mService?.stop()
+                            mBound = false
+                        }
+                        finish()
+                    }
+                }
+
             }
         })
-        mService?.timerTick =::tick
-        mService?.startTiming()
+
     }
 
     private fun tick(timeStamp: Long){

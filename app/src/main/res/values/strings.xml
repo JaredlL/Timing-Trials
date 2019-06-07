@@ -29,7 +29,7 @@
     <string name="riders">Riders</string>
     <string name="courses">Courses</string>
     <string name="time_trials">TimeTrials</string>
-    <string name="manage_riders">Manage Riders</string>
+    <string name="manage_riders">View Database</string>
     <string name="rider_passed">Rider Passed!</string>
     <string name="timetrial_to_start_at">TimeTrial to start at</string>
     <string name="press_assign_rider">Press to assign number</string>

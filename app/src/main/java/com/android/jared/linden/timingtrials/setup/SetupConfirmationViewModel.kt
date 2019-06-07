@@ -13,7 +13,7 @@ interface ISetupConformationViewModel{
     val lapsCourse: LiveData<String>
     val ridersInterval: LiveData<String>
     val startTime: LiveData<String>
-    val timeTrial: LiveData<TimeTrial>
+    val timeTrial: LiveData<TimeTrial?>
     fun positiveFunction(): Boolean
     fun negativeFunction(): Boolean
     fun insertTt(tt: TimeTrial)

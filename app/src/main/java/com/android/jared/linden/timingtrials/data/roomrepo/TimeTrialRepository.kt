@@ -12,13 +12,12 @@ import javax.inject.Singleton
 interface ITimeTrialRepository{
 
     suspend fun insert(timeTrial: TimeTrial):Long
-    suspend fun insertOrUpdate(timeTrial: TimeTrial): Long
+    //suspend fun insertOrUpdate(timeTrial: TimeTrial): Long
     suspend fun update(timeTrial: TimeTrial)
     suspend fun getTimeTrialByName(name: String): TimeTrial?
     suspend fun delete(timeTrial: TimeTrial)
     suspend fun getSetupTimeTrialSuspend(): TimeTrial
-    fun getSetupTimeTrial(): LiveData<TimeTrial>
-    fun getTimingTimeTrial(): LiveData<TimeTrial>
+    fun getNonFinishedTimeTrial(): LiveData<List<TimeTrial>>
     fun getLiveTimeTrialByName(name:String): LiveData<TimeTrial>
     fun getTimeTrialById(id: Long): LiveData<TimeTrial>
     val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>>
@@ -43,12 +42,12 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun insert(timeTrial: TimeTrial):Long {
+        System.out.println("JAREDMSG -> Inserting New TT ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
        return timeTrialDao.insert(timeTrial)
     }
 
-    override fun getSetupTimeTrial(): LiveData<TimeTrial> {
-
-        return timeTrialDao.getSetupTimeTrial()
+    override fun getNonFinishedTimeTrial(): LiveData<List<TimeTrial>> {
+        return timeTrialDao.getNonFinishedTimeTrial()
     }
 
     override suspend fun getSetupTimeTrialSuspend(): TimeTrial {
@@ -56,7 +55,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
         val tt = timeTrialDao.getSetupTimeTrialSuspend()
         return if(tt == null){
            val newtt = TimeTrial.createBlank()
-           val id = insertOrUpdate(newtt)
+           val id = insert(newtt)
            return timeTrialDao.getSetupTimeTrialSuspend()?: newtt.copy(timeTrialHeader = newtt.timeTrialHeader.copy(id = id))
         }else{
             tt
@@ -64,10 +63,6 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
 
     }
 
-    override fun getTimingTimeTrial(): LiveData<TimeTrial> {
-
-        return timeTrialDao.getTimingTimeTrial()
-    }
 
     override fun getLiveTimeTrialByName(name:String): LiveData<TimeTrial> {
 
@@ -78,6 +73,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun update(timeTrial: TimeTrial) {
+        System.out.println("JAREDMSG -> Updating ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
         timeTrialDao.update(timeTrial)
     }
 
@@ -93,18 +89,18 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
         timeTrialDao.delete(timeTrial)
     }
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    override suspend fun insertOrUpdate(timeTrial: TimeTrial): Long{
-        System.out.println("JAREDMSG -> Inserting ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
-        val id = timeTrial.timeTrialHeader.id ?: 0
-        return if(id != 0L){
-            timeTrialDao.update(timeTrial)
-             id
-        }else{
-            timeTrialDao.insert(timeTrial)
-        }
-
-    }
+//    @Suppress("RedundantSuspendModifier")
+//    @WorkerThread
+//    override suspend fun insertOrUpdate(timeTrial: TimeTrial): Long{
+//        System.out.println("JAREDMSG -> Inserting ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
+//        val id = timeTrial.timeTrialHeader.id ?: 0
+//        return if(id != 0L){
+//            timeTrialDao.update(timeTrial)
+//             id
+//        }else{
+//            timeTrialDao.insert(timeTrial)
+//        }
+//
+//    }
 
 }

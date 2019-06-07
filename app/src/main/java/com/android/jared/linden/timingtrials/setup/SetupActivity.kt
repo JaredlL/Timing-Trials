@@ -1,5 +1,6 @@
 package com.android.jared.linden.timingtrials.setup
 
+import android.content.Intent
 import com.google.android.material.tabs.TabLayout
 import androidx.appcompat.app.AppCompatActivity
 
@@ -9,7 +10,10 @@ import androidx.fragment.app.FragmentPagerAdapter
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.TimeTrialStatus
+import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
@@ -39,6 +43,23 @@ class SetupActivity : AppCompatActivity() {
         setContentView(R.layout.activity_setup)
 
         setupViewModel = getViewModel { injector.timeTrialSetupViewModel() }
+
+//        setupViewModel.timeTrial.value?.let {
+////            if(it.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS){
+////                val intent = Intent(this, TimingActivity::class.java)
+////                startActivity(intent)
+////            }
+////        }
+
+        setupViewModel.timeTrial.observe(this, Observer { tt->
+            tt?.let {
+                if(tt.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS){
+                    val intent = Intent(this, TimingActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+            }
+        })
 
         setupViewModel.timeTrialPropertiesViewModel.onBeginTt = {
 

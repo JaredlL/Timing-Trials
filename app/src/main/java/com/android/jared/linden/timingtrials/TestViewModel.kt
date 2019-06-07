@@ -24,7 +24,6 @@ class TestViewModel@Inject constructor(
 ) : ViewModel(){
 
 
-    val timeTt = timeTrialRepository.getTimingTimeTrial()
 
     val newId = MutableLiveData<Long>()
 
@@ -49,7 +48,7 @@ class TestViewModel@Inject constructor(
 
                 val newTt = timeTrial.helper.addRidersAsTimeTrialRiders(rList.filterIndexed { index, _ -> index%10 == 0 })
 
-                timeTrialRepository.insertOrUpdate(newTt)
+                timeTrialRepository.insert(newTt)
             }
 
 
@@ -73,7 +72,7 @@ class TestViewModel@Inject constructor(
                                 laps = 2,
                                 status = TimeTrialStatus.SETTING_UP))
                 val newTt = timeTrial.helper.addRidersAsTimeTrialRiders(rList)
-                val i = timeTrialRepository.insertOrUpdate(newTt)
+                val i = timeTrialRepository.insert(newTt)
                 newId.postValue(i)
             }
 
@@ -105,7 +104,7 @@ class TestViewModel@Inject constructor(
 
                 val newTt = timeTrial.helper.addRidersAsTimeTrialRiders(rList)
                 val withEvents = addFakeEvents(newTt)
-                val i = timeTrialRepository.insertOrUpdate(withEvents)
+                val i = timeTrialRepository.insert(withEvents)
                 newId.postValue(i)
             }
 

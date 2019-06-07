@@ -49,6 +49,7 @@ class SetupConfirmationFragment : DialogFragment() {
                     val intent = Intent(requireActivity(), TimingActivity::class.java)
                     startActivity(intent)
                     this@SetupConfirmationFragment.dismiss()
+                    requireActivity().finish()
                 }else{
                     Toast.makeText(requireActivity(), "TT must start in the future, select start time", Toast.LENGTH_LONG).show()
                     this@SetupConfirmationFragment.dismiss()
