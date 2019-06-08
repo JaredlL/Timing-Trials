@@ -37,6 +37,10 @@ data class RiderLight(
         @ColumnInfo(name = "dateOfBirth") val dateOfBirth: OffsetDateTime,
         @ColumnInfo(name = "gender") val gender: Gender,
         @ColumnInfo(name = "id") val id: Long? = null
-)
+){
+    fun getCategoryStandard(): RiderCategoryStandard{
+        return RiderCategoryStandard(gender, OffsetDateTime.now().year - dateOfBirth.year )
+    }
+}
 
 

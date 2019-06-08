@@ -1,7 +1,9 @@
 package com.android.jared.linden.timingtrials.util
 
+import androidx.databinding.BindingConversion
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import java.text.Format
@@ -19,6 +21,13 @@ object ConverterUtils{
     fun instantToSecondsDisplayString(instant: Instant): String{
         val  f:DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault())
         return (f.format(instant))
+    }
+
+    @BindingConversion
+    @JvmStatic
+    fun dateToDisplay(dateTime: OffsetDateTime): String{
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        return dateTime.format(formatter)
     }
 //
 //    fun toTenthsDisplayString(instant: Instant): String{

@@ -6,7 +6,7 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:fitsSystemWindows="false"
     tools:context=".setup.SetupActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -17,37 +17,39 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/dbtabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/dbtabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/riders" />
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tabItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/riders" />
 
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabItem2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/courses" />
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tabItem2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/courses" />
 
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabItem3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/time_trials" />
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tabItem3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/time_trials" />
 
 
-    </com.google.android.material.tabs.TabLayout>
-</com.google.android.material.appbar.AppBarLayout>
+        </com.google.android.material.tabs.TabLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/dbcontainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="?attr/actionBarSize"
+        android:layout_marginBottom="0dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

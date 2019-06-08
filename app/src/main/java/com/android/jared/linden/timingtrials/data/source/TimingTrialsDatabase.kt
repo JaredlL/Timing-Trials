@@ -117,7 +117,7 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             courseDao.deleteAll()
             courseDao.insert(Course("Lydbrook 10", 16093.4, "UC603"))
             courseDao.insert(Course("Hilly Lydbrook", 24140.2, "UC612"))
-            courseDao.insert(Course("Cannop", 19312.1, "UC611 "))
+            courseDao.insert(Course("Cannop", 19312.1, "UC611"))
             courseDao.insert(Course("Tomarton", 37014.9, "U601B"))
             courseDao.insert(Course("Tintern 10", 16093.4, "UC620"))
             courseDao.insert(Course("Speech House 10", 16093.4, "UC606"))

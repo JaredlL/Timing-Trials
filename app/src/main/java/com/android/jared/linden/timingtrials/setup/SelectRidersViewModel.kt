@@ -62,25 +62,6 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
 
         }
 
-//        val oldList = selectedRiders()?.toMutableList()?: ArrayList()
-//        val newList = ArrayList<RiderLight>()
-//        oldList.forEach { r ->
-//            if(r.id != rider.id) {
-//                newList.add(r)
-//            }
-//        }
-//
-//        if(sel){newList.add(rider)}
-//
-//        if (oldList.map { it.id } != newList.map { it.id }){
-//            ttSetup.timeTrial.value?.let {
-//                val updated = it.helper.addRidersAsTimeTrialRiders(newList)
-//                if(it != updated){
-//                    ttSetup.updateTimeTrial(it.helper.addRidersAsTimeTrialRiders(newList))
-//                }
-//
-//            }
-//        }
     }
 
 }
@@ -91,6 +72,8 @@ class SelectableRiderViewWrapper(val rider: RiderLight): BaseObservable(){
     var getSelected: (RiderLight) -> Boolean = { _ -> false}
     var onSelectionChanged = { _: RiderLight, _:Boolean -> Unit}
 
+
+    val catString = rider.getCategoryStandard().categoryId()
     var mIsSel: Boolean = false
 
     fun changeSelectionStatus(newCheckStatus: Boolean){
@@ -110,8 +93,6 @@ class SelectableRiderViewWrapper(val rider: RiderLight): BaseObservable(){
             mIsSel = value
             onSelectionChanged(rider, value)
         }
-
-        //notifyPropertyChanged(BR.riderIsSelected)
     }
 }
 

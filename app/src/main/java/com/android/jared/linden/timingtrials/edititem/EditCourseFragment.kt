@@ -30,6 +30,8 @@ class EditCourseFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
+        activity?.title = if(courseId == 0L) getString(R.string.add_course) else getString(R.string.edit_course)
+
         courseViewModel = getViewModel { injector.courseViewModel() }.apply { initialise(courseId) }
         val binding = DataBindingUtil.inflate<FragmentCourseBinding>(inflater, R.layout.fragment_course, container, false).apply {
             viewModel = courseViewModel

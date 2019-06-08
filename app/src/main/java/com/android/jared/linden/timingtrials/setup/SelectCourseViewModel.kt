@@ -4,6 +4,9 @@ import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.BR
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
+import org.threeten.bp.Instant
+import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.format.DateTimeFormatter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -42,13 +45,10 @@ class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCou
             ttSetup.timeTrial.value?.let { ttd->
                 val tt = ttd.timeTrialHeader
                 if(tt.ttName == ""){
+                    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                    val dateString = ZonedDateTime.now().format(formatter)
 
-                    //Todo: Use Threeten
-                    val f = SimpleDateFormat("dd/MM/yy")
-                    val c = Calendar.getInstance()
-                    val formatString = f.format(c.time)
-
-                    ttSetup.updateDefinition(tt.copy(ttName = course.courseName + " " + formatString, course = course))
+                    ttSetup.updateDefinition(tt.copy(ttName = course.courseName + " " + dateString, course = course))
 
                 }else if( oldCourseName != ""  && tt.ttName.contains(oldCourseName, false)){
 

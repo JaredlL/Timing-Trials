@@ -22,9 +22,10 @@
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@{courseVm.course.courseName}"
+            android:text="@{courseVm.course.courseName ?? @string/course_name}"
             tools:text="Course Name" />
 
         <TextView
@@ -34,7 +35,7 @@
             android:layout_centerInParent="true"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@{courseVm.convertedLengthString}"
+            android:text="@{courseVm.convertedLengthString ?? @string/distance}"
             tools:text="Length" />
 
         <TextView
@@ -46,7 +47,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:layout_marginRight="8dp"
-            android:text="@{courseVm.course.cttName}"
+            android:text="@{courseVm.course.cttName ?? @string/cttname}"
             tools:text="CTT Name" />
 
         <CheckBox

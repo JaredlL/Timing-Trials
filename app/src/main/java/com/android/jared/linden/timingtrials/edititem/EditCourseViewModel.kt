@@ -29,7 +29,8 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
 
     private fun updateLengthString(newLength: Double){
         if(newLength > 0){
-            mutableLengthString.value = BigDecimal((newLength * distances[selectedItemPosition].conversion )).setScale(3, RoundingMode.HALF_EVEN).toString()
+            //mutableLengthString.value = BigDecimal((newLength * distances[selectedItemPosition].conversion )).setScale(3, RoundingMode.HALF_EVEN).toString()
+            mutableLengthString.value = BigDecimal((newLength * distances[selectedItemPosition].conversion)).setScale(3, RoundingMode.HALF_EVEN).toString()
         }else{
             mutableLengthString.value = "0.000"
         }
@@ -47,17 +48,13 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
 
 
     var selectedItemPosition = 0
-    set(value){
-        val oldLength = mutableLengthString.value?.toDoubleOrNull()?.let { it / distances[selectedItemPosition].conversion}
-        field = value
-        oldLength?.let { updateLengthString(it) }
-    }
 
     fun initialise(courseId: Long){
         if(mutableCourse.value == null){
             mutableCourse.addSource(repository.getCourse(courseId)){result: Course ->
                 result.let {
                     mutableCourse.value = result
+                    updateLengthString(it.length)
                 }
             }
         }
@@ -73,11 +70,11 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
 
             mutableCourse.value?.let {
 
-                val len = mutableLengthString.value?.toDoubleOrNull()?.apply {
+                val len = mutableLengthString.value?.toDoubleOrNull()?.run {
                     this / distances[selectedItemPosition].conversion
                 }?:0.0
 
-                repository.insertOrUpdate(it)
+                repository.insertOrUpdate(it.copy(length = len))
             }
         }
     }

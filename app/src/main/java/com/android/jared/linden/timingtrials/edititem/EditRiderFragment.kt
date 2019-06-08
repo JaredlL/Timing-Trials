@@ -42,6 +42,8 @@ class EditRiderFragment : Fragment() {
             mAdapter.notifyDataSetChanged()
         })
 
+        activity?.title = if(riderId == 0L) getString(R.string.add_rider) else getString(R.string.edit_rider)
+
         val binding = DataBindingUtil.inflate<FragmentRiderBinding>(inflater, R.layout.fragment_rider, container, false).apply {
             viewModel = riderViewModel
             lifecycleOwner = (this@EditRiderFragment)
