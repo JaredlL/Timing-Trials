@@ -21,6 +21,14 @@ data class Rider(
         return RiderLight(firstName, lastName, club, dateOfBirth, gender, id)
     }
 
+    fun fullName(): String{
+        return "$firstName $lastName"
+    }
+
+    fun getCategoryStandard(): RiderCategoryStandard{
+        return RiderCategoryStandard(gender, OffsetDateTime.now().year - dateOfBirth.year )
+    }
+
     companion object {
 
         fun createBlank() = Rider("", "", "", OffsetDateTime.now().minusYears(20), Gender.UNKNOWN)

@@ -20,8 +20,8 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
 
     fun initialise(riderId: Long){
         if(mutableRider.value == null){
-            mutableRider.addSource(repository.getRider(riderId)){result: Rider ->
-                result.let {
+            mutableRider.addSource(repository.getRider(riderId)){result: Rider? ->
+                result?.let {
                     mutableRider.value = result
                 }
             }

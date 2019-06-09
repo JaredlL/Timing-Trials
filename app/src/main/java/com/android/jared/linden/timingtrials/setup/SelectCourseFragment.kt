@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.adapters.CourseListAdapter
 import com.android.jared.linden.timingtrials.data.Course
+import com.android.jared.linden.timingtrials.data.CourseLight
 import com.android.jared.linden.timingtrials.databinding.FragmentCourseListBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
@@ -39,7 +40,7 @@ class SelectCourseFragment : DialogFragment() {
 
 
 
-        val heading: CourseListViewWrapper = object: CourseListViewWrapper(Course("Course Name", 0.0, "CTT Name")){
+        val heading: CourseListViewWrapper = object: CourseListViewWrapper(CourseLight("Course Name", 0.0, "CTT Name")){
 
             override var convertedLengthString = "Distance"
         }
@@ -51,7 +52,7 @@ class SelectCourseFragment : DialogFragment() {
             courseRecyclerView.adapter = adapter
             courseRecyclerView.layoutManager = viewManager
             courseListFab.setOnClickListener {
-                editCourse(Course.createBlank())
+                editCourse(Course.createBlank().toCourseLight())
             }
         }
 
@@ -80,7 +81,7 @@ class SelectCourseFragment : DialogFragment() {
         return dialog
     }
 
-    private fun editCourse(course: Course){
+    private fun editCourse(course: CourseLight){
         val intent = Intent(context, EditItemActivity::class.java).apply {
             putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
             putExtra(ITEM_ID_EXTRA, course.id)

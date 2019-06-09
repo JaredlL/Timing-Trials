@@ -40,7 +40,7 @@ class TestViewModel@Inject constructor(
                                 startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(5), ZoneId.systemDefault()),
                                 firstRiderStartOffset = 0,
                                 interval = 2,
-                                course = courses[2],
+                                course = courses[2].toCourseLight(),
                                 laps = 2,
                                 status = TimeTrialStatus.IN_PROGRESS))
 
@@ -68,7 +68,7 @@ class TestViewModel@Inject constructor(
                                 startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
                                 firstRiderStartOffset = 0,
                                 interval = 2,
-                                course = courses[2],
+                                course = courses[2].toCourseLight(),
                                 laps = 2,
                                 status = TimeTrialStatus.SETTING_UP))
                 val newTt = timeTrial.helper.addRidersAsTimeTrialRiders(rList)
@@ -97,7 +97,7 @@ class TestViewModel@Inject constructor(
                                 startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
                                 firstRiderStartOffset = 0,
                                 interval = 2,
-                                course = courses[2],
+                                course = courses[2].toCourseLight(),
                                 laps = 3,
                                 status = TimeTrialStatus.FINISHED))
 

@@ -8,7 +8,7 @@ import org.threeten.bp.temporal.ChronoUnit
 
 @Entity(tableName = "timetrial_table", indices = [Index("id")])
 data class TimeTrialHeader(val ttName: String,
-                           val course: Course? = null,
+                           val course: CourseLight? = null,
                            val laps: Int = 1,
                            val interval:Int = 60,
                            val startTime: OffsetDateTime,

@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
-import com.android.jared.linden.timingtrials.ui.ResultViewWrapper
 import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
@@ -35,16 +34,38 @@ class ResultActivity : AppCompatActivity() {
 
         val adapter = ResultListAdapter(this)
 
-        resultViewModel.timeTrial.observe(this, Observer {res->
-            res?.let {tt->
-                val newRes = tt.helper.results.asSequence().map { res -> ResultViewWrapper(res) }.sortedBy { it.result.totalTime }.toList()
+//        resultViewModel.timeTrial.observe(this, Observer {res->
+//            res?.let {tt->
+//                val newRes = tt.helper.results.asSequence().map { res -> ResultViewWrapper(res) }.sortedBy { it.result.totalTime }.toList()
+//                if(newRes.isNotEmpty()){
+//                    val rowLength = newRes.first().resultsRow.size
+//
+//                    viewManager.spanCount = rowLength + 2
+//                    viewManager.spanSizeLookup = (object : GridLayoutManager.SpanSizeLookup(){
+//                        override fun getSpanSize(position: Int): Int {
+//                           return if (position.rem(rowLength) == 0 || position.rem(rowLength) == 2) {
+//                                2
+//                            }else {
+//                                1
+//                            }
+//
+//                        }
+//                    })
+//                    adapter.setResults(newRes)
+//                }
+//
+//            }
+//        })
+
+        resultViewModel.results.observe(this, Observer {res->
+            res?.let {newRes->
                 if(newRes.isNotEmpty()){
-                    val rowLength = newRes.first().resultsRow.size
+                    val rowLength = newRes.first().row.size
 
                     viewManager.spanCount = rowLength + 2
                     viewManager.spanSizeLookup = (object : GridLayoutManager.SpanSizeLookup(){
                         override fun getSpanSize(position: Int): Int {
-                           return if (position.rem(rowLength) == 0 || position.rem(rowLength) == 2) {
+                            return if (position.rem(rowLength) == 0 || position.rem(rowLength) == 2) {
                                 2
                             }else {
                                 1
@@ -72,23 +93,23 @@ class ResultActivity : AppCompatActivity() {
 
 
 
-class SpacesItemDecoration(private val space: Int) : RecyclerView.ItemDecoration() {
-
-   override fun getItemOffsets(outRect: Rect, view: View,
-                       parent: RecyclerView, state: RecyclerView.State) {
-        //outRect.left = space
-        //outRect.right = space
-        outRect.bottom = space
-        view.background = ColorDrawable(Color.BLACK)
-
-        // Add top margin only for the first item to avoid double space between items
-//        if (parent.getChildLayoutPosition(view) == 0) {
-//          //  outRect.top = space
-//        } else {
-//          //  outRect.top = 0
-//        }
-    }
-}
+//class SpacesItemDecoration(private val space: Int) : RecyclerView.ItemDecoration() {
+//
+//   override fun getItemOffsets(outRect: Rect, view: View,
+//                       parent: RecyclerView, state: RecyclerView.State) {
+//        //outRect.left = space
+//        //outRect.right = space
+//        outRect.bottom = space
+//        view.background = ColorDrawable(Color.BLACK)
+//
+//        // Add top margin only for the first item to avoid double space between items
+////        if (parent.getChildLayoutPosition(view) == 0) {
+////          //  outRect.top = space
+////        } else {
+////          //  outRect.top = 0
+////        }
+//    }
+//}
 
 class DividerItemDecoration(context: Context, orientation: Int) : RecyclerView.ItemDecoration() {
 

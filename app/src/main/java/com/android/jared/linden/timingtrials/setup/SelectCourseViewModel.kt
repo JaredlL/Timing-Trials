@@ -3,6 +3,7 @@ package com.android.jared.linden.timingtrials.setup
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.BR
+import com.android.jared.linden.timingtrials.data.CourseLight
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
 import org.threeten.bp.Instant
 import org.threeten.bp.ZonedDateTime
@@ -23,10 +24,10 @@ class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCou
     //private val timeTrialDef = Transformations.map(ttSetup.setupTimeTrial){it.timeTrialHeader}
     //private val selectedCourse = ttSetup.setupTimeTrial.value?.timeTrialHeader?.course
 
-    private fun selectedCourse(): Course? { return ttSetup.timeTrial.value?.timeTrialHeader?.course }
+    private fun selectedCourse(): CourseLight? { return ttSetup.timeTrial.value?.timeTrialHeader?.course }
 
     private val mCourseWrapperList: LiveData<List<CourseListViewWrapper>>
-            = Transformations.map(ttSetup.courseRepository.allCourses){ list -> list.map {course -> CourseListViewWrapper(course).apply {
+            = Transformations.map(ttSetup.courseRepository.allCoursesLight){ list -> list.map {course -> CourseListViewWrapper(course).apply {
         getSelected = {c -> selectedCourse()?.id == c.id}
         onSet = ::onCourseSelected
     } }}
@@ -36,7 +37,7 @@ class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCou
 
     override fun getAllCourses(): LiveData<List<CourseListViewWrapper>> = mCourseWrapperList
 
-    private fun onCourseSelected(course: Course) {
+    private fun onCourseSelected(course: CourseLight) {
 
         if(selectedCourse()?.id != course.id){
 

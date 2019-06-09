@@ -28,4 +28,6 @@ interface RiderDao {
     @Query("SELECT DISTINCT club from rider_table") fun getAllClubs(): LiveData<List<String>>
 
     @Query("SELECT * FROM rider_table WHERE Id = :riderId LIMIT 1") fun getRiderById(riderId: Long): LiveData<Rider>
+
+    @Query("SELECT * FROM rider_table WHERE Id IN (:ids)") suspend fun getRidersByIds(ids: List<Long>): List<Rider>
 }

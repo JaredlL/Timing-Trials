@@ -4,15 +4,18 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.jared.linden.timingtrials.data.Course
+import com.android.jared.linden.timingtrials.data.CourseLight
 import com.android.jared.linden.timingtrials.data.source.CourseDao
 import javax.inject.Inject
 import javax.inject.Singleton
 
 interface ICourseRepository {
 
-    val allCourses: LiveData<List<Course>>
+    val allCoursesLight: LiveData<List<CourseLight>>
 
     suspend fun getAllCoursesSuspend(): List<Course>
+
+    suspend fun getCourseSuspend(courseId: Long): Course
 
     fun getCourse(courseId: Long) : LiveData<Course>
 
@@ -40,13 +43,17 @@ class RoomCourseRepository @Inject constructor(private val courseDao: CourseDao)
 
     // Room executes all queries on a separate thread.
     // Observed LiveData will notify the observer when the data has changed.
-    override val allCourses: LiveData<List<Course>> = courseDao.getAllCourses()
+    override val allCoursesLight: LiveData<List<CourseLight>> = courseDao.getAllCoursesLight()
 
     override fun getCourse(courseId: Long) : LiveData<Course> {
         return when(courseId){
             0L ->  MutableLiveData<Course>(Course.createBlank())
             else ->  courseDao.getCourseById(courseId)
         }
+    }
+
+    override suspend fun getCourseSuspend(courseId: Long): Course {
+        return courseDao.getCourseSuspend(courseId)
     }
 
     override suspend fun getAllCoursesSuspend(): List<Course> {

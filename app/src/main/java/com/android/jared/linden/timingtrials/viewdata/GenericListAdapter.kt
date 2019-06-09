@@ -17,8 +17,6 @@ class GenericListAdapter<T> internal constructor(val context: Context, val vhFac
 
     var mData: List<T> = listOf()
     val layoutInflater = LayoutInflater.from(context)
-    var itemLongPress: ((data:Long) -> Unit) = {}
-    //var selectable: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder<T> {
         return vhFact.createViewHolder(layoutInflater, parent)
@@ -31,7 +29,6 @@ class GenericListAdapter<T> internal constructor(val context: Context, val vhFac
             with(holder){
                 itemView.tag = data
                 bind(data)
-                this.onLongPress = {id -> itemLongPress.invoke(id)}
             }
         }
     }
@@ -46,7 +43,6 @@ class GenericListAdapter<T> internal constructor(val context: Context, val vhFac
 }
 
 abstract class BaseHolder<T>(binding: ViewDataBinding): RecyclerView.ViewHolder(binding.root){
-    var onLongPress: (id:Long) -> Unit ={}
     abstract fun bind(data: T)
 }
 

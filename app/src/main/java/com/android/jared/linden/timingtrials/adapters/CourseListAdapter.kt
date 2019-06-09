@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.Course
+import com.android.jared.linden.timingtrials.data.CourseLight
 import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
 
@@ -16,7 +17,7 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
     inner class CourseViewHolder(binding: ListItemCourseBinding): RecyclerView.ViewHolder(binding.root) {
         private val _binding = binding
 
-        var longPress = {(course): Course -> Unit}
+        var longPress = {(course): CourseLight -> Unit}
 
         fun bind(courseWrapper: CourseListViewWrapper){
 
@@ -34,7 +35,7 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
 
     var mCourses: List<CourseListViewWrapper> = listOf()
     val layoutInflater = LayoutInflater.from(context)
-    var editCourse = {(course):Course -> Unit}
+    var editCourse = {(course):CourseLight -> Unit}
 
 
     override fun onBindViewHolder(holder: CourseViewHolder, position: Int) {

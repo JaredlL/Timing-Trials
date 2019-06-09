@@ -4,18 +4,19 @@ import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
 import com.android.jared.linden.timingtrials.BR
 import com.android.jared.linden.timingtrials.data.Course
+import com.android.jared.linden.timingtrials.data.CourseLight
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-open class CourseListViewWrapper(var course: Course) : BaseObservable(){
+open class CourseListViewWrapper(var course: CourseLight) : BaseObservable(){
 
     var sel:Boolean = false
 
 
-    var getSelected: (Course) -> Boolean = { _ -> false}
+    var getSelected: (CourseLight) -> Boolean = { _ -> false}
 
-    var onSet = {(course): Course -> Unit}
+    var onSet = {(course): CourseLight -> Unit}
 
     @Bindable
     fun getCourseIsSelected(): Boolean {

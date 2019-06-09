@@ -68,8 +68,6 @@ class GenericListFragment : Fragment() {
             }
         }
 
-        adapter.itemLongPress = { itemId -> editItem(itemId)}
-
         viewManager = LinearLayoutManager(context)
 
         val binding = DataBindingUtil.inflate<FragmentListGenericBinding>(inflater, R.layout.fragment_list_generic, container, false).apply{
@@ -84,13 +82,6 @@ class GenericListFragment : Fragment() {
     }
 
 
-    private fun editItem(itemId: Long){
-        val intent = Intent(context, EditItemActivity::class.java).apply {
-            putExtra(ITEM_ID_EXTRA, itemId)
-            putExtra(ITEM_TYPE_EXTRA, itemType)
-        }
-        startActivity(intent)
-    }
 
 
     companion object {

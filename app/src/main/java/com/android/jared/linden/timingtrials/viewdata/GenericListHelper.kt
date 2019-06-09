@@ -15,6 +15,7 @@ import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemTimetrialBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
+import com.android.jared.linden.timingtrials.result.ResultActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
 import com.android.jared.linden.timingtrials.util.ITEM_COURSE
 import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
@@ -31,7 +32,12 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<RiderLig
 
         _binding.apply{
             rider = data
-            riderLayout.setOnLongClickListener { onLongPress(data.id?:0L)
+            riderLayout.setOnLongClickListener {
+                val intent = Intent(root.context, EditItemActivity::class.java).apply {
+                    putExtra(ITEM_ID_EXTRA, data.id)
+                    putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
+                }
+                root.context.startActivity(intent)
                 true
             }
 
@@ -76,7 +82,12 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Co
         _binding.apply{
             courseVm = data
             checkBox.visibility = View.GONE
-            courseLayout.setOnLongClickListener { onLongPress(data.course.id?:0L)
+            courseLayout.setOnLongClickListener {
+                val intent = Intent(root.context, EditItemActivity::class.java).apply {
+                    putExtra(ITEM_ID_EXTRA, data.course.id)
+                    putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
+                }
+                root.context.startActivity(intent)
                 true
             }
 
@@ -126,7 +137,15 @@ class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHol
     override fun bind(data: TimeTrialHeader){
         _binding.apply{
             viewModel = data
+            timetrialLayout.setOnLongClickListener {
+                val intent = Intent(this.root.context, ResultActivity::class.java).apply {
+                    putExtra(ITEM_ID_EXTRA, data.id)
+                }
+                this.root.context.startActivity(intent)
+                return@setOnLongClickListener true
+            }
             executePendingBindings()
+
         }
     }
 }
