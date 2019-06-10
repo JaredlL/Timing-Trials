@@ -48,10 +48,12 @@ class SetupTimeTrialFragment : Fragment() {
 
         }
 
-        propsViewModel.timeTrialHeader.observe(viewLifecycleOwner, Observer {
-           if(it.ttName == "" && it.course == null){
-               showCourseFrag()
-           }
+        propsViewModel.timeTrialHeader.observe(viewLifecycleOwner, Observer {tt->
+          tt?.let {
+              if (it.ttName == "" && it.course == null) {
+                  showCourseFrag()
+              }
+          }
         })
 
         return binding.root

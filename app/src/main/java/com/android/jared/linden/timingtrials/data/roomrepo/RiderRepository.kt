@@ -3,6 +3,7 @@ package com.android.jared.linden.timingtrials.data.roomrepo
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.android.jared.linden.timingtrials.data.Gender
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.RiderLight
 import com.android.jared.linden.timingtrials.data.source.RiderDao
@@ -80,7 +81,7 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
 
     override fun getRider(riderId: Long) : LiveData<Rider> {
         return when(riderId){
-            0L ->  MutableLiveData<Rider>(Rider.createBlank())
+            0L ->  MutableLiveData<Rider>(Rider.createBlank().copy(gender = Gender.MALE))
             else ->  riderDao.getRiderById(riderId)
         }
     }

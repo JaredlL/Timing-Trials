@@ -3,6 +3,7 @@
     package="com.android.jared.linden.timingtrials">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:name=".TimingTrialsApplication"
@@ -25,6 +26,7 @@
         </activity>
         <activity
             android:name=".setup.SetupActivity"
+            android:windowSoftInputMode="adjustPan"
             android:label="@string/title_activity_setup"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

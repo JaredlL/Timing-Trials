@@ -49,4 +49,6 @@
     <string name="gender">Gender</string>
     <string name="dob">DoB</string>
     <string name="yob">Year of birth</string>
+    <string name="rider_start_offset">First rider start offset</string>
+    <string name="delete">Delete</string>
 </resources>

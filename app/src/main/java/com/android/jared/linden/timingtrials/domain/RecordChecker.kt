@@ -10,22 +10,24 @@ import com.android.jared.linden.timingtrials.data.roomrepo.RoomCourseRepository
 
 class RecordChecker(val timeTrial: TimeTrial,val riderRepository: IRiderRepository, val courseRepository: ICourseRepository) {
 
-    val notesMap: Map<Long, MutableLiveData<String>> = timeTrial.riderList.asSequence().mapNotNull { it.id }.associate { r -> Pair(r, MutableLiveData<String>() ) }
+    val notesMap: Map<Long, MutableLiveData<String>> = timeTrial.riderList.asSequence().mapNotNull { it.rider.id }.associate { r -> Pair(r, MutableLiveData<String>() ) }
 
     val ridersToUpdate = mutableListOf<Rider>()
+    var courseToUpdate: Course? = null
 
     suspend fun checkRecords(){
         val courseId = timeTrial.timeTrialHeader.course?.id
-       if(courseId != null){
+        val results = timeTrial.helper.results
+       if(courseId != null && results.isNotEmpty()){
 
            val course = courseRepository.getCourseSuspend(courseId)
+           val idList = timeTrial.riderList.mapNotNull { it.rider.id }
            val riderList = riderRepository.ridersFromIds(timeTrial.riderList.mapNotNull { it.rider.id })
-           val results = timeTrial.helper.results
-
-           var updatingCourseRecords = course.courseRecords.toMutableList()
+           //val results = timeTrial.helper.results
+           val updatingCourseRecords = course.courseRecords.toMutableList()
 
            riderList.forEach { rider ->
-               val result = results.first { it.timeTrialRider.id == rider.id }
+               val result = results.first { it.timeTrialRider.rider.id == rider.id }
                val pb = rider.personalBests.firstOrNull{it.courseId == course.id}
                var note = ""
                if (pb != null) {
@@ -41,26 +43,35 @@ class RecordChecker(val timeTrial: TimeTrial,val riderRepository: IRiderReposito
                    ridersToUpdate.add(rider.copy(personalBests = newPbs))
                }
 
-
-               val courseRecord = updatingCourseRecords.sortedByDescending { it.timeMillis }.firstOrNull()
-               val genderRecord = if(rider.gender == Gender.MALE || rider.gender == Gender.FEMALE) updatingCourseRecords.filter { it.category.gender == rider.gender }.sortedByDescending { it.timeMillis }.firstOrNull() else null
-               val categoryRecord = updatingCourseRecords.firstOrNull { it.category.categoryId() == rider.getCategoryStandard().categoryId() }
-
-               if(courseRecord == null || courseRecord.timeMillis > result.totalTime){
-                   updatingCourseRecords.r
-                   updatingCourseRecords.add(CourseRecord(rider.id, rider.fullName(), timeTrial.timeTrialHeader.id, rider.club, rider.getCategoryStandard(), result.totalTime, timeTrial.timeTrialHeader.startTime))
-
-               }else if (genderRecord == null || genderRecord.timeMillis > result.totalTime){
-
-                   updatingCourseRecords.add(CourseRecord(rider.id, rider.fullName(), timeTrial.timeTrialHeader.id, rider.club, rider.getCategoryStandard(), result.totalTime, timeTrial.timeTrialHeader.startTime))
-
-               }else if(categoryRecord == null || categoryRecord.timeMillis > result.totalTime){
+               val helper = CourseRecordHelper(updatingCourseRecords)
+               val rt = helper.getRecordType(result)
+               when(rt){
+                   RecordType.ABSOLUTE -> note = "Course Record!"
+                   RecordType.GENDER -> note = "${rider.gender.fullString()} CR!"
+                   RecordType.CATEGORY -> note = "${rider.getCategoryStandard().categoryId()} CR"
+               }
+               if(rt!= RecordType.NONE){
+                   val index = updatingCourseRecords.indexOfFirst{cr -> cr.category.categoryId() != rider.getCategoryStandard().categoryId()}
+                   if(index >= 0){
+                       updatingCourseRecords.removeAt(index)
+                   }
 
                    updatingCourseRecords.add(CourseRecord(rider.id, rider.fullName(), timeTrial.timeTrialHeader.id, rider.club, rider.getCategoryStandard(), result.totalTime, timeTrial.timeTrialHeader.startTime))
-
+               }
+               if(note != ""){
+                   notesMap[rider.id]?.postValue(note)
                }
            }
-
+           results.forEach {result->
+               val helper = CourseRecordHelper(updatingCourseRecords)
+               val rt = helper.getRecordType(result)
+               when(rt){
+                   //RecordType.ABSOLUTE -> note = "Course Record!"
+                  // RecordType.GENDER -> note = "${result.timeTrialRider.rider.gender.fullString()} CR!"
+                  // RecordType.CATEGORY -> note = "${result.timeTrialRider.rider.getCategoryStandard().categoryId()} CR"
+               }
+           }
+           courseToUpdate = course.copy(courseRecords = updatingCourseRecords)
        }
 
     }

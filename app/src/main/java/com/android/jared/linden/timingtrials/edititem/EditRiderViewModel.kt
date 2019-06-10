@@ -31,7 +31,7 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
 
     val genders = Gender.values().map { it.fullString() }
 
-    val selectedGenderPosition = MutableLiveData(1).createLink(
+    val selectedGenderPosition = MutableLiveData(2).createLink(
             mutableRider,
             {new -> mutableRider.value?.let { Pair(Gender.values().indexOf(it.gender), it.copy(gender = Gender.values()[new])) }},
             {Gender.values().indexOf(mutableRider.value?.gender?:Gender.UNKNOWN)}
@@ -97,9 +97,13 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
 
     fun addOrUpdate(){
         viewModelScope.launch(Dispatchers.IO) {
-
-
             mutableRider.value?.let { repository.insertOrUpdate(it) }
+        }
+    }
+
+    fun delete(){
+        viewModelScope.launch(Dispatchers.IO) {
+            mutableRider.value?.let { repository.delete(it) }
         }
     }
 

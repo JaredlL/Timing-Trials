@@ -3,6 +3,7 @@ package com.android.jared.linden.timingtrials.setup
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.util.ConverterUtils
+import com.android.jared.linden.timingtrials.util.createLink
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 
@@ -16,6 +17,8 @@ interface ITimeTrialPropertiesViewModel{
     val startTime: MutableLiveData<OffsetDateTime>
     val laps: MutableLiveData<String>
     val interval: MutableLiveData<String>
+    val firstRiderOffset: MutableLiveData<String>
+    val offsetDescription: LiveData<String>
     val availableLaps: List<String>
     var selectedLapsPosition: Int
     var onBeginTt: () -> Unit
@@ -27,7 +30,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
 
    override val timeTrialHeader = Transformations.map(ttSetup.timeTrial){it.timeTrialHeader}
 
-    //private val timeTrialValue = ttSetup.setupTimeTrial.value?.timeTrialHeader
+    //private val timeTrialValue = ttSetup.setupTimeTrial.value.timeTrialHeader
 
     override val courseName: LiveData<String> = Transformations.map(ttSetup.timeTrial){tt->
         tt?.let{
@@ -51,6 +54,35 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
                     ttSetup.updateDefinition(it.copy(ttName = newName))
                 }
             }
+        }
+    }.also { it.observeForever {  } }
+
+
+    override val offsetDescription: LiveData<String> = Transformations.map(ttSetup.timeTrial){tt->
+        tt?.timeTrialHeader?.let {
+           val tString = ConverterUtils.instantToSecondsDisplayString(it.startTime.toInstant().plusSeconds(it.firstRiderStartOffset.toLong()))
+            "(ie first rider starts at $tString)"
+        }
+    }
+
+
+    override val firstRiderOffset = MutableLiveData<String>()
+    private val firstRiderOffsetMediator = MediatorLiveData<String>().apply {
+        addSource(ttSetup.timeTrial) { tt->
+            tt?.let {
+                if (firstRiderOffset.value != it.timeTrialHeader.firstRiderStartOffset.toString()) {
+                    firstRiderOffset.value = it.timeTrialHeader.firstRiderStartOffset.toString()
+                }
+            }
+
+        }
+        addSource(firstRiderOffset) {os->
+            os.toIntOrNull()?.let{newos ->
+                timeTrialHeader.value?.let { tt->
+                    if(tt.firstRiderStartOffset != newos) {
+                        ttSetup.updateDefinition(tt.copy(firstRiderStartOffset = newos))
+                    }
+                }}
         }
     }.also { it.observeForever {  } }
 

@@ -49,6 +49,8 @@ class TestViewModel@Inject constructor(
                 val newTt = timeTrial.helper.addRidersAsTimeTrialRiders(rList.filterIndexed { index, _ -> index%10 == 0 })
 
                 timeTrialRepository.insert(newTt)
+            }else{
+                timeTrialRepository.update(exist.copy(timeTrialHeader = exist.timeTrialHeader.copy(status = TimeTrialStatus.IN_PROGRESS)))
             }
 
 
@@ -106,6 +108,8 @@ class TestViewModel@Inject constructor(
                 val withEvents = addFakeEvents(newTt)
                 val i = timeTrialRepository.insert(withEvents)
                 newId.postValue(i)
+            }else{
+                newId.postValue(exist.timeTrialHeader.id)
             }
 
 

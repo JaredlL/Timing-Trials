@@ -12,7 +12,7 @@ import com.android.jared.linden.timingtrials.databinding.ListItemResultBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderStatusBinding
 import com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper
 
-class ResultListAdapter internal constructor(val context: Context): RecyclerView.Adapter<ResultListAdapter.ResultViewHolder>(){
+class ResultListAdapter internal constructor(val activity: ResultActivity): RecyclerView.Adapter<ResultListAdapter.ResultViewHolder>(){
 
 
     inner class ResultViewHolder(binding: ListItemResultBinding): RecyclerView.ViewHolder(binding.root){
@@ -20,6 +20,7 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
 
         fun bind(result: ResultCell, position: Int){
             _binding.apply {
+                lifecycleOwner = activity
                 viewModel = result
 
                 if(position.rem(rowLength) == 0 || position < rowLength){
@@ -57,7 +58,7 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
 
     private var mResults: List<ResultCell> = listOf()
     private var rowLength = 0
-    val layoutInflater = LayoutInflater.from(context)
+    val layoutInflater = LayoutInflater.from(activity)
 
     fun setResults(newResults: List<ResultRowViewModel>){
 

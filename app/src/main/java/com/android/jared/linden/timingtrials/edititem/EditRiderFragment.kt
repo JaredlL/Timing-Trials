@@ -57,6 +57,10 @@ class EditRiderFragment : Fragment() {
                 }
 
             }
+            deleteButton.setOnClickListener {
+                riderViewModel.delete()
+                activity?.finish()
+            }
 
         }
 

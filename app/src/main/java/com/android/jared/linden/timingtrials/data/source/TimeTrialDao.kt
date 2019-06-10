@@ -54,7 +54,12 @@ abstract class TimeTrialDao {
 
     @Delete
     fun delete(timeTrial: TimeTrial){
-        delete(timeTrial.timeTrialHeader)
+        timeTrial.timeTrialHeader.id?.let {
+            _deleteTtEvents(it)
+            _deleteTtRiders(it)
+            delete(timeTrial.timeTrialHeader)
+        }
+
     }
 
     @Query("DELETE FROM timetrial_table") abstract fun deleteAll()

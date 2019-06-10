@@ -41,7 +41,6 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                 val timing = res?.firstOrNull()
                 if (res?.size?:0 > 1) throw Exception("Multiple non finished TTs in DB")
                     if(timing != null && timeTrial.value != timing) {
-                        showMessage("Loaded ${timing.timeTrialHeader.ttName}")
                         currentTt = timing
                         timeTrial.value = timing
                         currentTimeLine = TimeLine(timing, Instant.now().toEpochMilli() - timing.timeTrialHeader.startTime.toInstant().toEpochMilli())
@@ -100,7 +99,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     var queue = ConcurrentLinkedQueue<TimeTrial>()
     var isCorotineAlive = AtomicBoolean()
 
-    fun updateTimeTrial(newtt: TimeTrial){
+    private fun updateTimeTrial(newtt: TimeTrial){
         //timeTrial.value = newtt
             if(!isCorotineAlive.get()){
                 queue.add(newtt)
@@ -194,17 +193,29 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     fun discardTt(){
         //timer.cancel()
         viewModelScope.launch(Dispatchers.IO) {
-            timeTrial.value?.let {
-                timeTrialRepository.delete(it)
+            while (!isCorotineAlive.get()){
+                timeTrial.value?.let {
+                    timeTrialRepository.delete(it)
+                }
+                delay(20L)
             }
+
         }
     }
 
-    @ExperimentalCoroutinesApi
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.cancel()
+    fun backToSetup(){
+        currentTt?.let {
+            val headerCopy = it.timeTrialHeader.copy(status = TimeTrialStatus.SETTING_UP)
+            updateTimeTrial(it.copy(timeTrialHeader = headerCopy, eventList = listOf()))
+        }
+
     }
+
+//    @ExperimentalCoroutinesApi
+//    override fun onCleared() {
+//        super.onCleared()
+//        viewModelScope.cancel()
+//    }
 
 
 

@@ -8,23 +8,33 @@ import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import kotlinx.android.synthetic.main.result_activity.*
+import kotlinx.android.synthetic.main.activity_result.*
 import androidx.recyclerview.widget.RecyclerView
 import android.graphics.Rect
-import android.view.View
 import android.graphics.drawable.Drawable
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
+import android.os.Environment
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
+import android.content.Intent
+import android.net.Uri
+import android.view.View
 
 
 class ResultActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.android.jared.linden.timingtrials.R.layout.result_activity)
+        setContentView(com.android.jared.linden.timingtrials.R.layout.activity_result)
+
+//        viewResultsButton.setOnClickListener {
+//            val v = resultRecyclerView
+//            takeScreenShot(v)
+//        }
 
         val timeTrialId by argument<Long>(ITEM_ID_EXTRA)
         val resultViewModel = getViewModel { injector.resultViewModel() }.apply { initialise(timeTrialId) }
@@ -34,28 +44,6 @@ class ResultActivity : AppCompatActivity() {
 
         val adapter = ResultListAdapter(this)
 
-//        resultViewModel.timeTrial.observe(this, Observer {res->
-//            res?.let {tt->
-//                val newRes = tt.helper.results.asSequence().map { res -> ResultViewWrapper(res) }.sortedBy { it.result.totalTime }.toList()
-//                if(newRes.isNotEmpty()){
-//                    val rowLength = newRes.first().resultsRow.size
-//
-//                    viewManager.spanCount = rowLength + 2
-//                    viewManager.spanSizeLookup = (object : GridLayoutManager.SpanSizeLookup(){
-//                        override fun getSpanSize(position: Int): Int {
-//                           return if (position.rem(rowLength) == 0 || position.rem(rowLength) == 2) {
-//                                2
-//                            }else {
-//                                1
-//                            }
-//
-//                        }
-//                    })
-//                    adapter.setResults(newRes)
-//                }
-//
-//            }
-//        })
 
         resultViewModel.results.observe(this, Observer {res->
             res?.let {newRes->
@@ -86,8 +74,43 @@ class ResultActivity : AppCompatActivity() {
 
         }
 
+    fun takeScreenShot(view: View){
+        try {
+            val now = Date()
+            android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
+            // image naming and path  to include sd card  appending name you choose for file
+            val mPath = getApplicationInfo().dataDir + "/" + now + ".jpg";
 
+            // create bitmap screen capture
+            //val v1 = getWindow().getDecorView().getRootView()
 
+            val bitmap = Bitmap.createBitmap(view.getWidth(),
+                    view.getHeight(), Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            view.draw(canvas)
+
+            val imageFile = File(mPath);
+
+            val outputStream = FileOutputStream(imageFile)
+            val quality = 100
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+            outputStream.flush()
+            outputStream.close()
+
+            openScreenshot(imageFile);
+        } catch (e:Throwable) {
+            // Several error may come out with file handling or DOM
+            e.printStackTrace();
+        }
+    }
+
+    private fun openScreenshot(imageFile: File) {
+        val intent = Intent()
+        intent.action = Intent.ACTION_VIEW
+        val uri = Uri.fromFile(imageFile)
+        intent.setDataAndType(uri, "image/*")
+        startActivity(intent)
+    }
 
     }
 

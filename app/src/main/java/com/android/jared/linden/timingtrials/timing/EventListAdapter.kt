@@ -1,6 +1,8 @@
 package com.android.jared.linden.timingtrials.timing
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -30,6 +32,15 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
         fun bind(eventWrapper: EventViewWrapper){
             _binding.apply {
                 event = eventWrapper
+
+                if(eventWrapper.event.eventType == TimelineEventType.RIDER_PASSED){
+                    text1.setTextColor(Color.BLUE)
+                }
+                else if(eventWrapper.event.eventType == TimelineEventType.RIDER_FINISHED){
+                    text1.setTextColor(Color.MAGENTA)
+                }else{
+                    text1.setTextColor(Color.BLACK)
+                }
                 executePendingBindings()
             }
 

@@ -16,11 +16,23 @@ enum class RecordType{
 class CourseRecordHelper(val courseRecords: List<CourseRecord>){
 
 
-    fun getRecordType(result: TimeTrialResult){
+    fun getRecordType(result: TimeTrialResult): RecordType{
         val rider = result.timeTrialRider.rider
         val courseRecord = courseRecords.sortedByDescending { it.timeMillis }.firstOrNull()
+        if(courseRecord == null || courseRecord.timeMillis > result.totalTime){
+            return RecordType.ABSOLUTE
+        }
+
         val genderRecord = if(rider.gender == Gender.MALE || rider.gender == Gender.FEMALE) courseRecords.filter { it.category.gender == rider.gender }.sortedByDescending { it.timeMillis }.firstOrNull() else null
+        if (genderRecord == null || genderRecord.timeMillis > result.totalTime){
+            return RecordType.GENDER
+        }
+
         val categoryRecord = courseRecords.firstOrNull { it.category.categoryId() == rider.getCategoryStandard().categoryId() }
+        if(categoryRecord == null || categoryRecord.timeMillis > result.totalTime){
+            return RecordType.CATEGORY
+        }
+        return RecordType.NONE
     }
 
 }
