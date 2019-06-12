@@ -21,11 +21,11 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
     val results = Transformations.map(timeTrial){tt->
         if(tt != null && tt.timeTrialHeader.status == TimeTrialStatus.FINISHED) {
 
-//            val checker = RecordChecker(tt, riderRepository, courseRepository)
-//            viewModelScope.launch(Dispatchers.IO) {
-//                checker.checkRecords()
-//            }
-            (sequenceOf(getHeading(tt)) + tt.helper.results.asSequence().sortedBy { it.totalTime }.map { res-> ResultRowViewModel(res) }).toList()
+            val checker = RecordChecker(tt, riderRepository, courseRepository)
+            viewModelScope.launch(Dispatchers.IO) {
+                checker.checkRecords()
+            }
+            (sequenceOf(getHeading(tt)) + tt.helper.results.asSequence().sortedBy { it.totalTime }.map { res-> ResultRowViewModel(res, checker) }).toList()
         }else{
             null
         }
@@ -53,7 +53,7 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
         tt.helper.results.firstOrNull()?.let {
             if(it.splits.size > 1) it.splits.forEachIndexed{ index, _ -> if(index - 1 <it.splits.size) mutList.add("Split ${index + 1}") }
         }
-       // mutList.add("Notes")
+        mutList.add("Notes")
         return ResultRowViewModel(mutList)
     }
 
@@ -66,7 +66,7 @@ class ResultRowViewModel{
         strings.forEach { row.add(ResultCell(MutableLiveData(it))) }
     }
 
-    constructor(result: TimeTrialResult)
+    constructor(result: TimeTrialResult, checker: RecordChecker)
      {
         row.add(ResultCell(MutableLiveData("${result.timeTrialRider.rider.firstName} ${result.timeTrialRider.rider.lastName}")))
         row.add(ResultCell(MutableLiveData(result.category.categoryId())))
@@ -76,7 +76,7 @@ class ResultRowViewModel{
         if(result.splits.size > 1){
             row.addAll(result.splits.map { ResultCell(MutableLiveData(ConverterUtils.toTenthsDisplayString(it))) })
         }
-        // row.add(ResultCell(checker.notesMap[result.timeTrialRider.rider.id]?:MutableLiveData("Was Null")))
+        row.add(ResultCell(checker.notesMap[result.timeTrialRider.rider.id]?:MutableLiveData("Was Null")))
 
     }
 }
