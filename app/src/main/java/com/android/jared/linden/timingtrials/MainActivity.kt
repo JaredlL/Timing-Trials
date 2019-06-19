@@ -97,6 +97,20 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        testResult2.setOnClickListener {
+            val tvm = getViewModel { injector.testViewModel() }
+            tvm.insertFinishedTt2()
+            tvm.newId.observe(this, Observer {res->
+                res?.let {
+                    val mIntent = Intent(this@MainActivity, ResultActivity::class.java)
+                    mIntent.putExtra(ITEM_ID_EXTRA, it)
+                    startActivity(mIntent)
+                    tvm.newId.removeObservers(this)
+                }
+
+            })
+        }
+
         createFinishedButton.setOnClickListener {
             val tvm = getViewModel { injector.testViewModel() }
             tvm.insertFinishedTt()

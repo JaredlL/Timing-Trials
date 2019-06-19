@@ -29,7 +29,7 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
                         TimingTrialsDatabase::class.java,
                         "timingtrials_database")
                         .fallbackToDestructiveMigration()
-                        //.addCallback(TimingTrialsDatabaseCallback(scope))
+                        .addCallback(TimingTrialsDatabaseCallback(scope))
                         .build()
                 INSTANCE = instance
                 instance

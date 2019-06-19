@@ -14,6 +14,9 @@ interface RiderDao {
     @Update
     fun update(rider: Rider)
 
+    @Update
+    fun updateList(riders: List<Rider>)
+
     @Delete
     fun delete(rider: Rider)
 

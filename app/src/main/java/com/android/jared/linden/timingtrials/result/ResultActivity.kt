@@ -67,6 +67,12 @@ class ResultActivity : AppCompatActivity() {
             }
         })
 
+        resultViewModel.timeTrial.observe(this, Observer {
+            it?.let { tt->
+                resultHeading.text = tt.timeTrialHeader.ttName
+            }
+        })
+
         resultRecyclerView.layoutManager = viewManager
         resultRecyclerView.adapter = adapter
         resultRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))

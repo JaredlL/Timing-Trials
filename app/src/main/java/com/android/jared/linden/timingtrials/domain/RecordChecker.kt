@@ -22,7 +22,7 @@ class RecordChecker(val timeTrial: TimeTrial,val riderRepository: IRiderReposito
 
            val course = courseRepository.getCourseSuspend(courseId)
            val riderList = riderRepository.ridersFromIds(timeTrial.riderList.mapNotNull { it.rider.id })
-           val updatingCourseRecords = course.courseRecords.toMutableList()
+           val updatingCourseRecords = course.courseRecords.associate { cr -> Pair(cr.category.categoryId(), cr) }.toMutableMap()
 
            riderList.forEach { rider ->
                val result = results.first { it.timeTrialRider.rider.id == rider.id }
@@ -39,18 +39,13 @@ class RecordChecker(val timeTrial: TimeTrial,val riderRepository: IRiderReposito
                    ridersToUpdate.add(rider.copy(personalBests = newPbs))
                }
 
-               val helper = CourseRecordHelper(updatingCourseRecords)
-               val rt = helper.getRecordType(result)
-               if(rt!= RecordType.NONE){
-                   val index = updatingCourseRecords.indexOfFirst{cr -> cr.category.categoryId() != rider.getCategoryStandard().categoryId()}
-                   if(index >= 0){
-                       updatingCourseRecords.removeAt(index)
-                   }
-                   updatingCourseRecords.add(CourseRecord(rider.id, rider.fullName(), timeTrial.timeTrialHeader.id, rider.club, rider.getCategoryStandard(), result.totalTime, timeTrial.timeTrialHeader.startTime))
+
+               if(updatingCourseRecords[rider.getCategoryStandard().categoryId()]?.timeMillis?: Long.MAX_VALUE > result.totalTime){
+                   updatingCourseRecords[rider.getCategoryStandard().categoryId()] = CourseRecord(rider.id, rider.fullName(), timeTrial.timeTrialHeader.id, rider.club, rider.getCategoryStandard(), result.totalTime, timeTrial.timeTrialHeader.startTime)
                }
            }
            results.forEach {result->
-               val helper = CourseRecordHelper(updatingCourseRecords)
+               val helper = CourseRecordHelper(updatingCourseRecords.map { it.value })
                val rt = helper.getRecordType(result)
                result.timeTrialRider.rider.id?.let { id->
                    val note = when(rt){
@@ -63,7 +58,7 @@ class RecordChecker(val timeTrial: TimeTrial,val riderRepository: IRiderReposito
                }
 
            }
-           courseToUpdate = course.copy(courseRecords = updatingCourseRecords)
+           courseToUpdate = course.copy(courseRecords = updatingCourseRecords.map { it.value })
        }
 
     }

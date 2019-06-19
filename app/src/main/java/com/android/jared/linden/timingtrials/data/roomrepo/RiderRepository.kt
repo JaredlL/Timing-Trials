@@ -30,6 +30,10 @@ interface IRiderRepository {
     @WorkerThread
     suspend fun update(rider: Rider)
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun updateRiders(riders: List<Rider>)
+
     fun getRider(riderId: Long) : LiveData<Rider>
 
     @Suppress("RedundantSuspendModifier")
@@ -76,6 +80,12 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
     @WorkerThread
     override suspend fun update(rider: Rider) {
         riderDao.update(rider)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun updateRiders(riders: List<Rider>) {
+        riderDao.updateList(riders)
     }
 
 

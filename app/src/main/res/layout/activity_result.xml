@@ -11,6 +11,11 @@
     android:layout_height="match_parent">
 
 
+    <TextView
+        android:id="@+id/resultHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Results for Lydbrook 10"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

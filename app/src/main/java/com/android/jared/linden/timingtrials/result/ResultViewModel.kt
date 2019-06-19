@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val riderRepository: IRiderRepository, val courseRepository: ICourseRepository) : ViewModel() {
-    // TODO: Implement the ViewModel
+
 
 
     val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
@@ -24,6 +24,8 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
             val checker = RecordChecker(tt, riderRepository, courseRepository)
             viewModelScope.launch(Dispatchers.IO) {
                 checker.checkRecords()
+               checker.courseToUpdate?.let {  courseRepository.update(it)}
+                riderRepository.updateRiders(checker.ridersToUpdate)
             }
             (sequenceOf(getHeading(tt)) + tt.helper.results.asSequence().sortedBy { it.totalTime }.map { res-> ResultRowViewModel(res, checker) }).toList()
         }else{
