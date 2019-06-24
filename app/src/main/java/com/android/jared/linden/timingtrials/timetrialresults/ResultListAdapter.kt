@@ -1,16 +1,12 @@
-package com.android.jared.linden.timingtrials.result
+package com.android.jared.linden.timingtrials.timetrialresults
 
-import android.content.Context
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.ListItemResultBinding
-import com.android.jared.linden.timingtrials.databinding.ListItemRiderStatusBinding
-import com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper
 
 class ResultListAdapter internal constructor(val activity: ResultActivity): RecyclerView.Adapter<ResultListAdapter.ResultViewHolder>(){
 

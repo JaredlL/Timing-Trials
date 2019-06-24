@@ -5,7 +5,7 @@ import com.android.jared.linden.timingtrials.MainViewModel
 import com.android.jared.linden.timingtrials.TestViewModel
 import com.android.jared.linden.timingtrials.edititem.EditCourseViewModel
 import com.android.jared.linden.timingtrials.edititem.EditRiderViewModel
-import com.android.jared.linden.timingtrials.result.ResultViewModel
+import com.android.jared.linden.timingtrials.timetrialresults.ResultViewModel
 import com.android.jared.linden.timingtrials.setup.SetupViewModel
 import com.android.jared.linden.timingtrials.timing.TimingViewModel
 import com.android.jared.linden.timingtrials.viewdata.ListViewModel

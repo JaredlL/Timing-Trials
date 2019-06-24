@@ -8,7 +8,7 @@
     <data>
     <variable
         name="viewModel"
-        type="com.android.jared.linden.timingtrials.result.ResultCell"/>
+        type="com.android.jared.linden.timingtrials.timetrialresults.ResultCell"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

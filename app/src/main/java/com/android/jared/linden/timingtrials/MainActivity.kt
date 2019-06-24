@@ -3,11 +3,9 @@ package com.android.jared.linden.timingtrials
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
-import androidx.databinding.DataBindingUtil.setContentView
 import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.result.ResultActivity
+import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
 import com.android.jared.linden.timingtrials.setup.*
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA

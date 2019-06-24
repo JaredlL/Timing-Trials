@@ -3,25 +3,20 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.startActivity
 import androidx.databinding.DataBindingUtil
-import com.android.jared.linden.timingtrials.BR
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.Course
-import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.RiderLight
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemTimetrialBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
-import com.android.jared.linden.timingtrials.result.ResultActivity
+import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
 import com.android.jared.linden.timingtrials.util.ITEM_COURSE
 import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.ITEM_RIDER
 import com.android.jared.linden.timingtrials.util.ITEM_TYPE_EXTRA
-import kotlinx.android.synthetic.main.list_item_rider.view.*
 
 
 class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<RiderLight, ListItemRiderBinding>(binding) {

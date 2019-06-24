@@ -51,4 +51,5 @@
     <string name="yob">Year of birth</string>
     <string name="rider_start_offset">First rider start offset</string>
     <string name="delete">Delete</string>
+    <string name="title_activity_global_result">GlobalResultActivity</string>
 </resources>

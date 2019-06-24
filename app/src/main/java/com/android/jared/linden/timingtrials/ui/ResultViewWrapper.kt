@@ -1,10 +1,6 @@
 package com.android.jared.linden.timingtrials.ui
 
 
-import com.android.jared.linden.timingtrials.data.TimeTrialResult
-import com.android.jared.linden.timingtrials.result.ResultCell
-import com.android.jared.linden.timingtrials.util.ConverterUtils
-
 //data class ResultViewWrapper(val result: TimeTrialResult){
 //
 //    val resultsRow: List<ResultCell>

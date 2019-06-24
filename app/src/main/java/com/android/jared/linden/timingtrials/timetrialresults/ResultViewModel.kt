@@ -1,4 +1,4 @@
-package com.android.jared.linden.timingtrials.result
+package com.android.jared.linden.timingtrials.timetrialresults
 
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.TimeTrial

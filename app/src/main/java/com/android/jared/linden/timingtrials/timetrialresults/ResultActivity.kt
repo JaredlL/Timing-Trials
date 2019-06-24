@@ -1,4 +1,4 @@
-package com.android.jared.linden.timingtrials.result
+package com.android.jared.linden.timingtrials.timetrialresults
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.os.Environment
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
