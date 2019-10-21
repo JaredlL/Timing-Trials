@@ -5,16 +5,11 @@ import android.os.Bundle
 import android.os.IBinder
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.OneShotPreDrawListener.add
 import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
-import com.android.jared.linden.timingtrials.setup.SelectCourseFragment
 import com.android.jared.linden.timingtrials.setup.SetupActivity
-import com.android.jared.linden.timingtrials.setup.SetupTimeTrialFragment
-import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 

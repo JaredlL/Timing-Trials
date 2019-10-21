@@ -1,7 +1,6 @@
 package com.android.jared.linden.timingtrials.viewdata
 
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,15 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.*
-import com.android.jared.linden.timingtrials.data.Course
-import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.data.RiderLight
-import com.android.jared.linden.timingtrials.data.TimeTrialHeader
+import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.FragmentListGenericBinding
-import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
 import com.android.jared.linden.timingtrials.util.*
-import kotlinx.android.synthetic.main.fragment_course.*
 
 
 /**

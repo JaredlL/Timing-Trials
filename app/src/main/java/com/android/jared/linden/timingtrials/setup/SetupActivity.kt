@@ -16,10 +16,8 @@ import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
 
 import kotlinx.android.synthetic.main.activity_setup.*
-import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 
 class SetupActivity : AppCompatActivity() {

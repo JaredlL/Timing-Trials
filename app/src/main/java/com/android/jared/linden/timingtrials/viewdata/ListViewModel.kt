@@ -19,6 +19,7 @@ class ListViewModel @Inject constructor(private val courseRepository: ICourseRep
 
     val allCourses: LiveData<List<CourseListViewWrapper>> = getCourseWrapperList()
 
+
     val allRiders = riderRepository.allRidersLight
     val allTimeTrials = timeTrialRepository.allTimeTrialsHeader
 

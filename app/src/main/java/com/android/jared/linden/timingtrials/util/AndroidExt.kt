@@ -39,6 +39,10 @@ inline fun <reified T: ViewModel> FragmentActivity.getViewModel(crossinline fact
     }).get(clazz)
 }
 
+inline fun <reified T: ViewModel> FragmentActivity.getViewModel2(crossinline factory: () -> T): T = T::class.java.let { clazz ->
+    ViewModelProvider.AndroidViewModelFactory(this.application).create(clazz)
+}
+
 //inline fun <reified T1: Any, reified T2:Any> MediatorLiveData<T1>.createLink(mutableValue: MutableLiveData<T1>, observedObject: MediatorLiveData<T2>, crossinline onUpdateObject:(T1) -> Unit, crossinline onObjectUpdated:() -> T1){
 //    this.addSource(mutableValue){
 //        it?.let { res-> onUpdateObject(res) }

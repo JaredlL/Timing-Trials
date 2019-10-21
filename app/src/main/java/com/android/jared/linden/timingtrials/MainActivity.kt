@@ -8,7 +8,7 @@ import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
 import com.android.jared.linden.timingtrials.setup.*
 import com.android.jared.linden.timingtrials.timing.TimingActivity
-import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
+import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.TimingTrialsDbActivity
@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     var setupTimeTrial: TimeTrial? = null
 
 
-    fun setDefaultSetupClickListner(){
+    private fun setDefaultSetupClickListner(){
         ma_butt_begintt.text = getString(R.string.start_tt)
         ma_butt_begintt.setOnClickListener {
             val tt = setupTimeTrial

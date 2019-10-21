@@ -11,12 +11,13 @@ import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemTimetrialBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
+import com.android.jared.linden.timingtrials.globalresults.GlobalResultActivity
 import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
-import com.android.jared.linden.timingtrials.util.ITEM_COURSE
-import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
-import com.android.jared.linden.timingtrials.util.ITEM_RIDER
-import com.android.jared.linden.timingtrials.util.ITEM_TYPE_EXTRA
+import com.android.jared.linden.timingtrials.data.ITEM_COURSE
+import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
+import com.android.jared.linden.timingtrials.data.ITEM_RIDER
+import com.android.jared.linden.timingtrials.data.ITEM_TYPE_EXTRA
 
 
 class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<RiderLight, ListItemRiderBinding>(binding) {
@@ -29,6 +30,15 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<RiderLig
             rider = data
             riderLayout.setOnLongClickListener {
                 val intent = Intent(root.context, EditItemActivity::class.java).apply {
+                    putExtra(ITEM_ID_EXTRA, data.id)
+                    putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
+                }
+                root.context.startActivity(intent)
+                true
+            }
+
+            riderLayout.setOnClickListener {
+                val intent = Intent(root.context, GlobalResultActivity::class.java).apply {
                     putExtra(ITEM_ID_EXTRA, data.id)
                     putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
                 }

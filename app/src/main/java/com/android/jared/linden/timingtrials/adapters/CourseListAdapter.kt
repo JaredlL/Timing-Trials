@@ -33,7 +33,7 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
 
     }
 
-    var mCourses: List<CourseListViewWrapper> = listOf()
+    private var mCourses: List<CourseListViewWrapper> = listOf()
     val layoutInflater = LayoutInflater.from(context)
     var editCourse = {(course):CourseLight -> Unit}
 

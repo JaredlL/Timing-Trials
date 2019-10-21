@@ -5,14 +5,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.util.ITEM_COURSE
-import com.android.jared.linden.timingtrials.util.ITEM_RIDER
-import com.android.jared.linden.timingtrials.util.ITEM_TIMETRIAL
+import com.android.jared.linden.timingtrials.data.ITEM_COURSE
+import com.android.jared.linden.timingtrials.data.ITEM_RIDER
+import com.android.jared.linden.timingtrials.data.ITEM_TIMETRIAL
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_database.*
-import kotlinx.android.synthetic.main.activity_setup.*
-
-
 
 
 class TimingTrialsDbActivity : AppCompatActivity()  {

@@ -7,8 +7,8 @@
 
     <data>
         <variable
-            name="rider"
-            type="com.android.jared.linden.timingtrials.data.RiderLight"/>
+            name="item"
+            type="com.android.jared.linden.timingtrials.ui.IGenericListItem"/>
 
     </data>
 
@@ -24,12 +24,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="@{rider != null ? rider.firstName + ' ' + rider.lastName : @string/name}"
+            android:text="@{item.itemText1}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_conversion_wrapHeight="50"
             tools:layout_conversion_wrapWidth="169"
-            tools:text="Firstname" />
+            tools:text="Text1" />
 
         <TextView
             android:id="@+id/textView3"
@@ -41,15 +41,15 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@{rider.getCategoryStandard().categoryId() ?? @string/category}"
+            android:text="@{item.itemText2}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_conversion_wrapHeight="50"
-            tools:layout_conversion_wrapWidth="147 "
-            tools:text="category" />
+            tools:layout_conversion_wrapWidth="147"
+            tools:text="Text2" />
 
         <TextView
             android:id="@+id/textView4"
@@ -59,12 +59,12 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@{rider.club ?? @string/club}"
+            android:text="@{item.itemText3}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_conversion_wrapHeight="50"
             tools:layout_conversion_wrapWidth="74"
-            tools:text="Club" />
+            tools:text="Text3" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

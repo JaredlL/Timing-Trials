@@ -229,7 +229,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
         val ss = tte.helper.sparseRiderStartTimes.indexOfKey(millisSinceStart)
 
-        if(nextIndex < tte.helper.sparseRiderStartTimes.size){
+        if(nextIndex < tte.helper.sparseRiderStartTimes.size()){
 
             //If we are more than 1 min before TT start time
             val nextStartMilli = sparse.keyAt(nextIndex)

@@ -16,7 +16,7 @@ import com.android.jared.linden.timingtrials.databinding.FragmentSetupConfirmati
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
+import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
 
 
 class SetupConfirmationFragment : DialogFragment() {

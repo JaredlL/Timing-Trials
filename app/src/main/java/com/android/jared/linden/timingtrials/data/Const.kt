@@ -1,4 +1,4 @@
-package com.android.jared.linden.timingtrials.util
+package com.android.jared.linden.timingtrials.data
 
 const val RIDER_EXTRA = "rider_extra"
 const val ITEM_TYPE_EXTRA = "item_type"

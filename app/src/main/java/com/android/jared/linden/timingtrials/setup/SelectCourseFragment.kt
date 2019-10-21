@@ -12,8 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.adapters.CourseListAdapter
-import com.android.jared.linden.timingtrials.data.Course
-import com.android.jared.linden.timingtrials.data.CourseLight
+import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.FragmentCourseListBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper

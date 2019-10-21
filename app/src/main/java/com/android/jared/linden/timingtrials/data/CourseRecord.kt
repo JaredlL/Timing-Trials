@@ -13,12 +13,12 @@ enum class RecordType{
     NONE
 }
 
-class CourseRecordHelper(val courseRecords: List<CourseRecord>){
+class CourseRecordHelper(private val courseRecords: List<CourseRecord>){
 
 
     fun getRecordType(result: TimeTrialResult): RecordType{
         val rider = result.timeTrialRider.rider
-        val courseRecord = courseRecords.sortedBy { it.timeMillis }.firstOrNull()
+        val courseRecord = courseRecords.minBy { it.timeMillis }
         if(courseRecord == null || courseRecord.timeMillis >= result.totalTime){
             return RecordType.ABSOLUTE
         }

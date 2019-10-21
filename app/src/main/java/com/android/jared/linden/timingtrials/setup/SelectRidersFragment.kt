@@ -7,9 +7,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.startActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.ViewCompat.jumpDrawablesToCurrentState
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,12 +14,10 @@ import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.R
 
 import com.android.jared.linden.timingtrials.adapters.SelectableRiderListAdapter
-import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.data.RiderLight
+import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.util.*
-import kotlinx.android.synthetic.main.fragment_selectrider_list.*
 
 
 /**
