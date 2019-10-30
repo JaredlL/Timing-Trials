@@ -3,6 +3,7 @@ package com.android.jared.linden.timingtrials.data.roomrepo
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.android.jared.linden.timingtrials.data.Gender
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.RiderLight
 import com.android.jared.linden.timingtrials.data.source.RiderDao
@@ -13,6 +14,7 @@ import javax.inject.Singleton
 interface IRiderRepository {
 
     val allRiders: LiveData<List<Rider>>
+
 
     val allRidersLight: LiveData<List<RiderLight>>
 
@@ -28,6 +30,10 @@ interface IRiderRepository {
     @WorkerThread
     suspend fun update(rider: Rider)
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun updateRiders(riders: List<Rider>)
+
     fun getRider(riderId: Long) : LiveData<Rider>
 
     @Suppress("RedundantSuspendModifier")
@@ -37,6 +43,8 @@ interface IRiderRepository {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun insertOrUpdate(rider: Rider)
+
+    suspend fun ridersFromIds(ids: List<Long>): List<Rider>
 }
 @Singleton
 class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : IRiderRepository {
@@ -63,6 +71,10 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
         riderDao.insert(rider)
     }
 
+    override suspend fun ridersFromIds(ids: List<Long>): List<Rider> {
+       return riderDao.getRidersByIds(ids)
+    }
+
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
@@ -70,10 +82,16 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
         riderDao.update(rider)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun updateRiders(riders: List<Rider>) {
+        riderDao.updateList(riders)
+    }
+
 
     override fun getRider(riderId: Long) : LiveData<Rider> {
         return when(riderId){
-            0L ->  MutableLiveData<Rider>(Rider.createBlank())
+            0L ->  MutableLiveData<Rider>(Rider.createBlank().copy(gender = Gender.MALE))
             else ->  riderDao.getRiderById(riderId)
         }
     }

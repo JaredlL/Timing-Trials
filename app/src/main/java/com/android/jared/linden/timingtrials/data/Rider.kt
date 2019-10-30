@@ -21,6 +21,14 @@ data class Rider(
         return RiderLight(firstName, lastName, club, dateOfBirth, gender, id)
     }
 
+    fun fullName(): String{
+        return "$firstName $lastName"
+    }
+
+    fun getCategoryStandard(): RiderCategoryStandard{
+        return RiderCategoryStandard(gender, OffsetDateTime.now().year - dateOfBirth.year )
+    }
+
     companion object {
 
         fun createBlank() = Rider("", "", "", OffsetDateTime.now().minusYears(20), Gender.UNKNOWN)
@@ -37,6 +45,10 @@ data class RiderLight(
         @ColumnInfo(name = "dateOfBirth") val dateOfBirth: OffsetDateTime,
         @ColumnInfo(name = "gender") val gender: Gender,
         @ColumnInfo(name = "id") val id: Long? = null
-)
+){
+    fun getCategoryStandard(): RiderCategoryStandard{
+        return RiderCategoryStandard(gender, OffsetDateTime.now().year - dateOfBirth.year )
+    }
+}
 
 

@@ -2,13 +2,14 @@ package com.android.jared.linden.timingtrials.di
 
 import android.content.Context
 import com.android.jared.linden.timingtrials.MainViewModel
-import com.android.jared.linden.timingtrials.TestViewModel
 import com.android.jared.linden.timingtrials.edititem.EditCourseViewModel
 import com.android.jared.linden.timingtrials.edititem.EditRiderViewModel
-import com.android.jared.linden.timingtrials.result.ResultViewModel
+import com.android.jared.linden.timingtrials.globalresults.GlobalResultViewModel
+import com.android.jared.linden.timingtrials.timetrialresults.ResultViewModel
 import com.android.jared.linden.timingtrials.setup.SetupViewModel
 import com.android.jared.linden.timingtrials.timing.TimingViewModel
 import com.android.jared.linden.timingtrials.viewdata.ListViewModel
+import com.android.jared.linden.timingtrials.TestViewModel
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -41,6 +42,8 @@ interface AppComponent{
     fun testViewModel(): TestViewModel
 
     fun resultViewModel(): ResultViewModel
+
+    fun globalResultViewModel(): GlobalResultViewModel
 
 }
 

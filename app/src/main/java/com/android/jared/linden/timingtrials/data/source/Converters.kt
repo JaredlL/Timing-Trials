@@ -47,13 +47,6 @@ class Converters {
         return date?.format(formatter)
     }
 
-    @TypeConverter
-    fun courseFromString(courseString:String?): Course? {
-       return courseString?.let{
-        val courseType = object : TypeToken<Course>() {}.type
-         Gson().fromJson<Course>(courseString, courseType)}
-
-    }
 
     @TypeConverter
     fun courseRecordsToString(cr:List<CourseRecord>?): String?{
@@ -65,6 +58,14 @@ class Converters {
         return courseRecordString?.let{
             val courseType = object : TypeToken<List<CourseRecord>>() {}.type
             Gson().fromJson<List<CourseRecord>>(courseRecordString, courseType)}
+
+    }
+
+    @TypeConverter
+    fun courseLightFromString(courseString:String?): CourseLight? {
+        return courseString?.let{
+            val courseType = object : TypeToken<CourseLight>() {}.type
+            Gson().fromJson<CourseLight>(courseString, courseType)}
 
     }
 
@@ -82,7 +83,7 @@ class Converters {
     }
 
     @TypeConverter
-    fun courseToString(course: Course?): String?{
+    fun courseLightToString(course: CourseLight?): String?{
         return course?.let { Gson().toJson(course)}
     }
 

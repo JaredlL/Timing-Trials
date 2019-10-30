@@ -7,19 +7,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.databinding.FragmentTimerRiderStatusBinding
-import com.android.jared.linden.timingtrials.result.ResultActivity
+import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
 import com.android.jared.linden.timingtrials.ui.RiderStatus
 import com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper
 import com.android.jared.linden.timingtrials.util.*
-import com.android.jared.linden.timingtrials.viewdata.TimingTrialsDbActivity
 import kotlinx.android.synthetic.main.fragment_timer_rider_status.*
 
 

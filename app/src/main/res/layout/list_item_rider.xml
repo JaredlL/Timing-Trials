@@ -8,34 +8,48 @@
     <data>
         <variable
             name="rider"
-            type="com.android.jared.linden.timingtrials.data.Rider"/>
+            type="com.android.jared.linden.timingtrials.data.RiderLight"/>
 
     </data>
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/riderLayout"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="@{rider.firstName}"
+            android:text="@{rider != null ? rider.firstName + ' ' + rider.lastName : @string/name}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_conversion_wrapHeight="50"
+            tools:layout_conversion_wrapWidth="169"
             tools:text="Firstname" />
 
         <TextView
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@{rider.lastName}"
-            tools:text="Lastname" />
+            android:text="@{rider.getCategoryStandard().categoryId() ?? @string/category}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_conversion_wrapHeight="50"
+            tools:layout_conversion_wrapWidth="147 "
+            tools:text="category" />
 
         <TextView
             android:id="@+id/textView4"
@@ -43,13 +57,16 @@
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
             android:layout_marginTop="8dp"
-            android:layout_alignParentEnd="true"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@{rider.club}"
+            android:text="@{rider.club ?? @string/club}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_conversion_wrapHeight="50"
+            tools:layout_conversion_wrapWidth="74"
             tools:text="Club" />
 
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

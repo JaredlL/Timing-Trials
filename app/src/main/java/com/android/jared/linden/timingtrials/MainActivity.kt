@@ -4,10 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.android.jared.linden.timingtrials.result.ResultActivity
+import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
 import com.android.jared.linden.timingtrials.setup.*
 import com.android.jared.linden.timingtrials.timing.TimingActivity
-import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
+import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.TimingTrialsDbActivity
@@ -17,39 +18,45 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    var setupId: Long? = null
-    var inProgressId: Long? = null
+    var setupTimeTrial: TimeTrial? = null
 
 
-    fun setDefaultSetupClickListner(){
+    private fun setDefaultSetupClickListner(){
         ma_butt_begintt.text = getString(R.string.start_tt)
         ma_butt_begintt.setOnClickListener {
-            if(setupId != null){
+            val tt = setupTimeTrial
+                if(tt != null){
+                    if(tt.timeTrialHeader.ttName != "" && tt.timeTrialHeader.course != null){
 
-                val confDialog: UseOldConfirmationFragment = supportFragmentManager
-                        .findFragmentByTag("useold") as? UseOldConfirmationFragment ?: UseOldConfirmationFragment()
+                        val confDialog: UseOldConfirmationFragment = supportFragmentManager
+                                .findFragmentByTag("useold") as? UseOldConfirmationFragment ?: UseOldConfirmationFragment()
 
-                if(confDialog.dialog?.isShowing != true){
-                    confDialog.show(supportFragmentManager, "useold")
+                        if(confDialog.dialog?.isShowing != true){
+                            confDialog.show(supportFragmentManager, "useold")
+                        }
+                    }else{
+                        val mIntent = Intent(this@MainActivity, SetupActivity::class.java)
+                        startActivity(mIntent)
+
+                    }
+                }else{
+                    val mIntent = Intent(this@MainActivity, SetupActivity::class.java)
+                    startActivity(mIntent)
                 }
-            }else{
-                val mIntent = Intent(this@MainActivity, SetupActivity::class.java)
-                startActivity(mIntent)
             }
+
+
         }
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setupId = null
         val vm = getViewModel { injector.mainViewModel() }
-        vm.setupTimeTrial.observe(this, Observer { tt->
-            tt?.let {
-                setupId = tt.timeTrialHeader.id
-            }
 
+        vm.setupTimeTrial.observe(this, Observer {
+            setupTimeTrial = it
         })
 
         vm.timingTimeTrial.observe(this, Observer { tt->
@@ -86,6 +93,20 @@ class MainActivity : AppCompatActivity() {
             val tIntent = Intent(this@MainActivity, TimingActivity::class.java)
             startActivity(tIntent)
 
+        }
+
+        testResult2.setOnClickListener {
+            val tvm = getViewModel { injector.testViewModel() }
+            tvm.insertFinishedTt2()
+            tvm.newId.observe(this, Observer {res->
+                res?.let {
+                    val mIntent = Intent(this@MainActivity, ResultActivity::class.java)
+                    mIntent.putExtra(ITEM_ID_EXTRA, it)
+                    startActivity(mIntent)
+                    tvm.newId.removeObservers(this)
+                }
+
+            })
         }
 
         createFinishedButton.setOnClickListener {

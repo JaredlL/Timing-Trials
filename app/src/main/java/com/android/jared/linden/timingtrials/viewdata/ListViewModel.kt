@@ -14,12 +14,13 @@ class ListViewModel @Inject constructor(private val courseRepository: ICourseRep
 
 
     private fun getCourseWrapperList(): LiveData<List<CourseListViewWrapper>>{
-       return Transformations.map(courseRepository.allCourses){c -> c.map { CourseListViewWrapper(it)
+       return Transformations.map(courseRepository.allCoursesLight){c -> c.map { CourseListViewWrapper(it)
        }}}
 
     val allCourses: LiveData<List<CourseListViewWrapper>> = getCourseWrapperList()
 
-    val allRiders = riderRepository.allRiders
+
+    val allRiders = riderRepository.allRidersLight
     val allTimeTrials = timeTrialRepository.allTimeTrialsHeader
 
 }

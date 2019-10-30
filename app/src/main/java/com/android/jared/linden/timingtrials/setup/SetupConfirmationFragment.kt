@@ -16,7 +16,7 @@ import com.android.jared.linden.timingtrials.databinding.FragmentSetupConfirmati
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
+import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
 
 
 class SetupConfirmationFragment : DialogFragment() {
@@ -47,9 +47,9 @@ class SetupConfirmationFragment : DialogFragment() {
             okButton.setOnClickListener {
                 if(confirmationViewModel.positiveFunction()){
                     val intent = Intent(requireActivity(), TimingActivity::class.java)
-                    intent.putExtra(ITEM_ID_EXTRA, confirmationViewModel.timeTrial.value?.timeTrialHeader?.id)
                     startActivity(intent)
                     this@SetupConfirmationFragment.dismiss()
+                    requireActivity().finish()
                 }else{
                     Toast.makeText(requireActivity(), "TT must start in the future, select start time", Toast.LENGTH_LONG).show()
                     this@SetupConfirmationFragment.dismiss()

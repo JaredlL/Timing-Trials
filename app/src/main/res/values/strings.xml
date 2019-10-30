@@ -11,7 +11,7 @@
     <string name="setup_tab_text_4">Select Time</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
-    <string name="timetrial_name">Time Trial Name</string>
+    <string name="timetrial_name">Timetrial Name</string>
     <string name="selected_course">Selected Course</string>
     <string name="number_of_laps">Number of laps (splits)</string>
     <string name="timetrial_interval">Start interval (seconds)</string>
@@ -29,10 +29,27 @@
     <string name="riders">Riders</string>
     <string name="courses">Courses</string>
     <string name="time_trials">TimeTrials</string>
-    <string name="manage_riders">Manage Riders</string>
+    <string name="manage_riders">View Database</string>
     <string name="rider_passed">Rider Passed!</string>
     <string name="timetrial_to_start_at">TimeTrial to start at</string>
     <string name="press_assign_rider">Press to assign number</string>
     <string name="now_choose_rider">Now select number</string>
     <string name="view_results">View Results</string>
+    <string name="category">Category</string>
+    <string name="name">Name</string>
+    <string name="course_name">Course Name</string>
+    <string name="distance">Distance</string>
+    <string name="cttname">CTT Name</string>
+    <string name="timetrial_status">Status</string>
+    <string name="date">Date</string>
+    <string name="add_rider">Add Rider</string>
+    <string name="edit_rider">Edit Rider</string>
+    <string name="add_course">Add Course</string>
+    <string name="edit_course">Edit Course</string>
+    <string name="gender">Gender</string>
+    <string name="dob">DoB</string>
+    <string name="yob">Year of birth</string>
+    <string name="rider_start_offset">First rider start offset</string>
+    <string name="delete">Delete</string>
+    <string name="title_activity_global_result">GlobalResultActivity</string>
 </resources>

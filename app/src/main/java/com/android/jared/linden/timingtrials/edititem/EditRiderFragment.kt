@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentRiderBinding
-import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
+import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
@@ -42,6 +42,8 @@ class EditRiderFragment : Fragment() {
             mAdapter.notifyDataSetChanged()
         })
 
+        activity?.title = if(riderId == 0L) getString(R.string.add_rider) else getString(R.string.edit_rider)
+
         val binding = DataBindingUtil.inflate<FragmentRiderBinding>(inflater, R.layout.fragment_rider, container, false).apply {
             viewModel = riderViewModel
             lifecycleOwner = (this@EditRiderFragment)
@@ -54,6 +56,10 @@ class EditRiderFragment : Fragment() {
                     Toast.makeText(activity, "Rider must have firstname set", Toast.LENGTH_SHORT).show()
                 }
 
+            }
+            deleteButton.setOnClickListener {
+                riderViewModel.delete()
+                activity?.finish()
             }
 
         }

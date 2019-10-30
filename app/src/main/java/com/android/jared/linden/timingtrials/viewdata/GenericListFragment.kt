@@ -1,7 +1,6 @@
 package com.android.jared.linden.timingtrials.viewdata
 
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,11 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.*
-import com.android.jared.linden.timingtrials.data.Course
-import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.data.TimeTrialHeader
+import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.FragmentListGenericBinding
-import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
 import com.android.jared.linden.timingtrials.util.*
 
@@ -47,7 +43,7 @@ class GenericListFragment : Fragment() {
                 viewFactory = RiderViewHolderFactory()
                 adapter = GenericListAdapter(requireContext(), viewFactory)
                 listViewModel.allRiders.observe(viewLifecycleOwner, Observer{res->
-                    res?.let {(adapter as? GenericListAdapter<Rider>)?.setItems(it)}
+                    res?.let {(adapter as? GenericListAdapter<RiderLight>)?.setItems(it)}
                 })
             }
             ITEM_COURSE -> {
@@ -66,8 +62,6 @@ class GenericListFragment : Fragment() {
             }
         }
 
-        adapter.itemLongPress = { itemId -> editItem(itemId)}
-
         viewManager = LinearLayoutManager(context)
 
         val binding = DataBindingUtil.inflate<FragmentListGenericBinding>(inflater, R.layout.fragment_list_generic, container, false).apply{
@@ -75,19 +69,13 @@ class GenericListFragment : Fragment() {
             listHeading.addView(viewFactory.createTitle(inflater, container))
             genericRecyclerView.adapter = adapter
             genericRecyclerView.layoutManager = viewManager
+            viewFactory.performFabAction(genericListFab)
         }
 
         return binding.root
     }
 
 
-    private fun editItem(itemId: Long){
-        val intent = Intent(context, EditItemActivity::class.java).apply {
-            putExtra(ITEM_ID_EXTRA, itemId)
-            putExtra(ITEM_TYPE_EXTRA, itemType)
-        }
-        startActivity(intent)
-    }
 
 
     companion object {

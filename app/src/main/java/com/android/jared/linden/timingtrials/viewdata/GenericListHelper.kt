@@ -1,30 +1,48 @@
 package com.android.jared.linden.timingtrials.viewdata
-
-import android.icu.lang.UCharacter.GraphemeClusterBreak.L
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.Course
-import com.android.jared.linden.timingtrials.data.Rider
+import com.android.jared.linden.timingtrials.data.RiderLight
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemTimetrialBinding
+import com.android.jared.linden.timingtrials.edititem.EditItemActivity
+import com.android.jared.linden.timingtrials.globalresults.GlobalResultActivity
+import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
+import com.android.jared.linden.timingtrials.data.ITEM_COURSE
+import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
+import com.android.jared.linden.timingtrials.data.ITEM_RIDER
+import com.android.jared.linden.timingtrials.data.ITEM_TYPE_EXTRA
 
 
-class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, ListItemRiderBinding>(binding) {
+class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<RiderLight, ListItemRiderBinding>(binding) {
 
     private val _binding = binding
     //override var onLongPress : (id:Long) -> Unit = {}
-    override fun bind(data: Rider){
+    override fun bind(data: RiderLight){
 
         _binding.apply{
             rider = data
-            riderLayout.setOnLongClickListener { onLongPress(data.id?:0L)
+            riderLayout.setOnLongClickListener {
+                val intent = Intent(root.context, EditItemActivity::class.java).apply {
+                    putExtra(ITEM_ID_EXTRA, data.id)
+                    putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
+                }
+                root.context.startActivity(intent)
                 true
+            }
+
+            riderLayout.setOnClickListener {
+                val intent = Intent(root.context, GlobalResultActivity::class.java).apply {
+                    putExtra(ITEM_ID_EXTRA, data.id)
+                    putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
+                }
+                root.context.startActivity(intent)
             }
 
             executePendingBindings()
@@ -32,18 +50,29 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, L
     }
 }
 
-class RiderViewHolderFactory: GenericViewHolderFactory<Rider>() {
+class RiderViewHolderFactory: GenericViewHolderFactory<RiderLight>() {
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
-        return createView(layoutInflator, parent, Rider.createBlank().copy ( firstName = "Name", club = "Club" ))
+        val b = DataBindingUtil.inflate<ListItemRiderBinding>(layoutInflator, R.layout.list_item_rider, parent, false)
+        return b.root
     }
 
-    override fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?): GenericBaseHolder<Rider, ListItemRiderBinding> {
-        var binding = DataBindingUtil.inflate<ListItemRiderBinding>(layoutInflator, R.layout.list_item_rider, parent, false)
+    override fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?): GenericBaseHolder<RiderLight, ListItemRiderBinding> {
+        val binding = DataBindingUtil.inflate<ListItemRiderBinding>(layoutInflator, R.layout.list_item_rider, parent, false)
         return RiderViewHolder(binding)
     }
-    override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: Rider): View {
-        var binding = DataBindingUtil.inflate<ListItemRiderBinding>(layoutInflator, R.layout.list_item_rider, parent, false).apply { rider = data }
+    override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: RiderLight): View {
+        val binding = DataBindingUtil.inflate<ListItemRiderBinding>(layoutInflator, R.layout.list_item_rider, parent, false).apply { rider = data }
         return binding.root
+    }
+
+    override fun performFabAction(fab: View) {
+        fab.setOnClickListener {
+            val intent = Intent(fab.context, EditItemActivity::class.java).apply {
+                putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
+                putExtra(ITEM_ID_EXTRA, 0L)
+            }
+            fab.context.startActivity(intent)
+        }
     }
 }
 
@@ -56,9 +85,25 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Co
 
         _binding.apply{
             courseVm = data
-            courseLayout.setOnLongClickListener { onLongPress(data.course.id?:0L)
+            checkBox.visibility = View.GONE
+
+            courseLayout.setOnLongClickListener {
+                val intent = Intent(root.context, EditItemActivity::class.java).apply {
+                    putExtra(ITEM_ID_EXTRA, data.course.id)
+                    putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
+                }
+                root.context.startActivity(intent)
                 true
             }
+
+            courseLayout.setOnClickListener {
+                val intent = Intent(root.context, GlobalResultActivity::class.java).apply {
+                    putExtra(ITEM_ID_EXTRA, data.course.id)
+                    putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
+                }
+                root.context.startActivity(intent)
+            }
+
 
             executePendingBindings()
         }
@@ -67,20 +112,33 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Co
 
 class CourseViewHolderFactory: GenericViewHolderFactory<CourseListViewWrapper>() {
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
-        return createView(layoutInflator, parent, data = object: CourseListViewWrapper(Course("Course Name", 0.0, "CTT Name")){
-
-            override var convertedLengthString = "Distance"
-        })
+        val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply { checkBox.visibility = View.GONE }
+        return binding.root
+//        return createView(layoutInflator, parent, data = object: CourseListViewWrapper(Course("Course Name", 0.0, "CTT Name")){
+//
+//            override var convertedLengthString = "Distance"
+//        })
     }
 
     override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: CourseListViewWrapper): View {
-        var binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply { courseVm = data }
+        val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply { courseVm = data; checkBox.visibility = View.GONE }
         return binding.root
     }
 
     override fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?): GenericBaseHolder<CourseListViewWrapper, ListItemCourseBinding> {
-        var binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false)
+        val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false)
         return CourseListViewHolder(binding)
+    }
+
+    override fun performFabAction(fab: View) {
+        fab.setOnClickListener {
+            val intent = Intent(fab.context, EditItemActivity::class.java).apply {
+                putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
+                putExtra(ITEM_ID_EXTRA, 0L)
+            }
+            fab.context.startActivity(intent)
+        }
+
     }
 }
 
@@ -92,26 +150,35 @@ class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHol
     override fun bind(data: TimeTrialHeader){
         _binding.apply{
             viewModel = data
+            timetrialLayout.setOnClickListener {
+                val intent = Intent(this.root.context, ResultActivity::class.java).apply {
+                    putExtra(ITEM_ID_EXTRA, data.id)
+                }
+                this.root.context.startActivity(intent)
+            }
             executePendingBindings()
+
         }
     }
 }
 
 class TimeTrialViewHolderFactory: GenericViewHolderFactory<TimeTrialHeader>() {
+    override fun performFabAction(fab: View) {
+        fab.visibility = View.GONE
+    }
+
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
-        return createView(layoutInflator, parent, TimeTrialHeader.createBlank().copy(
-            ttName = "Time Trial Name",
-            course = Course.createBlank().copy( courseName = "Course Name" )
-        ))
+        val binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false)
+        return binding.root
     }
 
     override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: TimeTrialHeader): View {
-        var binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false).apply { viewModel = data }
+        val binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false).apply { viewModel = data }
         return binding.root
     }
 
     override fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?): GenericBaseHolder<TimeTrialHeader, ListItemTimetrialBinding> {
-        var binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false)
+        val binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false)
         return TimeTrialListViewHolder(binding)
     }
 }

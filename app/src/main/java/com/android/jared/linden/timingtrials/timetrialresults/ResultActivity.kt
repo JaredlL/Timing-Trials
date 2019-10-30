@@ -1,31 +1,39 @@
-package com.android.jared.linden.timingtrials.result
+package com.android.jared.linden.timingtrials.timetrialresults
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
-import com.android.jared.linden.timingtrials.ui.ResultViewWrapper
-import com.android.jared.linden.timingtrials.util.ITEM_ID_EXTRA
+import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import kotlinx.android.synthetic.main.result_activity.*
+import kotlinx.android.synthetic.main.activity_result.*
 import androidx.recyclerview.widget.RecyclerView
 import android.graphics.Rect
-import android.view.View
 import android.graphics.drawable.Drawable
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
+import android.content.Intent
+import android.net.Uri
+import android.view.View
 
 
 class ResultActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.android.jared.linden.timingtrials.R.layout.result_activity)
+        setContentView(com.android.jared.linden.timingtrials.R.layout.activity_result)
+
+//        viewResultsButton.setOnClickListener {
+//            val v = resultRecyclerView
+//            takeScreenShot(v)
+//        }
 
         val timeTrialId by argument<Long>(ITEM_ID_EXTRA)
         val resultViewModel = getViewModel { injector.resultViewModel() }.apply { initialise(timeTrialId) }
@@ -35,16 +43,16 @@ class ResultActivity : AppCompatActivity() {
 
         val adapter = ResultListAdapter(this)
 
-        resultViewModel.timeTrial.observe(this, Observer {res->
-            res?.let {tt->
-                val newRes = tt.helper.results.asSequence().map { res -> ResultViewWrapper(res) }.sortedBy { it.result.totalTime }.toList()
+
+        resultViewModel.results.observe(this, Observer {res->
+            res?.let {newRes->
                 if(newRes.isNotEmpty()){
-                    val rowLength = newRes.first().resultsRow.size
+                    val rowLength = newRes.first().row.size
 
                     viewManager.spanCount = rowLength + 2
                     viewManager.spanSizeLookup = (object : GridLayoutManager.SpanSizeLookup(){
                         override fun getSpanSize(position: Int): Int {
-                           return if (position.rem(rowLength) == 0 || position.rem(rowLength) == 2) {
+                            return if (position.rem(rowLength) == 0 || position.rem(rowLength) == 2) {
                                 2
                             }else {
                                 1
@@ -58,6 +66,12 @@ class ResultActivity : AppCompatActivity() {
             }
         })
 
+        resultViewModel.timeTrial.observe(this, Observer {
+            it?.let { tt->
+                resultHeading.text = tt.timeTrialHeader.ttName
+            }
+        })
+
         resultRecyclerView.layoutManager = viewManager
         resultRecyclerView.adapter = adapter
         resultRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
@@ -65,30 +79,65 @@ class ResultActivity : AppCompatActivity() {
 
         }
 
+    fun takeScreenShot(view: View){
+        try {
+            val now = Date()
+            android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
+            // image naming and path  to include sd card  appending name you choose for file
+            val mPath = getApplicationInfo().dataDir + "/" + now + ".jpg";
 
+            // create bitmap screen capture
+            //val v1 = getWindow().getDecorView().getRootView()
 
+            val bitmap = Bitmap.createBitmap(view.getWidth(),
+                    view.getHeight(), Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            view.draw(canvas)
+
+            val imageFile = File(mPath);
+
+            val outputStream = FileOutputStream(imageFile)
+            val quality = 100
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+            outputStream.flush()
+            outputStream.close()
+
+            openScreenshot(imageFile);
+        } catch (e:Throwable) {
+            // Several error may come out with file handling or DOM
+            e.printStackTrace();
+        }
+    }
+
+    private fun openScreenshot(imageFile: File) {
+        val intent = Intent()
+        intent.action = Intent.ACTION_VIEW
+        val uri = Uri.fromFile(imageFile)
+        intent.setDataAndType(uri, "image/*")
+        startActivity(intent)
+    }
 
     }
 
 
 
-class SpacesItemDecoration(private val space: Int) : RecyclerView.ItemDecoration() {
-
-   override fun getItemOffsets(outRect: Rect, view: View,
-                       parent: RecyclerView, state: RecyclerView.State) {
-        //outRect.left = space
-        //outRect.right = space
-        outRect.bottom = space
-        view.background = ColorDrawable(Color.BLACK)
-
-        // Add top margin only for the first item to avoid double space between items
-//        if (parent.getChildLayoutPosition(view) == 0) {
-//          //  outRect.top = space
-//        } else {
-//          //  outRect.top = 0
-//        }
-    }
-}
+//class SpacesItemDecoration(private val space: Int) : RecyclerView.ItemDecoration() {
+//
+//   override fun getItemOffsets(outRect: Rect, view: View,
+//                       parent: RecyclerView, state: RecyclerView.State) {
+//        //outRect.left = space
+//        //outRect.right = space
+//        outRect.bottom = space
+//        view.background = ColorDrawable(Color.BLACK)
+//
+//        // Add top margin only for the first item to avoid double space between items
+////        if (parent.getChildLayoutPosition(view) == 0) {
+////          //  outRect.top = space
+////        } else {
+////          //  outRect.top = 0
+////        }
+//    }
+//}
 
 class DividerItemDecoration(context: Context, orientation: Int) : RecyclerView.ItemDecoration() {
 

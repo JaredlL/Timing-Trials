@@ -1,5 +1,6 @@
 package com.android.jared.linden.timingtrials.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -11,7 +12,18 @@ data class Course(
         val courseRecords: List<CourseRecord> = listOf(),
         @PrimaryKey(autoGenerate = true) val id: Long? = null
 ) {
+    fun toCourseLight(): CourseLight{
+        return CourseLight(courseName, length,cttName,id)
+    }
     companion object {
         fun createBlank() = Course("", 0.0, "")
     }
 }
+
+data class CourseLight(
+        @ColumnInfo(name = "courseName") val courseName: String,
+        @ColumnInfo(name = "length") val length: Double = 0.0,
+        @ColumnInfo(name = "cttName") val cttName: String = "",
+        @ColumnInfo(name = "id") val id: Long? = null
+)
+

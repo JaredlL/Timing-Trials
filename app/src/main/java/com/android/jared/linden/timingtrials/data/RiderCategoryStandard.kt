@@ -9,6 +9,8 @@ data class RiderCategoryStandard (val gender: Gender, val ageInYears: Int){
 
     fun categoryId() = getAgeString() + gender.gendarString()
 
+    fun readableName(): String {return categoryId()}
+
     private fun getAgeString(): String{
 
         return when(ageInYears){

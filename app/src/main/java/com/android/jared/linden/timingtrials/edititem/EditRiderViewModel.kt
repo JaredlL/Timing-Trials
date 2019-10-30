@@ -2,10 +2,12 @@ package com.android.jared.linden.timingtrials.edititem
 
 
 import androidx.lifecycle.*
+import com.android.jared.linden.timingtrials.data.Gender
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
 import com.android.jared.linden.timingtrials.util.createLink
 import kotlinx.coroutines.*
+import org.threeten.bp.ZonedDateTime
 import javax.inject.Inject
 
 
@@ -18,8 +20,8 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
 
     fun initialise(riderId: Long){
         if(mutableRider.value == null){
-            mutableRider.addSource(repository.getRider(riderId)){result: Rider ->
-                result.let {
+            mutableRider.addSource(repository.getRider(riderId)){result: Rider? ->
+                result?.let {
                     mutableRider.value = result
                 }
             }
@@ -27,30 +29,34 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
 
     }
 
+    val genders = Gender.values().map { it.fullString() }
+
+    val selectedGenderPosition = MutableLiveData(2).createLink(
+            mutableRider,
+            {new -> mutableRider.value?.let { Pair(Gender.values().indexOf(it.gender), it.copy(gender = Gender.values()[new])) }},
+            {Gender.values().indexOf(mutableRider.value?.gender?:Gender.UNKNOWN)}
+    )
+
+    val yearOfBirth = MutableLiveData("").createLink(
+            mutableRider,
+            {new -> mutableRider.value?.let { Pair(it.dateOfBirth.year.toString(), it.copy(dateOfBirth = it.dateOfBirth.withYear(new?.toIntOrNull()?:0))) }},
+            {mutableRider.value?.dateOfBirth?.year?.toString()?:""}
+    )
+
+//    var selectedGendarPosition = 1
+//    set(value) {
+//        mutableRider.value?.let {
+//            mutableRider.value = it.copy(gender = Gender.values()[selectedGendarPosition])
+//        }
+//        field = value
+//    }
+
     val lastName: MutableLiveData<String> = MutableLiveData<String>("").createLink(
             mutableRider,
             {new -> mutableRider.value?.let { Pair(it.lastName, it.copy(lastName = new)) }},
             {mutableRider.value?.lastName?:"" }
     )
 
-//    val lastName = MutableLiveData<String>("")
-//    private val lastNameMediator = MediatorLiveData<String>().apply {
-//        addSource(lastName) {str->
-//            mutableRider.value?.let { ri ->
-//                if(ri.lastName != str){
-//                    mutableRider.value = ri.copy(lastName = str)
-//                }
-//            }
-//        }
-//        addSource(mutableRider) { r->
-//            r?.let {
-//                if (lastName.value != r.lastName) {
-//                    lastName.value = r.lastName
-//                }
-//            }
-//
-//        }
-//    }.also { it.observeForever {  } }
 
     val club = MutableLiveData<String>("")
     private val clubMediator = MediatorLiveData<String>().apply {
@@ -91,9 +97,13 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
 
     fun addOrUpdate(){
         viewModelScope.launch(Dispatchers.IO) {
-
-
             mutableRider.value?.let { repository.insertOrUpdate(it) }
+        }
+    }
+
+    fun delete(){
+        viewModelScope.launch(Dispatchers.IO) {
+            mutableRider.value?.let { repository.delete(it) }
         }
     }
 

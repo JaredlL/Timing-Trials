@@ -7,7 +7,7 @@ import com.android.jared.linden.timingtrials.domain.ITimelineEvent
 
 @Entity(tableName = "timetrial_event_table",
         indices = [Index("timeTrialId")],
-        foreignKeys = [ForeignKey(entity =TimeTrialHeader::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = ForeignKey.CASCADE, deferred = true)])
+        foreignKeys = [ForeignKey(entity =TimeTrialHeader::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = CASCADE, deferred = true)])
 data class RiderPassedEvent(val timeTrialId: Long,
                             val riderId: Long?,
                             val timeStamp: Long,
