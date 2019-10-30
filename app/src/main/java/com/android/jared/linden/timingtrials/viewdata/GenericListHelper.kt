@@ -43,7 +43,6 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<RiderLig
                     putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
                 }
                 root.context.startActivity(intent)
-                true
             }
 
             executePendingBindings()
@@ -87,6 +86,7 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Co
         _binding.apply{
             courseVm = data
             checkBox.visibility = View.GONE
+
             courseLayout.setOnLongClickListener {
                 val intent = Intent(root.context, EditItemActivity::class.java).apply {
                     putExtra(ITEM_ID_EXTRA, data.course.id)
@@ -94,6 +94,14 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Co
                 }
                 root.context.startActivity(intent)
                 true
+            }
+
+            courseLayout.setOnClickListener {
+                val intent = Intent(root.context, GlobalResultActivity::class.java).apply {
+                    putExtra(ITEM_ID_EXTRA, data.course.id)
+                    putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
+                }
+                root.context.startActivity(intent)
             }
 
 
@@ -142,12 +150,11 @@ class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHol
     override fun bind(data: TimeTrialHeader){
         _binding.apply{
             viewModel = data
-            timetrialLayout.setOnLongClickListener {
+            timetrialLayout.setOnClickListener {
                 val intent = Intent(this.root.context, ResultActivity::class.java).apply {
                     putExtra(ITEM_ID_EXTRA, data.id)
                 }
                 this.root.context.startActivity(intent)
-                return@setOnLongClickListener true
             }
             executePendingBindings()
 

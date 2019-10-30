@@ -15,20 +15,26 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
 
     private val typeIdLiveData:MutableLiveData<Pair<String, Long>>  = MutableLiveData()
 
+    val titleString: MutableLiveData<String> = MutableLiveData<String>()
+
     val resultsToDisplay: LiveData<List<IGenericListItem>> = Transformations.switchMap(typeIdLiveData){listInfo ->
 
         var retList: LiveData<List<IGenericListItem>> = MutableLiveData()
+
         listInfo?.let {li->
             when(li.first){
                 ITEM_RIDER->{
+
                     retList = Transformations.map(riderRepository.getRider(li.second)){ri ->
                         ri?.let {
+                            titleString.value = "${it.firstName} ${it.lastName} PBs"
                             it.personalBests.map {pb -> listItemFromPb(pb) }
                         }}
                 }
                 ITEM_COURSE->{
                     retList = Transformations.map(courseRepository.getCourse(li.second)){c ->
                         c?.let {
+                            titleString.value = "${it.courseName} CRs"
                             c.courseRecords.map {cr -> listItemFromCourseRecord(cr) }
                         }}
                 }

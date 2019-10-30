@@ -28,6 +28,7 @@ class GlobalResultActivity : AppCompatActivity() {
         setContentView(R.layout.activity_global_result)
         setSupportActionBar(toolbar)
 
+
         genericItemViewModel = getViewModel{ injector.globalResultViewModel()}
 
         viewManager = LinearLayoutManager(this)
@@ -41,6 +42,13 @@ class GlobalResultActivity : AppCompatActivity() {
         genericItemViewModel.resultsToDisplay.observe(this, Observer {items ->
             items?.let {
                 adapter.setItems(items)
+
+            }
+        })
+
+        genericItemViewModel.titleString.observe(this, Observer {item ->
+            item?.let {
+                toolbar.title = item
 
             }
         })
