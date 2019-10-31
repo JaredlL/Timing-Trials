@@ -8,7 +8,7 @@ import org.threeten.bp.OffsetDateTime
 @Entity(tableName = "timetrial_rider_table",
         indices = [Index("timeTrialId")],
         foreignKeys = [ForeignKey(entity =TimeTrialHeader::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = ForeignKey.CASCADE, deferred = true)])
-data class TimeTrialRider(@Embedded(prefix = "rider_") val rider: RiderLight,
+data class TimeTrialRider(@Embedded(prefix = "rider_") val rider: Rider,
                           val timeTrialId: Long,
                           val number: Int,
                           val startTimeOffset: Int = 0,

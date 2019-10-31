@@ -43,7 +43,7 @@ class GenericListFragment : Fragment() {
                 viewFactory = RiderViewHolderFactory()
                 adapter = GenericListAdapter(requireContext(), viewFactory)
                 listViewModel.allRiders.observe(viewLifecycleOwner, Observer{res->
-                    res?.let {(adapter as? GenericListAdapter<RiderLight>)?.setItems(it)}
+                    res?.let {(adapter as? GenericListAdapter<Rider>)?.setItems(it)}
                 })
             }
             ITEM_COURSE -> {

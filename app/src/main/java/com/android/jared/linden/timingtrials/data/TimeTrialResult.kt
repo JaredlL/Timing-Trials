@@ -10,11 +10,11 @@ data class TimeTrialResult(val timeTrialRider:TimeTrialRider, val splits: List<L
 
 
 interface IRiderResult {
-    val rider: RiderLight
+    val rider: Rider
     val time: Long
-    val course: CourseLight
-    val timeTrial: TimeTrialHeader
+    val course: Course
+    val timeTrial: TimeTrialHeader?
     val note: String
 }
 
-data class RiderResult(override val rider: RiderLight, override val time: Long, override val course: CourseLight, override val timeTrial: TimeTrialHeader, override val note: String) : IRiderResult
+//data class RiderResult(override val rider: RiderLight, override val time: Long, override val course: CourseLight, override val timeTrial: TimeTrialHeader? = null, override val note: String) : IRiderResult

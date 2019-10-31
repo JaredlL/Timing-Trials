@@ -25,18 +25,10 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
             when(li.first){
                 ITEM_RIDER->{
 
-                    retList = Transformations.map(riderRepository.getRider(li.second)){ri ->
-                        ri?.let {
-                            titleString.value = "${it.firstName} ${it.lastName} PBs"
-                            it.personalBests.map {pb -> listItemFromPb(pb) }
-                        }}
+
                 }
                 ITEM_COURSE->{
-                    retList = Transformations.map(courseRepository.getCourse(li.second)){c ->
-                        c?.let {
-                            titleString.value = "${it.courseName} CRs"
-                            c.courseRecords.map {cr -> listItemFromCourseRecord(cr) }
-                        }}
+
                 }
             }
         }

@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.RiderLight
 import com.android.jared.linden.timingtrials.databinding.ListItemGenericBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemSelectableRiderBinding
 import com.android.jared.linden.timingtrials.setup.SelectableRiderViewWrapper

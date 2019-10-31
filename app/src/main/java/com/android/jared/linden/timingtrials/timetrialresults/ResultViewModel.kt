@@ -1,11 +1,11 @@
 package com.android.jared.linden.timingtrials.timetrialresults
 
 import androidx.lifecycle.*
+import com.android.jared.linden.timingtrials.data.GlobalResult
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialResult
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.data.roomrepo.*
-import com.android.jared.linden.timingtrials.domain.RecordChecker
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,13 +21,14 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
     val results = Transformations.map(timeTrial){tt->
         if(tt != null && tt.timeTrialHeader.status == TimeTrialStatus.FINISHED) {
 
-            val checker = RecordChecker(tt, riderRepository, courseRepository)
-            viewModelScope.launch(Dispatchers.IO) {
-                checker.checkRecords()
-               checker.courseToUpdate?.let {  courseRepository.update(it)}
-                riderRepository.updateRiders(checker.ridersToUpdate)
-            }
-            (sequenceOf(getHeading(tt)) + tt.helper.results.asSequence().sortedBy { it.totalTime }.map { res-> ResultRowViewModel(res, checker) }).toList()
+            listOf<ResultRowViewModel>()
+            //val checker = RecordChecker(tt, riderRepository, courseRepository)
+          //  viewModelScope.launch(Dispatchers.IO) {
+             //   checker.checkRecords()
+            //   checker.courseToUpdate?.let {  courseRepository.update(it)}
+             //   riderRepository.updateRiders(checker.ridersToUpdate)
+          //  }
+            //(sequenceOf(getHeading(tt)) + tt.helper.results.asSequence().sortedBy { it.totalTime }.map { res-> ResultRowViewModel(res, checker) }).toList()
         }else{
             null
         }
@@ -68,7 +69,7 @@ class ResultRowViewModel{
         strings.forEach { row.add(ResultCell(MutableLiveData(it))) }
     }
 
-    constructor(result: TimeTrialResult, checker: RecordChecker)
+    constructor(result: TimeTrialResult)
      {
         row.add(ResultCell(MutableLiveData("${result.timeTrialRider.rider.firstName} ${result.timeTrialRider.rider.lastName}")))
         row.add(ResultCell(MutableLiveData(result.category.categoryId())))
@@ -78,7 +79,7 @@ class ResultRowViewModel{
         if(result.splits.size > 1){
             row.addAll(result.splits.map { ResultCell(MutableLiveData(ConverterUtils.toTenthsDisplayString(it))) })
         }
-        row.add(ResultCell(checker.notesMap[result.timeTrialRider.rider.id]?:MutableLiveData("Was Null")))
+
 
     }
 }

@@ -62,10 +62,10 @@ class Converters {
     }
 
     @TypeConverter
-    fun courseLightFromString(courseString:String?): CourseLight? {
+    fun courseLightFromString(courseString:String?): Course? {
         return courseString?.let{
-            val courseType = object : TypeToken<CourseLight>() {}.type
-            Gson().fromJson<CourseLight>(courseString, courseType)}
+            val courseType = object : TypeToken<Course>() {}.type
+            Gson().fromJson<Course>(courseString, courseType)}
 
     }
 
@@ -83,7 +83,7 @@ class Converters {
     }
 
     @TypeConverter
-    fun courseLightToString(course: CourseLight?): String?{
+    fun courseLightToString(course: Course?): String?{
         return course?.let { Gson().toJson(course)}
     }
 

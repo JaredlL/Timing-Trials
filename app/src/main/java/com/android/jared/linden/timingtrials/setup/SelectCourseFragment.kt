@@ -39,7 +39,7 @@ class SelectCourseFragment : DialogFragment() {
 
 
 
-        val heading: CourseListViewWrapper = object: CourseListViewWrapper(CourseLight("Course Name", 0.0, "CTT Name")){
+        val heading: CourseListViewWrapper = object: CourseListViewWrapper(Course("Course Name", 0.0, "CTT Name")){
 
             override var convertedLengthString = "Distance"
         }
@@ -51,7 +51,7 @@ class SelectCourseFragment : DialogFragment() {
             courseRecyclerView.adapter = adapter
             courseRecyclerView.layoutManager = viewManager
             courseListFab.setOnClickListener {
-                editCourse(Course.createBlank().toCourseLight())
+                editCourse(Course.createBlank())
             }
         }
 
@@ -80,7 +80,7 @@ class SelectCourseFragment : DialogFragment() {
         return dialog
     }
 
-    private fun editCourse(course: CourseLight){
+    private fun editCourse(course: Course){
         val intent = Intent(context, EditItemActivity::class.java).apply {
             putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
             putExtra(ITEM_ID_EXTRA, course.id)

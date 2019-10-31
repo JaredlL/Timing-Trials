@@ -103,7 +103,7 @@ class SetupViewModel @Inject constructor(
 
 
         }
-        override fun getOrderableRiders(): LiveData<List<RiderLight>> = Transformations.map(timeTrial){it.riderList.map { r -> r.rider }}
+        override fun getOrderableRiders(): LiveData<List<Rider>> = Transformations.map(timeTrial){it.riderList.map { r -> r.rider }}
     }
 
     override val selectCourseViewModel: ISelectCourseViewModel = SelectCourseViewModelImpl(this)
@@ -120,13 +120,13 @@ class SetupViewModel @Inject constructor(
          * Need to remember which ids were selected when a rider is added/removed
          * Also need to update selected riders if they are modfied in the DB
          */
-        timeTrial.addSource(riderRepository.allRidersLight) { result: List<RiderLight>? ->
+        timeTrial.addSource(riderRepository.allRidersLight) { result: List<Rider>? ->
             result?.let {newRiders->
                 timeTrial.value?.let {ttdef->
                     val currentSelected = ttdef.riderList.map { r -> r.rider }
                     if(currentSelected.count() > 0){
 
-                        val oldSelected: LinkedHashMap<Long, RiderLight> =  LinkedHashMap(currentSelected.associateBy { r -> r.id ?: 0 })
+                        val oldSelected: LinkedHashMap<Long, Rider> =  LinkedHashMap(currentSelected.associateBy { r -> r.id ?: 0 })
                         val retainedIds: MutableSet<Long> = mutableSetOf()
                         newRiders.forEach{rider ->
                             rider.id?.let {id ->

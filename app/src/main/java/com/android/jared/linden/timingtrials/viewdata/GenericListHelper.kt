@@ -5,8 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.RiderLight
-import com.android.jared.linden.timingtrials.data.TimeTrialHeader
+import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemTimetrialBinding
@@ -14,17 +13,13 @@ import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.globalresults.GlobalResultActivity
 import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
-import com.android.jared.linden.timingtrials.data.ITEM_COURSE
-import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
-import com.android.jared.linden.timingtrials.data.ITEM_RIDER
-import com.android.jared.linden.timingtrials.data.ITEM_TYPE_EXTRA
 
 
-class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<RiderLight, ListItemRiderBinding>(binding) {
+class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, ListItemRiderBinding>(binding) {
 
     private val _binding = binding
     //override var onLongPress : (id:Long) -> Unit = {}
-    override fun bind(data: RiderLight){
+    override fun bind(data: Rider){
 
         _binding.apply{
             rider = data
@@ -50,17 +45,17 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<RiderLig
     }
 }
 
-class RiderViewHolderFactory: GenericViewHolderFactory<RiderLight>() {
+class RiderViewHolderFactory: GenericViewHolderFactory<Rider>() {
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
         val b = DataBindingUtil.inflate<ListItemRiderBinding>(layoutInflator, R.layout.list_item_rider, parent, false)
         return b.root
     }
 
-    override fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?): GenericBaseHolder<RiderLight, ListItemRiderBinding> {
+    override fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?): GenericBaseHolder<Rider, ListItemRiderBinding> {
         val binding = DataBindingUtil.inflate<ListItemRiderBinding>(layoutInflator, R.layout.list_item_rider, parent, false)
         return RiderViewHolder(binding)
     }
-    override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: RiderLight): View {
+    override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: Rider): View {
         val binding = DataBindingUtil.inflate<ListItemRiderBinding>(layoutInflator, R.layout.list_item_rider, parent, false).apply { rider = data }
         return binding.root
     }

@@ -9,14 +9,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 
-@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, RiderPassedEvent::class, TimeTrialRider::class], version = 24, exportSchema = false)
+@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, RiderPassedEvent::class, TimeTrialRider::class, GlobalResult::class], version = 25, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 
     abstract fun riderDao() : RiderDao
     abstract fun courseDao(): CourseDao
     abstract fun timeTrialDao(): TimeTrialDao
-
+    abstract fun globalResultDao(): GlobalResultDao
 
     companion object {
         @Volatile private var INSTANCE: TimingTrialsDatabase? = null

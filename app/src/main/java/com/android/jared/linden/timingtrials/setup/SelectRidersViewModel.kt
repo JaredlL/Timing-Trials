@@ -6,7 +6,6 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.BR
 import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.data.RiderLight
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import java.util.ArrayList
@@ -24,7 +23,7 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
     override var allSelectableRiders: LiveData<List<SelectableRiderViewWrapper>> = mRiderViewWrapperList
 
     init {
-        mRiderViewWrapperList.addSource(ttSetup.riderRepository.allRidersLight){ result: List<RiderLight>? ->
+        mRiderViewWrapperList.addSource(ttSetup.riderRepository.allRidersLight){ result: List<Rider>? ->
             result?.let{ mRiderViewWrapperList.value = ( result.map {r ->
                 SelectableRiderViewWrapper(r).apply {
                     onSelectionChanged = {r,s -> riderSelectionChangeHandler(r,s)}
@@ -47,7 +46,7 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
      * Need to remember order of ids were selected when a selection is changed
      *
      */
-    private fun riderSelectionChangeHandler(rider: RiderLight, sel:Boolean){
+    private fun riderSelectionChangeHandler(rider: Rider, sel:Boolean){
 
 
         ttSetup.timeTrial.value?.let{tt->
@@ -67,10 +66,10 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
 }
 
 
-class SelectableRiderViewWrapper(val rider: RiderLight): BaseObservable(){
+class SelectableRiderViewWrapper(val rider: Rider): BaseObservable(){
 
-    var getSelected: (RiderLight) -> Boolean = { _ -> false}
-    var onSelectionChanged = { _: RiderLight, _:Boolean -> Unit}
+    var getSelected: (Rider) -> Boolean = { _ -> false}
+    var onSelectionChanged = { _: Rider, _:Boolean -> Unit}
 
 
     val catString = rider.getCategoryStandard().categoryId()

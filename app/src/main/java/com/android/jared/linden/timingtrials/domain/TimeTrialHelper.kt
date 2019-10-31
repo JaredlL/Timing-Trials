@@ -33,7 +33,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
         return timeTrial.riderList.asSequence().firstOrNull { it.rider.id == id }
     }
 
-    fun addRidersAsTimeTrialRiders(riders: List<RiderLight>): TimeTrial{
+    fun addRidersAsTimeTrialRiders(riders: List<Rider>): TimeTrial{
         return timeTrial.copy(riderList =  riders.asSequence().mapIndexed { index, rider -> TimeTrialRider(rider, timeTrial.timeTrialHeader.id?:0L, number = index + 1) }.toList())
     }
 

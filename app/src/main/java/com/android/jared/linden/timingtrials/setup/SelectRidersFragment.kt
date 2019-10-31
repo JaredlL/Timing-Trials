@@ -45,13 +45,13 @@ class SelectRidersFragment : Fragment() {
 
         val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
             lifecycleOwner = (this@SelectRidersFragment)
-            riderHeading.selectableRider =  SelectableRiderViewWrapper(Rider.createBlank().copy( firstName = "Name", club = "Club").toRiderLight())
+            riderHeading.selectableRider =  SelectableRiderViewWrapper(Rider.createBlank().copy( firstName = "Name", club = "Club"))
             riderHeading.checkBox.visibility =  View.INVISIBLE
             riderRecyclerView.adapter = adapter
             riderRecyclerView.layoutManager = viewManager
 
             riderListFab.setOnClickListener {
-                editRider(Rider.createBlank().toRiderLight())
+                editRider(Rider.createBlank())
             }
         }
 
@@ -66,7 +66,7 @@ class SelectRidersFragment : Fragment() {
         return binding.root
     }
 
-    private fun editRider(rider: RiderLight){
+    private fun editRider(rider: Rider){
         val intent = Intent(context, EditItemActivity::class.java).apply {
             putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
             putExtra(ITEM_ID_EXTRA, rider.id)

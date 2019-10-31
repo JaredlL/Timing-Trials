@@ -14,7 +14,7 @@ class EventViewWrapper(val event: ITimelineEvent, val timeTrial: TimeTrial) : Ba
     private fun getRider(): TimeTrialRider? = event.riderId?.let {  timeTrial.riderList.firstOrNull{ r -> r.rider.id == event.riderId}}
 
     var getSelected: (ITimelineEvent) -> Boolean = { _ -> false}
-    var onSelectionChanged = { e: ITimelineEvent, b:Boolean -> Unit}
+    var onSelectionChanged = { _: ITimelineEvent, _:Boolean -> Unit}
 
     @Bindable
     fun getEventSelected():Boolean {
