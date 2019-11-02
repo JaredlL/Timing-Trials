@@ -22,9 +22,14 @@ import java.util.*
 import android.content.Intent
 import android.net.Uri
 import android.view.View
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
+import com.android.jared.linden.timingtrials.R
 
 
 class ResultActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,6 +83,23 @@ class ResultActivity : AppCompatActivity() {
 
 
         }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // R.menu.mymenu is a reference to an xml file named mymenu.xml which should be inside your res/menu directory.
+        // If you don't have res/menu, just create a directory named "menu" inside res
+        menuInflater.inflate(R.menu.menu_results, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    // handle button activities
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        if (item.itemId == R.id.doneButton) {
+            val resultViewModel = getViewModel { injector.resultViewModel() }
+            resultViewModel.insertResults()
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     fun takeScreenShot(view: View){
         try {

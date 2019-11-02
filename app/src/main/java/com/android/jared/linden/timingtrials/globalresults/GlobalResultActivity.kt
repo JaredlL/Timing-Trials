@@ -46,6 +46,7 @@ class GlobalResultActivity : AppCompatActivity() {
             }
         })
 
+
         genericItemViewModel.titleString.observe(this, Observer {item ->
             item?.let {
                 toolbar.title = item

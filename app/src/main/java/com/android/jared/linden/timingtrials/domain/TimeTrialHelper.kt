@@ -71,6 +71,19 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
        riderEventMap.mapNotNull { rek -> getRiderById(rek.key)?.let { rider -> TimeTrialResult(rider, (listOf(getRiderStartTime(rider)) + rek.value.map { it.timeStamp }).zipWithNext{a, b -> b - a}, timeTrial) }  }
     }
 
+    val results3: List<IResult> by lazy {
+        riderEventMap.mapNotNull { rek -> getRiderById(rek.key)?.let { rider ->
+            val splits = (listOf(getRiderStartTime(rider)) + rek.value.map { it.timeStamp }).zipWithNext{a, b -> b - a}
+            val totalTime = splits.sum()
+            FilledResult.fromRiderCourseTT(
+                    rider.rider,
+                    timeTrial.timeTrialHeader.course ?: Course.createBlank(),
+                    totalTime,
+                    splits,
+                    timeTrial.timeTrialHeader,
+                    "") }  }
+    }
+
     val results2: List<TimeTrialResult> by lazy {
         timeTrial.eventList.asSequence().groupBy { it.riderId }.mapNotNull { riderEvents ->
             getRiderById(riderEvents.key)?.let { TimeTrialResult(it, riderEvents.value.asSequence().sortedBy {ev-> ev.timeStamp }.zipWithNext{ a, b -> b.timeStamp - a.timeStamp }.toList(), timeTrial) }
