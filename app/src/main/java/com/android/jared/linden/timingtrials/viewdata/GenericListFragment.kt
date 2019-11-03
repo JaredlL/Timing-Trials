@@ -66,7 +66,7 @@ class GenericListFragment : Fragment() {
 
         val binding = DataBindingUtil.inflate<FragmentListGenericBinding>(inflater, R.layout.fragment_list_generic, container, false).apply{
             lifecycleOwner = (this@GenericListFragment)
-            listHeading.addView(viewFactory.createTitle(inflater, container))
+            listHeading.addView(viewFactory.createTitle(inflater, container), 0, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
             genericRecyclerView.adapter = adapter
             genericRecyclerView.layoutManager = viewManager
             viewFactory.performFabAction(genericListFab)

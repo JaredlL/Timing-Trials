@@ -26,18 +26,18 @@ class TimingTrialsDbActivity : AppCompatActivity()  {
         setContentView(R.layout.activity_database)
 
 
-        setSupportActionBar(databaseToolbar)
-        supportActionBar?.title = resources.getString(R.string.timingtrials_database)
-
-        mSectionsPagerAdapter = DbActivitySectionsPagerAdapter(supportFragmentManager)
-
-
-        // Set up the ViewPager with the sections adapter.
-        dbcontainer.adapter = mSectionsPagerAdapter
-        dbcontainer.offscreenPageLimit = 2
-
-        dbcontainer.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(dbtabs))
-        dbtabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(dbcontainer))
+//        setSupportActionBar(databaseToolbar)
+//        supportActionBar?.title = resources.getString(R.string.timingtrials_database)
+//
+//        mSectionsPagerAdapter = DbActivitySectionsPagerAdapter(supportFragmentManager)
+//
+//
+//        // Set up the ViewPager with the sections adapter.
+//        dbcontainer.adapter = mSectionsPagerAdapter
+//        dbcontainer.offscreenPageLimit = 2
+//
+//        dbcontainer.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(dbtabs))
+//        dbtabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(dbcontainer))
 
     }
 

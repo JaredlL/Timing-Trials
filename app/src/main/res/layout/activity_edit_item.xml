@@ -22,11 +22,20 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
-        android:id="@+id/editItemContainer"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-/>
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/editItemContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
