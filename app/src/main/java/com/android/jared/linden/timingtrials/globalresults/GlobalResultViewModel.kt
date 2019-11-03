@@ -82,7 +82,7 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
     private fun listItemForCourseResult(result: IResult):IGenericListItem{
         return object :IGenericListItem{
             override val itemText1: String
-                get() = "${result.rider.firstName} ${result.rider.lastName}"
+                get() = result.rider.fullName()
 
             override val itemText2: String
                 get() = "${result.dateSet?.let { ConverterUtils.dateToDisplay(it) } ?: ""} ${result.categoryString}"

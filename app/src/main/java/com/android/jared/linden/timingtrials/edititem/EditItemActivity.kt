@@ -20,16 +20,29 @@ class EditItemActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_edit_item)
 
+        setSupportActionBar(toolbar)
+
         val dataType = intent.getStringExtra(ITEM_TYPE_EXTRA)
         val itemId = intent.getLongExtra(ITEM_ID_EXTRA, 0)
+
+        val string1 = if(itemId == 0L) "New" else "Edit"
+        var string2 = ""
 
         if(savedInstanceState != null) return
 
         val frag: Fragment = when(dataType){
-           ITEM_RIDER -> EditRiderFragment.newInstance(itemId)
-           ITEM_COURSE -> EditCourseFragment.newInstance(itemId)
+           ITEM_RIDER -> {
+               string2 = " Rider"
+               EditRiderFragment.newInstance(itemId)
+           }
+           ITEM_COURSE ->{
+               string2 = " Course"
+               EditCourseFragment.newInstance(itemId)
+           }
            else -> EditRiderFragment.newInstance(itemId)
         }
+
+        supportActionBar?.title = string1 + string2
 
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.add(editItemContainer.id, frag).commit()

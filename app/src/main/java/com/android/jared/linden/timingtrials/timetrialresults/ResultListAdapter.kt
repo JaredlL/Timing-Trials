@@ -4,6 +4,7 @@ import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.ListItemResultBinding
@@ -39,6 +40,10 @@ class ResultListAdapter internal constructor(val activity: ResultActivity): Recy
         }
     }
 
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultViewHolder {
         val binding: ListItemResultBinding = DataBindingUtil.inflate(layoutInflater, R.layout.list_item_result, parent, false)
         return ResultViewHolder(binding)
@@ -64,3 +69,4 @@ class ResultListAdapter internal constructor(val activity: ResultActivity): Recy
     }
 
 }
+

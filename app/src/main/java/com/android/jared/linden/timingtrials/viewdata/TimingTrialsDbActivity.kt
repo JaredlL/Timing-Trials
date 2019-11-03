@@ -1,6 +1,8 @@
 package com.android.jared.linden.timingtrials.viewdata
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -10,6 +12,7 @@ import com.android.jared.linden.timingtrials.data.ITEM_RIDER
 import com.android.jared.linden.timingtrials.data.ITEM_TIMETRIAL
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_database.*
+import kotlinx.android.synthetic.main.activity_global_result.*
 
 
 class TimingTrialsDbActivity : AppCompatActivity()  {
@@ -23,6 +26,9 @@ class TimingTrialsDbActivity : AppCompatActivity()  {
         setContentView(R.layout.activity_database)
 
 
+        setSupportActionBar(databaseToolbar)
+        supportActionBar?.title = resources.getString(R.string.timingtrials_database)
+
         mSectionsPagerAdapter = DbActivitySectionsPagerAdapter(supportFragmentManager)
 
 
@@ -34,6 +40,8 @@ class TimingTrialsDbActivity : AppCompatActivity()  {
         dbtabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(dbcontainer))
 
     }
+
+
 
     /**
      * A [FragmentPagerAdapter] that returns a fragment corresponding to

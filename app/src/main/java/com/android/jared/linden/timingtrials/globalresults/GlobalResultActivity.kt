@@ -27,7 +27,7 @@ class GlobalResultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_global_result)
         setSupportActionBar(toolbar)
-
+        supportActionBar?.title = resources.getString(R.string.results)
 
         genericItemViewModel = getViewModel{ injector.globalResultViewModel()}
 

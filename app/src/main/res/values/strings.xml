@@ -44,12 +44,15 @@
     <string name="date">Date</string>
     <string name="add_rider">Add Rider</string>
     <string name="edit_rider">Edit Rider</string>
+    <string name="setup_timetrial">Setup Timetrial</string>
     <string name="add_course">Add Course</string>
     <string name="edit_course">Edit Course</string>
     <string name="gender">Gender</string>
     <string name="dob">DoB</string>
     <string name="yob">Year of birth</string>
+    <string name="timingtrials_database">Timing Trials Database</string>
     <string name="rider_start_offset">First rider start offset</string>
     <string name="delete">Delete</string>
     <string name="title_activity_global_result">GlobalResultActivity</string>
+    <string name="results">Results</string>
 </resources>

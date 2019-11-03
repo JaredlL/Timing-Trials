@@ -1,5 +1,6 @@
 package com.android.jared.linden.timingtrials.timetrialresults
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.Observer
@@ -21,9 +22,11 @@ import java.io.FileOutputStream
 import java.util.*
 import android.content.Intent
 import android.net.Uri
+import android.util.AttributeSet
 import android.view.View
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.widget.Toast
 import com.android.jared.linden.timingtrials.R
 
@@ -33,21 +36,26 @@ class ResultActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.android.jared.linden.timingtrials.R.layout.activity_result)
+        setContentView(R.layout.activity_result)
 
 //        viewResultsButton.setOnClickListener {
 //            val v = resultRecyclerView
 //            takeScreenShot(v)
 //        }
 
+        //toolbar.inflateMenu(R.menu.menu_results)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.title = "Results"
+
         val timeTrialId by argument<Long>(ITEM_ID_EXTRA)
         val resultViewModel = getViewModel { injector.resultViewModel() }.apply { initialise(timeTrialId) }
 
         val viewManager = GridLayoutManager(this, 2)
 
-
         val adapter = ResultListAdapter(this)
 
+        adapter.setHasStableIds(true)
 
         resultViewModel.results.observe(this, Observer {res->
             res?.let {newRes->
@@ -73,14 +81,16 @@ class ResultActivity : AppCompatActivity() {
 
         resultViewModel.timeTrial.observe(this, Observer {
             it?.let { tt->
-                resultHeading.text = tt.timeTrialHeader.ttName
+
+                supportActionBar?.title= "${tt.timeTrialHeader.ttName} Results"
             }
         })
 
+
+        resultRecyclerView.isNestedScrollingEnabled = false
         resultRecyclerView.layoutManager = viewManager
         resultRecyclerView.adapter = adapter
         resultRecyclerView.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
-
 
         }
 
@@ -238,3 +248,4 @@ class DividerItemDecoration(context: Context, orientation: Int) : RecyclerView.I
         val VERTICAL_LIST = LinearLayoutManager.VERTICAL
     }
 }
+
