@@ -31,10 +31,10 @@
                 android:value="com.android.jared.linden.timingtrials.MainActivity" />
         </activity>
 
-        <activity
-            android:name=".setup.SetupActivity"
-            android:label="@string/title_activity_setup"
-            android:windowSoftInputMode="adjustPan" />
+<!--        <activity-->
+<!--            android:name=".setup.SetupActivity"-->
+<!--            android:label="@string/title_activity_setup"-->
+<!--            android:windowSoftInputMode="adjustPan" />-->
 
         <activity
             android:name=".MainActivity"
@@ -46,7 +46,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".viewdata.TimingTrialsDbActivity" />
 
         <service android:name=".timing.TimingService" />
 

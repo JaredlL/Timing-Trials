@@ -1,21 +1,10 @@
 package com.android.jared.linden.timingtrials
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
-import com.android.jared.linden.timingtrials.setup.*
-import com.android.jared.linden.timingtrials.timing.TimingActivity
-import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
-import com.android.jared.linden.timingtrials.util.getViewModel
-import com.android.jared.linden.timingtrials.util.injector
-import com.android.jared.linden.timingtrials.viewdata.TimingTrialsDbActivity
-import kotlinx.android.synthetic.main.activity_database.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -24,13 +13,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_database)
+        setContentView(R.layout.activity_main)
 
-        val navController = findNavController(R.id.nav_host_fragment_database)
+        val navController = findNavController(R.id.nav_host_fragment)
         val appBarConfiguration = AppBarConfiguration(navController.graph)
 
-        databaseToolbar.setupWithNavController(navController, appBarConfiguration)
-        setSupportActionBar(databaseToolbar)
+        toolbar.setupWithNavController(navController, appBarConfiguration)
+        setSupportActionBar(toolbar)
         supportActionBar?.title = resources.getString(R.string.timingtrials_database)
 
 //

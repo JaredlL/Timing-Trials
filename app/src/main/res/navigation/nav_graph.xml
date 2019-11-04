@@ -8,12 +8,16 @@
     <fragment
         android:id="@+id/titleFragment"
         android:name="com.android.jared.linden.timingtrials.TitleFragment"
+        tools:layout="@layout/fragment_title"
         android:label="Title Fragment">
         <action
             android:id="@+id/action_dataBaseViewPagerFragment_to_dataBaseViewPagerFragment2"
             app:destination="@id/dataBaseViewPagerFragment"
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_titleFragment_to_setupViewPagerFragment2"
+            app:destination="@id/setupViewPagerFragment2" />
     </fragment>
     <fragment
         android:id="@+id/editRiderFragment"
@@ -29,11 +33,29 @@
     <fragment
         android:id="@+id/dataBaseViewPagerFragment"
         android:name="com.android.jared.linden.timingtrials.viewdata.DataBaseViewPagerFragment"
+        tools:layout="@layout/fragment_list_generic"
         android:label="DataBaseViewPagerFragment" >
         <action
             android:id="@+id/action_dataBaseViewPagerFragment2_to_editRiderFragment"
             app:destination="@id/editRiderFragment"
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_editCourseFragment"
+            app:destination="@id/editCourseFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/editCourseFragment"
+        android:name="com.android.jared.linden.timingtrials.edititem.EditCourseFragment"
+        tools:layout="@layout/fragment_course"
+        android:label="EditCourseFragment" >
+        <argument
+            android:name="courseId"
+            app:argType="long"
+            android:defaultValue="0L" />
+    </fragment>
+    <fragment
+        android:id="@+id/setupViewPagerFragment2"
+        android:name="com.android.jared.linden.timingtrials.setup.SetupViewPagerFragment"
+        android:label="SetupViewPagerFragment" />
 </navigation>

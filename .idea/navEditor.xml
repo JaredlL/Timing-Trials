@@ -13,8 +13,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-206" />
-                            <option name="y" value="308" />
+                            <option name="x" value="-401" />
+                            <option name="y" value="522" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -24,7 +24,24 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_dataBaseViewPagerFragment_to_editCourseFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                           </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="editCourseFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="66" />
+                            <option name="y" value="854" />
+                          </Point>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -34,8 +51,20 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="123" />
-                            <option name="y" value="322" />
+                            <option name="x" value="64" />
+                            <option name="y" value="513" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="setupViewPagerFragment2">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-338" />
+                            <option name="y" value="-8" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -46,13 +75,18 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-579" />
-                            <option name="y" value="281" />
+                            <option name="x" value="-704" />
+                            <option name="y" value="157" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
                             <entry key="action_dataBaseViewPagerFragment_to_dataBaseViewPagerFragment2">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_titleFragment_to_setupViewPagerFragment2">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -117,25 +151,12 @@
                 <map>
                   <entry key="editRiderFragment2">
                     <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="186" />
-                            <option name="y" value="224" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
+                      <LayoutPositions />
                     </value>
                   </entry>
                   <entry key="setupViewPagerFragment">
                     <value>
                       <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="-180" />
-                            <option name="y" value="139" />
-                          </Point>
-                        </option>
                         <option name="myPositions">
                           <map>
                             <entry key="action_setupViewPagerFragment_to_editRiderFragment2">
