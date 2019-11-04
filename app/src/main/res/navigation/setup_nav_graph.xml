@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/setup_nav_graph"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/setupViewPagerFragment">
+
+    <fragment
+        android:id="@+id/setupViewPagerFragment"
+        tools:layout="@layout/fragment_setup_time_trial"
+        android:name="com.android.jared.linden.timingtrials.setup.SetupViewPagerFragment"
+        android:label="SetupViewPagerFragment" >
+        <action
+            android:id="@+id/action_setupViewPagerFragment_to_editRiderFragment2"
+            app:destination="@id/editRiderFragment2"
+            app:enterAnim="@anim/fragment_open_enter" />
+    </fragment>
+    <fragment
+        android:id="@+id/editRiderFragment2"
+        android:name="com.android.jared.linden.timingtrials.edititem.EditRiderFragment"
+        android:label="EditRiderFragment">
+        <argument
+            android:name="riderId"
+            android:defaultValue="0L"
+            app:argType="long" />
+    </fragment>
+
+</navigation>

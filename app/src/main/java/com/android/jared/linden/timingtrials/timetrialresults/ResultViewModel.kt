@@ -107,7 +107,7 @@ class ResultRowViewModel{
         if(result.splits.size > 1){
             row.addAll(result.splits.map { ResultCell(MutableLiveData(ConverterUtils.toTenthsDisplayString(it))) })
         }
-         row.add(ResultCell(MutableLiveData("blobs")))
+         row.add(ResultCell(MutableLiveData("")))
 
 
     }

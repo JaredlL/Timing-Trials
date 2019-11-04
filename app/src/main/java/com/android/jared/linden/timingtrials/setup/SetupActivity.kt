@@ -11,11 +11,16 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import kotlinx.android.synthetic.main.activity_database.*
+import kotlinx.android.synthetic.main.activity_main.*
 
 import kotlinx.android.synthetic.main.activity_setup.*
 import org.threeten.bp.OffsetDateTime
@@ -32,7 +37,7 @@ class SetupActivity : AppCompatActivity() {
      */
 
 
-    private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
+    //private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
     //private lateinit var riderListViewModel: RiderListViewModel
     private lateinit var setupViewModel: SetupViewModel
 
@@ -64,7 +69,7 @@ class SetupActivity : AppCompatActivity() {
             setupViewModel.timeTrial.value?.let {
                 if(it.riderList.count() == 0){
                     Toast.makeText(this, "TT Needs at least 1 rider", Toast.LENGTH_LONG).show()
-                    container.currentItem = 1
+                    //container.currentItem = 1
                     return@let
                 }
                 if(it.timeTrialHeader.startTime.isBefore(OffsetDateTime.now())){
@@ -83,19 +88,29 @@ class SetupActivity : AppCompatActivity() {
 
         }
 
-        setSupportActionBar(toolbar)
+        setSupportActionBar(toolbarSetup)
         supportActionBar?.title = resources.getString(R.string.setup_timetrial)
+
+
+        val navController = findNavController(R.id.nav_host_fragment_setup)
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+
+        toolbarSetup.setupWithNavController(navController, appBarConfiguration)
+        setSupportActionBar(toolbarSetup)
+        supportActionBar?.title = resources.getString(R.string.setup_timetrial)
+
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
-
-
-        // Set up the ViewPager with the sections adapter.
-        container.adapter = mSectionsPagerAdapter
-        container.offscreenPageLimit = 2
-
-        container.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabs))
-        tabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(container))
+//        mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
+//
+//
+//        // Set up the ViewPager with the sections adapter.
+//        container.adapter = mSectionsPagerAdapter
+//        container.offscreenPageLimit = 2
+//
+//        container.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabs))
+//        tabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(container))
 
 
     }
@@ -122,71 +137,71 @@ class SetupActivity : AppCompatActivity() {
     }
 
 
-    /**
-     * A [FragmentPagerAdapter] that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
-
-        override fun getItem(position: Int): Fragment {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-
-
-           return when (position){
-                0 ->  SetupTimeTrialFragment.newInstance()
-                1 ->  SelectRidersFragment.newInstance()
-                2 ->  OrderRidersFragment.newInstance()
-                else ->  SetupTimeTrialFragment.newInstance()
-
-            }
-        }
-
-        override fun getCount(): Int {
-            // Show 3 total pages.
-            return 3
-        }
-    }
-
-
-    class DuelHostFragment : Fragment() {
-
-        private val TTTAG = "tt_tag"
-        private val COURSETAG = "course_tag"
-
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                                  savedInstanceState: Bundle?): View? {
-            val rootView = inflater.inflate(R.layout.fragment_host, container, false)
-
-            /**
-             * Check if the fragemts already exist in child fragment manager
-             * To make sure we do not recreate fragments unnecessarily
-             */
-
-            childFragmentManager.findFragmentByTag(TTTAG)?: SetupTimeTrialFragment.newInstance().also {
-                childFragmentManager.beginTransaction().apply{
-                    add(R.id.higherFrame, it, TTTAG)
-                    commit()
-                }
-            }
-
-            childFragmentManager.findFragmentByTag(COURSETAG)?: SelectCourseFragment.newInstance().also {
-                childFragmentManager.beginTransaction().apply{
-                    add(R.id.lowerFrame, it, COURSETAG)
-                    commit()
-                }
-            }
-
-
-            return rootView
-        }
-
-        companion object {
-
-
-            fun newInstance(): DuelHostFragment {
-                return DuelHostFragment()
-            }
-        }
-    }
+//    /**
+//     * A [FragmentPagerAdapter] that returns a fragment corresponding to
+//     * one of the sections/tabs/pages.
+//     */
+//    inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+//
+//        override fun getItem(position: Int): Fragment {
+//            // getItem is called to instantiate the fragment for the given page.
+//            // Return a PlaceholderFragment (defined as a static inner class below).
+//
+//
+//           return when (position){
+//                0 ->  SetupTimeTrialFragment.newInstance()
+//                1 ->  SelectRidersFragment.newInstance()
+//                2 ->  OrderRidersFragment.newInstance()
+//                else ->  SetupTimeTrialFragment.newInstance()
+//
+//            }
+//        }
+//
+//        override fun getCount(): Int {
+//            // Show 3 total pages.
+//            return 3
+//        }
+//    }
+//
+//
+//    class DuelHostFragment : Fragment() {
+//
+//        private val TTTAG = "tt_tag"
+//        private val COURSETAG = "course_tag"
+//
+//        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+//                                  savedInstanceState: Bundle?): View? {
+//            val rootView = inflater.inflate(R.layout.fragment_host, container, false)
+//
+//            /**
+//             * Check if the fragemts already exist in child fragment manager
+//             * To make sure we do not recreate fragments unnecessarily
+//             */
+//
+//            childFragmentManager.findFragmentByTag(TTTAG)?: SetupTimeTrialFragment.newInstance().also {
+//                childFragmentManager.beginTransaction().apply{
+//                    add(R.id.higherFrame, it, TTTAG)
+//                    commit()
+//                }
+//            }
+//
+//            childFragmentManager.findFragmentByTag(COURSETAG)?: SelectCourseFragment.newInstance().also {
+//                childFragmentManager.beginTransaction().apply{
+//                    add(R.id.lowerFrame, it, COURSETAG)
+//                    commit()
+//                }
+//            }
+//
+//
+//            return rootView
+//        }
+//
+//        companion object {
+//
+//
+//            fun newInstance(): DuelHostFragment {
+//                return DuelHostFragment()
+//            }
+//        }
+//    }
 }

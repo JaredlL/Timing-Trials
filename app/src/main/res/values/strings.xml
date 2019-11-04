@@ -23,6 +23,8 @@
     <string name="club">Club</string>
     <string name="begin_tt">Begin TT!</string>
     <string name="ok">OK</string>
+    <string name="select_riders">Select Riders</string>
+    <string name="order_riders">Order Riders</string>
     <string name="cancel">Cancel</string>
     <string name="title_activity_timing">TimingActivity</string>
     <string name="start_tt">Start TT</string>

@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.navArgs
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentRiderBinding
@@ -30,10 +31,13 @@ class EditRiderFragment : Fragment() {
     private val riderId by argument<Long>(ITEM_ID_EXTRA)
     private lateinit var riderViewModel: EditRiderViewModel
 
+    val args: EditRiderFragmentArgs by navArgs()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        riderViewModel = getViewModel { injector.riderViewModel().apply { initialise(riderId) } }
+
+        riderViewModel = getViewModel { injector.riderViewModel().apply { initialise(args.riderId) } }
         val mAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
 
         riderViewModel.clubs.observe(viewLifecycleOwner, Observer{
@@ -42,7 +46,7 @@ class EditRiderFragment : Fragment() {
             mAdapter.notifyDataSetChanged()
         })
 
-        activity?.title = if(riderId == 0L) getString(R.string.add_rider) else getString(R.string.edit_rider)
+        activity?.title = if(args.riderId == 0L) getString(R.string.add_rider) else getString(R.string.edit_rider)
 
         val binding = DataBindingUtil.inflate<FragmentRiderBinding>(inflater, R.layout.fragment_rider, container, false).apply {
             viewModel = riderViewModel

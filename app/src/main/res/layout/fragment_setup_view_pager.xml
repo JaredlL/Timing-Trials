@@ -4,13 +4,13 @@
 
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/viewpager_coordinator_layout"
+        android:id="@+id/viewpager_coordinator_layout_setup"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
         <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/view_pager2"
+            android:id="@+id/view_pager2_setup"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
@@ -23,16 +23,6 @@
             android:theme="@style/AppTheme.AppBarOverlay">
 
 
-<!--                        <androidx.appcompat.widget.Toolbar-->
-<!--                            android:id="@+id/toolbar"-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="?attr/actionBarSize"-->
-<!--                            android:background="?attr/colorPrimary"-->
-<!--                            app:popupTheme="@style/AppTheme.PopupOverlay" />-->
-
-
-
-            <!-- Override tabIconTint attribute of style with selector -->
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"

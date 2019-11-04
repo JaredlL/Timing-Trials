@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/titleFragment">
+
+    <fragment
+        android:id="@+id/titleFragment"
+        android:name="com.android.jared.linden.timingtrials.TitleFragment"
+        android:label="Title Fragment">
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_dataBaseViewPagerFragment2"
+            app:destination="@id/dataBaseViewPagerFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit" />
+    </fragment>
+    <fragment
+        android:id="@+id/editRiderFragment"
+        android:name="com.android.jared.linden.timingtrials.edititem.EditRiderFragment"
+        android:label="Edit Rider"
+        tools:layout="@layout/fragment_rider">
+
+        <argument
+            android:name="riderId"
+            android:defaultValue="0L"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/dataBaseViewPagerFragment"
+        android:name="com.android.jared.linden.timingtrials.viewdata.DataBaseViewPagerFragment"
+        android:label="DataBaseViewPagerFragment" >
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment2_to_editRiderFragment"
+            app:destination="@id/editRiderFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit" />
+    </fragment>
+</navigation>

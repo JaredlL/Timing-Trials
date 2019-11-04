@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.Navigation
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
@@ -24,11 +25,15 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, L
         _binding.apply{
             rider = data
             riderLayout.setOnLongClickListener {
-                val intent = Intent(root.context, EditItemActivity::class.java).apply {
-                    putExtra(ITEM_ID_EXTRA, data.id)
-                    putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
-                }
-                root.context.startActivity(intent)
+
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment(data.id ?: 0)
+                Navigation.findNavController(_binding.root).navigate(action)
+
+//                val intent = Intent(root.context, EditItemActivity::class.java).apply {
+//                    putExtra(ITEM_ID_EXTRA, data.id)
+//                    putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
+//                }
+//                root.context.startActivity(intent)
                 true
             }
 

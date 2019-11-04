@@ -1,4 +1,7 @@
-package com.android.jared.linden.timingtrials.viewdata
+package com.android.jared.linden.timingtrials.setup
+
+import com.android.jared.linden.timingtrials.viewdata.GenericListFragment
+
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,16 +15,19 @@ import com.android.jared.linden.timingtrials.data.ITEM_COURSE
 import com.android.jared.linden.timingtrials.data.ITEM_RIDER
 import com.android.jared.linden.timingtrials.data.ITEM_TIMETRIAL
 import com.android.jared.linden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
+import com.android.jared.linden.timingtrials.viewdata.COURSE_PAGE_INDEX
 import com.google.android.material.tabs.TabLayoutMediator
 
-class DataBaseViewPagerFragment: Fragment() {
+class SetupViewPagerFragment: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val binding = FragmentDatabaseViewPagerBinding.inflate(inflater, container, false)
         val tabLayout = binding.tabs
         val viewPager = binding.viewPager2
-        viewPager.adapter = TimeTrialDBPagerAdapter(this)
+        viewPager.adapter = SetupPagerAdapter(this)
+
+        viewPager.offscreenPageLimit = 2
 
         // Set the icon and text for each tab
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
@@ -37,7 +43,7 @@ class DataBaseViewPagerFragment: Fragment() {
     private fun getTabIcon(position: Int): Int {
         return when (position) {
             RIDER_PAGE_INDEX -> R.drawable.ic_action_done
-            COURSE_PAGE_INDEX -> R.drawable.ic_dashboard_black_24dp
+            ORDER_RIDER_INDEX -> R.drawable.ic_dashboard_black_24dp
             TIMETRIAL_PAGE_INDEX -> R.drawable.ic_home_black_24dp
             else -> throw IndexOutOfBoundsException()
         }
@@ -45,9 +51,9 @@ class DataBaseViewPagerFragment: Fragment() {
 
     private fun getTabTitle(position: Int): String? {
         return when (position) {
-            RIDER_PAGE_INDEX -> getString(R.string.riders)
-            COURSE_PAGE_INDEX -> getString(R.string.courses)
-            TIMETRIAL_PAGE_INDEX->getString(R.string.time_trials)
+            RIDER_PAGE_INDEX -> getString(R.string.select_riders)
+            ORDER_RIDER_INDEX -> getString(R.string.order_riders)
+            TIMETRIAL_PAGE_INDEX->getString(R.string.setup_timetrial)
             else -> null
         }
     }
@@ -56,20 +62,21 @@ class DataBaseViewPagerFragment: Fragment() {
 }
 
 
+const val TIMETRIAL_PAGE_INDEX = 0
+const val RIDER_PAGE_INDEX = 1
+const val ORDER_RIDER_INDEX = 2
 
-const val RIDER_PAGE_INDEX = 0
-const val COURSE_PAGE_INDEX = 1
-const val TIMETRIAL_PAGE_INDEX = 2
 
-class TimeTrialDBPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class SetupPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     /**
      * Mapping of the ViewPager page indexes to their respective Fragments
      */
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-            RIDER_PAGE_INDEX to { GenericListFragment.newInstance(ITEM_RIDER) },
-            COURSE_PAGE_INDEX to { GenericListFragment.newInstance(ITEM_COURSE) },
-            TIMETRIAL_PAGE_INDEX to {GenericListFragment.newInstance(ITEM_TIMETRIAL)}
+            TIMETRIAL_PAGE_INDEX to {SetupTimeTrialFragment.newInstance()},
+            RIDER_PAGE_INDEX to { SelectRidersFragment.newInstance()},
+            ORDER_RIDER_INDEX to { OrderRidersFragment.newInstance() }
+
     )
 
     override fun getItemCount() = tabFragmentsCreators.size
