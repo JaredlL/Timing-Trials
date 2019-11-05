@@ -23,13 +23,13 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
 
     inner class SelectableRiderViewHolder(val binding: ListItemSelectableRiderBinding): RecyclerView.ViewHolder(binding.root) {
 
-        var longPress = {(rider): Rider -> Unit}
+        var longPress = {_: Long -> Unit}
 
         fun bind(riderVm: SelectableRiderViewWrapper){
 
             binding.apply{
                 selectableRider = riderVm
-                riderLayout.setOnLongClickListener { longPress(riderVm.rider)
+                riderLayout.setOnLongClickListener { longPress(riderVm.rider.id?:0)
                     true
                 }
 
@@ -39,7 +39,6 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
     }
 
     var mRiders: List<SelectableRiderViewWrapper> = listOf()
-    //var mSelected: ArrayList<Long> = arrayListOf()
     val layoutInflater = LayoutInflater.from(context)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectableRiderViewHolder {
@@ -59,7 +58,7 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
         }
     }
 
-    var editRider = {(SelectableRiderViewWrapper):Rider -> Unit}
+    var editRider = {_: Long -> Unit}
 
     fun setRiders(newRiders: List<SelectableRiderViewWrapper>){
         mRiders = newRiders

@@ -16,14 +16,13 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
     inner class CourseViewHolder(binding: ListItemCourseBinding): RecyclerView.ViewHolder(binding.root) {
         private val _binding = binding
 
-        var longPress = {(course): Course -> Unit}
+        var longPress = {_: Long -> Unit}
 
         fun bind(courseWrapper: CourseListViewWrapper){
 
             _binding.apply{
                 courseVm = courseWrapper
-                val isSel = courseWrapper.getCourseIsSelected()
-                courseLayout.setOnLongClickListener { longPress(courseWrapper.course)
+                courseLayout.setOnLongClickListener { longPress(courseWrapper.course.id?:0)
                     true
                 }
                 executePendingBindings()
@@ -34,7 +33,7 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
 
     private var mCourses: List<CourseListViewWrapper> = listOf()
     val layoutInflater = LayoutInflater.from(context)
-    var editCourse = {(course):Course -> Unit}
+    var editCourse = {_:Long -> Unit}
 
 
     override fun onBindViewHolder(holder: CourseViewHolder, position: Int) {

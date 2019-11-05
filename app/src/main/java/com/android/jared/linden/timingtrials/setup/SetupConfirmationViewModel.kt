@@ -2,7 +2,7 @@ package com.android.jared.linden.timingtrials.setup
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.android.jared.linden.timingtrials.MainViewModel
+import com.android.jared.linden.timingtrials.TitleViewModel
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.util.ConverterUtils
@@ -74,7 +74,7 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
     }
 }
 
-class ResumeOldConfirmationViewModel (private val mainViewModel: MainViewModel) : ISetupConformationViewModel{
+class ResumeOldConfirmationViewModel (private val mainViewModel: TitleViewModel) : ISetupConformationViewModel{
 
 
     override val timeTrial = mainViewModel.setupTimeTrial

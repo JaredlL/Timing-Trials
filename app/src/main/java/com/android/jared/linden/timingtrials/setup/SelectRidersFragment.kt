@@ -11,12 +11,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.android.jared.linden.timingtrials.R
 
 import com.android.jared.linden.timingtrials.adapters.SelectableRiderListAdapter
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.FragmentSelectriderListBinding
-import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.util.*
 
 
@@ -51,7 +52,7 @@ class SelectRidersFragment : Fragment() {
             riderRecyclerView.layoutManager = viewManager
 
             riderListFab.setOnClickListener {
-                editRider(Rider.createBlank())
+                editRider(0)
             }
         }
 
@@ -66,12 +67,9 @@ class SelectRidersFragment : Fragment() {
         return binding.root
     }
 
-    private fun editRider(rider: Rider){
-        val intent = Intent(context, EditItemActivity::class.java).apply {
-            putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
-            putExtra(ITEM_ID_EXTRA, rider.id)
-        }
-        startActivity(intent)
+    private fun editRider(riderId: Long){
+        val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(riderId)
+        findNavController().navigate(action)
     }
 
 

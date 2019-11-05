@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 
 
-class MainViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel() {
+class TitleViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel() {
 
     val setupTimeTrial = Transformations.map(timeTrialRepository.getNonFinishedTimeTrial()){tt->
         tt?.firstOrNull{it.timeTrialHeader.status == TimeTrialStatus.SETTING_UP}

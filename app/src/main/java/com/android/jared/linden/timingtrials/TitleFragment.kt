@@ -14,61 +14,61 @@ import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
-import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.databinding.FragmentTitleBinding
 
 
 class TitleFragment : Fragment()
 {
 
-    var setupTimeTrial: TimeTrial? = null
+    private lateinit var titleViewmodel: TitleViewModel
 
-
+    private lateinit var testViewModel: TestViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
-        val vm = getViewModel { injector.mainViewModel() }
+        titleViewmodel = getViewModel { injector.mainViewModel() }
+        testViewModel = getViewModel { injector.testViewModel() }
 
         val binding =  DataBindingUtil.inflate<FragmentTitleBinding>(inflater, R.layout.fragment_title, container, false).apply{
 
-            maButtManageRiders.setOnClickListener {
+            startTtSetupButton.setOnClickListener{
+                val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
+                Navigation.findNavController(this.root).navigate(action)
+            }
+
+            viewDatabaseButton.setOnClickListener {
                 val action = TitleFragmentDirections.actionDataBaseViewPagerFragmentToDataBaseViewPagerFragment2()
                 Navigation.findNavController(this.root).navigate(action)
             }
 
-            createSetupButton.setOnClickListener {
-                val tvm = getViewModel { injector.testViewModel() }
-                tvm.insertSetupTt()
+            testSetupButton.setOnClickListener {
+                testViewModel.insertSetupTt()
                 val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
                 Navigation.findNavController(this.root).navigate(action)
 
             }
 
-            createTimingButton.setOnClickListener {
+            testTimingButton.setOnClickListener {
                 val tvm = getViewModel { injector.testViewModel() }
                 tvm.insertTimingTt()
                 val tIntent = Intent(requireActivity(), TimingActivity::class.java)
                 startActivity(tIntent)
 
             }
-
-
-
-
-
         }
 
 
 
-        binding.createFinishedButton.setOnClickListener {
-            val tvm = getViewModel { injector.testViewModel() }
-            tvm.insertFinishedTt()
-            tvm.newId.observe(this, Observer {res->
+
+
+        binding.testResults1.setOnClickListener {
+            testViewModel.insertFinishedTt()
+            testViewModel.newId.observe(this, Observer {res->
                 res?.let {
                     val mIntent = Intent(requireActivity(), ResultActivity::class.java)
                     mIntent.putExtra(ITEM_ID_EXTRA, it)
                     startActivity(mIntent)
-                    tvm.newId.removeObservers(this)
+                    testViewModel.newId.removeObservers(this)
                 }
 
             })

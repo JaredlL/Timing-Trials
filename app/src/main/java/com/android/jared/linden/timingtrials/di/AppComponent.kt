@@ -1,7 +1,7 @@
 package com.android.jared.linden.timingtrials.di
 
 import android.content.Context
-import com.android.jared.linden.timingtrials.MainViewModel
+import com.android.jared.linden.timingtrials.TitleViewModel
 import com.android.jared.linden.timingtrials.edititem.EditCourseViewModel
 import com.android.jared.linden.timingtrials.edititem.EditRiderViewModel
 import com.android.jared.linden.timingtrials.globalresults.GlobalResultViewModel
@@ -37,7 +37,7 @@ interface AppComponent{
 
     fun timingViewModel(): TimingViewModel
 
-    fun mainViewModel(): MainViewModel
+    fun mainViewModel(): TitleViewModel
 
     fun testViewModel(): TestViewModel
 

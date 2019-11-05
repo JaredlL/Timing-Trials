@@ -13,6 +13,8 @@ import android.widget.TimePicker
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentSetupTimeTrialBinding
@@ -60,13 +62,19 @@ class SetupTimeTrialFragment : Fragment() {
     }
 
     private fun showCourseFrag(){
-        val courseFrag: SelectCourseFragment = requireActivity().supportFragmentManager
-                .findFragmentByTag("dialog") as? SelectCourseFragment ?: SelectCourseFragment.newInstance()
-
-        if(courseFrag.dialog?.isShowing != true) {
-            courseFrag.show(requireActivity().supportFragmentManager, "dialog")
-        }
+        val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragmentToSelectCourseFragment()
+        findNavController().navigate(action)
     }
+
+//    private fun showCourseFrag(){
+//        val courseFrag: SelectCourseFragment = requireActivity().supportFragmentManager
+//                .findFragmentByTag("dialog") as? SelectCourseFragment ?: SelectCourseFragment.newInstance()
+//
+//        if(courseFrag.dialog?.isShowing != true) {
+//
+//            courseFrag.show(requireActivity().supportFragmentManager, "dialog")
+//        }
+//    }
 
 
 

@@ -25,6 +25,11 @@ class TestViewModel@Inject constructor(
 
 
 
+
+
+    // region Test methods
+
+
     val newId = MutableLiveData<Long>()
 
     fun insertTimingTt(){
@@ -182,5 +187,7 @@ class TestViewModel@Inject constructor(
         }
         return timeTrial.copy(eventList = events)
     }
+
+    // endregion
 
 }

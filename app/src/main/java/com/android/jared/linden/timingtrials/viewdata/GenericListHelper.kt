@@ -10,7 +10,6 @@ import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemTimetrialBinding
-import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.globalresults.GlobalResultActivity
 import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
 import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
@@ -28,12 +27,6 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, L
 
                 val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment(data.id ?: 0)
                 Navigation.findNavController(_binding.root).navigate(action)
-
-//                val intent = Intent(root.context, EditItemActivity::class.java).apply {
-//                    putExtra(ITEM_ID_EXTRA, data.id)
-//                    putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
-//                }
-//                root.context.startActivity(intent)
                 true
             }
 
@@ -67,11 +60,7 @@ class RiderViewHolderFactory: GenericViewHolderFactory<Rider>() {
 
     override fun performFabAction(fab: View) {
         fab.setOnClickListener {
-            val intent = Intent(fab.context, EditItemActivity::class.java).apply {
-                putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
-                putExtra(ITEM_ID_EXTRA, 0L)
-            }
-            fab.context.startActivity(intent)
+
         }
     }
 }
@@ -88,11 +77,8 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Co
             checkBox.visibility = View.GONE
 
             courseLayout.setOnLongClickListener {
-                val intent = Intent(root.context, EditItemActivity::class.java).apply {
-                    putExtra(ITEM_ID_EXTRA, data.course.id)
-                    putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
-                }
-                root.context.startActivity(intent)
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(data.course.id ?: 0)
+                Navigation.findNavController(_binding.root).navigate(action)
                 true
             }
 
@@ -114,10 +100,7 @@ class CourseViewHolderFactory: GenericViewHolderFactory<CourseListViewWrapper>()
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
         val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply { checkBox.visibility = View.GONE }
         return binding.root
-//        return createView(layoutInflator, parent, data = object: CourseListViewWrapper(Course("Course Name", 0.0, "CTT Name")){
-//
-//            override var convertedLengthString = "Distance"
-//        })
+
     }
 
     override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: CourseListViewWrapper): View {
@@ -132,11 +115,8 @@ class CourseViewHolderFactory: GenericViewHolderFactory<CourseListViewWrapper>()
 
     override fun performFabAction(fab: View) {
         fab.setOnClickListener {
-            val intent = Intent(fab.context, EditItemActivity::class.java).apply {
-                putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
-                putExtra(ITEM_ID_EXTRA, 0L)
-            }
-            fab.context.startActivity(intent)
+            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(0)
+            Navigation.findNavController(fab).navigate(action)
         }
 
     }
@@ -145,7 +125,6 @@ class CourseViewHolderFactory: GenericViewHolderFactory<CourseListViewWrapper>()
 
 class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHolder<TimeTrialHeader, ListItemTimetrialBinding>(binding) {
     private val _binding = binding
-    //override var onLongPress = {(rider):TimeTrialHeader -> Unit}
 
     override fun bind(data: TimeTrialHeader){
         _binding.apply{

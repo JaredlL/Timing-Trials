@@ -31,8 +31,7 @@ class SetupViewModel @Inject constructor(
 
 
     val timeTrial = MediatorLiveData<TimeTrial>().apply { addSource(timeTrialRepository.getNonFinishedTimeTrial()) { res ->
-//        val settingUp = res?.firstOrNull{it.timeTrialHeader.status == TimeTrialStatus.SETTING_UP}
-//        val timing = res?.firstOrNull{it.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS}
+
         val settingUp = res?.firstOrNull()
         if (res?.size?:0 > 1) throw Exception("Multiple non finished TTs in DB")
         if (settingUp != null) {
@@ -44,7 +43,6 @@ class SetupViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 timeTrialRepository.insert(TimeTrial.createBlank())
             }
-            //updateTimeTrial(TimeTrial.createBlank())
         }
     }
     }
