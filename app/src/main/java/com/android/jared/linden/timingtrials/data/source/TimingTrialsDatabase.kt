@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 
-@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, RiderPassedEvent::class, TimeTrialRider::class, GlobalResult::class], version = 27, exportSchema = false)
+@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, RiderPassedEvent::class, TimeTrialRider::class, GlobalResult::class], version = 28, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 

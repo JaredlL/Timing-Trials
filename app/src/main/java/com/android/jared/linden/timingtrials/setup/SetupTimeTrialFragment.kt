@@ -36,7 +36,6 @@ class SetupTimeTrialFragment : Fragment() {
         val mAdapter = ArrayAdapter<String>(requireContext(),R.layout.support_simple_spinner_dropdown_item, listOf("15", "30", "60", "90", "120"))
         val binding = DataBindingUtil.inflate<FragmentSetupTimeTrialBinding>(inflater, R.layout.fragment_setup_time_trial, container, false).apply {
             viewModel = propsViewModel
-
             lifecycleOwner = (this@SetupTimeTrialFragment)
             autocomplete.threshold = 1
             autocomplete.setAdapter(mAdapter)
@@ -57,6 +56,8 @@ class SetupTimeTrialFragment : Fragment() {
               }
           }
         })
+
+
 
         return binding.root
     }

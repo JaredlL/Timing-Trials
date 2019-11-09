@@ -22,6 +22,9 @@
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popUpTo="@+id/titleFragment" />
+        <action
+            android:id="@+id/action_titleFragment_to_selectCourseFragment"
+            app:destination="@id/selectCourseFragment" />
     </fragment>
     <fragment
         android:id="@+id/editRiderFragment"
@@ -100,5 +103,8 @@
             app:destination="@id/editCourseFragment"
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_selectCourseFragment_to_setupViewPagerFragment"
+            app:destination="@id/setupViewPagerFragment" />
     </fragment>
 </navigation>

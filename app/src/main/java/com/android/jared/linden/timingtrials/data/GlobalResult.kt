@@ -8,9 +8,9 @@ import java.lang.Exception
 @Entity(tableName = "globalresult_table",
         indices = [Index("riderId"),Index("courseId"), Index("timeTrialId")],
         foreignKeys = [
-            ForeignKey(entity = Rider::class, parentColumns = arrayOf("id"), childColumns = arrayOf("riderId"), onDelete = ForeignKey.CASCADE, deferred = true),
-            ForeignKey(entity = Course::class, parentColumns = arrayOf("id"), childColumns = arrayOf("courseId"), onDelete = ForeignKey.CASCADE, deferred = true),
-            ForeignKey(entity = TimeTrialHeader::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = ForeignKey.CASCADE, deferred = true)
+            ForeignKey(entity = Rider::class, parentColumns = arrayOf("id"), childColumns = arrayOf("riderId"), onDelete = ForeignKey.CASCADE, deferred = false),
+            ForeignKey(entity = Course::class, parentColumns = arrayOf("id"), childColumns = arrayOf("courseId"), onDelete = ForeignKey.CASCADE, deferred = false),
+            ForeignKey(entity = TimeTrialHeader::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = ForeignKey.CASCADE, deferred = false)
         ])
 
 data class GlobalResult(val riderId: Long,

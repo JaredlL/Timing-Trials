@@ -38,8 +38,8 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         if (timeTrial.value == null) {
             timeTrial.addSource(timeTrialRepository.getNonFinishedTimeTrial()) { res ->
 
-                val timing = res?.firstOrNull()
-                if (res?.size?:0 > 1) throw Exception("Multiple non finished TTs in DB")
+                val timing = res
+                if (res != null) throw Exception("Multiple non finished TTs in DB")
                     if(timing != null && timeTrial.value != timing) {
                         currentTt = timing
                         timeTrial.value = timing

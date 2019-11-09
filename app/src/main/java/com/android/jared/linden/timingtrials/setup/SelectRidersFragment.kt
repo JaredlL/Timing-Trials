@@ -41,7 +41,7 @@ class SelectRidersFragment : Fragment() {
         viewManager = LinearLayoutManager(context)
         adapter = SelectableRiderListAdapter(requireContext())
 
-
+        adapter.setHasStableIds(true)
         adapter.editRider = ::editRider
 
         val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {

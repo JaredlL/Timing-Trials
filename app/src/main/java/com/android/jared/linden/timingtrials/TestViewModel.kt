@@ -79,12 +79,10 @@ class TestViewModel@Inject constructor(
                                 laps = 2,
                                 status = TimeTrialStatus.SETTING_UP))
                 val newTt = timeTrial.helper.addRidersAsTimeTrialRiders(rList)
-                val i = timeTrialRepository.insert(newTt)
+                val i = timeTrialRepository.insertOrUpdate(newTt)
                 newId.postValue(i)
             }
-
-                }
-
+        }
 
         }
 

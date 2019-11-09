@@ -31,19 +31,12 @@ class SetupViewModel @Inject constructor(
 
 
     val timeTrial = MediatorLiveData<TimeTrial>().apply { addSource(timeTrialRepository.getNonFinishedTimeTrial()) { res ->
-
-        val settingUp = res?.firstOrNull()
-        if (res?.size?:0 > 1) throw Exception("Multiple non finished TTs in DB")
-        if (settingUp != null) {
-            if(!isCorotineAlive.get() && value != settingUp){
-                System.out.println("JAREDMSG -> Updating Livedata with ${settingUp.timeTrialHeader.id} ${settingUp.timeTrialHeader.ttName}")
-                value = settingUp
-            }
-        }else{
-            viewModelScope.launch(Dispatchers.IO) {
-                timeTrialRepository.insert(TimeTrial.createBlank())
-            }
+        if(res == null){
+            value = TimeTrial.createBlank()
+        }else if (value != res){
+            value = res
         }
+
     }
     }
 
@@ -66,7 +59,7 @@ class SetupViewModel @Inject constructor(
                         while (queue.peek() != null){
                             ttToInsert = queue.poll()
                         }
-                        timeTrialRepository.update(ttToInsert)
+                        timeTrialRepository.insertOrUpdate(ttToInsert)
                     }
                     isCorotineAlive.set(false)
                 }
@@ -104,7 +97,7 @@ class SetupViewModel @Inject constructor(
         override fun getOrderableRiders(): LiveData<List<Rider>> = Transformations.map(timeTrial){it.riderList.map { r -> r.rider }}
     }
 
-    override val selectCourseViewModel: ISelectCourseViewModel = SelectCourseViewModelImpl(this)
+    override val selectCourseViewModel: ISelectCourseViewModel = ISelectCourseViewModel.SelectCourseViewModelImpl(this)
     override val selectRidersViewModel: ISelectRidersViewModel = SelectRidersViewModelImpl(this)
     override val timeTrialPropertiesViewModel: ITimeTrialPropertiesViewModel = TimeTrialPropertiesViewModelImpl(this)
     override val setupConformationViewModel: ISetupConformationViewModel = SetupConfirmationViewModel(this)

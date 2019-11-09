@@ -12,12 +12,12 @@ import javax.inject.Singleton
 interface ITimeTrialRepository{
 
     suspend fun insert(timeTrial: TimeTrial):Long
-    //suspend fun insertOrUpdate(timeTrial: TimeTrial): Long
+    suspend fun insertOrUpdate(timeTrial: TimeTrial): Long
     suspend fun update(timeTrial: TimeTrial)
     suspend fun getTimeTrialByName(name: String): TimeTrial?
     suspend fun delete(timeTrial: TimeTrial)
     suspend fun getSetupTimeTrialSuspend(): TimeTrial
-    fun getNonFinishedTimeTrial(): LiveData<List<TimeTrial>>
+    fun getNonFinishedTimeTrial(): LiveData<TimeTrial>
     fun getLiveTimeTrialByName(name:String): LiveData<TimeTrial>
     fun getTimeTrialById(id: Long): LiveData<TimeTrial>
     val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>>
@@ -46,7 +46,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
        return timeTrialDao.insert(timeTrial)
     }
 
-    override fun getNonFinishedTimeTrial(): LiveData<List<TimeTrial>> {
+    override fun getNonFinishedTimeTrial(): LiveData<TimeTrial> {
         return timeTrialDao.getNonFinishedTimeTrial()
     }
 
@@ -89,18 +89,18 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
         timeTrialDao.delete(timeTrial)
     }
 
-//    @Suppress("RedundantSuspendModifier")
-//    @WorkerThread
-//    override suspend fun insertOrUpdate(timeTrial: TimeTrial): Long{
-//        System.out.println("JAREDMSG -> Inserting ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
-//        val id = timeTrial.timeTrialHeader.id ?: 0
-//        return if(id != 0L){
-//            timeTrialDao.update(timeTrial)
-//             id
-//        }else{
-//            timeTrialDao.insert(timeTrial)
-//        }
-//
-//    }
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun insertOrUpdate(timeTrial: TimeTrial): Long{
+        System.out.println("JAREDMSG -> Inserting ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
+        val id = timeTrial.timeTrialHeader.id
+        return if(id != null){
+            timeTrialDao.update(timeTrial)
+             id
+        }else{
+            timeTrialDao.insert(timeTrial)
+        }
+
+    }
 
 }

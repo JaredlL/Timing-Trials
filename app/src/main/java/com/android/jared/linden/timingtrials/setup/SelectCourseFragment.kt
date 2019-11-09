@@ -17,7 +17,7 @@ import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.adapters.CourseListAdapter
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.FragmentCourseListBinding
-import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
+import com.android.jared.linden.timingtrials.ui.SelectableCourseViewModel
 import com.android.jared.linden.timingtrials.util.*
 
 class SelectCourseFragment : Fragment() {
@@ -37,11 +37,15 @@ class SelectCourseFragment : Fragment() {
         viewModel.getAllCourses().observe(viewLifecycleOwner, Observer { courses ->
             courses?.let{adapter.setCourses(it)}
         })
+        adapter.courseSelected = { blobs ->
+            findNavController().popBackStack()
+            viewModel.setSelectedCourse(blobs)
 
+        }
 
+        adapter.setHasStableIds(true)
 
-
-        val heading: CourseListViewWrapper = object: CourseListViewWrapper(Course("Course Name", 0.0, "CTT Name")){
+        val heading: SelectableCourseViewModel = object: SelectableCourseViewModel(Course("Course Name", 0.0, "CTT Name")){
 
             override var convertedLengthString = "Distance"
         }
@@ -60,9 +64,6 @@ class SelectCourseFragment : Fragment() {
                // dismiss()
             }
         }
-
-
-        viewModel.courseSelected ={ findNavController().popBackStack()}
 
 
         return binding.root

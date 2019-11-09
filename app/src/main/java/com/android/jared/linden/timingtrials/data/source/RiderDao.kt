@@ -23,9 +23,9 @@ interface RiderDao {
 
     @Query("SELECT * from rider_table ORDER BY firstName COLLATE NOCASE ASC") fun getAllRiders(): LiveData<List<Rider>>
 
-    @Query("SELECT firstName,lastName,club,dateOfBirth,gender,id  from rider_table ORDER BY firstName COLLATE NOCASE ASC") fun getAllRidersLight(): LiveData<List<Rider>>
+    @Query("SELECT *  from rider_table ORDER BY firstName COLLATE NOCASE ASC") fun getAllRidersLight(): LiveData<List<Rider>>
 
-    @Query  ("SELECT firstName,lastName,club,dateOfBirth,gender,id  from rider_table ORDER BY firstName COLLATE NOCASE ASC") suspend fun getAllRidersLightSuspend(): List<Rider>
+    @Query  ("SELECT *  from rider_table ORDER BY firstName COLLATE NOCASE ASC") suspend fun getAllRidersLightSuspend(): List<Rider>
 
     @Query("SELECT DISTINCT club from rider_table") fun getAllClubs(): LiveData<List<String>>
 

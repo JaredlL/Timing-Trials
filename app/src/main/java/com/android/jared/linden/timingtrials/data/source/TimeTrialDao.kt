@@ -16,16 +16,17 @@ abstract class TimeTrialDao {
     abstract fun delete(timeTrialHeader: TimeTrialHeader)
 
     @Transaction
-    open suspend fun insert(timeTrial: TimeTrial): Long{
-        val uncom = getAllUncompleteTimeTrial()
-        if(timeTrial.timeTrialHeader.status != TimeTrialStatus.FINISHED){
-            uncom.forEach { delete(it) }
-        }
-
+    open suspend fun insert(timeTrial: TimeTrial): Long
+    {
         val id = insert(timeTrial.timeTrialHeader)
+
+
+        val allTt = getAllTimeTrialsSuspend()
+
         //setupTimeTrial.eventList.map { it.copy(timeTrialId = id)}
+        val newRiderList = timeTrial.riderList.map { it.copy(timeTrialId = id)}
         _insertAllEvents( timeTrial.eventList.map { it.copy(timeTrialId = id)})
-        _insertAllTimeTrialRiders(timeTrial.riderList.map { it.copy(timeTrialId = id)})
+        _insertAllTimeTrialRiders(newRiderList)
         return id
     }
 
@@ -34,20 +35,15 @@ abstract class TimeTrialDao {
     open suspend fun update(timeTrial: TimeTrial){
         timeTrial.timeTrialHeader.id?.let { ttId->
 
-            val uncom = getAllUncompleteTimeTrial()
-            if(timeTrial.timeTrialHeader.status != TimeTrialStatus.FINISHED){
-                uncom.filter { it.id != ttId }.forEach { delete(it) }
-            }
-
             _deleteTtEvents(ttId)
             _deleteTtRiders(ttId)
 
-            timeTrial.eventList.map { it.copy(timeTrialId = ttId)}
-            _insertAllEvents(timeTrial.eventList)
+            val newEvents = timeTrial.eventList.map { it.copy(timeTrialId = ttId)}
+            _insertAllEvents(newEvents)
 
-            timeTrial.riderList.map { it.copy(timeTrialId = ttId)}
-            _insertAllTimeTrialRiders(timeTrial.riderList)
-            update(timeTrial.timeTrialHeader)
+            val newRiderList = timeTrial.riderList.map { it.copy(timeTrialId = ttId)}
+            _insertAllTimeTrialRiders(newRiderList)
+
         }
 
     }
@@ -55,8 +51,8 @@ abstract class TimeTrialDao {
     @Delete
     fun delete(timeTrial: TimeTrial){
         timeTrial.timeTrialHeader.id?.let {
-            _deleteTtEvents(it)
-            _deleteTtRiders(it)
+            //_deleteTtEvents(it)
+            //_deleteTtRiders(it)
             delete(timeTrial.timeTrialHeader)
         }
 
@@ -65,6 +61,8 @@ abstract class TimeTrialDao {
     @Query("DELETE FROM timetrial_table") abstract fun deleteAll()
     @Query("DELETE FROM timetrial_rider_table") abstract fun deleteAllR()
     @Query("DELETE FROM timetrial_event_table") abstract fun deleteAllE()
+
+    @Query("SELECT * from timetrial_table ORDER BY startTime ASC") abstract fun getAllTimeTrialsSuspend(): List<TimeTrialHeader>
 
     @Query("SELECT * from timetrial_table ORDER BY startTime ASC") abstract fun getAllTimeTrials(): LiveData<List<TimeTrialHeader>>
 
@@ -75,11 +73,11 @@ abstract class TimeTrialDao {
     @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName LIMIT 1") abstract fun getLiveTimeTrialByName(timeTrialName: String): LiveData<TimeTrial>
 
     //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
-    @Transaction @Query("SELECT * FROM timetrial_table WHERE status != 2") abstract fun getNonFinishedTimeTrial(): LiveData<List<TimeTrial>>
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE status != 2 LIMIT 1") abstract fun getNonFinishedTimeTrial(): LiveData<TimeTrial>
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE status = 0 LIMIT 1") abstract suspend fun getSetupTimeTrialSuspend(): TimeTrial?
 
-    @Transaction @Query("SELECT * FROM timetrial_table WHERE status != 2") abstract suspend fun getAllUncompleteTimeTrial(): List<TimeTrialHeader>
+    @Query("SELECT * FROM timetrial_table WHERE status != 2") abstract suspend fun _getAllUncompleteTimeTrial(): List<TimeTrialHeader>
 
 
     //@Transaction @Query("SELECT * FROM timetrial_table WHERE status = 1 LIMIT 1") abstract fun getTimingTimeTrial(): LiveData<TimeTrial>

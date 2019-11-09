@@ -51,7 +51,7 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
     override fun onBindViewHolder(holder: SelectableRiderViewHolder, position: Int) {
         mRiders.get(position).let { rider ->
             with(holder){
-                itemView.tag = rider
+                itemView.tag = rider.rider.id
                 holder.longPress = editRider
                 bind(rider)
             }

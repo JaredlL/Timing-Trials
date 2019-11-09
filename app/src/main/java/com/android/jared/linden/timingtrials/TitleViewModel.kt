@@ -14,11 +14,11 @@ import javax.inject.Inject
 class TitleViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel() {
 
     val setupTimeTrial = Transformations.map(timeTrialRepository.getNonFinishedTimeTrial()){tt->
-        tt?.firstOrNull{it.timeTrialHeader.status == TimeTrialStatus.SETTING_UP}
+        tt
     }
 
     val timingTimeTrial = Transformations.map(timeTrialRepository.getNonFinishedTimeTrial()){tt->
-        tt?.firstOrNull{it.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS}
+        tt
     }
 
     val resumeOldViewModel: ResumeOldConfirmationViewModel = ResumeOldConfirmationViewModel(this)

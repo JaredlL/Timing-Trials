@@ -12,7 +12,7 @@ import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemTimetrialBinding
 import com.android.jared.linden.timingtrials.globalresults.GlobalResultActivity
 import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
-import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
+import com.android.jared.linden.timingtrials.ui.SelectableCourseViewModel
 
 
 class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, ListItemRiderBinding>(binding) {
@@ -65,12 +65,12 @@ class RiderViewHolderFactory: GenericViewHolderFactory<Rider>() {
     }
 }
 
-class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<CourseListViewWrapper, ListItemCourseBinding>(binding) {
+class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<SelectableCourseViewModel, ListItemCourseBinding>(binding) {
     private val _binding = binding
 
     //override var onLongPress = {course: CourseListViewWrapper -> Unit}
 
-    override fun bind(data: CourseListViewWrapper){
+    override fun bind(data: SelectableCourseViewModel){
 
         _binding.apply{
             courseVm = data
@@ -96,19 +96,19 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Co
     }
 }
 
-class CourseViewHolderFactory: GenericViewHolderFactory<CourseListViewWrapper>() {
+class CourseViewHolderFactory: GenericViewHolderFactory<SelectableCourseViewModel>() {
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
         val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply { checkBox.visibility = View.GONE }
         return binding.root
 
     }
 
-    override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: CourseListViewWrapper): View {
+    override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: SelectableCourseViewModel): View {
         val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply { courseVm = data; checkBox.visibility = View.GONE }
         return binding.root
     }
 
-    override fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?): GenericBaseHolder<CourseListViewWrapper, ListItemCourseBinding> {
+    override fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?): GenericBaseHolder<SelectableCourseViewModel, ListItemCourseBinding> {
         val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false)
         return CourseListViewHolder(binding)
     }
