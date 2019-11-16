@@ -43,14 +43,6 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
             {mutableRider.value?.dateOfBirth?.year?.toString()?:""}
     )
 
-//    var selectedGendarPosition = 1
-//    set(value) {
-//        mutableRider.value?.let {
-//            mutableRider.value = it.copy(gender = Gender.values()[selectedGendarPosition])
-//        }
-//        field = value
-//    }
-
     val lastName: MutableLiveData<String> = MutableLiveData<String>("").createLink(
             mutableRider,
             {new -> mutableRider.value?.let { Pair(it.lastName, it.copy(lastName = new)) }},

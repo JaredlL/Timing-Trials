@@ -9,7 +9,9 @@ import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemSelectableRiderBinding
-import com.android.jared.linden.timingtrials.setup.SelectableRiderViewWrapper
+import com.android.jared.linden.timingtrials.setup.SelectedRidersInformation
+import kotlinx.android.synthetic.main.list_item_selectable_rider.view.*
+import java.util.HashSet
 
 
 /**
@@ -25,20 +27,37 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
 
         var longPress = {_: Long -> Unit}
 
-        fun bind(riderVm: SelectableRiderViewWrapper){
+        fun bind(riderVm: Rider){
 
             binding.apply{
-                selectableRider = riderVm
-                riderLayout.setOnLongClickListener { longPress(riderVm.rider.id?:0)
+                rider = riderVm
+                checkBox.isChecked = mSelected.asSequence().map { it.id }.contains(riderVm.id)
+                riderLayout.setOnLongClickListener { longPress(riderVm.id?:0)
                     true
                 }
 
                 executePendingBindings()
+
+                checkBox.setOnClickListener {
+                    if(riderVm.id != null && checkBox.isChecked != mSelected.asSequence().map { it.id }.contains(riderVm.id)){
+                        if(checkBox.isChecked){
+                            val nSelected = mSelected + listOf(riderVm)
+                            mSelected = nSelected
+                            riderSelectionChanged(mSelected)
+                        }else{
+                            val nSelected = mSelected.filterNot { it.id == riderVm.id }
+                            mSelected = nSelected
+                            riderSelectionChanged(mSelected)
+                        }
+
+                    }
+                }
             }
         }
     }
 
-    var mRiders: List<SelectableRiderViewWrapper> = listOf()
+    var mRiders: List<Rider> = listOf()
+    var mSelected: List<Rider> = listOf()
     val layoutInflater = LayoutInflater.from(context)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectableRiderViewHolder {
@@ -51,18 +70,30 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
     override fun onBindViewHolder(holder: SelectableRiderViewHolder, position: Int) {
         mRiders.get(position).let { rider ->
             with(holder){
-                itemView.tag = rider.rider.id
+                itemView.tag = rider.id
                 holder.longPress = editRider
                 bind(rider)
             }
         }
     }
 
-    var editRider = {_: Long -> Unit}
+    override fun getItemId(position: Int): Long {
+        return mRiders[position].id?:0
+    }
 
-    fun setRiders(newRiders: List<SelectableRiderViewWrapper>){
-        mRiders = newRiders
-        notifyDataSetChanged()
+    var editRider = {_: Long -> Unit}
+    var riderSelectionChanged = {_:List<Rider> -> Unit}
+
+    fun setRiders(newInfo: SelectedRidersInformation){
+        val newSelected = newInfo.timeTrial.riderList.map { it.rider }
+
+        if(mRiders != newInfo.allRiderList || mSelected != newSelected){
+            mRiders = newInfo.allRiderList
+            mSelected = newSelected
+            System.out.println("JAREDMSG -> NOTIFY Select Riders Changed")
+            notifyDataSetChanged()
+        }
+
     }
 
     override fun getItemCount(): Int{ return mRiders.count() }

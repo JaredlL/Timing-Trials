@@ -1,15 +1,18 @@
 package com.android.jared.linden.timingtrials.data.source
 
 import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.android.jared.linden.timingtrials.data.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.threeten.bp.OffsetDateTime
 
-@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, RiderPassedEvent::class, TimeTrialRider::class, GlobalResult::class], version = 28, exportSchema = false)
+@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, RiderPassedEvent::class, TimeTrialRider::class, GlobalResult::class], version = 30, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 
@@ -17,6 +20,12 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
     abstract fun courseDao(): CourseDao
     abstract fun timeTrialDao(): TimeTrialDao
     abstract fun globalResultDao(): GlobalResultDao
+
+    val mDbIsPopulated = MutableLiveData(false)
+
+    fun getDatabasePopulated(): LiveData<Boolean> {
+        return mDbIsPopulated
+    }
 
     companion object {
         @Volatile private var INSTANCE: TimingTrialsDatabase? = null
@@ -31,6 +40,8 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
                         .fallbackToDestructiveMigration()
                         .addCallback(TimingTrialsDatabaseCallback(scope))
                         .build()
+                System.out.println("JAREDMSG -> CREATE DB")
+
                 INSTANCE = instance
                 instance
             }
@@ -52,15 +63,19 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
                 super.onOpen(db)
                 // If you want to keep the data through app restarts,
                 // comment out the following line.
+                System.out.println("JAREDMSG -> OPEN DB")
                 INSTANCE?.let { database ->
                     scope.launch(Dispatchers.IO) {
-                        populateRiders(database.riderDao())
-                        populateCourses(database.courseDao())
-                        populateTt(database.timeTrialDao(), database.riderDao(), database.courseDao())
+                            populateRiders(database.riderDao())
+                            populateCourses(database.courseDao())
+                            populateTt(database.timeTrialDao(), database.riderDao(), database.courseDao())
+                            database.mDbIsPopulated.postValue(true)
+                            System.out.println("JAREDMSG -> POPULATE DB")
                     }
                 }
             }
         }
+
 
         fun populateRiders(riderDao: RiderDao) {
             // Start the app with a clean database every time.

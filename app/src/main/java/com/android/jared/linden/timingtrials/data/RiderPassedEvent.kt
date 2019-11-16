@@ -12,20 +12,3 @@ data class RiderPassedEvent(val timeTrialId: Long,
                             val riderId: Long?,
                             val timeStamp: Long,
                             @PrimaryKey(autoGenerate = true) val id: Long? = null)
-
-
-//data class TimeTrialWithEvents(@Embedded var timeTrialHeader: TimeTrialHeader,
-//                               @Relation(parentColumn = "id", entityColumn = "timeTrialId", entity = RiderPassedEvent::class)
-//                               var eventList: List<RiderPassedEvent> = listOf())
-
-
-//enum class EventType(val type: Int){
-//    EMPTY(0),
-//    RIDER_PASSED(1);
-//
-//    companion object {
-//        private val map = values().associateBy(EventType::type)
-//        fun fromInt(type: Int) = map[type]
-//    }
-//
-//}

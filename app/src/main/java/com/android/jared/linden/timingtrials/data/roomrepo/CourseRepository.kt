@@ -42,12 +42,12 @@ class RoomCourseRepository @Inject constructor(private val courseDao: CourseDao)
 
     // Room executes all queries on a separate thread.
     // Observed LiveData will notify the observer when the data has changed.
-    override val allCoursesLight: LiveData<List<Course>> = courseDao.getAllCoursesLight()
+    override val allCoursesLight: LiveData<List<Course>> = courseDao.getAllCoursesLive()
 
     override fun getCourse(courseId: Long) : LiveData<Course> {
         return when(courseId){
             0L ->  MutableLiveData<Course>(Course.createBlank())
-            else ->  courseDao.getCourseById(courseId)
+            else ->  courseDao.getLiveCourseById(courseId)
         }
     }
 

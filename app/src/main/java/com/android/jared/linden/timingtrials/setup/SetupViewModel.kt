@@ -31,12 +31,12 @@ class SetupViewModel @Inject constructor(
 
 
     val timeTrial = MediatorLiveData<TimeTrial>().apply { addSource(timeTrialRepository.getNonFinishedTimeTrial()) { res ->
-        if(res == null){
-            value = TimeTrial.createBlank()
-        }else if (value != res){
-            value = res
+        res?.let {tt->
+            if(value !=tt){
+                System.out.println("JAREDMSG -> SETUPVIEWMODEL setting new livedata value ${tt.timeTrialHeader}, Rider Count = ${tt.riderList.count()}")
+                value = tt
+            }
         }
-
     }
     }
 
@@ -59,7 +59,7 @@ class SetupViewModel @Inject constructor(
                         while (queue.peek() != null){
                             ttToInsert = queue.poll()
                         }
-                        timeTrialRepository.insertOrUpdate(ttToInsert)
+                        timeTrialRepository.update(ttToInsert)
                     }
                     isCorotineAlive.set(false)
                 }

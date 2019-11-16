@@ -20,13 +20,13 @@ interface CourseDao {
 
     @Query("SELECT * FROM course_table ORDER BY courseName COLLATE NOCASE ASC") fun getAllCourses(): LiveData<List<Course>>
 
-    @Query("SELECT courseName,length,cttName,id  FROM course_table ORDER BY courseName COLLATE NOCASE ASC") fun getAllCoursesLight(): LiveData<List<Course>>
+    @Query("SELECT courseName,length,cttName,id  FROM course_table ORDER BY courseName COLLATE NOCASE ASC") fun getAllCoursesLive(): LiveData<List<Course>>
 
-    @Query("SELECT * FROM course_table ORDER BY courseName COLLATE NOCASE ASC") suspend fun getAllCoursesSuspend(): List<Course>
+    @Query("SELECT * FROM course_table ORDER BY courseName COLLATE NOCASE ASC") fun getAllCoursesSuspend(): List<Course>
 
-    @Query("SELECT * FROM course_table WHERE Id = :courseId LIMIT 1") suspend fun getCourseSuspend(courseId: Long): Course
+    @Query("SELECT * FROM course_table WHERE Id = :courseId LIMIT 1") fun getCourseSuspend(courseId: Long): Course
 
-    @Query("SELECT * FROM course_table WHERE Id = :courseId LIMIT 1") fun getCourseById(courseId: Long): LiveData<Course>
+    @Query("SELECT * FROM course_table WHERE Id = :courseId LIMIT 1") fun getLiveCourseById(courseId: Long): LiveData<Course>
 
     @Query("SELECT * FROM course_table LIMIT 1") fun getFirst(): LiveData<Course>
 }

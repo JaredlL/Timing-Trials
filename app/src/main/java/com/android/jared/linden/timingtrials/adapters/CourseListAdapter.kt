@@ -77,6 +77,10 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
 
     }
 
+    override fun getItemId(position: Int): Long {
+        return mCourses[position].course.id?:0
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseViewHolder {
 

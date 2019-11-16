@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
+import com.android.jared.linden.timingtrials.data.source.TimingTrialsDatabase
 import com.android.jared.linden.timingtrials.setup.ResumeOldConfirmationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

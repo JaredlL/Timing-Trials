@@ -34,6 +34,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
 
     override val courseName: LiveData<String> = Transformations.map(ttSetup.timeTrial){tt->
         tt?.let{
+
             tt.timeTrialHeader.course?.courseName
         }
     }
@@ -44,8 +45,12 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
      */
     override val timeTrialName: MutableLiveData<String> = MutableLiveData("")
     private val nameMediator = MediatorLiveData<String>().apply {
-        addSource(ttSetup.timeTrial) { tt->
-            tt?.timeTrialHeader?.let { if(timeTrialName.value != it.ttName) timeTrialName.value = it.ttName }
+        addSource(timeTrialHeader) { tt->
+            tt?.let {
+                if(timeTrialName.value != it.ttName)
+                    System.out.println("JAREDMSG -> Old Name = ${timeTrialName.value}, New Name = ${it.ttName}")
+                    timeTrialName.value = it.ttName
+            }
 
         }
         addSource(timeTrialName) { newName ->
@@ -58,8 +63,8 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
     }.also { it.observeForever {  } }
 
 
-    override val offsetDescription: LiveData<String> = Transformations.map(ttSetup.timeTrial){tt->
-        tt?.timeTrialHeader?.let {
+    override val offsetDescription: LiveData<String> = Transformations.map(timeTrialHeader){tt->
+        tt?.let {
            val tString = ConverterUtils.instantToSecondsDisplayString(it.startTime.toInstant().plusSeconds(it.firstRiderStartOffset.toLong()))
             "(ie first rider starts at $tString)"
         }
@@ -68,10 +73,10 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
 
     override val firstRiderOffset = MutableLiveData<String>()
     private val firstRiderOffsetMediator = MediatorLiveData<String>().apply {
-        addSource(ttSetup.timeTrial) { tt->
+        addSource(timeTrialHeader) { tt->
             tt?.let {
-                if (firstRiderOffset.value != it.timeTrialHeader.firstRiderStartOffset.toString()) {
-                    firstRiderOffset.value = it.timeTrialHeader.firstRiderStartOffset.toString()
+                if (firstRiderOffset.value != it.firstRiderStartOffset.toString()) {
+                    firstRiderOffset.value = it.firstRiderStartOffset.toString()
                 }
             }
 
@@ -89,10 +94,10 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
 
     override val laps = MutableLiveData<String>()
     private val lapsMediator = MediatorLiveData<String>().apply {
-        addSource(ttSetup.timeTrial) { tt->
+        addSource(timeTrialHeader) { tt->
             tt?.let {
-                if (laps.value != it.timeTrialHeader.laps.toString()) {
-                    laps.value = it.timeTrialHeader.laps.toString()
+                if (laps.value != it.laps.toString()) {
+                    laps.value = it.laps.toString()
                 }
             }
 
@@ -118,10 +123,10 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
                 }
             }
         }
-        addSource(ttSetup.timeTrial) { tt->
+        addSource(timeTrialHeader) { tt->
             tt?.let {
-                if (interval.value != it.timeTrialHeader.interval.toString()) {
-                    interval.value = it.timeTrialHeader.interval.toString()
+                if (interval.value != it.interval.toString()) {
+                    interval.value = it.interval.toString()
                 }
             }
 
