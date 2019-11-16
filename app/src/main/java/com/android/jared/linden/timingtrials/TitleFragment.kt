@@ -64,12 +64,14 @@ class TitleFragment : Fragment()
             }
         })
 
-        testViewModel.inserted.observe(requireActivity(), Observer {
+        testViewModel.inserted.observe(viewLifecycleOwner, Observer {
             it?.let { value->
                 if (value){
                     val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
                     findNavController().navigate(action)
                     testViewModel.onInsertionAction()
+                    testViewModel.inserted.removeObservers(viewLifecycleOwner)
+
                 }
             }
         })

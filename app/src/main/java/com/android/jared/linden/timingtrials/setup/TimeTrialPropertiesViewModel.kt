@@ -47,14 +47,17 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
     private val nameMediator = MediatorLiveData<String>().apply {
         addSource(timeTrialHeader) { tt->
             tt?.let {
-                if(timeTrialName.value != it.ttName)
+                val curentName = timeTrialName.value
+                val ttName = it.ttName
+                if(curentName!= ttName){
                     System.out.println("JAREDMSG -> Old Name = ${timeTrialName.value}, New Name = ${it.ttName}")
                     timeTrialName.value = it.ttName
+                }
             }
 
         }
         addSource(timeTrialName) { newName ->
-            ttSetup.timeTrial.value?.timeTrialHeader?.let {
+            timeTrialHeader.value?.let {
                 if(it.ttName != newName) {
                     ttSetup.updateDefinition(it.copy(ttName = newName))
                 }

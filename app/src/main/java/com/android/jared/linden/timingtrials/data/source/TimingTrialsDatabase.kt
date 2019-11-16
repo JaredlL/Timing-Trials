@@ -23,9 +23,6 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
 
     val mDbIsPopulated = MutableLiveData(false)
 
-    fun getDatabasePopulated(): LiveData<Boolean> {
-        return mDbIsPopulated
-    }
 
     companion object {
         @Volatile private var INSTANCE: TimingTrialsDatabase? = null

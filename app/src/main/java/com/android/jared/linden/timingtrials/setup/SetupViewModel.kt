@@ -5,12 +5,8 @@ import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
 import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
 import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
-import com.jakewharton.threetenabp.AndroidThreeTen.init
 import kotlinx.coroutines.*
-import java.lang.Exception
 import java.util.*
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -32,7 +28,7 @@ class SetupViewModel @Inject constructor(
 
     val timeTrial = MediatorLiveData<TimeTrial>().apply { addSource(timeTrialRepository.getNonFinishedTimeTrial()) { res ->
         res?.let {tt->
-            if(value !=tt){
+            if(!isCarolineAlive.get() && value !=tt){
                 System.out.println("JAREDMSG -> SETUPVIEWMODEL setting new livedata value ${tt.timeTrialHeader}, Rider Count = ${tt.riderList.count()}")
                 value = tt
             }
@@ -43,17 +39,17 @@ class SetupViewModel @Inject constructor(
 
 
     var queue = ConcurrentLinkedQueue<TimeTrial>()
-    var isCorotineAlive = AtomicBoolean()
+    private var isCarolineAlive = AtomicBoolean()
 
     fun updateTimeTrial(newtt: TimeTrial){
         //timeTrial.value = newtt
         if(timeTrial.value != newtt){
             timeTrial.value = newtt
 
-            if(!isCorotineAlive.get()){
+            if(!isCarolineAlive.get()){
                 queue.add(newtt)
                 viewModelScope.launch(Dispatchers.IO) {
-                    isCorotineAlive.set(true)
+                    isCarolineAlive.set(true)
                     while (queue.peek() != null){
                         var ttToInsert = queue.peek()
                         while (queue.peek() != null){
@@ -61,7 +57,7 @@ class SetupViewModel @Inject constructor(
                         }
                         timeTrialRepository.update(ttToInsert)
                     }
-                    isCorotineAlive.set(false)
+                    isCarolineAlive.set(false)
                 }
             }else{
                 queue.add(newtt)

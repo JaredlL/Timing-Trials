@@ -22,7 +22,6 @@ interface ITimeTrialRepository{
     suspend fun update(timeTrial: TimeTrial)
     suspend fun getTimeTrialByName(name: String): TimeTrial?
     suspend fun delete(timeTrial: TimeTrial)
-    suspend fun getNonFinishedTimeTrialSuspend(): TimeTrial?
     fun getNonFinishedTimeTrial(): LiveData<TimeTrial?>
     fun getLiveTimeTrialByName(name:String): LiveData<TimeTrial>
     fun getTimeTrialById(id: Long): LiveData<TimeTrial>
@@ -56,16 +55,13 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     }
 
 
-    val nonFinishedMediator = MediatorLiveData<TimeTrial>()
-
+    private val nonFinishedMediator = MediatorLiveData<TimeTrial>()
     init {
         nonFinishedMediator.addSource(timeTrialDao.getNonFinishedTt()){timeTrial->
             if(timeTrial == null){
                 CoroutineScope(Dispatchers.IO).launch {
                     timeTrialDao.insert(TimeTrialHeader.createBlank())
                 }
-
-                //nonFinishedMediator.value = TimeTrial.createBlank()
             }else{
                 nonFinishedMediator.value = timeTrial
             }
@@ -76,9 +72,6 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
         return nonFinishedMediator
     }
 
-    override suspend fun getNonFinishedTimeTrialSuspend(): TimeTrial? {
-        return timeTrialDao.getNonFinishedTimeTrialSuspend()
-    }
 
 
     override fun getLiveTimeTrialByName(name:String): LiveData<TimeTrial> {

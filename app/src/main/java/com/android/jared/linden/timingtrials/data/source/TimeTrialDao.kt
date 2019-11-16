@@ -33,40 +33,12 @@ abstract class TimeTrialDao(db: RoomDatabase) {
         _insertAllEvents(newEvents)
         _insertAllTimeTrialRiders(newRiderList)
 
-        printStackTrace()
         return id
     }
 
 
     fun getNonFinishedTt() : LiveData<TimeTrial?>{
         return getNonFinishedTtLive()
-//        return liveData(Dispatchers.IO) {
-//            val nonFinishedTt = _getNonFinishedTimeTrial()
-//            if(nonFinishedTt == null){
-//                val id = insert(TimeTrialHeader.createBlank())
-//                System.out.println("JAREDMSG -> Insert Blank New TT $id from LIVEDATA")
-//
-//
-//            }
-//            val ntt = _getNonFinishedTimeTrial()
-//            System.out.println("JAREDMSG -> EMIT TT id = ${ntt?.timeTrialHeader?.id} from LIVEDATA, rider count =  ${ntt?.riderList?.count()}")
-//             emit(ntt)
-//        }
-    }
-
-    fun getNonFinishedTimeTrialSuspend(): TimeTrial?{
-        val nonFinishedTt = _getNonFinishedTimeTrial()
-
-        if(nonFinishedTt == null){
-
-            val id = insert(TimeTrialHeader.createBlank())
-            System.out.println("JAREDMSG -> Insert Blank New TT $id from SUSPEND")
-            printStackTrace()
-            return _getNonFinishedTimeTrial()
-        }else{
-            System.out.println("JAREDMSG -> Found non finished tt ${nonFinishedTt.timeTrialHeader} from SUSPEND")
-            return nonFinishedTt
-        }
     }
 
 
@@ -74,43 +46,27 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     open fun update(timeTrial: TimeTrial){
         timeTrial.timeTrialHeader.id?.let { ttId->
 
-            val allTt = getAllTimeTrialsSuspend()
-            System.out.println("JAREDMSG -> UPDATE(${timeTrial.timeTrialHeader.id} + ${timeTrial.timeTrialHeader.ttName}), Riders -> ${timeTrial.riderList.map { it.rider.firstName }},  All TT Ids = ${allTt.map { it.id }.toList()}")
-            printStackTrace()
-
             _deleteTtEvents(ttId)
             _deleteTtRiders(ttId)
+
+            update(timeTrial.timeTrialHeader)
 
             val newEvents = timeTrial.eventList.map { it.copy(timeTrialId = ttId)}
              _insertAllEvents(newEvents)
 
             val newRiderList = timeTrial.riderList.map { it.copy(timeTrialId = ttId)}
-            System.out.println("JAREDMSG -> UPDATE(${timeTrial.timeTrialHeader.id} + ${timeTrial.timeTrialHeader.ttName}), ${newRiderList.count()} riders into DB")
-
-            update(timeTrial.timeTrialHeader)
-
             _insertAllTimeTrialRiders(newRiderList)
 
-
-
-            val allTtR = _allTtRiders()
-
-            System.out.println("JAREDMSG -> UPDATE(${timeTrial.timeTrialHeader.id} + ${timeTrial.timeTrialHeader.ttName}), ${allTtR.count()} TT Riders in DB")
 
         }
 
     }
 
-    fun printStackTrace(){
-
-        val mlist = Thread.currentThread().stackTrace.map { it.className }
-        //System.out.println("JAREDMSG -> ${mlist}")
-    }
-
     @Delete
     fun delete(timeTrial: TimeTrial){
         timeTrial.timeTrialHeader.id?.let {ttId ->
-
+            _deleteTtEvents(ttId)
+            _deleteTtRiders(ttId)
             delete(timeTrial.timeTrialHeader)
         }
 
@@ -132,15 +88,13 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName LIMIT 1") abstract fun getLiveTimeTrialByName(timeTrialName: String): LiveData<TimeTrial>
 
     //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
-    @Transaction @Query("SELECT * FROM timetrial_table LIMIT 1") abstract fun _getNonFinishedTimeTrial(): TimeTrial?
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE status !=2 LIMIT 1") abstract fun _getNonFinishedTimeTrial(): TimeTrial?
 
-    @Transaction @Query("SELECT * FROM timetrial_table LIMIT 1") abstract fun getNonFinishedTtLive(): LiveData<TimeTrial?>
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE status !=2 LIMIT 1") abstract fun getNonFinishedTtLive(): LiveData<TimeTrial?>
 
 
     @Query("SELECT * FROM timetrial_table WHERE status != 2") abstract fun _getAllUncompleteTimeTrial(): List<TimeTrialHeader>
 
-
-    //@Transaction @Query("SELECT * FROM timetrial_table WHERE status = 1 LIMIT 1") abstract fun getTimingTimeTrial(): LiveData<TimeTrial>
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE id = :timeTrialId LIMIT 1") abstract fun getFullTimeTrial(timeTrialId: Long): LiveData<TimeTrial>
 
