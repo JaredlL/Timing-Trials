@@ -3,16 +3,15 @@ package com.android.jared.linden.timingtrials.data.roomrepo
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.sql.Time
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,7 +21,7 @@ interface ITimeTrialRepository{
     suspend fun update(timeTrial: TimeTrial)
     suspend fun getTimeTrialByName(name: String): TimeTrial?
     suspend fun delete(timeTrial: TimeTrial)
-    fun getNonFinishedTimeTrial(): LiveData<TimeTrial?>
+    val nonFinishedTimeTrial: LiveData<TimeTrial?>
     fun getLiveTimeTrialByName(name:String): LiveData<TimeTrial>
     fun getTimeTrialById(id: Long): LiveData<TimeTrial>
     val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>>
@@ -55,22 +54,35 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     }
 
 
+    private val inserting: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    override val nonFinishedTimeTrial: LiveData<TimeTrial?>
+        get() = nonFinishedMediator
+
     private val nonFinishedMediator = MediatorLiveData<TimeTrial>()
+
+    private val insertingBool = AtomicBoolean()
     init {
         nonFinishedMediator.addSource(timeTrialDao.getNonFinishedTt()){timeTrial->
-            if(timeTrial == null){
-                CoroutineScope(Dispatchers.IO).launch {
-                    timeTrialDao.insert(TimeTrialHeader.createBlank())
+            if(timeTrial == null) {
+                if (!insertingBool.get()) {
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        if(!insertingBool.get()){
+                            println("JAREDMSG -> Inserting Blank - isinserting = ${insertingBool.get()}")
+                            insertingBool.set(true)
+                            timeTrialDao.insert(TimeTrialHeader.createBlank())
+                            insertingBool.set(false)
+                        }
+
+
+                    }
                 }
-            }else{
-                nonFinishedMediator.value = timeTrial
             }
+            nonFinishedMediator.value = timeTrial
         }
     }
 
-    override fun getNonFinishedTimeTrial(): LiveData<TimeTrial?> {
-        return nonFinishedMediator
-    }
 
 
 

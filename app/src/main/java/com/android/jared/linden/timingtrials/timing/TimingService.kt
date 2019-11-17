@@ -65,11 +65,12 @@ class TimingService : Service(){
 
 
     fun stop(){
-        System.out.println("JAREDMSG -> Ending Service")
+        System.out.println("JAREDMSG -> Trying to end service")
         timer.cancel()
         notificationManager.cancel(NOTIFICATION_ID)
         stopForeground(true)
         stopSelf()
+        System.out.println("JAREDMSG -> Service Stopped")
     }
 
 

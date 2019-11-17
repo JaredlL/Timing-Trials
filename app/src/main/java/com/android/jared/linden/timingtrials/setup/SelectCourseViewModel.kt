@@ -4,11 +4,8 @@ import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.ui.SelectableCourseData
 import com.android.jared.linden.timingtrials.ui.SelectableCourseViewModel
-import org.threeten.bp.Instant
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 interface ISelectCourseViewModel{

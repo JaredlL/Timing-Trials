@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TimePicker
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
@@ -31,7 +32,10 @@ class SetupTimeTrialFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        propsViewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.timeTrialPropertiesViewModel
+        propsViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.timeTrialPropertiesViewModel
+
+        //Order is important
+        propsViewModel.setupMediator.observe(viewLifecycleOwner, Observer {  })
 
         val mAdapter = ArrayAdapter<String>(requireContext(),R.layout.support_simple_spinner_dropdown_item, listOf("15", "30", "60", "90", "120"))
         val binding = DataBindingUtil.inflate<FragmentSetupTimeTrialBinding>(inflater, R.layout.fragment_setup_time_trial, container, false).apply {
@@ -46,6 +50,29 @@ class SetupTimeTrialFragment : Fragment() {
                 TimePickerFragment().show(childFragmentManager, "timePicker")
             }
 
+            startTtButton.setOnClickListener{
+                propsViewModel.timeTrial.value?.let {
+                    if(it.riderList.count() == 0){
+                        Toast.makeText(requireActivity(), "TT Needs at least 1 rider", Toast.LENGTH_LONG).show()
+                        //container.currentItem = 1
+                        return@let
+                    }
+                    if(it.timeTrialHeader.startTime.isBefore(OffsetDateTime.now())){
+                        Toast.makeText(requireActivity(), "TT must start in the future, select start time", Toast.LENGTH_LONG).show()
+                        TimePickerFragment().show(requireActivity().supportFragmentManager, "timePicker")
+                        return@let
+                    }
+                    val confDialog: SetupConfirmationFragment = requireActivity().supportFragmentManager
+                            .findFragmentByTag("confdialog") as? SetupConfirmationFragment ?: SetupConfirmationFragment()
+
+                    if(confDialog.dialog?.isShowing != true){
+                        confDialog.show(requireActivity().supportFragmentManager, "confdialog")
+                    }
+
+                }
+            }
+
+
 
         }
 
@@ -56,6 +83,8 @@ class SetupTimeTrialFragment : Fragment() {
               }
           }
         })
+
+
 
 
 
@@ -93,7 +122,7 @@ class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the current time as the default values for the picker
 
-        timeTrialViewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.timeTrialPropertiesViewModel
+        timeTrialViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.timeTrialPropertiesViewModel
 
         var now = Instant.now()
         if(timeTrialViewModel.startTime.value != null){

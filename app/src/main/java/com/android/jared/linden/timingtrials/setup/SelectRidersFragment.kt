@@ -36,7 +36,7 @@ class SelectRidersFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        viewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.selectRidersViewModel
+        viewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
 
         viewManager = LinearLayoutManager(context)
         adapter = SelectableRiderListAdapter(requireContext())

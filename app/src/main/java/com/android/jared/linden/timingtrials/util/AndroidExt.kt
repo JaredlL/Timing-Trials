@@ -52,27 +52,27 @@ inline fun <reified T: ViewModel> FragmentActivity.getViewModel(crossinline fact
 //    }
 //}
 
-inline fun <reified T1: Any, reified T2:Any> MutableLiveData<T1>.createLink(observedObject: MediatorLiveData<T2>, crossinline updateObject:(T1) -> Pair<T1?, T2?>?, crossinline onObjectUpdated:() -> T1): MutableLiveData<T1>{
-    this.let { rec->
-        val valMed: MediatorLiveData<T1> = MediatorLiveData<T1>().apply {
-            addSource(rec){
-                val new = updateObject(it)
-                 if(new?.first != it){
-                     observedObject.value = new?.second
-                 }
-            }
-            addSource(observedObject){obj->
-                obj?.let {
-                    if(rec.value != it)
-                        rec.value = onObjectUpdated()
-                }
-            }
-        }.also { it.observeForever {  } }
-        return rec
-    }
-
-
-}
+//inline fun <reified T1: Any, reified T2:Any> MutableLiveData<T1>.createLink(observedObject: MediatorLiveData<T2>, crossinline updateObject:(T1) -> Pair<T1?, T2?>?, crossinline onObjectUpdated:() -> T1): MutableLiveData<T1>{
+//    this.let { rec->
+//        val valMed: MediatorLiveData<T1> = MediatorLiveData<T1>().apply {
+//            addSource(rec){
+//                val new = updateObject(it)
+//                 if(new?.first != it){
+//                     observedObject.value = new?.second
+//                 }
+//            }
+//            addSource(observedObject){obj->
+//                obj?.let {
+//                    if(rec.value != it)
+//                        rec.value = onObjectUpdated()
+//                }
+//            }
+//        }.also { it.observeForever {  } }
+//        return rec
+//    }
+//
+//
+//}
 
 val Activity.injector get() = (application as TimingTrialsApplication).component
 val Fragment.injector get() = (requireActivity().application as TimingTrialsApplication).component

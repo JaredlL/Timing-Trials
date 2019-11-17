@@ -1,14 +1,9 @@
 package com.android.jared.linden.timingtrials.setup
 
 
-import androidx.databinding.BaseObservable
-import androidx.databinding.Bindable
 import androidx.lifecycle.*
-import com.android.jared.linden.timingtrials.BR
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.data.TimeTrialRider
-import java.util.ArrayList
 
 
 interface ISelectRidersViewModel{
@@ -32,7 +27,7 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
 //                }})
 //            }
 //        }
-//        mRiderViewWrapperList.addSource(ttSetup.timeTrial){tt->
+//        mRiderViewWrapperList.addSource(ttSetup._mTimeTrial){tt->
 //            tt?.let {
 //                val selectedIds = tt.riderList.mapNotNull {r -> r.rider.id }
 //                mRiderViewWrapperList.value?.forEach {
@@ -63,7 +58,7 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
                 selectedRidersMediator.value = SelectedRidersInformation(result, tt)
             }
         }
-        selectedRidersMediator.addSource(ttSetup.timeTrial){tt->
+        selectedRidersMediator.addSource(ttSetup.timeTrial){ tt->
             val riders = ttSetup.riderRepository.allRidersLight.value
             if(tt!=null && riders!=null){
                 selectedRidersMediator.value = SelectedRidersInformation(riders, tt)
@@ -81,7 +76,7 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
 //    private fun riderSelectionChangeHandler(rider: Rider, sel:Boolean){
 //
 //
-//        ttSetup.timeTrial.value?.let{tt->
+//        ttSetup._mTimeTrial.value?.let{tt->
 //            val containsRider = tt.riderList.asSequence().map { it.rider.id }.contains(rider.id)
 //            if(sel && !containsRider){
 //                val newList = tt.riderList.map { it.rider } + rider

@@ -5,20 +5,20 @@ import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
 import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
 
-//class RecordChecker(val timeTrial: TimeTrial,val riderRepository: IRiderRepository, val courseRepository: ICourseRepository) {
+//class RecordChecker(val _mTimeTrial: TimeTrial,val riderRepository: IRiderRepository, val courseRepository: ICourseRepository) {
 //
-//    val notesMap: Map<Long, MutableLiveData<String>> = timeTrial.riderList.asSequence().mapNotNull { it.rider.id }.associate { r -> Pair(r, MutableLiveData<String>() ) }
+//    val notesMap: Map<Long, MutableLiveData<String>> = _mTimeTrial.riderList.asSequence().mapNotNull { it.rider.id }.associate { r -> Pair(r, MutableLiveData<String>() ) }
 //
 //    val ridersToUpdate = mutableListOf<Rider>()
 //    var courseToUpdate: Course? = null
 //
 //    suspend fun checkRecords(){
-//        val courseId = timeTrial.timeTrialHeader.course?.id
-//        val results = timeTrial.helper.results
+//        val courseId = _mTimeTrial.timeTrialHeader.course?.id
+//        val results = _mTimeTrial.helper.results
 //       if(courseId != null && results.isNotEmpty()){
 //
 //           val course = courseRepository.getCourseSuspend(courseId)
-//           val riderList = riderRepository.ridersFromIds(timeTrial.riderList.mapNotNull { it.rider.id })
+//           val riderList = riderRepository.ridersFromIds(_mTimeTrial.riderList.mapNotNull { it.rider.id })
 //           val updatingCourseRecords = course.courseRecords.associate { cr -> Pair(cr.category.categoryId(), cr) }.toMutableMap()
 //
 //           riderList.forEach { rider ->
@@ -27,18 +27,18 @@ import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
 //               if (pb != null) {
 //                   if(result.totalTime < pb.millisTime) {
 //                       val newPbs = rider.allResults.filter { it.courseId != course.id }.toMutableList()
-//                       newPbs.add(PersonalBest(courseId, timeTrial.timeTrialHeader.id, course.courseName, course.length, result.totalTime, timeTrial.timeTrialHeader.startTime))
+//                       newPbs.add(PersonalBest(courseId, _mTimeTrial.timeTrialHeader.id, course.courseName, course.length, result.totalTime, _mTimeTrial.timeTrialHeader.startTime))
 //                       ridersToUpdate.add(rider.copy(allResults = newPbs))
 //                   }
 //               }else{
 //                   val newPbs = rider.allResults.filter { it.courseId != course.id }.toMutableList()
-//                   newPbs.add(PersonalBest(courseId, timeTrial.timeTrialHeader.id, course.courseName, course.length, result.totalTime, timeTrial.timeTrialHeader.startTime))
+//                   newPbs.add(PersonalBest(courseId, _mTimeTrial.timeTrialHeader.id, course.courseName, course.length, result.totalTime, _mTimeTrial.timeTrialHeader.startTime))
 //                   ridersToUpdate.add(rider.copy(allResults = newPbs))
 //               }
 //
 //
 //               if(updatingCourseRecords[rider.getCategoryStandard().categoryId()]?.timeMillis?: Long.MAX_VALUE > result.totalTime){
-//                   updatingCourseRecords[rider.getCategoryStandard().categoryId()] = CourseRecord(rider.id, rider.fullName(), timeTrial.timeTrialHeader.id, rider.club, rider.getCategoryStandard(), result.totalTime, timeTrial.timeTrialHeader.startTime)
+//                   updatingCourseRecords[rider.getCategoryStandard().categoryId()] = CourseRecord(rider.id, rider.fullName(), _mTimeTrial.timeTrialHeader.id, rider.club, rider.getCategoryStandard(), result.totalTime, _mTimeTrial.timeTrialHeader.startTime)
 //               }
 //           }
 //           results.forEach {result->

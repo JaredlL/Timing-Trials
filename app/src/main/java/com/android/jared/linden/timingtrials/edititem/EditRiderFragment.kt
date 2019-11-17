@@ -27,6 +27,9 @@ class EditRiderFragment : Fragment() {
 
 
         val riderViewModel = getViewModel { injector.riderViewModel().apply { initialise(args.riderId) } }
+        riderViewModel.mutableRider.observe(viewLifecycleOwner, Observer {  })
+
+
         val mAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
 
         riderViewModel.clubs.observe(viewLifecycleOwner, Observer{
@@ -56,6 +59,7 @@ class EditRiderFragment : Fragment() {
             }
 
         }
+
 
         return binding.root
     }

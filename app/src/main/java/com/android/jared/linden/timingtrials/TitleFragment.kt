@@ -58,12 +58,6 @@ class TitleFragment : Fragment()
             }
         }
 
-        testViewModel.nonFinishedTt.observe(requireActivity(), Observer { tt->
-            tt?.let {
-                Toast.makeText(requireActivity(), "${it.timeTrialHeader.ttName} ${it.timeTrialHeader.id}", Toast.LENGTH_SHORT).show()
-            }
-        })
-
         testViewModel.inserted.observe(viewLifecycleOwner, Observer {
             it?.let { value->
                 if (value){
@@ -76,23 +70,6 @@ class TitleFragment : Fragment()
             }
         })
 
-
-
-
-
-//        binding.testResults1.setOnClickListener {
-//            testViewModel.insertFinishedTt()
-//            testViewModel.newId.observe(this, Observer {res->
-//                res?.let {
-//                    val mIntent = Intent(requireActivity(), ResultActivity::class.java)
-//                    mIntent.putExtra(ITEM_ID_EXTRA, it)
-//                    startActivity(mIntent)
-//                    testViewModel.newId.removeObservers(this)
-//                }
-//
-//            })
-//
-//        }
 
 
 

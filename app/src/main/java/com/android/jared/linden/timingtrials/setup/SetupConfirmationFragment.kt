@@ -33,7 +33,7 @@ class SetupConfirmationFragment : DialogFragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
 
-        confirmationViewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.setupConformationViewModel
+        confirmationViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.setupConformationViewModel
 
         confirmationViewModel.title.observe(viewLifecycleOwner, Observer { dialog?.setTitle(it) })
 
@@ -50,7 +50,6 @@ class SetupConfirmationFragment : DialogFragment() {
                     val intent = Intent(requireActivity(), TimingActivity::class.java)
                     startActivity(intent)
                     this@SetupConfirmationFragment.dismiss()
-                    requireActivity().finish()
                 }else{
                     Toast.makeText(requireActivity(), "TT must start in the future, select start time", Toast.LENGTH_LONG).show()
                     this@SetupConfirmationFragment.dismiss()

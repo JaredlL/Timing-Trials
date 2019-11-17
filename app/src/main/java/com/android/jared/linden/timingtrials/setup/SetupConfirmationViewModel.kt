@@ -22,14 +22,14 @@ interface ISetupConformationViewModel{
 class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupConformationViewModel{
 
    override val timeTrial = ttSetup.timeTrial
-    val timeTrialDefinition = Transformations.map(timeTrial){it.timeTrialHeader}
+    val timeTrialDefinition = Transformations.map(timeTrial){it?.timeTrialHeader}
 
     override val title = Transformations.map(timeTrialDefinition){ tt ->
         "Starting ${tt?.ttName}"
     }
 
     override val lapsCourse = Transformations.map(timeTrialDefinition){ tt->
-        "${tt?.laps} laps of ${tt.course?.courseName}"
+        "${tt?.laps} laps of ${tt?.course?.courseName}"
     }
 
    override val ridersInterval = Transformations.map(timeTrial){
@@ -60,7 +60,6 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
         timeTrialDefinition.value?.let {
             return if(it.startTime.isAfter(OffsetDateTime.now())){
                 ttSetup.updateDefinition(it.copy(status = TimeTrialStatus.IN_PROGRESS))
-
                 true
             }else{
                 false

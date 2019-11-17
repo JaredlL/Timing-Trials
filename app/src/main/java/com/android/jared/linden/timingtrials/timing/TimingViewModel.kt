@@ -14,6 +14,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.math.abs
 
 interface IEventSelectionData{
     var eventAwaitingSelection: Long?
@@ -36,11 +37,9 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     init {
         if (timeTrial.value == null) {
-            timeTrial.addSource(timeTrialRepository.getNonFinishedTimeTrial()) { res ->
+            timeTrial.addSource(timeTrialRepository.nonFinishedTimeTrial) { timing ->
 
-                val timing = res
-                if (res != null) throw Exception("Multiple non finished TTs in DB")
-                    if(timing != null && timeTrial.value != timing) {
+                    if(timing != null && timing.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS && timeTrial.value != timing) {
                         currentTt = timing
                         timeTrial.value = timing
                         currentTimeLine = TimeLine(timing, Instant.now().toEpochMilli() - timing.timeTrialHeader.startTime.toInstant().toEpochMilli())
@@ -100,7 +99,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     var isCorotineAlive = AtomicBoolean()
 
     private fun updateTimeTrial(newtt: TimeTrial){
-        //timeTrial.value = newtt
+        //_mTimeTrial.value = newtt
             if(!isCorotineAlive.get()){
                 queue.add(newtt)
                 viewModelScope.launch(Dispatchers.IO) {
@@ -144,7 +143,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                     currentTimeLine = TimeLine(ctt, millisSinceStart )
                     timeLine.postValue(currentTimeLine)
 
-                    if(Math.abs(millisSinceStart - lastSave) > saveInterval){
+                    if(abs(millisSinceStart - lastSave) > saveInterval){
                         updateTimeTrial(ctt)
                         lastSave = millisSinceStart
                     }
@@ -194,10 +193,12 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         //timer.cancel()
         viewModelScope.launch(Dispatchers.IO) {
             while (!isCorotineAlive.get()){
+                isCorotineAlive.set(true)
                 timeTrial.value?.let {
                     timeTrialRepository.delete(it)
                 }
-                delay(20L)
+                isCorotineAlive.set(false)
+
             }
 
         }

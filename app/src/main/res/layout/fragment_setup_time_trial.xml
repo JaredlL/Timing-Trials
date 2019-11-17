@@ -238,7 +238,6 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:background="@drawable/number_back"
-            android:onClick="@{() -> viewModel.beginTt()}"
             android:padding="8dp"
             android:text="@string/begin_tt"
             android:textSize="18sp"

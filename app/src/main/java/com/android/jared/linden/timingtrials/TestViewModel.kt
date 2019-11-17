@@ -12,6 +12,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.ChronoUnit
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 import kotlin.random.Random
 
 class TestViewModel@Inject constructor(
@@ -30,11 +31,11 @@ class TestViewModel@Inject constructor(
 
 
 
-    val nonFinishedTt = timeTrialRepository.getNonFinishedTimeTrial()
+    val nonFinishedTt = timeTrialRepository.nonFinishedTimeTrial
 
     fun insertTimingTt(){
 
-        timeTrialRepository.getNonFinishedTimeTrial().observeForever{tt->
+        timeTrialRepository.nonFinishedTimeTrial.observeForever{tt->
             tt?.let {dbTt->
                 viewModelScope.launch(Dispatchers.IO) {
 
@@ -53,6 +54,9 @@ class TestViewModel@Inject constructor(
 
                         val mod = timeTrial.helper.addRidersAsTimeTrialRiders(rList.filterIndexed { index, _ -> index % 10 == 0 })
                         timeTrialRepository.update(mod)
+                    launch(Dispatchers.Main){
+                        blobs()
+                    }
                     }
 
                 }
@@ -69,15 +73,19 @@ class TestViewModel@Inject constructor(
 
     fun onInsertionAction(){
         _inserted.value = false
-        timeTrialRepository.getNonFinishedTimeTrial().removeObserver(obs)
+        timeTrialRepository.nonFinishedTimeTrial.removeObserver(obs)
 
+    }
+
+    fun blobs(){
+        timeTrialRepository.nonFinishedTimeTrial.removeObserver(obs)
     }
 
     fun insertSetupTt(){
 
         timingTrialsDatabase.mDbIsPopulated.observeForever{
             if(it){
-                timeTrialRepository.getNonFinishedTimeTrial().observeForever(obs)
+                timeTrialRepository.nonFinishedTimeTrial.observeForever(obs)
             }
         }
 
@@ -89,6 +97,9 @@ class TestViewModel@Inject constructor(
             t?.let {exist->
                 viewModelScope.launch(Dispatchers.IO) {
 
+                    launch(Dispatchers.Main){
+                        blobs()
+                    }
                     if( timingTrialsDatabase.mDbIsPopulated.value == true){
                         System.out.println("JAREDMSG - Get riders for test VM")
 
@@ -107,7 +118,6 @@ class TestViewModel@Inject constructor(
                         withContext(Dispatchers.IO){
                             timeTrialRepository.update(newTt)
                             _inserted.postValue(true)
-
 
                         }
 
@@ -130,7 +140,7 @@ class TestViewModel@Inject constructor(
 //                val rList = riderRepository.allRidersLightSuspend()
 //                val courses = courseRepository.getAllCoursesSuspend()
 //
-//                val timeTrial =exist.copy(timeTrialHeader = exist.timeTrialHeader
+//                val _mTimeTrial =exist.copy(timeTrialHeader = exist.timeTrialHeader
 //                        .copy(ttName = "Result Timetrial",
 //                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
 //                                firstRiderStartOffset = 0,
@@ -140,7 +150,7 @@ class TestViewModel@Inject constructor(
 //                                status = TimeTrialStatus.FINISHED))
 //
 //
-//                val newTt = timeTrial.helper.addRidersAsTimeTrialRiders(rList)
+//                val newTt = _mTimeTrial.helper.addRidersAsTimeTrialRiders(rList)
 //                val withEvents = addFakeEvents(newTt)
 //                timeTrialRepository.update(withEvents)
 //            }
@@ -157,7 +167,7 @@ class TestViewModel@Inject constructor(
 //                val rList = riderRepository.allRidersLightSuspend()
 //                val courses = courseRepository.getAllCoursesSuspend()
 //
-//                val timeTrial = TimeTrial.createBlank().copy(timeTrialHeader = TimeTrialHeader.createBlank()
+//                val _mTimeTrial = TimeTrial.createBlank().copy(timeTrialHeader = TimeTrialHeader.createBlank()
 //                        .copy(ttName = "Test Result TT 1",
 //                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
 //                                firstRiderStartOffset = 0,
@@ -167,7 +177,7 @@ class TestViewModel@Inject constructor(
 //                                status = TimeTrialStatus.FINISHED))
 //
 //
-//                val newTt = timeTrial.helper.addRidersAsTimeTrialRiders(rList)
+//                val newTt = _mTimeTrial.helper.addRidersAsTimeTrialRiders(rList)
 //                val withEvents = addFakeEvents2(newTt)
 //                val i = timeTrialRepository.insertOrUpdate(withEvents)
 //                newId.postValue(i)
@@ -198,7 +208,7 @@ class TestViewModel@Inject constructor(
     fun addFakeEvents(timeTrial: TimeTrial): TimeTrial{
         val events = mutableListOf<RiderPassedEvent>()
         timeTrial.helper.riderStartTimes.forEach {
-            //events.add(RiderPassedEvent(timeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key))
+            //events.add(RiderPassedEvent(_mTimeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key))
 
 
             var prev = it.key

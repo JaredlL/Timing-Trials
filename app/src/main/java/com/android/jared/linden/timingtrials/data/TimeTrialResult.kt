@@ -21,4 +21,4 @@ interface IRiderResult {
     val note: String
 }
 
-//data class RiderResult(override val rider: RiderLight, override val time: Long, override val course: CourseLight, override val timeTrial: TimeTrialHeader? = null, override val note: String) : IRiderResult
+//data class RiderResult(override val rider: RiderLight, override val time: Long, override val course: CourseLight, override val _mTimeTrial: TimeTrialHeader? = null, override val note: String) : IRiderResult

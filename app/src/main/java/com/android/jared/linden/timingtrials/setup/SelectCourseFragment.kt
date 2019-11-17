@@ -30,7 +30,7 @@ class SelectCourseFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        viewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.selectCourseViewModel
+        viewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectCourseViewModel
         viewManager = LinearLayoutManager(context)
         adapter = CourseListAdapter(requireContext())
         adapter.editCourse = ::editCourse

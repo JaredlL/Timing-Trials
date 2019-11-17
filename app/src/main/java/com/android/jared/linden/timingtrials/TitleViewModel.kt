@@ -14,11 +14,11 @@ import javax.inject.Inject
 
 class TitleViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel() {
 
-    val setupTimeTrial = Transformations.map(timeTrialRepository.getNonFinishedTimeTrial()){tt->
+    val setupTimeTrial = Transformations.map(timeTrialRepository.nonFinishedTimeTrial){tt->
         tt
     }
 
-    val timingTimeTrial = Transformations.map(timeTrialRepository.getNonFinishedTimeTrial()){tt->
+    val timingTimeTrial = Transformations.map(timeTrialRepository.nonFinishedTimeTrial){tt->
         tt
     }
 
