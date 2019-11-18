@@ -39,6 +39,16 @@ data class TimeTrial(
     @Ignore
     val helper = TimeTrialHelper(this)
 
+    fun equalsOtherExcludingIds(other: TimeTrial?): Boolean{
+        if(other == null) return false
+        if(timeTrialHeader.copy(id = null) != other.timeTrialHeader.copy(id = null)) return false
+        if(riderList.size != other.riderList.size) return false
+        if(riderList.asSequence().map { it.copy(id = null) }.zip(other.riderList.asSequence().map { it.copy(id = null) }).asSequence().any{ (a,b) -> a!=b }) return false
+        if(eventList.size != other.eventList.size) return false
+        if(eventList.asSequence().map { it.copy(id = null) }.zip(other.eventList.asSequence().map { it.copy(id = null) }).asSequence().any{ (a,b) -> a!=b }) return false
+        return true
+
+    }
 
     companion object {
         fun createBlank(): TimeTrial {

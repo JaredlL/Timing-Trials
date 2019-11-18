@@ -11,6 +11,7 @@ import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.ChronoUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 import kotlin.random.Random
@@ -24,110 +25,62 @@ class TestViewModel@Inject constructor(
 
 
 
+    private val inserting = AtomicBoolean()
 
+     val insertedTest = MutableLiveData(false)
 
-    // region Test methods
+    fun insertionActedUpon(){
+        insertedTest.value = false
+    }
 
+    fun testSetup(timeTrial: TimeTrial){
 
-
-
-    val nonFinishedTt = timeTrialRepository.nonFinishedTimeTrial
-
-    fun insertTimingTt(){
-
-        timeTrialRepository.nonFinishedTimeTrial.observeForever{tt->
-            tt?.let {dbTt->
+            if(!inserting.get() && timeTrial.timeTrialHeader.ttName != "Test Setup Timetrial"){
+                inserting.set(true)
                 viewModelScope.launch(Dispatchers.IO) {
+                    val rList = riderRepository.allRidersLightSuspend()
+                    val courses = courseRepository.getAllCoursesSuspend()
+                    val newTt = timeTrial.copy(timeTrialHeader = timeTrial.timeTrialHeader
+                            .copy(ttName = "Test Setup Timetrial",
+                                    startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
+                                    firstRiderStartOffset = 0,
+                                    interval = 2,
+                                    course = courses[3],
+                                    laps = 2,
+                                    status = TimeTrialStatus.SETTING_UP))
+                    val copy = newTt.helper.addRidersAsTimeTrialRiders(rList)
+                    timeTrialRepository.update(copy)
+                    inserting.set(false)
+                    insertedTest.postValue(true)
+                }
+            }
+    }
 
-                        val rList = riderRepository.allRidersLightSuspend()
-                        val courses = courseRepository.getAllCoursesSuspend()
-
-                        val timeTrial = dbTt.copy(timeTrialHeader = dbTt.timeTrialHeader.copy(
-                                ttName = "Timing Timetrial",
-                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(5), ZoneId.systemDefault()),
+    fun testTiming(timeTrial: TimeTrial){
+        if(!inserting.get()  && timeTrial.timeTrialHeader.ttName != "Test Timing TimeTrial"){
+            inserting.set(true)
+            viewModelScope.launch(Dispatchers.IO) {
+                val rList = riderRepository.allRidersLightSuspend()
+                val courses = courseRepository.getAllCoursesSuspend()
+                val cop1 = timeTrial.copy(timeTrialHeader = timeTrial.timeTrialHeader
+                        .copy(ttName = "Test Timing TimeTrial",
+                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
                                 firstRiderStartOffset = 0,
                                 interval = 2,
-                                course = courses[2],
+                                course = courses[3],
                                 laps = 2,
                                 status = TimeTrialStatus.IN_PROGRESS))
-
-
-                        val mod = timeTrial.helper.addRidersAsTimeTrialRiders(rList.filterIndexed { index, _ -> index % 10 == 0 })
-                        timeTrialRepository.update(mod)
-                    launch(Dispatchers.Main){
-                        blobs()
-                    }
-                    }
-
-                }
-            }
-
-        }
-
-
-
-
-    private val _inserted: MutableLiveData<Boolean> = MutableLiveData(false)
-    val  inserted: LiveData<Boolean> = _inserted
-
-
-    fun onInsertionAction(){
-        _inserted.value = false
-        timeTrialRepository.nonFinishedTimeTrial.removeObserver(obs)
-
-    }
-
-    fun blobs(){
-        timeTrialRepository.nonFinishedTimeTrial.removeObserver(obs)
-    }
-
-    fun insertSetupTt(){
-
-        timingTrialsDatabase.mDbIsPopulated.observeForever{
-            if(it){
-                timeTrialRepository.nonFinishedTimeTrial.observeForever(obs)
+                val newTt = cop1.helper.addRidersAsTimeTrialRiders(rList)
+                timeTrialRepository.update(newTt)
+                inserting.set(false)
+                insertedTest.postValue(true)
             }
         }
-
-
-        }
-
-    val obs = object :Observer<TimeTrial?>{
-        override fun onChanged(t: TimeTrial?) {
-            t?.let {exist->
-                viewModelScope.launch(Dispatchers.IO) {
-
-                    launch(Dispatchers.Main){
-                        blobs()
-                    }
-                    if( timingTrialsDatabase.mDbIsPopulated.value == true){
-                        System.out.println("JAREDMSG - Get riders for test VM")
-
-                        val rList = riderRepository.allRidersLightSuspend()
-                        val courses = courseRepository.getAllCoursesSuspend()
-                        System.out.println("JAREDMSG - Test VM Rider Count = ${rList.count()}")
-                        val timeTrial = exist.copy(timeTrialHeader = exist.timeTrialHeader
-                                .copy(ttName = "Setup Timetrial",
-                                        startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
-                                        firstRiderStartOffset = 0,
-                                        interval = 2,
-                                        course = courses[3],
-                                        laps = 2,
-                                        status = TimeTrialStatus.SETTING_UP))
-                        val newTt = timeTrial.helper.addRidersAsTimeTrialRiders(rList)
-                        withContext(Dispatchers.IO){
-                            timeTrialRepository.update(newTt)
-                            _inserted.postValue(true)
-
-                        }
-
-                    }
-
-                }
-            }
-
-        }
     }
+
+
+
+
 
 
 

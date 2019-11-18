@@ -54,10 +54,13 @@ class TimingActivity : AppCompatActivity() {
                         finish()
                     }
                     TimeTrialStatus.IN_PROGRESS -> {
-                        mService?.currentTt = tt
-                        if(mService == null) throw Exception("SERVICE IS NULL, BUT WHY")
-                        mService?.timerTick =::tick
-                        mService?.startTiming()
+                        val mserv = mService?:throw Exception("SERVICE IS NULL, BUT WHY")
+                        if(mserv.currentTt != tt.timeTrialHeader){
+                            mserv.currentTt = tt.timeTrialHeader
+                            mService?.timerTick =::tick
+                            mService?.startTiming()
+                        }
+
                     }
                     TimeTrialStatus.FINISHED -> {
                         if(mBound){

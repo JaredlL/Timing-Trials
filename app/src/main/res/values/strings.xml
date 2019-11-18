@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Timing Trials</string>
     <string name="title_home">Home</string>
+    <string name="start_new_timetrial">Start New Timetrial</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_edit_item">Edit Item</string>
@@ -24,6 +25,7 @@
     <string name="club">Club</string>
     <string name="begin_tt">Begin TT!</string>
     <string name="ok">OK</string>
+    <string name="resume">Resume</string>
     <string name="select_riders">Select Riders</string>
     <string name="order_riders">Order Riders</string>
     <string name="cancel">Cancel</string>
@@ -57,5 +59,8 @@
     <string name="rider_start_offset">First rider start offset</string>
     <string name="delete">Delete</string>
     <string name="title_activity_global_result">GlobalResultActivity</string>
+    <string name="resume_setup">Resume setting up</string>
     <string name="results">Results</string>
+    <string name="start_new">Start New</string>
+    <string name="dismiss">Dismiss</string>
 </resources>

@@ -31,7 +31,7 @@ class TimerFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
 
-        timingViewModel = requireActivity().getViewModel { injector.timingViewModel() }
+        timingViewModel = requireActivity().getViewModel { requireActivity().injector.timingViewModel() }
 
         val adapter = EventListAdapter(requireActivity())
         val viewManager = LinearLayoutManager(context)

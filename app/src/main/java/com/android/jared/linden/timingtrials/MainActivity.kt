@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
 //
 //        createSetupButton.setOnClickListener {
 //            val tvm = getViewModel { injector.testViewModel() }
-//            tvm.insertSetupTt()
+//            tvm.testSetup()
 //
 //
 //        }

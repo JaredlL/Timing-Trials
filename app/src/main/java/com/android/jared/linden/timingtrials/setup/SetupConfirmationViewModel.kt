@@ -76,7 +76,7 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
 class ResumeOldConfirmationViewModel (private val mainViewModel: TitleViewModel) : ISetupConformationViewModel{
 
 
-    override val timeTrial = mainViewModel.setupTimeTrial
+    override val timeTrial = mainViewModel.nonFinishedTimeTrial
     val timeTrialDefinition = Transformations.map(timeTrial){it?.timeTrialHeader}
 
     override val title = Transformations.map(timeTrialDefinition){ tt ->

@@ -16,17 +16,9 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
 
     val mutableCourse: MediatorLiveData<Course> = MediatorLiveData()
     val mutableLengthString: MutableLiveData<String> = MutableLiveData()
-
     val courseName = MutableLiveData<String>("")
-//            .createLink(
-//            mutableCourse,
-//            {new -> mutableCourse.value?.let { Pair(it.courseName, it.copy(courseName = new)) }},
-//            {mutableCourse.value?.courseName?:"" })
     val cttName = MutableLiveData<String>("")
-//    .createLink(
-//            mutableCourse,
-//            {new -> mutableCourse.value?.let { Pair(it.cttName, it.copy(cttName = new)) }},
-//            {mutableCourse.value?.cttName?:"" })
+
 
     init {
         mutableCourse.addSource(mutableCourse){

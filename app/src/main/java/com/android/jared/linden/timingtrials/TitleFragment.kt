@@ -5,37 +5,56 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
-import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
+import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
+import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.databinding.FragmentTitleBinding
-
+import kotlinx.android.synthetic.main.fragment_title.*
 
 class TitleFragment : Fragment()
 {
 
-    private lateinit var titleViewmodel: TitleViewModel
+    private lateinit var titleViewModel: TitleViewModel
 
     private lateinit var testViewModel: TestViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
-        titleViewmodel = getViewModel { injector.mainViewModel() }
-        testViewModel = getViewModel { injector.testViewModel() }
+        titleViewModel = requireActivity().getViewModel {  requireActivity().injector.mainViewModel() }
+        testViewModel =  requireActivity().getViewModel {  requireActivity().injector.testViewModel() }
+
+        titleViewModel.nonFinishedTimeTrial.observe(viewLifecycleOwner, Observer {tt->
+            tt?.let { timeTrial->
+                if(timeTrial.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS){
+                    val tIntent = Intent(requireActivity(), TimingActivity::class.java)
+                    startActivity(tIntent)
+                }
+            }
+        })
 
         val binding =  DataBindingUtil.inflate<FragmentTitleBinding>(inflater, R.layout.fragment_title, container, false).apply{
 
             startTtSetupButton.setOnClickListener{
-                val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
-                Navigation.findNavController(this.root).navigate(action)
+                titleViewModel.nonFinishedTimeTrial.observe(viewLifecycleOwner, Observer {result->
+                    result?.let {timeTrial->
+                        if(timeTrial.timeTrialHeader.copy(id = null) != TimeTrialHeader.createBlank()){
+                            showSetupDialog(timeTrial)
+                        }else{
+                            val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
+                            findNavController().navigate(action)
+                        }
+                    }
+                })
+
             }
 
             viewDatabaseButton.setOnClickListener {
@@ -44,39 +63,43 @@ class TitleFragment : Fragment()
             }
 
             testSetupButton.setOnClickListener {
-                testViewModel.insertSetupTt()
-
+                titleViewModel.nonFinishedTimeTrial.value?.let {
+                    testViewModel.testSetup(it)
+                }
             }
 
 
             testTimingButton.setOnClickListener {
-                val tvm = getViewModel { injector.testViewModel() }
-                tvm.insertTimingTt()
-                val tIntent = Intent(requireActivity(), TimingActivity::class.java)
-                startActivity(tIntent)
+                titleViewModel.nonFinishedTimeTrial.value?.let {
+                    testViewModel.testTiming(it)
+                }
+
+
 
             }
         }
 
-        testViewModel.inserted.observe(viewLifecycleOwner, Observer {
-            it?.let { value->
-                if (value){
-                    val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
-                    findNavController().navigate(action)
-                    testViewModel.onInsertionAction()
-                    testViewModel.inserted.removeObservers(viewLifecycleOwner)
-
-                }
-            }
-        })
-
-
-
-
-
-
-
 
         return binding.root
+    }
+
+   private fun showSetupDialog(timeTrial: TimeTrial){
+        AlertDialog.Builder(requireActivity())
+                .setTitle(resources.getString(R.string.resume_setup))
+                .setMessage("${resources.getString(R.string.resume_setup)} ${timeTrial.timeTrialHeader.ttName}?")
+                .setPositiveButton(resources.getString(R.string.ok)) { _, _ ->
+
+                    val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
+                    findNavController().navigate(action)
+                }
+                .setNegativeButton(resources.getString(R.string.start_new)){_,_->
+                    titleViewModel.clearTimeTrial(timeTrial)
+                    val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
+                    findNavController().navigate(action)
+                }
+                .setNeutralButton(resources.getString(R.string.dismiss)){_,_->
+
+                }
+                .create().show()
     }
 }

@@ -19,7 +19,7 @@ import java.util.*
 import android.R.string.cancel
 import android.app.NotificationManager
 import android.R
-
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 
 
 const val NOTIFICATION_ID = 2
@@ -27,6 +27,7 @@ const val NOTIFICATION_ID = 2
 class TimingService : Service(){
 
     private var timer: Timer = Timer()
+    private var timerTask: TimerTask? = null
     private val TIMER_PERIOD_MS = 25L
     private lateinit var notificationManager: NotificationManager
 
@@ -36,22 +37,22 @@ class TimingService : Service(){
     }
 
     var timerTick: (Long) -> Unit = {}
-    var currentTt: TimeTrial? = null
+    var currentTt: TimeTrialHeader? = null
 
     fun startTiming(){
 
         timer.cancel()
         System.out.println("JAREDMSG -> Timing Service -> Creating Timer")
             timer = Timer()
-            val task = object : TimerTask(){
+           timerTask= object : TimerTask(){
                 override fun run() {
 
                     currentTt?.let {
                         val now = Instant.now()
-                        val millisSinceStart = now.toEpochMilli() - it.timeTrialHeader.startTime.toInstant().toEpochMilli()
+                        val millisSinceStart = now.toEpochMilli() - it.startTime.toInstant().toEpochMilli()
                         val secs = toSecondsDisplayString(millisSinceStart)
                         if(prevString != secs){
-                            updateNotificationTitle(it.timeTrialHeader.ttName, secs)
+                            updateNotificationTitle(it.ttName, secs)
                             prevString = secs
                         }
                         timerTick.invoke(millisSinceStart)
@@ -59,17 +60,19 @@ class TimingService : Service(){
 
                 }
             }
-            timer.scheduleAtFixedRate(task, 0L, TIMER_PERIOD_MS)
+            timer.scheduleAtFixedRate(timerTask, 0L, TIMER_PERIOD_MS)
         }
 
 
 
     fun stop(){
         System.out.println("JAREDMSG -> Timing Service -> Trying to end service")
+        timerTask?.cancel()
         timer.cancel()
         notificationManager.cancel(NOTIFICATION_ID)
         stopForeground(true)
         stopSelf()
+        timerTick = {}
         System.out.println("JAREDMSG -> Timing Service -> Service Stopped")
     }
 
@@ -90,6 +93,13 @@ class TimingService : Service(){
         fun getService(): TimingService{
             return this@TimingService
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        timerTask?.cancel()
+        timerTick = {}
+        timer.cancel()
     }
 
     var prevString = ""

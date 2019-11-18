@@ -80,10 +80,10 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
 //            val containsRider = tt.riderList.asSequence().map { it.rider.id }.contains(rider.id)
 //            if(sel && !containsRider){
 //                val newList = tt.riderList.map { it.rider } + rider
-//                ttSetup.updateTimeTrial(tt.helper.addRidersAsTimeTrialRiders(newList))
+//                ttSetup.testTiming(tt.helper.addRidersAsTimeTrialRiders(newList))
 //            }else if(!sel && containsRider){
 //                val newList = tt.riderList.filter { it.rider.id != rider.id}
-//                ttSetup.updateTimeTrial(tt.copy(riderList = newList))
+//                ttSetup.testTiming(tt.copy(riderList = newList))
 //            }
 //
 //        }

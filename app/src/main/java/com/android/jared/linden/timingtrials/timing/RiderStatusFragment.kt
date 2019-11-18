@@ -27,14 +27,13 @@ import kotlinx.android.synthetic.main.fragment_timer_rider_status.*
  */
 class RiderStatusFragment : Fragment() {
 
-    private val timeTrialId by argument<Long>(ITEM_ID_EXTRA)
     private lateinit var timingViewModel: TimingViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
 
-        timingViewModel = requireActivity().getViewModel { injector.timingViewModel() }
+        timingViewModel = requireActivity().getViewModel { requireActivity().injector.timingViewModel() }
 
         val adapter = RiderStatusAdapter(requireActivity())
         val viewManager = GridLayoutManager(context, 4)

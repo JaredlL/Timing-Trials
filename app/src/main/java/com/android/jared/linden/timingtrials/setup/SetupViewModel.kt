@@ -33,31 +33,15 @@ class SetupViewModel @Inject constructor(
         _mTimeTrial.addSource(timeTrialRepository.nonFinishedTimeTrial) { res ->
             res?.let {tt->
                 val current = _mTimeTrial.value
-                val new = tt
-
-                val equals = new.equals(current)
-                if(!isCarolineAlive.get() && changed(new, current)){
-                    System.out.println("JAREDMSG -> SETUPVIEWMODEL current data = ${_mTimeTrial.value?.riderList?.count()} new = ${tt.riderList.count()}")
+                val equals = tt.equalsOtherExcludingIds(current)
+                if(!isCarolineAlive.get() && !equals){
+                    System.out.println("JAREDMSG -> SETUPVIEWMODEL -> current data = ${_mTimeTrial.value?.timeTrialHeader?.id} new = ${tt.timeTrialHeader.id}")
                     _mTimeTrial.value = tt
             }
         }
     }
     }
 
-    fun changed(tt1:TimeTrial?, tt2: TimeTrial?): Boolean
-    {
-
-           if(tt1?.timeTrialHeader != tt2?.timeTrialHeader) return true
-
-            if(tt1?.riderList?.map { it.rider } != tt2?.riderList?.map { it.rider }) return true
-
-            if(tt1?.eventList?.map { it.timeStamp } != tt2?.eventList?.map { it.timeStamp }) return true
-
-            return false
-
-
-
-    }
 
     var queue = ConcurrentLinkedQueue<TimeTrial>()
     private var isCarolineAlive = AtomicBoolean()

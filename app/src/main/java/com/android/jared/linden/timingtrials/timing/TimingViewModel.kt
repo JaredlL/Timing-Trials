@@ -37,7 +37,8 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     init {
         timeTrial.addSource(timeTrialRepository.nonFinishedTimeTrial) { timing ->
-            if(timing != null && timing.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS && timeTrial.value != timing) {
+
+            if(timing != null && timing.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS && !timing.equalsOtherExcludingIds(timeTrial.value)) {
                 currentTt = timing
                 timeTrial.value = timing
                 currentTimeLine = TimeLine(timing, Instant.now().toEpochMilli() - timing.timeTrialHeader.startTime.toInstant().toEpochMilli())
@@ -243,7 +244,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
                     val riderString = "(${nextStartRider.number}) ${nextStartRider.rider.firstName} ${nextStartRider.rider.lastName}"
                     return when(millisToNextRider){
-                      in ttIntervalMilis - 3000..ttIntervalMilis ->
+                      in (ttIntervalMilis - 3000)..ttIntervalMilis ->
                         {
                             if(prevIndex >= 0){
                                 val prevRider = sparse.valueAt(prevIndex)
