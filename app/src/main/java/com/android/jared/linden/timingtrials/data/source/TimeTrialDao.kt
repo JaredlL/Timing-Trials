@@ -65,6 +65,7 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     @Delete
     fun delete(timeTrial: TimeTrial){
         timeTrial.timeTrialHeader.id?.let {ttId ->
+            println("JAREDMSG -> TTDAO DeletingtT ${ttId}")
             _deleteTtEvents(ttId)
             _deleteTtRiders(ttId)
             delete(timeTrial.timeTrialHeader)

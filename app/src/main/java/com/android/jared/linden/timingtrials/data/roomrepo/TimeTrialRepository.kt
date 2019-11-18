@@ -64,21 +64,21 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     private val insertingBool = AtomicBoolean()
     init {
         nonFinishedMediator.addSource(timeTrialDao.getNonFinishedTt()){timeTrial->
+            println("JAREDMSG -> TTREPO -> Getting time trial ${timeTrial?.timeTrialHeader?.id} ${timeTrial?.timeTrialHeader?.ttName}")
             if(timeTrial == null) {
                 if (!insertingBool.get()) {
-
+                    insertingBool.set(true)
+                    println("JAREDMSG -> TTREPO -> Set inserting to TRUE")
                     CoroutineScope(Dispatchers.IO).launch {
-                        if(!insertingBool.get()){
-                            println("JAREDMSG -> Inserting Blank - isinserting = ${insertingBool.get()}")
-                            insertingBool.set(true)
-                            timeTrialDao.insert(TimeTrialHeader.createBlank())
-                            insertingBool.set(false)
-                        }
+                            println("JAREDMSG -> TTREPO Corotine launched")
+                           val id = timeTrialDao.insert(TimeTrialHeader.createBlank())
 
-
+                        println("JAREDMSG -> TTREPO TT Inserted ${id} -> Set inserting to FALSE")
+                        insertingBool.set(false)
                     }
                 }
             }
+            println("JAREDMSG -> TTREPO -> SET nonFinishedMediator to ${timeTrial?.timeTrialHeader?.id} ${timeTrial?.timeTrialHeader?.ttName}")
             nonFinishedMediator.value = timeTrial
         }
     }

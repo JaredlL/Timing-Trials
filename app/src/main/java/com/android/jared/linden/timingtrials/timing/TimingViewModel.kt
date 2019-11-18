@@ -191,16 +191,21 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     fun discardTt(){
         //timer.cancel()
+        System.out.println("JAREDMSG -> TIMINGVM Deleting TT")
         viewModelScope.launch(Dispatchers.IO) {
-            while (!isCorotineAlive.get()){
-                isCorotineAlive.set(true)
-                timeTrial.value?.let {
-                    timeTrialRepository.delete(it)
+            var deleted = false
+            while (!deleted){
+                if(!isCorotineAlive.get()){
+                    isCorotineAlive.set(true)
+                    timeTrial.value?.let {
+                        timeTrialRepository.delete(it)
+                    }
+                    isCorotineAlive.set(false)
+                    deleted = true
+                }else{
+                    delay(5L)
                 }
-                isCorotineAlive.set(false)
-
             }
-
         }
     }
 
