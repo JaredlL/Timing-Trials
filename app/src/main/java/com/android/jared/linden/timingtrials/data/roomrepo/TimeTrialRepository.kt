@@ -46,7 +46,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun insert(timeTrial: TimeTrial):Long {
-        System.out.println("JAREDMSG -> Inserting New TT ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
+        System.out.println("JAREDMSG -> TTREPO -> Inserting New TT ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
         if(timeTrial.timeTrialHeader.status != TimeTrialStatus.FINISHED){
             throw Exception("Cannot insertFull non finished TT")
         }
@@ -70,9 +70,8 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
                     insertingBool.set(true)
                     println("JAREDMSG -> TTREPO -> Set inserting to TRUE")
                     CoroutineScope(Dispatchers.IO).launch {
-                            println("JAREDMSG -> TTREPO Corotine launched")
-                           val id = timeTrialDao.insert(TimeTrialHeader.createBlank())
-
+                        println("JAREDMSG -> TTREPO Corotine launched, going to insert")
+                        val id = timeTrialDao.insert(TimeTrialHeader.createBlank())
                         println("JAREDMSG -> TTREPO TT Inserted ${id} -> Set inserting to FALSE")
                         insertingBool.set(false)
                     }
@@ -95,7 +94,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun update(timeTrial: TimeTrial) {
-        System.out.println("JAREDMSG -> Updating ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
+        System.out.println("JAREDMSG -> TTREPO -> Updating ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
         if((timeTrial.timeTrialHeader.id ?: 0L) == 0L){
             throw Exception("TT ID cannot be null")
         }

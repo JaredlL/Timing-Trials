@@ -40,8 +40,8 @@ class TimingService : Service(){
 
     fun startTiming(){
 
-            timer.cancel()
-        System.out.println("JAREDMSG -> Creating Timer")
+        timer.cancel()
+        System.out.println("JAREDMSG -> Timing Service -> Creating Timer")
             timer = Timer()
             val task = object : TimerTask(){
                 override fun run() {
@@ -65,16 +65,17 @@ class TimingService : Service(){
 
 
     fun stop(){
-        System.out.println("JAREDMSG -> Trying to end service")
+        System.out.println("JAREDMSG -> Timing Service -> Trying to end service")
         timer.cancel()
         notificationManager.cancel(NOTIFICATION_ID)
         stopForeground(true)
         stopSelf()
-        System.out.println("JAREDMSG -> Service Stopped")
+        System.out.println("JAREDMSG -> Timing Service -> Service Stopped")
     }
 
 
     override fun onCreate() {
+        System.out.println("JAREDMSG -> Timing Service -> Creating Timer")
         setInForeground()
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }

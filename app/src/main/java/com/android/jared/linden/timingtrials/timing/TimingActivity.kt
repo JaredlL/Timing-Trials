@@ -41,16 +41,9 @@ class TimingActivity : AppCompatActivity() {
     }
 
     fun onBound(){
-        viewModel.timeTrial.observe(this, Observer {tt->
-
-            if(tt == null){
-                if(mBound){
-                    applicationContext.unbindService(connection)
-                    mService?.stop()
-                    mBound = false
-                }
-                finish()
-            }else{
+        viewModel.timeTrial.observe(this, Observer {result->
+            result?.let {tt->
+                System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial ${tt.timeTrialHeader.ttName} ${tt.timeTrialHeader.status}")
                 when(tt.timeTrialHeader.status){
                     TimeTrialStatus.SETTING_UP -> {
                         if(mBound){

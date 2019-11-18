@@ -36,19 +36,14 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
 
     init {
-        if (timeTrial.value == null) {
-            timeTrial.addSource(timeTrialRepository.nonFinishedTimeTrial) { timing ->
-
-                    if(timing != null && timing.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS && timeTrial.value != timing) {
-                        currentTt = timing
-                        timeTrial.value = timing
-                        currentTimeLine = TimeLine(timing, Instant.now().toEpochMilli() - timing.timeTrialHeader.startTime.toInstant().toEpochMilli())
-                        timeLine.value = currentTimeLine
-                    }else{
-                        timeTrial.value = timing
-                    }
-
-
+        timeTrial.addSource(timeTrialRepository.nonFinishedTimeTrial) { timing ->
+            if(timing != null && timing.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS && timeTrial.value != timing) {
+                currentTt = timing
+                timeTrial.value = timing
+                currentTimeLine = TimeLine(timing, Instant.now().toEpochMilli() - timing.timeTrialHeader.startTime.toInstant().toEpochMilli())
+                timeLine.value = currentTimeLine
+            }else{
+                timeTrial.value = timing
             }
         }
     }
