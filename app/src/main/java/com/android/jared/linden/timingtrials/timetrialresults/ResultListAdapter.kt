@@ -1,5 +1,7 @@
 package com.android.jared.linden.timingtrials.timetrialresults
 
+import android.app.Activity
+import android.content.Context
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.ListItemResultBinding
 
-class ResultListAdapter internal constructor(val activity: ResultActivity): RecyclerView.Adapter<ResultListAdapter.ResultViewHolder>(){
+class ResultListAdapter internal constructor(val context: Context): RecyclerView.Adapter<ResultListAdapter.ResultViewHolder>(){
 
 
     inner class ResultViewHolder(binding: ListItemResultBinding): RecyclerView.ViewHolder(binding.root){
@@ -17,7 +19,7 @@ class ResultListAdapter internal constructor(val activity: ResultActivity): Recy
 
         fun bind(result: ResultCell, position: Int){
             _binding.apply {
-                lifecycleOwner = activity
+                //lifecycleOwner = activity
                 viewModel = result
 
                 if(position.rem(rowLength) == 0 || position < rowLength){
@@ -59,7 +61,7 @@ class ResultListAdapter internal constructor(val activity: ResultActivity): Recy
 
     private var mResults: List<ResultCell> = listOf()
     private var rowLength = 0
-    val layoutInflater = LayoutInflater.from(activity)
+    val layoutInflater = LayoutInflater.from(context)
 
     fun setResults(newResults: List<ResultRowViewModel>){
 

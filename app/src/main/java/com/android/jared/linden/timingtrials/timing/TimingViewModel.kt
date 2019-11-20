@@ -221,7 +221,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
 
 
-    private fun getStatusString(millisSinceStart: Long, tte: TimeTrial): String{
+    fun getStatusString(millisSinceStart: Long, tte: TimeTrial): String{
 
         val sparse = tte.helper.sparseRiderStartTimes
         val index = sparse.indexOfKey(millisSinceStart)
@@ -244,16 +244,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
                     val riderString = "(${nextStartRider.number}) ${nextStartRider.rider.firstName} ${nextStartRider.rider.lastName}"
                     return when(millisToNextRider){
-                      in (ttIntervalMilis - 3000)..ttIntervalMilis ->
-                        {
-                            if(prevIndex >= 0){
-                                val prevRider = sparse.valueAt(prevIndex)
-                                 "(${prevRider.rider.firstName} ${prevRider.rider.lastName}) GO GO GO!!!"
-                            }else{
-                                "Next rider is $riderString"
-                            }
 
-                        }
                         in 0L..10000 -> {
                             var x = millisToNextRider
                             if(x > 1000){
@@ -267,6 +258,16 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                             "$riderString starts in ${ttIntervalMilis/4000} seconds!"
                         in ttIntervalMilis/4.. ttIntervalMilis/2 ->
                             "$riderString starts in ${ttIntervalMilis/2000} seconds"
+                        in (ttIntervalMilis - 3000)..ttIntervalMilis ->
+                        {
+                            if(prevIndex >= 0){
+                                val prevRider = sparse.valueAt(prevIndex)
+                                "(${prevRider.rider.firstName} ${prevRider.rider.lastName}) GO GO GO!!!"
+                            }else{
+                                "Next rider is $riderString"
+                            }
+
+                        }
                         else ->
                             "Next rider is $riderString"
                     }

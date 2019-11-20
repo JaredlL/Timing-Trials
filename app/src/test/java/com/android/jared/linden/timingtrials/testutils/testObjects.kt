@@ -3,13 +3,15 @@ package com.android.jared.linden.timingtrials.testutils
 import androidx.core.util.size
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.source.TimingTrialsDatabase
-import com.android.jared.linden.timingtrials.domain.TimeLine
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.ChronoUnit
 
-object AndroidTestObjects{
+
+
+object TestObjects{
+
     fun createTestTimeTrial(): TimeTrial{
         val new = TimeTrial(createTestHeader(), listOf(), listOf()).helper.addRidersAsTimeTrialRiders(createRiderList())
         return createMockEvents(new)
@@ -18,9 +20,9 @@ object AndroidTestObjects{
     fun createTestHeader(): TimeTrialHeader {
         return TimeTrialHeader.createBlank()
                 .copy(ttName = "Testing Timetrial",
-                        startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.MINUTES).minusSeconds(60), ZoneId.systemDefault()),
+                        startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.MINUTES).minusSeconds(300), ZoneId.systemDefault()),
                         laps = 1,
-                        firstRiderStartOffset = 0,
+                        firstRiderStartOffset = 60,
                         course = createTestCourse(),
                         interval = 60,
                         id = 20913)
@@ -68,5 +70,5 @@ object AndroidTestObjects{
         mList.add(TimingTrialsDatabase.createBaseRider("Rob", "Borek", "Forever Pedalling", 1992, Gender.MALE))
         return mList.mapIndexed { index, rider ->  rider.copy(id = index * 1L) }
     }
-}
 
+}
