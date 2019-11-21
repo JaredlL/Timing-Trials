@@ -25,6 +25,11 @@
         <action
             android:id="@+id/action_titleFragment_to_selectCourseFragment"
             app:destination="@id/selectCourseFragment" />
+        <action
+            android:id="@+id/action_titleFragment_to_resultFragment"
+            app:destination="@id/resultFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit" />
     </fragment>
     <fragment
         android:id="@+id/editRiderFragment"
@@ -57,6 +62,11 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_resultFragment"
+            app:destination="@id/resultFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit" />
     </fragment>
     <fragment
         android:id="@+id/editCourseFragment"
@@ -106,5 +116,14 @@
         <action
             android:id="@+id/action_selectCourseFragment_to_setupViewPagerFragment"
             app:destination="@id/setupViewPagerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="com.android.jared.linden.timingtrials.timetrialresults.ResultFragment"
+        tools:layout="@layout/fragment_timetrial_result"
+        android:label="ResultFragment" >
+        <argument
+            android:name="timeTrialId"
+            app:argType="long" />
     </fragment>
 </navigation>

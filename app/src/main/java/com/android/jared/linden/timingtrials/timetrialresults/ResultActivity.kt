@@ -116,7 +116,7 @@ class ResultActivity : AppCompatActivity() {
             val now = Date()
             android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
             // image naming and path  to include sd card  appending name you choose for file
-            val mPath = getApplicationInfo().dataDir + "/" + now + ".jpg";
+            val mPath = getApplicationInfo().dataDir + "/" + now + ".jpg"
 
             // create bitmap screen capture
             //val v1 = getWindow().getDecorView().getRootView()
@@ -126,7 +126,7 @@ class ResultActivity : AppCompatActivity() {
             val canvas = Canvas(bitmap)
             view.draw(canvas)
 
-            val imageFile = File(mPath);
+            val imageFile = File(mPath)
 
             val outputStream = FileOutputStream(imageFile)
             val quality = 100
@@ -134,10 +134,10 @@ class ResultActivity : AppCompatActivity() {
             outputStream.flush()
             outputStream.close()
 
-            openScreenshot(imageFile);
+            openScreenshot(imageFile)
         } catch (e:Throwable) {
             // Several error may come out with file handling or DOM
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
@@ -153,99 +153,4 @@ class ResultActivity : AppCompatActivity() {
 
 
 
-//class SpacesItemDecoration(private val space: Int) : RecyclerView.ItemDecoration() {
-//
-//   override fun getItemOffsets(outRect: Rect, view: View,
-//                       parent: RecyclerView, state: RecyclerView.State) {
-//        //outRect.left = space
-//        //outRect.right = space
-//        outRect.bottom = space
-//        view.background = ColorDrawable(Color.BLACK)
-//
-//        // Add top margin only for the first item to avoid double space between items
-////        if (parent.getChildLayoutPosition(view) == 0) {
-////          //  outRect.top = space
-////        } else {
-////          //  outRect.top = 0
-////        }
-//    }
-//}
-
-class DividerItemDecoration(context: Context, orientation: Int) : RecyclerView.ItemDecoration() {
-
-    private val mDivider: Drawable?
-
-    private var mOrientation: Int = 0
-
-    init {
-        val a = context.obtainStyledAttributes(ATTRS)
-        mDivider = a.getDrawable(0)
-        a.recycle()
-        setOrientation(orientation)
-    }
-
-    fun setOrientation(orientation: Int) {
-        if (orientation != HORIZONTAL_LIST && orientation != VERTICAL_LIST) {
-            throw IllegalArgumentException("invalid orientation")
-        }
-        mOrientation = orientation
-    }
-
-    override fun onDraw(c: Canvas, parent: RecyclerView) {
-        if (mOrientation == VERTICAL_LIST) {
-            drawVertical(c, parent)
-        } else {
-            drawHorizontal(c, parent)
-        }
-    }
-
-    fun drawVertical(c: Canvas, parent: RecyclerView) {
-        val left = parent.paddingLeft
-        val right = parent.width - parent.paddingRight
-
-        val childCount = parent.childCount
-        for (i in 0 until childCount) {
-            val child = parent.getChildAt(i)
-            val params = child
-                    .layoutParams as RecyclerView.LayoutParams
-            val top = child.bottom + params.bottomMargin
-            val bottom = top + mDivider!!.intrinsicHeight
-            mDivider.setBounds(left, top, right, bottom)
-            mDivider.draw(c)
-        }
-    }
-
-    fun drawHorizontal(c: Canvas, parent: RecyclerView) {
-        val top = parent.paddingTop
-        val bottom = parent.height - parent.paddingBottom
-
-        val childCount = parent.childCount
-        for (i in 0 until childCount) {
-            val child = parent.getChildAt(i)
-            val params = child
-                    .layoutParams as RecyclerView.LayoutParams
-            val left = child.right + params.rightMargin
-            val right = left + mDivider!!.intrinsicHeight
-            mDivider.setBounds(left, top, right, bottom)
-            mDivider.draw(c)
-        }
-    }
-
-    override fun getItemOffsets(outRect: Rect, itemPosition: Int, parent: RecyclerView) {
-        if (mOrientation == VERTICAL_LIST) {
-            outRect.set(0, 0, 0, mDivider!!.intrinsicHeight)
-        } else {
-            outRect.set(0, 0, mDivider!!.intrinsicWidth, 0)
-        }
-    }
-
-    companion object {
-
-        private val ATTRS = intArrayOf(android.R.attr.listDivider)
-
-        val HORIZONTAL_LIST = LinearLayoutManager.HORIZONTAL
-
-        val VERTICAL_LIST = LinearLayoutManager.VERTICAL
-    }
-}
 

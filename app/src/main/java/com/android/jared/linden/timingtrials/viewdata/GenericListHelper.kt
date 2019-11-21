@@ -130,10 +130,8 @@ class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHol
         _binding.apply{
             viewModel = data
             timetrialLayout.setOnClickListener {
-                val intent = Intent(this.root.context, ResultActivity::class.java).apply {
-                    putExtra(ITEM_ID_EXTRA, data.id)
-                }
-                this.root.context.startActivity(intent)
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToResultFragment(data.id?:0)
+                Navigation.findNavController(_binding.root).navigate(action)
             }
             executePendingBindings()
 

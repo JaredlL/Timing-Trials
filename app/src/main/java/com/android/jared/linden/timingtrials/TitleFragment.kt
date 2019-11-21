@@ -18,6 +18,7 @@ import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.databinding.FragmentTitleBinding
+import com.android.jared.linden.timingtrials.util.EventObserver
 import kotlinx.android.synthetic.main.fragment_title.*
 
 class TitleFragment : Fragment()
@@ -73,9 +74,26 @@ class TitleFragment : Fragment()
                 titleViewModel.nonFinishedTimeTrial.value?.let {
                     testViewModel.testTiming(it)
                 }
+            }
 
+            testResults1.setOnClickListener {
+                testViewModel.insertFinishedTt2()
+                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
+                    it?.let {id->
+                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
+                        findNavController().navigate(action)
+                    }
+                })
+            }
 
-
+            testResult2.setOnClickListener {
+                testViewModel.insertFinishedTt()
+                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
+                    it?.let {id->
+                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
+                        findNavController().navigate(action)
+                    }
+                })
             }
         }
 
