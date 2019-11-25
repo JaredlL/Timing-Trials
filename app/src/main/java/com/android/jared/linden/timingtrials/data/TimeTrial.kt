@@ -14,7 +14,7 @@ data class TimeTrialHeader(val ttName: String,
                            val startTime: OffsetDateTime,
                            val firstRiderStartOffset: Int = 60,
                            val status: TimeTrialStatus = TimeTrialStatus.SETTING_UP,
-                           @PrimaryKey(autoGenerate = true) val id: Long? = null) {
+                           @PrimaryKey(autoGenerate = true) override val id: Long? = null) : ITimingTrialsEntity {
 
     companion object {
         fun createBlank(): TimeTrialHeader {

@@ -3,6 +3,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.Navigation
 import com.android.jared.linden.timingtrials.R
@@ -10,8 +11,6 @@ import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemTimetrialBinding
-import com.android.jared.linden.timingtrials.globalresults.GlobalResultActivity
-import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
 import com.android.jared.linden.timingtrials.ui.SelectableCourseViewModel
 
 
@@ -31,11 +30,8 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, L
             }
 
             riderLayout.setOnClickListener {
-                val intent = Intent(root.context, GlobalResultActivity::class.java).apply {
-                    putExtra(ITEM_ID_EXTRA, data.id)
-                    putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
-                }
-                root.context.startActivity(intent)
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.id?:0, data.javaClass.simpleName)
+                Navigation.findNavController(_binding.root).navigate(action)
             }
 
             executePendingBindings()
@@ -83,11 +79,8 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Se
             }
 
             courseLayout.setOnClickListener {
-                val intent = Intent(root.context, GlobalResultActivity::class.java).apply {
-                    putExtra(ITEM_ID_EXTRA, data.course.id)
-                    putExtra(ITEM_TYPE_EXTRA, ITEM_COURSE)
-                }
-                root.context.startActivity(intent)
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.course.id?:0, data.javaClass.simpleName)
+                Navigation.findNavController(_binding.root).navigate(action)
             }
 
 

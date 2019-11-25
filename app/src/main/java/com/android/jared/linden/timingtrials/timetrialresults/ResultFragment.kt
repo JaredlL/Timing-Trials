@@ -1,9 +1,12 @@
 package com.android.jared.linden.timingtrials.timetrialresults
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,13 +19,15 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.databinding.FragmentTimetrialResultBinding
 import com.android.jared.linden.timingtrials.edititem.EditRiderFragmentArgs
 import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_timetrial_result.*
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
 
 class ResultFragment : Fragment() {
 
@@ -70,6 +75,44 @@ class ResultFragment : Fragment() {
         })
 
         return binding.root
+    }
+
+    fun takeScreenShot(view: View){
+        try {
+            val now = Date()
+            android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
+            // image naming and path  to include sd card  appending name you choose for file
+            val mPath = requireActivity().applicationInfo.dataDir + "/" + now + ".jpg"
+
+            // create bitmap screen capture
+            //val v1 = getWindow().getDecorView().getRootView()
+
+            val bitmap = Bitmap.createBitmap(view.width,
+                    view.height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            view.draw(canvas)
+
+            val imageFile = File(mPath)
+
+            val outputStream = FileOutputStream(imageFile)
+            val quality = 100
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+            outputStream.flush()
+            outputStream.close()
+
+            openScreenshot(imageFile)
+        } catch (e:Throwable) {
+            // Several error may come out with file handling or DOM
+            e.printStackTrace()
+        }
+    }
+
+    private fun openScreenshot(imageFile: File) {
+        val intent = Intent()
+        intent.action = Intent.ACTION_VIEW
+        val uri = Uri.fromFile(imageFile)
+        intent.setDataAndType(uri, "image/*")
+        startActivity(intent)
     }
 
 }

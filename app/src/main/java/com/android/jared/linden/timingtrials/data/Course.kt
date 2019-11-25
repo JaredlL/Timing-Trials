@@ -9,8 +9,8 @@ data class Course(
         val courseName: String,
         val length: Double = 0.0,
         val cttName: String = "",
-        @PrimaryKey(autoGenerate = true) val id: Long? = null
-) {
+        @PrimaryKey(autoGenerate = true) override val id: Long? = null
+) : ITimingTrialsEntity {
    // fun toCourseLight(): CourseLight{
    //     return CourseLight(courseName, length,cttName,id)
    // }

@@ -19,12 +19,12 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
 
         a?.let { li->
             when(li.first){
-                ITEM_RIDER->{
+                Rider::class.java.simpleName->{
                     return@let Transformations.map(riderRepository.getRider(li.second)){
                         "${it.firstName} ${it.lastName} Results"
                     }
                 }
-                ITEM_COURSE->{
+                Course::class.java.simpleName->{
                     return@let Transformations.map(courseRepository.getCourse(li.second)){
                         "${it.courseName} Results"}
                     }
@@ -43,12 +43,12 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
 
         if (listInfo != null) {
             when (listInfo.first) {
-                ITEM_RIDER -> {
+                Rider::class.java.simpleName -> {
                     retList = Transformations.map(globalResultRepository.getRiderResults(listInfo.second)) { rl ->
                         rl?.let { list -> list.map { listItemForRiderResult(it) } }
                     }
                 }
-                ITEM_COURSE -> {
+                Course::class.java.simpleName -> {
                     retList = Transformations.map(globalResultRepository.getCourseResults(listInfo.second)) { rl ->
                         rl?.let { list -> list.map { listItemForCourseResult(it) } }
                     }

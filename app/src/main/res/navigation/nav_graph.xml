@@ -15,6 +15,8 @@
             app:destination="@id/dataBaseViewPagerFragment"
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
             app:popUpTo="@+id/titleFragment" />
         <action
             android:id="@+id/action_titleFragment_to_setupViewPagerFragment2"
@@ -67,6 +69,9 @@
             app:destination="@id/resultFragment"
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_globalResultFragment"
+            app:destination="@id/globalResultFragment" />
     </fragment>
     <fragment
         android:id="@+id/editCourseFragment"
@@ -125,5 +130,17 @@
         <argument
             android:name="timeTrialId"
             app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/globalResultFragment"
+        android:name="com.android.jared.linden.timingtrials.globalresults.GlobalResultFragment"
+        tools:layout="@layout/fragment_timetrial_result"
+        android:label="GlobalResultFragment" >
+        <argument
+            android:name="itemId"
+            app:argType="long" />
+        <argument
+            android:name="itemTypeId"
+            app:argType="string" />
     </fragment>
 </navigation>

@@ -13,8 +13,8 @@ data class Rider(
         val club: String = "",
         val dateOfBirth: OffsetDateTime,
         val gender: Gender,
-        @PrimaryKey(autoGenerate = true) val id: Long? = null
-)  {
+        @PrimaryKey(autoGenerate = true) override val id: Long? = null
+) : ITimingTrialsEntity  {
 
 
 
@@ -29,7 +29,6 @@ data class Rider(
     companion object {
 
         fun createBlank() = Rider("", "", "", OffsetDateTime.now().minusYears(20), Gender.UNKNOWN)
-
 
     }
 }
