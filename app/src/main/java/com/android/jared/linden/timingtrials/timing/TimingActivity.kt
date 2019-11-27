@@ -30,67 +30,46 @@ class TimingActivity : AppCompatActivity() {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
+            System.out.println("JAREDMSG -> Timing Activity -> Service Connectd")
             val binder = service as TimingService.TimingServiceBinder
             mService = binder.getService()
-            onBound()
+            observeIfNot()
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
+            System.out.println("JAREDMSG -> Timing Activity -> Service Disconnected")
             mBound = false
         }
     }
 
-    fun onBound(){
-        viewModel.timeTrial.observe(this, Observer {result->
-            result?.let {tt->
-                System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial ${tt.timeTrialHeader.ttName} ${tt.timeTrialHeader.status}")
-                when(tt.timeTrialHeader.status){
-                    TimeTrialStatus.SETTING_UP -> {
-                        if(mBound){
-                            applicationContext.unbindService(connection)
-                            mService?.stop()
-                            mBound = false
-                        }
-                        finish()
-                    }
-                    TimeTrialStatus.IN_PROGRESS -> {
-                        val mserv = mService?:throw Exception("SERVICE IS NULL, BUT WHY")
-                        if(mserv.currentTt != tt.timeTrialHeader){
-                            mserv.currentTt = tt.timeTrialHeader
-                            mService?.timerTick =::tick
-                            mService?.startTiming()
-                        }
 
-                    }
-                    TimeTrialStatus.FINISHED -> {
-                        if(mBound){
-                            applicationContext.unbindService(connection)
-                            mService?.stop()
-                            mBound = false
-                        }
-                        finish()
-                    }
-                }
-
-            }
-        })
+    var observing = false
+    fun observeIfNot(){
+        if(!observing){
+            observing = true
+            System.out.println("JAREDMSG -> Timing Activity -> On Bound -> Observing Timertick")
+            mService?.timerTick?.observe(this, Observer {
+                viewModel.updateLoop(it)
+            })
+            //TODO - How to fix
+        }
 
     }
 
-    private fun tick(timeStamp: Long){
-         viewModel.updateLoop(timeStamp)
+    override fun onDestroy() {
+        super.onDestroy()
+        System.out.println("JAREDMSG -> Timing Activity -> DESTROY")
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_timing)
         setSupportActionBar(toolbar)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
         viewModel = getViewModel { injector.timingViewModel() }
 
-        viewModel.showMessage = {msg -> Toast.makeText(this, msg, Toast.LENGTH_LONG).show()}
 
         mBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)
 
@@ -113,6 +92,36 @@ class TimingActivity : AppCompatActivity() {
                 commit()
             }
         }
+
+
+
+        viewModel.timeTrial.observe(this, Observer {result->
+            result?.let {tt->
+                System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial ${tt.timeTrialHeader.ttName} ${tt.timeTrialHeader.status}")
+                when(tt.timeTrialHeader.status){
+                    TimeTrialStatus.SETTING_UP -> {
+                        if(mBound){
+                            applicationContext.unbindService(connection)
+                            mService?.stop()
+                            mBound = false
+                        }
+                        finish()
+                    }
+                    TimeTrialStatus.IN_PROGRESS -> {
+                        //al mserv = mService?:throw Exception("SERVICE IS NULL, BUT WHY")
+                        mService?.startTiming(tt.timeTrialHeader)
+                    }
+                    TimeTrialStatus.FINISHED -> {
+                        if(mBound){
+                            applicationContext.unbindService(connection)
+                            mService?.stop()
+                            mBound = false
+                        }
+                        finish()
+                    }
+                }
+            }
+        })
     }
 
     var prevBackPress = 0L

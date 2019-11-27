@@ -24,7 +24,8 @@
         <activity
             android:name=".timing.TimingActivity"
             android:label="@string/title_activity_timing"
-            android:launchMode="singleInstance"
+
+            android:launchMode="singleTop"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

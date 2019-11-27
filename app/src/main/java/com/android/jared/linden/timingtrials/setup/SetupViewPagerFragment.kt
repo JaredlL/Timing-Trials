@@ -16,6 +16,8 @@ import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayoutMediator
 
 class SetupViewPagerFragment: Fragment() {
@@ -31,7 +33,6 @@ class SetupViewPagerFragment: Fragment() {
         viewPager.adapter = SetupPagerAdapter(this)
 
         viewPager.offscreenPageLimit = 2
-
         // Set the icon and text for each tab
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.setIcon(getTabIcon(position))

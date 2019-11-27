@@ -47,8 +47,8 @@
     <fragment
         android:id="@+id/dataBaseViewPagerFragment"
         android:name="com.android.jared.linden.timingtrials.viewdata.DataBaseViewPagerFragment"
-        tools:layout="@layout/fragment_list_generic"
-        android:label="DataBaseViewPagerFragment" >
+        android:label="Timing Trials Database"
+        tools:layout="@layout/fragment_list_generic">
         <action
             android:id="@+id/action_dataBaseViewPagerFragment2_to_editRiderFragment"
             app:destination="@id/editRiderFragment"
@@ -76,18 +76,21 @@
     <fragment
         android:id="@+id/editCourseFragment"
         android:name="com.android.jared.linden.timingtrials.edititem.EditCourseFragment"
-        tools:layout="@layout/fragment_course"
-        android:label="EditCourseFragment" >
+        android:label="Edit Course"
+        tools:layout="@layout/fragment_course">
         <argument
             android:name="courseId"
             app:argType="long"
             android:defaultValue="0L" />
+        <argument
+            android:name="label"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/setupViewPagerFragment"
         android:name="com.android.jared.linden.timingtrials.setup.SetupViewPagerFragment"
-        tools:layout="@layout/fragment_setup_time_trial"
-        android:label="SetupViewPagerFragment" >
+        android:label="Setup Timetrial"
+        tools:layout="@layout/fragment_setup_time_trial">
         <action
             android:id="@+id/action_setupViewPagerFragment2_to_editRiderFragment"
             app:destination="@id/editRiderFragment"
@@ -134,8 +137,8 @@
     <fragment
         android:id="@+id/globalResultFragment"
         android:name="com.android.jared.linden.timingtrials.globalresults.GlobalResultFragment"
-        tools:layout="@layout/fragment_timetrial_result"
-        android:label="GlobalResultFragment" >
+        android:label="Results"
+        tools:layout="@layout/fragment_timetrial_result">
         <argument
             android:name="itemId"
             app:argType="long" />

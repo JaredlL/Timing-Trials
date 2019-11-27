@@ -19,8 +19,19 @@ class MainActivity : AppCompatActivity() {
         val appBarConfiguration = AppBarConfiguration(navController.graph)
 
         toolbar.setupWithNavController(navController, appBarConfiguration)
-        setSupportActionBar(toolbar)
-        supportActionBar?.title = resources.getString(R.string.timingtrials_database)
+
+        navController.addOnDestinationChangedListener{ controller, destination, arguments ->
+            title = when (destination.id) {
+                R.id.navigation_home -> "My title"
+                R.id.dataBaseViewPagerFragment -> getString(R.string.timingtrials_database)
+                R.id.editRiderFragment -> getString(R.string.edit_rider)
+                R.id.editCourseFragment -> getString(R.string.edit_course)
+                R.id.setupViewPagerFragment -> getString(R.string.setup_timetrial)
+                R.id.selectCourseFragment -> getString(R.string.select_course)
+                else -> "Default title"
+            }
+
+        }
 
 //
 //        mSectionsPagerAdapter = DbActivitySectionsPagerAdapter(supportFragmentManager)

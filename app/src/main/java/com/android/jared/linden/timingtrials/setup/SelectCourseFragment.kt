@@ -57,7 +57,7 @@ class SelectCourseFragment : Fragment() {
             courseRecyclerView.adapter = adapter
             courseRecyclerView.layoutManager = viewManager
             courseListFab.setOnClickListener {
-                val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment()
+                val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")
                 findNavController().navigate(action)
 
                 //editCourse(0)
@@ -87,8 +87,8 @@ class SelectCourseFragment : Fragment() {
 //        return dialog
 //    }
 
-    private fun editCourse(courseId: Long){
-        val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(courseId)
+    private fun editCourse(course: Course){
+        val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(course.id?:0, resources.getString(R.string.edit_course))
         findNavController().navigate(action)
     }
 

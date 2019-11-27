@@ -66,6 +66,10 @@ class TimerFragment : Fragment() {
             }
         })
 
+        timingViewModel.timeString.observe(viewLifecycleOwner, Observer {
+            val b = "g"
+        })
+
 
 
 

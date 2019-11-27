@@ -30,7 +30,6 @@ class EditCourseFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
         val courseId = args.courseId
-        activity?.title = if(courseId == 0L) getString(R.string.add_course) else getString(R.string.edit_course)
 
         courseViewModel = getViewModel { injector.courseViewModel() }.apply { initialise(courseId) }
         courseViewModel.mutableCourse.observe(viewLifecycleOwner, Observer {  })

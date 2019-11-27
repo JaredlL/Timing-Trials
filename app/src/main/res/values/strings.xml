@@ -52,6 +52,8 @@
     <string name="setup_timetrial">Setup Timetrial</string>
     <string name="add_course">Add Course</string>
     <string name="edit_course">Edit Course</string>
+    <string name="new_rider">New Rider</string>
+    <string name="new_course">New Course</string>
     <string name="gender">Gender</string>
     <string name="dob">DoB</string>
     <string name="yob">Year of birth</string>

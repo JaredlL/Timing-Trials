@@ -17,14 +17,14 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
     inner class CourseViewHolder(binding: ListItemCourseBinding): RecyclerView.ViewHolder(binding.root) {
         private val _binding = binding
 
-        var longPress = {_: Long -> Unit}
+        var longPress = {_: Course -> Unit}
 
 
         fun bind(courseWrapper: SelectableCourseViewModel){
 
             _binding.apply{
                 courseVm = courseWrapper
-                courseLayout.setOnLongClickListener { longPress(courseWrapper.course.id?:0)
+                courseLayout.setOnLongClickListener { longPress(courseWrapper.course)
                     true
                 }
 
@@ -51,7 +51,7 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
     private var mCourses: List<SelectableCourseViewModel> = listOf()
 
     val layoutInflater = LayoutInflater.from(context)
-    var editCourse = {_:Long -> Unit}
+    var editCourse = {_:Course -> Unit}
     var courseSelected = {_:Course -> Unit}
 
 
