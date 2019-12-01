@@ -1,11 +1,12 @@
 package com.android.jared.linden.timingtrials.viewdata
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.ITEM_COURSE
@@ -22,6 +23,7 @@ class DataBaseViewPagerFragment: Fragment() {
         val tabLayout = binding.tabs
         val viewPager = binding.viewPager2
         viewPager.adapter = TimeTrialDBPagerAdapter(this)
+        setHasOptionsMenu(true)
 
         // Set the icon and text for each tab
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
@@ -52,6 +54,21 @@ class DataBaseViewPagerFragment: Fragment() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        //menu.clear()
+        inflater.inflate(R.menu.menu_database, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.app_bar_import -> {
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToImportFragment()
+                findNavController().navigate(action)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
 }
 

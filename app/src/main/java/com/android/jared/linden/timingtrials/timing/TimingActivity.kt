@@ -6,14 +6,20 @@ import android.os.IBinder
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import com.android.jared.linden.timingtrials.MainActivity
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
+import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
+import com.android.jared.linden.timingtrials.util.EventObserver
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import com.google.android.material.snackbar.Snackbar
 
 import kotlinx.android.synthetic.main.activity_timing.*
 import org.threeten.bp.Instant
@@ -24,7 +30,7 @@ class TimingActivity : AppCompatActivity() {
     private val TIMERTAG = "timing_tag"
     private val STATUSTAG = "status_tag"
 
-    private var mService: TimingService? = null
+    private val mService: MutableLiveData<TimingService?> = MutableLiveData()
     private lateinit var viewModel: TimingViewModel
     private var mBound: Boolean = false
 
@@ -34,7 +40,7 @@ class TimingActivity : AppCompatActivity() {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             System.out.println("JAREDMSG -> Timing Activity -> Service Connectd")
             val binder = service as TimingService.TimingServiceBinder
-            mService = binder.getService()
+            mService.value = binder.getService()
             serviceCreated.value = true
         }
 
@@ -83,63 +89,62 @@ class TimingActivity : AppCompatActivity() {
             }
         }
 
+        val liveTick = Transformations.switchMap(mService){result->
+            result?.timerTick
+        }
 
-        Transformations.switchMap(serviceCreated) { viewModel.timeTrial }.observe(this, Observer {result->
-            result?.let {tt->
-                System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial ${tt.timeTrialHeader.ttName} ${tt.timeTrialHeader.status}")
-                when(tt.timeTrialHeader.status){
-                    TimeTrialStatus.SETTING_UP -> {
-                        if(mBound){
-                            applicationContext.unbindService(connection)
-                            mService?.stop()
-                            mBound = false
-                        }
-                        finish()
-                    }
-                    TimeTrialStatus.IN_PROGRESS -> {
-                        //al mserv = mService?:throw Exception("SERVICE IS NULL, BUT WHY")
-                        mService?.startTiming(tt.timeTrialHeader)
-                    }
-                    TimeTrialStatus.FINISHED -> {
-                        if(mBound){
-                            applicationContext.unbindService(connection)
-                            mService?.stop()
-                            mBound = false
-                        }
-                        finish()
+        viewModel.messageData.observe(this, EventObserver{
+            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+        })
+
+        val initMediator = MediatorLiveData<Long>().apply {
+            addSource(mService){service->
+                   viewModel.timeTrial.value?.timeTrialHeader?.let{tt->
+                       service?.let {
+                           viewModelChange(tt, it)
+                       }
+                   }
+            }
+            addSource(viewModel.timeTrial){res->
+                res?.let { tt->
+                    mService.value?.let {
+                        viewModelChange(tt.timeTrialHeader, it)
                     }
                 }
             }
-
+            addSource(liveTick){
+                value = it
+            }
+        }.observe(this, Observer {
+            viewModel.updateLoop(it)
         })
+    }
 
-//        viewModel.timeTrial.observe(this, Observer {result->
-//            result?.let {tt->
-//                System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial ${tt.timeTrialHeader.ttName} ${tt.timeTrialHeader.status}")
-//                when(tt.timeTrialHeader.status){
-//                    TimeTrialStatus.SETTING_UP -> {
-//                        if(mBound){
-//                            applicationContext.unbindService(connection)
-//                            mService?.stop()
-//                            mBound = false
-//                        }
-//                        finish()
-//                    }
-//                    TimeTrialStatus.IN_PROGRESS -> {
-//                        //al mserv = mService?:throw Exception("SERVICE IS NULL, BUT WHY")
-//                        mService?.startTiming(tt.timeTrialHeader)
-//                    }
-//                    TimeTrialStatus.FINISHED -> {
-//                        if(mBound){
-//                            applicationContext.unbindService(connection)
-//                            mService?.stop()
-//                            mBound = false
-//                        }
-//                        finish()
-//                    }
-//                }
-//            }
-//        })
+    fun viewModelChange(timeTrialHeader: TimeTrialHeader, service: TimingService){
+        when(timeTrialHeader.status){
+            TimeTrialStatus.SETTING_UP -> {
+                if(mBound){
+                    System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
+                    applicationContext.unbindService(connection)
+                    service.stop()
+                    mBound = false
+                }
+                finish()
+            }
+            TimeTrialStatus.IN_PROGRESS -> {
+                System.out.println("JAREDMSG -> Timing Activity -> Got in progress TT and Service is up, lets roll")
+                service.startTiming(timeTrialHeader)
+            }
+            TimeTrialStatus.FINISHED -> {
+                if(mBound){
+                    System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
+                    applicationContext.unbindService(connection)
+                    service.stop()
+                    mBound = false
+                }
+                finish()
+            }
+        }
     }
 
     var prevBackPress = 0L
@@ -167,7 +172,7 @@ class TimingActivity : AppCompatActivity() {
                 .setNeutralButton("End and discard TT") { _, _ ->
                     if(mBound){
                         applicationContext.unbindService(connection)
-                        mService?.stop()
+                        mService.value?.stop()
                         mBound = false
 
                     }
@@ -180,7 +185,7 @@ class TimingActivity : AppCompatActivity() {
                         if(it.timeTrialHeader.startTime.toInstant() > Instant.now()){
                             if(mBound){
                                 applicationContext.unbindService(connection)
-                                mService?.stop()
+                                mService.value?.stop()
                                 mBound = false
 
                             }
@@ -207,7 +212,7 @@ class TimingActivity : AppCompatActivity() {
                 .setPositiveButton("End timing and discard") { _, _ ->
                     if(mBound){
                         applicationContext.unbindService(connection)
-                        mService?.stop()
+                        mService.value?.stop()
                         mBound = false
 
                     }

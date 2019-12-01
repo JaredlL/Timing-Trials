@@ -23,6 +23,8 @@
             app:destination="@id/setupViewPagerFragment"
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
             app:popUpTo="@+id/titleFragment" />
         <action
             android:id="@+id/action_titleFragment_to_selectCourseFragment"
@@ -71,7 +73,18 @@
             app:exitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/action_dataBaseViewPagerFragment_to_globalResultFragment"
-            app:destination="@id/globalResultFragment" />
+            app:destination="@id/globalResultFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_importFragment"
+            app:destination="@id/importFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
     <fragment
         android:id="@+id/editCourseFragment"
@@ -146,4 +159,9 @@
             android:name="itemTypeId"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/importFragment"
+        android:name="com.android.jared.linden.timingtrials.transfer.ImportFragment"
+        android:label="Import Data"
+        tools:layout="@layout/fragment_import" />
 </navigation>

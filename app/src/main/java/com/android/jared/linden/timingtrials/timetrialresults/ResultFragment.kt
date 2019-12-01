@@ -8,9 +8,7 @@ import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -33,6 +31,8 @@ class ResultFragment : Fragment() {
 
     private val args: ResultFragmentArgs by navArgs()
 
+    lateinit var resultViewModel: ResultViewModel
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
 
@@ -40,20 +40,26 @@ class ResultFragment : Fragment() {
         val adapter = ResultListAdapter(requireActivity())
         adapter.setHasStableIds(true)
 
+        requireActivity().invalidateOptionsMenu()
+        setHasOptionsMenu(true)
+
+        resultViewModel = requireActivity().getViewModel {  requireActivity().injector.resultViewModel() }.apply { initialise(args.timeTrialId) }
 
         val binding = DataBindingUtil.inflate<FragmentTimetrialResultBinding>(inflater, R.layout.fragment_timetrial_result, container, false).apply {
+
             fragResultRecyclerView.isNestedScrollingEnabled = false
             fragResultRecyclerView.layoutManager = viewManager
             fragResultRecyclerView.adapter = adapter
             fragResultRecyclerView.addItemDecoration(DividerItemDecoration(requireActivity(), LinearLayoutManager.VERTICAL))
         }
-        val resultViewModel = requireActivity().getViewModel {  requireActivity().injector.resultViewModel() }.apply { initialise(args.timeTrialId) }
 
 
 
 
 
-        resultViewModel.results.observe(this, Observer {res->
+
+
+        resultViewModel.results.observe(viewLifecycleOwner, Observer {res->
             res?.let {newRes->
                 if(newRes.isNotEmpty()){
                     val rowLength = newRes.first().row.size
@@ -74,7 +80,23 @@ class ResultFragment : Fragment() {
             }
         })
 
+
+
         return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_results, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.doneButton -> {
+                resultViewModel.insertResults()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     fun takeScreenShot(view: View){

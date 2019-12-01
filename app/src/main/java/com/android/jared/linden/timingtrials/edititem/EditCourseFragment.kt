@@ -31,7 +31,7 @@ class EditCourseFragment : Fragment() {
 
         val courseId = args.courseId
 
-        courseViewModel = getViewModel { injector.courseViewModel() }.apply { initialise(courseId) }
+        courseViewModel = requireActivity().getViewModel { requireActivity().injector.courseViewModel() }.apply { initialise(courseId) }
         courseViewModel.mutableCourse.observe(viewLifecycleOwner, Observer {  })
         val binding = DataBindingUtil.inflate<FragmentCourseBinding>(inflater, R.layout.fragment_course, container, false).apply {
             viewModel = courseViewModel

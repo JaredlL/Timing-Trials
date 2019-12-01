@@ -26,7 +26,7 @@ class EditRiderFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
 
-        val riderViewModel = getViewModel { injector.riderViewModel().apply { initialise(args.riderId) } }
+        val riderViewModel = requireActivity().getViewModel { requireActivity().injector.riderViewModel().apply { initialise(args.riderId) } }
         riderViewModel.mutableRider.observe(viewLifecycleOwner, Observer {  })
 
 

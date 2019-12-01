@@ -7,6 +7,7 @@ import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.android.jared.linden.timingtrials.domain.TimeLine
 import com.android.jared.linden.timingtrials.domain.TimeTrialHelper
 import com.android.jared.linden.timingtrials.util.ConverterUtils
+import com.android.jared.linden.timingtrials.util.Event
 import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 import java.lang.Exception
@@ -26,6 +27,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     val timeLine: MutableLiveData<TimeLine> = MutableLiveData()
     val timeString: MutableLiveData<String> = MutableLiveData()
     val statusString: MutableLiveData<String> = MutableLiveData()
+    val messageData: MutableLiveData<Event<String>> = MutableLiveData()
 
     private var currentTt: TimeTrial? = null
     private var currentTimeLine: TimeLine? = null
@@ -49,7 +51,9 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         }
     }
 
-    var showMessage: (String) -> Unit = {}
+    fun showMessage(mesg: String){
+        messageData.postValue(Event(mesg))
+    }
 
     fun onRiderPassed(){
 
@@ -132,29 +136,23 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                 statusString.postValue(newStatusString)
             }
 
-            if(timeTrial.value != currentTt){
-                currentTt?.let { ctt->
-                    System.out.println("JAREDMSG -> Update TT & TimeLine")
-                    timeTrial.postValue(ctt)
-                    currentTimeLine = TimeLine(ctt, millisSinceStart )
-                    timeLine.postValue(currentTimeLine)
+            if(!tt.equalsOtherExcludingIds(timeTrial.value)){
+                System.out.println("JAREDMSG -> Update TT & TimeLine")
+                timeTrial.postValue(tt)
+                currentTimeLine = TimeLine(tt, millisSinceStart )
+                timeLine.postValue(currentTimeLine)
 
-                    if(abs(millisSinceStart - lastSave) > saveInterval){
-                        updateTimeTrial(ctt)
-                        lastSave = millisSinceStart
-                    }
-
+                if(abs(millisSinceStart - lastSave) > saveInterval){
+                    updateTimeTrial(tt)
+                    lastSave = millisSinceStart
                 }
-
             }
 
             timeLine.value?.let {tl->
                if(!tl.isValidForTimeStamp(millisSinceStart)){
-                   currentTt?.let {
-                       System.out.println("JAREDMSG -> Update TimeLine")
-                       currentTimeLine = TimeLine(it, millisSinceStart )
-                       timeLine.postValue(currentTimeLine)
-                   }
+                   System.out.println("JAREDMSG -> Update TimeLine")
+                   currentTimeLine = TimeLine(tt, millisSinceStart )
+                   timeLine.postValue(currentTimeLine)
 
                }
             }
@@ -164,8 +162,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
             val endtime = System.currentTimeMillis() - startts
             looptime += endtime
-            iters ++
-            if(iters == 100){
+            if(iters++ == 100){
                 System.out.println("JAREDMSG -> Time for 100 loops =  $looptime")
                 looptime = 0
                 iters = 0

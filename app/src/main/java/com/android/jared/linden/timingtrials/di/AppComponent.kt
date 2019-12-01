@@ -10,6 +10,7 @@ import com.android.jared.linden.timingtrials.setup.SetupViewModel
 import com.android.jared.linden.timingtrials.timing.TimingViewModel
 import com.android.jared.linden.timingtrials.viewdata.ListViewModel
 import com.android.jared.linden.timingtrials.TestViewModel
+import com.android.jared.linden.timingtrials.transfer.ImportViewModel
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -44,6 +45,8 @@ interface AppComponent{
     fun resultViewModel(): ResultViewModel
 
     fun globalResultViewModel(): GlobalResultViewModel
+
+    fun importViewModel(): ImportViewModel
 
 }
 

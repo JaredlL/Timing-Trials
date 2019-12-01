@@ -41,7 +41,7 @@ class TimerFragment : Fragment() {
                 val oldCount  = adapter.itemCount
                 val newList = tl.timeLine.map { ev -> EventViewWrapper(ev, res.timeTrial)}
 
-                adapter.setEvents(newList.toList())
+                adapter.setEvents(newList)
 
                 newList.forEach {evw->
 

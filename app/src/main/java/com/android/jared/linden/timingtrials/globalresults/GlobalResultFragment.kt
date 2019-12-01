@@ -12,10 +12,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.adapters.GenericListItemAdapter
+import com.android.jared.linden.timingtrials.databinding.FragmentGlobalResultBinding
 import com.android.jared.linden.timingtrials.databinding.FragmentListGenericBinding
 import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import kotlinx.android.synthetic.main.fragment_list_generic.*
 
 class GlobalResultFragment : Fragment()
 {
@@ -35,8 +37,9 @@ class GlobalResultFragment : Fragment()
         viewManager = LinearLayoutManager(requireActivity())
         adapter = GenericListItemAdapter(requireActivity())
 
-        val binding = DataBindingUtil.inflate<FragmentListGenericBinding>(inflater, R.layout.fragment_list_generic, container, false).apply{
+        val binding = DataBindingUtil.inflate<FragmentGlobalResultBinding>(inflater, R.layout.fragment_global_result, container, false).apply{
             lifecycleOwner = this@GlobalResultFragment
+
             genericRecyclerView.adapter = adapter
             genericRecyclerView.layoutManager = viewManager
         }
@@ -47,11 +50,6 @@ class GlobalResultFragment : Fragment()
             }
         })
 
-        genericItemViewModel.titleString.observe(this, Observer {item ->
-            item?.let {
-
-            }
-        })
 
         genericItemViewModel.init(args.itemTypeId, args.itemId)
 

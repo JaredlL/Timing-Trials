@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".viewdata.GenericListFragment">
+
+
+            <include
+                android:id="@+id/listHeading"
+                layout="@layout/list_item_generic"
+                android:layout_width="fill_parent"
+                android:layout_height="32dp"
+                android:layout_marginTop="8dp" />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/genericRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:background="@android:color/background_light"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/listHeading"
+                tools:listitem="@layout/list_item_generic" />
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

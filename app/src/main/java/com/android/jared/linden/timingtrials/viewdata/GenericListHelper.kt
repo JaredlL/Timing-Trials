@@ -56,7 +56,8 @@ class RiderViewHolderFactory: GenericViewHolderFactory<Rider>() {
 
     override fun performFabAction(fab: View) {
         fab.setOnClickListener {
-
+            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment( 0)
+            Navigation.findNavController(fab).navigate(action)
         }
     }
 }
