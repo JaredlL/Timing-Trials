@@ -8,7 +8,7 @@
     <data>
         <variable
             name="courseVm"
-            type="com.android.jared.linden.timingtrials.ui.CourseListViewWrapper"/>
+            type="com.android.jared.linden.timingtrials.ui.SelectableCourseViewModel"/>
 
     </data>
 
@@ -54,7 +54,6 @@
             android:id="@+id/checkBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="@={courseVm.courseIsSelected}"
             android:layout_alignWithParentIfMissing="true"
             android:layout_alignParentRight="true" />
 

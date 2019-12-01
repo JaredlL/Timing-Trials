@@ -1,16 +1,16 @@
 package com.android.jared.linden.timingtrials.setup
 
 import androidx.lifecycle.*
+import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.util.ConverterUtils
-import com.android.jared.linden.timingtrials.util.createLink
-import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 
 
 interface ITimeTrialPropertiesViewModel{
 
-    val timeTrialHeader: LiveData<TimeTrialHeader>
+    val timeTrial: LiveData<TimeTrial?>
+    val timeTrialHeader: LiveData<TimeTrialHeader?>
     val timeTrialName: MutableLiveData<String>
     val startTimeString: LiveData<String>
     val courseName: LiveData<String>
@@ -20,132 +20,36 @@ interface ITimeTrialPropertiesViewModel{
     val firstRiderOffset: MutableLiveData<String>
     val offsetDescription: LiveData<String>
     val availableLaps: List<String>
+    val setupMediator: MediatorLiveData<Any>
     var selectedLapsPosition: Int
-    var onBeginTt: () -> Unit
-    fun beginTt()
+
 
 }
 
 class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITimeTrialPropertiesViewModel{
 
-   override val timeTrialHeader = Transformations.map(ttSetup.timeTrial){it.timeTrialHeader}
+    override val timeTrial = ttSetup.timeTrial
+   override val timeTrialHeader = Transformations.map(ttSetup.timeTrial){it?.timeTrialHeader}
 
     //private val timeTrialValue = ttSetup.setupTimeTrial.value.timeTrialHeader
 
-    override val courseName: LiveData<String> = Transformations.map(ttSetup.timeTrial){tt->
+    override val courseName: LiveData<String> = Transformations.map(ttSetup.timeTrial){ tt->
         tt?.let{
+
             tt.timeTrialHeader.course?.courseName
         }
     }
+    override val startTime = MutableLiveData<OffsetDateTime>()
+    override val firstRiderOffset = MutableLiveData<String>()
+    override val laps = MutableLiveData<String>()
+    override val interval = MutableLiveData<String>()
 
-
-    /**
-     * To perform a custom action on livedata set
-     */
-    override val timeTrialName: MutableLiveData<String> = MutableLiveData("")
-    private val nameMediator = MediatorLiveData<String>().apply {
-        addSource(ttSetup.timeTrial) { tt->
-            tt?.timeTrialHeader?.let { if(timeTrialName.value != it.ttName) timeTrialName.value = it.ttName }
-
-        }
-        addSource(timeTrialName) { newName ->
-            ttSetup.timeTrial.value?.timeTrialHeader?.let {
-                if(it.ttName != newName) {
-                    ttSetup.updateDefinition(it.copy(ttName = newName))
-                }
-            }
-        }
-    }.also { it.observeForever {  } }
-
-
-    override val offsetDescription: LiveData<String> = Transformations.map(ttSetup.timeTrial){tt->
-        tt?.timeTrialHeader?.let {
-           val tString = ConverterUtils.instantToSecondsDisplayString(it.startTime.toInstant().plusSeconds(it.firstRiderStartOffset.toLong()))
+    override val offsetDescription: LiveData<String> = Transformations.map(timeTrialHeader){tt->
+        tt?.let {
+            val tString = ConverterUtils.instantToSecondsDisplayString(it.startTime.toInstant().plusSeconds(it.firstRiderStartOffset.toLong()))
             "(ie first rider starts at $tString)"
         }
     }
-
-
-    override val firstRiderOffset = MutableLiveData<String>()
-    private val firstRiderOffsetMediator = MediatorLiveData<String>().apply {
-        addSource(ttSetup.timeTrial) { tt->
-            tt?.let {
-                if (firstRiderOffset.value != it.timeTrialHeader.firstRiderStartOffset.toString()) {
-                    firstRiderOffset.value = it.timeTrialHeader.firstRiderStartOffset.toString()
-                }
-            }
-
-        }
-        addSource(firstRiderOffset) {os->
-            os.toIntOrNull()?.let{newos ->
-                timeTrialHeader.value?.let { tt->
-                    if(tt.firstRiderStartOffset != newos) {
-                        ttSetup.updateDefinition(tt.copy(firstRiderStartOffset = newos))
-                    }
-                }}
-        }
-    }.also { it.observeForever {  } }
-
-
-    override val laps = MutableLiveData<String>()
-    private val lapsMediator = MediatorLiveData<String>().apply {
-        addSource(ttSetup.timeTrial) { tt->
-            tt?.let {
-                if (laps.value != it.timeTrialHeader.laps.toString()) {
-                    laps.value = it.timeTrialHeader.laps.toString()
-                }
-            }
-
-        }
-        addSource(laps) {laps->
-            laps.toIntOrNull()?.let{newLaps ->
-                timeTrialHeader.value?.let { tt->
-                if(tt.laps != newLaps) {
-                    ttSetup.updateDefinition(tt.copy(laps = newLaps))
-                }
-            }}
-        }
-    }.also { it.observeForever {  } }
-
-    override val interval = MutableLiveData<String>()
-    private val intervalMediator = MediatorLiveData<String>().apply {
-        addSource(interval) {interval->
-            timeTrialHeader.value?.let { tt ->
-                interval.toIntOrNull()?.let{
-                    if(tt.interval != it){
-                        ttSetup.updateDefinition(tt.copy(interval = it))
-                    }
-                }
-            }
-        }
-        addSource(ttSetup.timeTrial) { tt->
-            tt?.let {
-                if (interval.value != it.timeTrialHeader.interval.toString()) {
-                    interval.value = it.timeTrialHeader.interval.toString()
-                }
-            }
-
-        }
-    }.also { it.observeForever {  } }
-
-    override val startTime = MutableLiveData<OffsetDateTime>()
-    private val startTimeMediator = MediatorLiveData<OffsetDateTime>().apply {
-        addSource(timeTrialHeader) { tt->
-            tt?.let {
-                if (startTime.value != it.startTime) {
-                    startTime.value = it.startTime
-                }
-            }
-
-        }
-        addSource(startTime) {newStartTime->
-            timeTrialHeader.value?.let { tt->
-                if(tt.startTime != newStartTime) {
-                    ttSetup.updateDefinition(tt.copy(startTime = newStartTime))
-                }
-            }
-        }
-    }.also { it.observeForever {  } }
 
     override val startTimeString: LiveData<String>  = Transformations.map(timeTrialHeader){ tt->
         tt?.let { ConverterUtils.instantToSecondsDisplayString(it.startTime.toInstant())}
@@ -159,10 +63,161 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
             laps.value = availableLaps[value]
         }
 
-    override fun beginTt(){
-        onBeginTt()
+    /**
+     * To perform a custom action on livedata set
+     */
+    override val timeTrialName: MutableLiveData<String> = MutableLiveData("")
+    override val setupMediator = MediatorLiveData<Any>().apply {
+        addSource(timeTrialHeader) { tt->
+            tt?.let {
+                val curentName = timeTrialName.value
+                val ttName = it.ttName
+                if(curentName!= ttName){
+                    System.out.println("JAREDMSG -> Old Name = ${timeTrialName.value}, New Name = ${it.ttName}")
+                    timeTrialName.value = it.ttName
+                }
+                if (firstRiderOffset.value != it.firstRiderStartOffset.toString()) {
+                    firstRiderOffset.value = it.firstRiderStartOffset.toString()
+                }
+                if (startTime.value != it.startTime) {
+                    startTime.value = it.startTime
+                }
+                if (interval.value != it.interval.toString()) {
+                    interval.value = it.interval.toString()
+                }
+                if (laps.value != it.laps.toString()) {
+                    laps.value = it.laps.toString()
+                }
+            }
+
+        }
+        addSource(timeTrialName) { newName ->
+            timeTrialHeader.value?.let {
+                if(it.ttName != newName) { ttSetup.updateDefinition(it.copy(ttName = newName))
+                }
+            }
+        }
+        addSource(firstRiderOffset) {os->
+            os.toIntOrNull()?.let{newos ->
+                timeTrialHeader.value?.let { tt->
+                    if(tt.firstRiderStartOffset != newos) {
+                        ttSetup.updateDefinition(tt.copy(firstRiderStartOffset = newos))
+                    }
+                }}
+        }
+        addSource(startTime) {newStartTime->
+            timeTrialHeader.value?.let { tt->
+                if(tt.startTime != newStartTime) {
+                    ttSetup.updateDefinition(tt.copy(startTime = newStartTime))
+                }
+            }
+        }
+        addSource(interval) {interval->
+            timeTrialHeader.value?.let { tt ->
+                interval.toIntOrNull()?.let{
+                    if(tt.interval != it){
+                        ttSetup.updateDefinition(tt.copy(interval = it))
+                    }
+                }
+            }
+        }
+
+        addSource(laps) {laps->
+            laps.toIntOrNull()?.let{newLaps ->
+                timeTrialHeader.value?.let { tt->
+                    if(tt.laps != newLaps) {
+                        ttSetup.updateDefinition(tt.copy(laps = newLaps))
+                    }
+                }}
+        }
     }
-    override var onBeginTt = { Unit}
+
+
+
+
+
+
+//    val firstRiderOffsetMediator = MediatorLiveData<String>().apply {
+//        addSource(timeTrialHeader) { tt->
+//            tt?.let {
+//                if (firstRiderOffset.value != it.firstRiderStartOffset.toString()) {
+//                    firstRiderOffset.value = it.firstRiderStartOffset.toString()
+//                }
+//            }
+//
+//        }
+//        addSource(firstRiderOffset) {os->
+//            os.toIntOrNull()?.let{newos ->
+//                timeTrialHeader.value?.let { tt->
+//                    if(tt.firstRiderStartOffset != newos) {
+//                        ttSetup.updateDefinition(tt.copy(firstRiderStartOffset = newos))
+//                    }
+//                }}
+//        }
+//    }
+
+
+
+//    val lapsMediator = MediatorLiveData<String>().apply {
+//        addSource(timeTrialHeader) { tt->
+//            tt?.let {
+//                if (laps.value != it.laps.toString()) {
+//                    laps.value = it.laps.toString()
+//                }
+//            }
+//
+//        }
+//        addSource(laps) {laps->
+//            laps.toIntOrNull()?.let{newLaps ->
+//                timeTrialHeader.value?.let { tt->
+//                if(tt.laps != newLaps) {
+//                    ttSetup.updateDefinition(tt.copy(laps = newLaps))
+//                }
+//            }}
+//        }
+//    }
+
+
+//    val intervalMediator = MediatorLiveData<String>().apply {
+//        addSource(interval) {interval->
+//            timeTrialHeader.value?.let { tt ->
+//                interval.toIntOrNull()?.let{
+//                    if(tt.interval != it){
+//                        ttSetup.updateDefinition(tt.copy(interval = it))
+//                    }
+//                }
+//            }
+//        }
+//        addSource(timeTrialHeader) { tt->
+//            tt?.let {
+//                if (interval.value != it.interval.toString()) {
+//                    interval.value = it.interval.toString()
+//                }
+//            }
+//
+//        }
+//    }
+
+
+//    val startTimeMediator = MediatorLiveData<OffsetDateTime>().apply {
+//        addSource(timeTrialHeader) { tt->
+//            tt?.let {
+//                if (startTime.value != it.startTime) {
+//                    startTime.value = it.startTime
+//                }
+//            }
+//
+//        }
+//        addSource(startTime) {newStartTime->
+//            timeTrialHeader.value?.let { tt->
+//                if(tt.startTime != newStartTime) {
+//                    ttSetup.updateDefinition(tt.copy(startTime = newStartTime))
+//                }
+//            }
+//        }
+//    }
+
+
 
 }
 

@@ -18,11 +18,11 @@ object AndroidTestObjects{
     fun createTestHeader(): TimeTrialHeader {
         return TimeTrialHeader.createBlank()
                 .copy(ttName = "Testing Timetrial",
-                        startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.MINUTES).minusSeconds(300), ZoneId.systemDefault()),
+                        startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.MINUTES).minusSeconds(60), ZoneId.systemDefault()),
                         laps = 1,
-                        firstRiderStartOffset = 60,
+                        firstRiderStartOffset = 0,
                         course = createTestCourse(),
-                        interval = 30,
+                        interval = 60,
                         id = 20913)
 
     }

@@ -11,12 +11,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.android.jared.linden.timingtrials.R
 
 import com.android.jared.linden.timingtrials.adapters.SelectableRiderListAdapter
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.FragmentSelectriderListBinding
-import com.android.jared.linden.timingtrials.edititem.EditItemActivity
 import com.android.jared.linden.timingtrials.util.*
 
 
@@ -35,43 +36,46 @@ class SelectRidersFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        viewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.selectRidersViewModel
+        viewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
 
         viewManager = LinearLayoutManager(context)
         adapter = SelectableRiderListAdapter(requireContext())
 
-
+        adapter.setHasStableIds(true)
         adapter.editRider = ::editRider
 
         val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
             lifecycleOwner = (this@SelectRidersFragment)
-            riderHeading.selectableRider =  SelectableRiderViewWrapper(Rider.createBlank().copy( firstName = "Name", club = "Club").toRiderLight())
+            riderHeading.rider =  Rider.createBlank().copy( firstName = "Name", club = "Club")
             riderHeading.checkBox.visibility =  View.INVISIBLE
             riderRecyclerView.adapter = adapter
             riderRecyclerView.layoutManager = viewManager
 
             riderListFab.setOnClickListener {
-                editRider(Rider.createBlank().toRiderLight())
+                editRider(0)
             }
         }
 
-        viewModel.allSelectableRiders.observe(viewLifecycleOwner, Observer { riders ->
-            riders?.let{
+        adapter.riderSelectionChanged ={selectedRiders->
+            viewModel.updateSelectedRiders(selectedRiders)
+        }
+
+        viewModel.selectedRidersInformation.observe(viewLifecycleOwner, Observer {result->
+            result?.let {
                 adapter.setRiders(it)
             }
-            view?.jumpDrawablesToCurrentState()
         })
+
+
+
 
 
         return binding.root
     }
 
-    private fun editRider(rider: RiderLight){
-        val intent = Intent(context, EditItemActivity::class.java).apply {
-            putExtra(ITEM_TYPE_EXTRA, ITEM_RIDER)
-            putExtra(ITEM_ID_EXTRA, rider.id)
-        }
-        startActivity(intent)
+    private fun editRider(riderId: Long){
+        val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(riderId)
+        findNavController().navigate(action)
     }
 
 

@@ -6,12 +6,20 @@ import android.os.IBinder
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
+import com.android.jared.linden.timingtrials.MainActivity
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
+import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
-import com.android.jared.linden.timingtrials.setup.SetupActivity
+import com.android.jared.linden.timingtrials.util.EventObserver
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import com.google.android.material.snackbar.Snackbar
 
 import kotlinx.android.synthetic.main.activity_timing.*
 import org.threeten.bp.Instant
@@ -22,7 +30,7 @@ class TimingActivity : AppCompatActivity() {
     private val TIMERTAG = "timing_tag"
     private val STATUSTAG = "status_tag"
 
-    private var mService: TimingService? = null
+    private val mService: MutableLiveData<TimingService?> = MutableLiveData()
     private lateinit var viewModel: TimingViewModel
     private var mBound: Boolean = false
 
@@ -30,71 +38,34 @@ class TimingActivity : AppCompatActivity() {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
+            System.out.println("JAREDMSG -> Timing Activity -> Service Connectd")
             val binder = service as TimingService.TimingServiceBinder
-            mService = binder.getService()
-            onBound()
+            mService.value = binder.getService()
+            serviceCreated.value = true
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
+            System.out.println("JAREDMSG -> Timing Activity -> Service Disconnected")
             mBound = false
         }
     }
 
-    fun onBound(){
-        viewModel.timeTrial.observe(this, Observer {tt->
+    val serviceCreated: MutableLiveData<Boolean> = MutableLiveData(false)
 
-            if(tt == null){
-                if(mBound){
-                    applicationContext.unbindService(connection)
-                    mService?.stop()
-                    mBound = false
-                }
-                finish()
-            }else{
-                when(tt.timeTrialHeader.status){
-                    TimeTrialStatus.SETTING_UP -> {
-                        if(mBound){
-                            applicationContext.unbindService(connection)
-                            mService?.stop()
-                            mBound = false
-                        }
-                        finish()
-                    }
-                    TimeTrialStatus.IN_PROGRESS -> {
-                        mService?.currentTt = tt
-                        if(mService == null) throw Exception("SERVICE IS NULL, BUT WHY")
-                        mService?.timerTick =::tick
-                        mService?.startTiming()
-                    }
-                    TimeTrialStatus.FINISHED -> {
-                        if(mBound){
-                            applicationContext.unbindService(connection)
-                            mService?.stop()
-                            mBound = false
-                        }
-                        finish()
-                    }
-                }
-
-            }
-        })
-
+    override fun onDestroy() {
+        super.onDestroy()
+        System.out.println("JAREDMSG -> Timing Activity -> DESTROY")
     }
 
-    private fun tick(timeStamp: Long){
-         viewModel.updateLoop(timeStamp)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_timing)
         setSupportActionBar(toolbar)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
         viewModel = getViewModel { injector.timingViewModel() }
 
-        viewModel.showMessage = {msg -> Toast.makeText(this, msg, Toast.LENGTH_LONG).show()}
 
         mBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)
 
@@ -115,6 +86,63 @@ class TimingActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction().apply{
                 add(R.id.lowerFrame, it, STATUSTAG)
                 commit()
+            }
+        }
+
+        val liveTick = Transformations.switchMap(mService){result->
+            result?.timerTick
+        }
+
+        viewModel.messageData.observe(this, EventObserver{
+            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+        })
+
+        val initMediator = MediatorLiveData<Long>().apply {
+            addSource(mService){service->
+                   viewModel.timeTrial.value?.timeTrialHeader?.let{tt->
+                       service?.let {
+                           viewModelChange(tt, it)
+                       }
+                   }
+            }
+            addSource(viewModel.timeTrial){res->
+                res?.let { tt->
+                    mService.value?.let {
+                        viewModelChange(tt.timeTrialHeader, it)
+                    }
+                }
+            }
+            addSource(liveTick){
+                value = it
+            }
+        }.observe(this, Observer {
+            viewModel.updateLoop(it)
+        })
+    }
+
+    fun viewModelChange(timeTrialHeader: TimeTrialHeader, service: TimingService){
+        when(timeTrialHeader.status){
+            TimeTrialStatus.SETTING_UP -> {
+                if(mBound){
+                    System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
+                    applicationContext.unbindService(connection)
+                    service.stop()
+                    mBound = false
+                }
+                finish()
+            }
+            TimeTrialStatus.IN_PROGRESS -> {
+                System.out.println("JAREDMSG -> Timing Activity -> Got in progress TT and Service is up, lets roll")
+                service.startTiming(timeTrialHeader)
+            }
+            TimeTrialStatus.FINISHED -> {
+                if(mBound){
+                    System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
+                    applicationContext.unbindService(connection)
+                    service.stop()
+                    mBound = false
+                }
+                finish()
             }
         }
     }
@@ -144,7 +172,7 @@ class TimingActivity : AppCompatActivity() {
                 .setNeutralButton("End and discard TT") { _, _ ->
                     if(mBound){
                         applicationContext.unbindService(connection)
-                        mService?.stop()
+                        mService.value?.stop()
                         mBound = false
 
                     }
@@ -157,12 +185,12 @@ class TimingActivity : AppCompatActivity() {
                         if(it.timeTrialHeader.startTime.toInstant() > Instant.now()){
                             if(mBound){
                                 applicationContext.unbindService(connection)
-                                mService?.stop()
+                                mService.value?.stop()
                                 mBound = false
 
                             }
                             viewModel.backToSetup()
-                            val mIntent = Intent(this@TimingActivity, SetupActivity::class.java)
+                            val mIntent = Intent(this@TimingActivity, MainActivity::class.java)
                             startActivity(mIntent)
                         }else{
                            Toast.makeText(this, "TT has now started, cannot go back to setup!", Toast.LENGTH_SHORT).show()
@@ -184,7 +212,7 @@ class TimingActivity : AppCompatActivity() {
                 .setPositiveButton("End timing and discard") { _, _ ->
                     if(mBound){
                         applicationContext.unbindService(connection)
-                        mService?.stop()
+                        mService.value?.stop()
                         mBound = false
 
                     }

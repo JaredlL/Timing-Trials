@@ -2,41 +2,59 @@ package com.android.jared.linden.timingtrials.globalresults
 
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.*
-import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
-import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
-import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.*
 import com.android.jared.linden.timingtrials.ui.IGenericListItem
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import javax.inject.Inject
 
-class GlobalResultViewModel @Inject constructor(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository,private val courseRepository: ICourseRepository) : ViewModel() {
+class GlobalResultViewModel @Inject constructor(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository,private val courseRepository: ICourseRepository, private val globalResultRepository: IGlobalResultRepository) : ViewModel() {
 
 
 
     private val typeIdLiveData:MutableLiveData<Pair<String, Long>>  = MutableLiveData()
 
-    val titleString: MutableLiveData<String> = MutableLiveData<String>()
+    val titleString: LiveData<String> = Transformations.switchMap(typeIdLiveData){a ->
 
-    val resultsToDisplay: LiveData<List<IGenericListItem>> = Transformations.switchMap(typeIdLiveData){listInfo ->
+
+
+        a?.let { li->
+            when(li.first){
+                Rider::class.java.simpleName->{
+                    return@let Transformations.map(riderRepository.getRider(li.second)){
+                        "${it.firstName} ${it.lastName} Results"
+                    }
+                }
+                Course::class.java.simpleName->{
+                    return@let Transformations.map(courseRepository.getCourse(li.second)){
+                        "${it.courseName} Results"}
+                    }
+                else -> return@let MutableLiveData("")
+
+                }
+
+
+        }
+    }
+
+
+    val resultsToDisplay: LiveData<List<IGenericListItem>> = Transformations.switchMap(typeIdLiveData) { listInfo ->
 
         var retList: LiveData<List<IGenericListItem>> = MutableLiveData()
 
-        listInfo?.let {li->
-            when(li.first){
-                ITEM_RIDER->{
-
-                    retList = Transformations.map(riderRepository.getRider(li.second)){ri ->
-                        ri?.let {
-                            titleString.value = "${it.firstName} ${it.lastName} PBs"
-                            it.personalBests.map {pb -> listItemFromPb(pb) }
-                        }}
+        if (listInfo != null) {
+            when (listInfo.first) {
+                Rider::class.java.simpleName -> {
+                    retList = Transformations.map(globalResultRepository.getRiderResults(listInfo.second)) { rl ->
+                        rl?.let { list -> list.map { listItemForRiderResult(it) } }
+                    }
                 }
-                ITEM_COURSE->{
-                    retList = Transformations.map(courseRepository.getCourse(li.second)){c ->
-                        c?.let {
-                            titleString.value = "${it.courseName} CRs"
-                            c.courseRecords.map {cr -> listItemFromCourseRecord(cr) }
-                        }}
+                Course::class.java.simpleName -> {
+                    retList = Transformations.map(globalResultRepository.getCourseResults(listInfo.second)) { rl ->
+                        rl?.let { list -> list.map { listItemForCourseResult(it) } }
+                    }
+                }
+                else -> {
+
                 }
             }
         }
@@ -48,20 +66,33 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
         typeIdLiveData.value = Pair(itemType, id)
     }
 
-    private fun listItemFromPb(pb: PersonalBest):IGenericListItem{
+    private fun listItemForRiderResult(result: IResult):IGenericListItem{
         return object :IGenericListItem{
             override val itemText1: String
-                get() = pb.courseName
+                get() = result.course.courseName
 
             override val itemText2: String
-                get() = pb.dateTime?.let { ConverterUtils.dateToDisplay(pb.dateTime) } ?: ""
+                get() = result.dateSet?.let { ds-> ConverterUtils.dateToDisplay(ds) } ?: ""
 
             override val itemText3: String
-                get() = ConverterUtils.toSecondsDisplayString(pb.millisTime)
+                get() = ConverterUtils.toSecondsDisplayString(result.resultTime)
         }
     }
 
-    private fun listItemFromCourseRecord(cr: CourseRecord):IGenericListItem{
+    private fun listItemForCourseResult(result: IResult):IGenericListItem{
+        return object :IGenericListItem{
+            override val itemText1: String
+                get() = result.rider.fullName()
+
+            override val itemText2: String
+                get() = "${result.dateSet?.let { ConverterUtils.dateToDisplay(it) } ?: ""} ${result.categoryString}"
+
+            override val itemText3: String
+                get() = ConverterUtils.toSecondsDisplayString(result.resultTime)
+        }
+    }
+
+    private fun listItemForRider(cr: CourseRecord):IGenericListItem{
         return object :IGenericListItem{
             override val itemText1: String
                 get() = cr.riderName

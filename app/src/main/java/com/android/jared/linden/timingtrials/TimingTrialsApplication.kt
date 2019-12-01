@@ -11,6 +11,7 @@ import com.jakewharton.threetenabp.AndroidThreeTen
 class TimingTrialsApplication: Application(), DaggerComponentProvider {
 
     override val component: AppComponent by lazy { DaggerAppComponent.builder().applicationContext(applicationContext).build() }
+    //override val component: AppComponent = DaggerAppComponent.builder().applicationContext(applicationContext).build()
 
     override fun onCreate() {
         super.onCreate()

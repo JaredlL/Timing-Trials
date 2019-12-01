@@ -1,77 +1,47 @@
 package com.android.jared.linden.timingtrials.timing
 
-import android.os.Debug
-import android.util.Log
-import androidx.core.util.size
 import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.data.RiderPassedEvent
-import com.android.jared.linden.timingtrials.domain.TimeLine
-import com.android.jared.linden.timingtrials.testutils.AndroidTestObjects
-import org.junit.Assert
-import org.junit.Assert.*
+import com.android.jared.linden.timingtrials.testutils.TestObjects
 import org.junit.Test
-import org.threeten.bp.Instant
 
-class TimingViewModelTest{
+import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
+
+class TimingViewModelTest {
 
     @Test
-    fun getStatusStringTest() {
-
-        val tt = AndroidTestObjects.createTestTimeTrial()
+    fun getStatusStringBlobs() {
 
         val now = Instant.now()
-        var millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli()
-
-        Debug.startMethodTracing("Predict")
-
-        var start = System.currentTimeMillis()
-        var sString = getStatusString(millisSinceStart, tt)
-        var tll = TimeLine(tt, millisSinceStart)
-        var tl = tll.timeLine.last().eventType.name
-        var tot = System.currentTimeMillis() - start
-        System.out.println(tot.toString())
+        val startTime = OffsetDateTime.ofInstant (now.minusMillis(58000), ZoneId.systemDefault())
+        val timeTrialHeader = TestObjects.createTestHeader().copy(startTime = startTime)
+        var timeTrial = TimeTrial(timeTrialHeader, listOf(), listOf())
+        timeTrial = timeTrial.helper.addRidersAsTimeTrialRiders(TestObjects.createRiderList())
 
 
+        val millisSinceStart = now.toEpochMilli() - timeTrial.timeTrialHeader.startTime.toInstant().toEpochMilli()
 
-        millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli()
-        start = System.currentTimeMillis()
-        sString = getStatusString(millisSinceStart, tt)
-        tl = tll.timeLine.last().eventType.name
-        tot = System.currentTimeMillis() - start
-        System.out.println(tot.toString())
-
-        millisSinceStart = now.toEpochMilli() - tt.timeTrialHeader.startTime.toInstant().toEpochMilli()
-        start = System.currentTimeMillis()
-        sString = getStatusString(millisSinceStart, tt)
-        tl = tll.timeLine.last().eventType.name
-        tot = System.currentTimeMillis() - start
-        System.out.println(tot.toString())
-
-
-        Debug.stopMethodTracing()
-
-
+        val sString = getStatusStringBlobs(millisSinceStart, timeTrial)
+        System.out.println(sString)
     }
 
-    private fun getStatusString(millisSinceStart: Long, tte: TimeTrial): String{
+    fun getStatusStringBlobs(millisSinceStart: Long, tte: TimeTrial): String{
 
-        val ttIntervalMilis: Long = tte.timeTrialHeader.interval * 1000L
         val sparse = tte.helper.sparseRiderStartTimes
         val index = sparse.indexOfKey(millisSinceStart)
         val prevIndex = if(index >= 0){ index }else{ Math.abs(index) - 2 }
         val nextIndex = prevIndex + 1
-
-        //val ridersWhoShouldHaveStarted = tte.helper.riderStartTimes.headMap(millisSinceStart)
-        //val nextRiderStart = tte.helper.riderStartTimes.tailMap(millisSinceStart)
+        val ttIntervalMilis = (tte.timeTrialHeader.interval * 1000L)
 
         val ss = tte.helper.sparseRiderStartTimes.indexOfKey(millisSinceStart)
 
-        if(nextIndex < tte.helper.sparseRiderStartTimes.size){
+        if(nextIndex < tte.helper.sparseRiderStartTimes.size()){
 
             //If we are more than 1 min before TT start time
             val nextStartMilli = sparse.keyAt(nextIndex)
             if((nextStartMilli - millisSinceStart) > 60000){
-                return "TimeTrial starts at 0:00:00:0"
+                return "${tte.timeTrialHeader.ttName} starts at 0:00:00:0"
             }
 
             val nextStartRider = sparse.valueAt(nextIndex)
@@ -79,7 +49,7 @@ class TimingViewModelTest{
 
             val riderString = "(${nextStartRider.number}) ${nextStartRider.rider.firstName} ${nextStartRider.rider.lastName}"
             return when(millisToNextRider){
-                in ttIntervalMilis - 3000..ttIntervalMilis ->
+                in (ttIntervalMilis - 3000)..ttIntervalMilis ->
                 {
                     if(prevIndex >= 0){
                         val prevRider = sparse.valueAt(prevIndex)
@@ -112,7 +82,4 @@ class TimingViewModelTest{
         }
 
     }
-
-
-
 }

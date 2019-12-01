@@ -5,12 +5,9 @@ import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
 import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
 import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
-import com.jakewharton.threetenabp.AndroidThreeTen.init
 import kotlinx.coroutines.*
-import java.lang.Exception
+import java.sql.Time
 import java.util.*
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -30,39 +27,34 @@ class SetupViewModel @Inject constructor(
 ) : ViewModel(), ITimeTrialSetupViewModel{
 
 
-    val timeTrial = MediatorLiveData<TimeTrial>().apply { addSource(timeTrialRepository.getNonFinishedTimeTrial()) { res ->
-//        val settingUp = res?.firstOrNull{it.timeTrialHeader.status == TimeTrialStatus.SETTING_UP}
-//        val timing = res?.firstOrNull{it.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS}
-        val settingUp = res?.firstOrNull()
-        if (res?.size?:0 > 1) throw Exception("Multiple non finished TTs in DB")
-        if (settingUp != null) {
-            if(!isCorotineAlive.get() && value != settingUp){
-                System.out.println("JAREDMSG -> Updating Livedata with ${settingUp.timeTrialHeader.id} ${settingUp.timeTrialHeader.ttName}")
-                value = settingUp
+    private val _mTimeTrial = MediatorLiveData<TimeTrial?>()
+    val timeTrial: LiveData<TimeTrial?> = _mTimeTrial
+    init {
+        _mTimeTrial.addSource(timeTrialRepository.nonFinishedTimeTrial) { res ->
+            res?.let {tt->
+                val current = _mTimeTrial.value
+                val equals = tt.equalsOtherExcludingIds(current)
+                if(!isCarolineAlive.get() && !equals){
+                    System.out.println("JAREDMSG -> SETUPVIEWMODEL -> current data = ${_mTimeTrial.value?.timeTrialHeader?.id} new = ${tt.timeTrialHeader.id}")
+                    _mTimeTrial.value = tt
             }
-        }else{
-            viewModelScope.launch(Dispatchers.IO) {
-                timeTrialRepository.insert(TimeTrial.createBlank())
-            }
-            //updateTimeTrial(TimeTrial.createBlank())
         }
     }
     }
 
 
-
     var queue = ConcurrentLinkedQueue<TimeTrial>()
-    var isCorotineAlive = AtomicBoolean()
+    private var isCarolineAlive = AtomicBoolean()
 
     fun updateTimeTrial(newtt: TimeTrial){
-        //timeTrial.value = newtt
-        if(timeTrial.value != newtt){
-            timeTrial.value = newtt
+        //_mTimeTrial.value = newtt
+        if(_mTimeTrial.value != newtt){
+            _mTimeTrial.value = newtt
 
-            if(!isCorotineAlive.get()){
+            if(!isCarolineAlive.get()){
                 queue.add(newtt)
                 viewModelScope.launch(Dispatchers.IO) {
-                    isCorotineAlive.set(true)
+                    isCarolineAlive.set(true)
                     while (queue.peek() != null){
                         var ttToInsert = queue.peek()
                         while (queue.peek() != null){
@@ -70,7 +62,7 @@ class SetupViewModel @Inject constructor(
                         }
                         timeTrialRepository.update(ttToInsert)
                     }
-                    isCorotineAlive.set(false)
+                    isCarolineAlive.set(false)
                 }
             }else{
                 queue.add(newtt)
@@ -81,14 +73,14 @@ class SetupViewModel @Inject constructor(
 
 
     fun updateDefinition(ttHeader: TimeTrialHeader){
-        timeTrial.value?.let {
+        _mTimeTrial.value?.let {
             updateTimeTrial(it.copy(timeTrialHeader = ttHeader))
         }
     }
 
     override val orderRidersViewModel: IOrderRidersViewModel = object: IOrderRidersViewModel {
         override fun moveItem(fromPosition: Int, toPosition: Int) {
-            timeTrial.value?.let { tt->
+            _mTimeTrial.value?.let { tt->
                 val mutList = tt.riderList.map { it.rider }.toMutableList()
 
                 if(fromPosition > toPosition){
@@ -103,10 +95,10 @@ class SetupViewModel @Inject constructor(
 
 
         }
-        override fun getOrderableRiders(): LiveData<List<RiderLight>> = Transformations.map(timeTrial){it.riderList.map { r -> r.rider }}
+        override fun getOrderableRiders(): LiveData<List<Rider>> = Transformations.map(_mTimeTrial){it?.riderList?.map { r -> r.rider }}
     }
 
-    override val selectCourseViewModel: ISelectCourseViewModel = SelectCourseViewModelImpl(this)
+    override val selectCourseViewModel: ISelectCourseViewModel = ISelectCourseViewModel.SelectCourseViewModelImpl(this)
     override val selectRidersViewModel: ISelectRidersViewModel = SelectRidersViewModelImpl(this)
     override val timeTrialPropertiesViewModel: ITimeTrialPropertiesViewModel = TimeTrialPropertiesViewModelImpl(this)
     override val setupConformationViewModel: ISetupConformationViewModel = SetupConfirmationViewModel(this)
@@ -120,13 +112,13 @@ class SetupViewModel @Inject constructor(
          * Need to remember which ids were selected when a rider is added/removed
          * Also need to update selected riders if they are modfied in the DB
          */
-        timeTrial.addSource(riderRepository.allRidersLight) { result: List<RiderLight>? ->
+        _mTimeTrial.addSource(riderRepository.allRidersLight) { result: List<Rider>? ->
             result?.let {newRiders->
-                timeTrial.value?.let {ttdef->
+                _mTimeTrial.value?.let { ttdef->
                     val currentSelected = ttdef.riderList.map { r -> r.rider }
                     if(currentSelected.count() > 0){
 
-                        val oldSelected: LinkedHashMap<Long, RiderLight> =  LinkedHashMap(currentSelected.associateBy { r -> r.id ?: 0 })
+                        val oldSelected: LinkedHashMap<Long, Rider> =  LinkedHashMap(currentSelected.associateBy { r -> r.id ?: 0 })
                         val retainedIds: MutableSet<Long> = mutableSetOf()
                         newRiders.forEach{rider ->
                             rider.id?.let {id ->
@@ -153,6 +145,8 @@ class SetupViewModel @Inject constructor(
     @ExperimentalCoroutinesApi
     override fun onCleared() {
         super.onCleared()
+        System.out.println("JAREDMSG -> SETUPVIEWMODEL CLEARING")
+        isCarolineAlive.set(false)
         viewModelScope.cancel()
     }
 }

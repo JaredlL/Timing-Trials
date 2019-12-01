@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Timing Trials</string>
     <string name="title_home">Home</string>
+    <string name="start_new_timetrial">Start New Timetrial</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_edit_item">Edit Item</string>
@@ -14,6 +15,7 @@
     <string name="timetrial_name">Timetrial Name</string>
     <string name="selected_course">Selected Course</string>
     <string name="number_of_laps">Number of laps (splits)</string>
+    <string name="course_requires_name">Course requires a name</string>
     <string name="timetrial_interval">Start interval (seconds)</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="start_time">First rider to start at</string>
@@ -23,6 +25,9 @@
     <string name="club">Club</string>
     <string name="begin_tt">Begin TT!</string>
     <string name="ok">OK</string>
+    <string name="resume">Resume</string>
+    <string name="select_riders">Select Riders</string>
+    <string name="order_riders">Order Riders</string>
     <string name="cancel">Cancel</string>
     <string name="title_activity_timing">TimingActivity</string>
     <string name="start_tt">Start TT</string>
@@ -44,12 +49,21 @@
     <string name="date">Date</string>
     <string name="add_rider">Add Rider</string>
     <string name="edit_rider">Edit Rider</string>
+    <string name="setup_timetrial">Setup Timetrial</string>
     <string name="add_course">Add Course</string>
     <string name="edit_course">Edit Course</string>
+    <string name="new_rider">New Rider</string>
+    <string name="new_course">New Course</string>
     <string name="gender">Gender</string>
     <string name="dob">DoB</string>
     <string name="yob">Year of birth</string>
+    <string name="timingtrials_database">Timing Trials Database</string>
     <string name="rider_start_offset">First rider start offset</string>
     <string name="delete">Delete</string>
     <string name="title_activity_global_result">GlobalResultActivity</string>
+    <string name="resume_setup">Resume setting up</string>
+    <string name="results">Results</string>
+    <string name="start_new">Start New</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="import_data">Import Data</string>
 </resources>

@@ -15,24 +15,28 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".globalresults.GlobalResultActivity"
-            android:label="@string/title_activity_global_result"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:label="@string/title_activity_global_result">
+
+        </activity>
+
         <activity android:name=".timetrialresults.ResultActivity" />
+
         <activity
             android:name=".timing.TimingActivity"
             android:label="@string/title_activity_timing"
-            android:launchMode="singleInstance"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+
+            android:launchMode="singleTop"
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.android.jared.linden.timingtrials.MainActivity" />
         </activity>
-        <activity
-            android:name=".setup.SetupActivity"
-            android:label="@string/title_activity_setup"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustPan" />
+
+<!--        <activity-->
+<!--            android:name=".setup.SetupActivity"-->
+<!--            android:label="@string/title_activity_setup"-->
+<!--            android:windowSoftInputMode="adjustPan" />-->
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">
@@ -42,7 +46,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".viewdata.TimingTrialsDbActivity" />
+
 
         <service android:name=".timing.TimingService" />
 

@@ -7,6 +7,7 @@ import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.android.jared.linden.timingtrials.domain.TimeLine
 import com.android.jared.linden.timingtrials.domain.TimeTrialHelper
 import com.android.jared.linden.timingtrials.util.ConverterUtils
+import com.android.jared.linden.timingtrials.util.Event
 import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 import java.lang.Exception
@@ -14,6 +15,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.math.abs
 
 interface IEventSelectionData{
     var eventAwaitingSelection: Long?
@@ -25,6 +27,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     val timeLine: MutableLiveData<TimeLine> = MutableLiveData()
     val timeString: MutableLiveData<String> = MutableLiveData()
     val statusString: MutableLiveData<String> = MutableLiveData()
+    val messageData: MutableLiveData<Event<String>> = MutableLiveData()
 
     private var currentTt: TimeTrial? = null
     private var currentTimeLine: TimeLine? = null
@@ -35,26 +38,22 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
 
     init {
-        if (timeTrial.value == null) {
-            timeTrial.addSource(timeTrialRepository.getNonFinishedTimeTrial()) { res ->
+        timeTrial.addSource(timeTrialRepository.nonFinishedTimeTrial) { timing ->
 
-                val timing = res?.firstOrNull()
-                if (res?.size?:0 > 1) throw Exception("Multiple non finished TTs in DB")
-                    if(timing != null && timeTrial.value != timing) {
-                        currentTt = timing
-                        timeTrial.value = timing
-                        currentTimeLine = TimeLine(timing, Instant.now().toEpochMilli() - timing.timeTrialHeader.startTime.toInstant().toEpochMilli())
-                        timeLine.value = currentTimeLine
-                    }else{
-                        timeTrial.value = timing
-                    }
-
-
+            if(timing != null && timing.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS && !timing.equalsOtherExcludingIds(timeTrial.value)) {
+                currentTt = timing
+                timeTrial.value = timing
+                currentTimeLine = TimeLine(timing, Instant.now().toEpochMilli() - timing.timeTrialHeader.startTime.toInstant().toEpochMilli())
+                timeLine.value = currentTimeLine
+            }else{
+                timeTrial.value = timing
             }
         }
     }
 
-    var showMessage: (String) -> Unit = {}
+    fun showMessage(mesg: String){
+        messageData.postValue(Event(mesg))
+    }
 
     fun onRiderPassed(){
 
@@ -100,7 +99,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     var isCorotineAlive = AtomicBoolean()
 
     private fun updateTimeTrial(newtt: TimeTrial){
-        //timeTrial.value = newtt
+        //_mTimeTrial.value = newtt
             if(!isCorotineAlive.get()){
                 queue.add(newtt)
                 viewModelScope.launch(Dispatchers.IO) {
@@ -137,29 +136,23 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                 statusString.postValue(newStatusString)
             }
 
-            if(timeTrial.value != currentTt){
-                currentTt?.let { ctt->
-                    System.out.println("JAREDMSG -> Update TT & TimeLine")
-                    timeTrial.postValue(ctt)
-                    currentTimeLine = TimeLine(ctt, millisSinceStart )
-                    timeLine.postValue(currentTimeLine)
+            if(!tt.equalsOtherExcludingIds(timeTrial.value)){
+                System.out.println("JAREDMSG -> Update TT & TimeLine")
+                timeTrial.postValue(tt)
+                currentTimeLine = TimeLine(tt, millisSinceStart )
+                timeLine.postValue(currentTimeLine)
 
-                    if(Math.abs(millisSinceStart - lastSave) > saveInterval){
-                        updateTimeTrial(ctt)
-                        lastSave = millisSinceStart
-                    }
-
+                if(abs(millisSinceStart - lastSave) > saveInterval){
+                    updateTimeTrial(tt)
+                    lastSave = millisSinceStart
                 }
-
             }
 
             timeLine.value?.let {tl->
                if(!tl.isValidForTimeStamp(millisSinceStart)){
-                   currentTt?.let {
-                       System.out.println("JAREDMSG -> Update TimeLine")
-                       currentTimeLine = TimeLine(it, millisSinceStart )
-                       timeLine.postValue(currentTimeLine)
-                   }
+                   System.out.println("JAREDMSG -> Update TimeLine")
+                   currentTimeLine = TimeLine(tt, millisSinceStart )
+                   timeLine.postValue(currentTimeLine)
 
                }
             }
@@ -169,8 +162,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
             val endtime = System.currentTimeMillis() - startts
             looptime += endtime
-            iters ++
-            if(iters == 100){
+            if(iters++ == 100){
                 System.out.println("JAREDMSG -> Time for 100 loops =  $looptime")
                 looptime = 0
                 iters = 0
@@ -192,14 +184,21 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     fun discardTt(){
         //timer.cancel()
+        System.out.println("JAREDMSG -> TIMINGVM Deleting TT")
         viewModelScope.launch(Dispatchers.IO) {
-            while (!isCorotineAlive.get()){
-                timeTrial.value?.let {
-                    timeTrialRepository.delete(it)
+            var deleted = false
+            while (!deleted){
+                if(!isCorotineAlive.get()){
+                    isCorotineAlive.set(true)
+                    timeTrial.value?.let {
+                        timeTrialRepository.delete(it)
+                    }
+                    isCorotineAlive.set(false)
+                    deleted = true
+                }else{
+                    delay(5L)
                 }
-                delay(20L)
             }
-
         }
     }
 
@@ -219,7 +218,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
 
 
-    private fun getStatusString(millisSinceStart: Long, tte: TimeTrial): String{
+    fun getStatusString(millisSinceStart: Long, tte: TimeTrial): String{
 
         val sparse = tte.helper.sparseRiderStartTimes
         val index = sparse.indexOfKey(millisSinceStart)
@@ -242,16 +241,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
                     val riderString = "(${nextStartRider.number}) ${nextStartRider.rider.firstName} ${nextStartRider.rider.lastName}"
                     return when(millisToNextRider){
-                      in ttIntervalMilis - 3000..ttIntervalMilis ->
-                        {
-                            if(prevIndex >= 0){
-                                val prevRider = sparse.valueAt(prevIndex)
-                                 "(${prevRider.rider.firstName} ${prevRider.rider.lastName}) GO GO GO!!!"
-                            }else{
-                                "Next rider is $riderString"
-                            }
 
-                        }
                         in 0L..10000 -> {
                             var x = millisToNextRider
                             if(x > 1000){
@@ -265,6 +255,16 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                             "$riderString starts in ${ttIntervalMilis/4000} seconds!"
                         in ttIntervalMilis/4.. ttIntervalMilis/2 ->
                             "$riderString starts in ${ttIntervalMilis/2000} seconds"
+                        in (ttIntervalMilis - 3000)..ttIntervalMilis ->
+                        {
+                            if(prevIndex >= 0){
+                                val prevRider = sparse.valueAt(prevIndex)
+                                "(${prevRider.rider.firstName} ${prevRider.rider.lastName}) GO GO GO!!!"
+                            }else{
+                                "Next rider is $riderString"
+                            }
+
+                        }
                         else ->
                             "Next rider is $riderString"
                     }

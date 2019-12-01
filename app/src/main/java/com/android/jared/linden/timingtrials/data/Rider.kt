@@ -13,13 +13,10 @@ data class Rider(
         val club: String = "",
         val dateOfBirth: OffsetDateTime,
         val gender: Gender,
-        val personalBests: List<PersonalBest> = listOf(),
-        @PrimaryKey(autoGenerate = true) val id: Long? = null
-)  {
+        @PrimaryKey(autoGenerate = true) override val id: Long? = null
+) : ITimingTrialsEntity  {
 
-    fun toRiderLight():RiderLight {
-        return RiderLight(firstName, lastName, club, dateOfBirth, gender, id)
-    }
+
 
     fun fullName(): String{
         return "$firstName $lastName"
@@ -33,22 +30,8 @@ data class Rider(
 
         fun createBlank() = Rider("", "", "", OffsetDateTime.now().minusYears(20), Gender.UNKNOWN)
 
-
-    }
-    //val fullName = "$firstName $lastName"
-}
-
-data class RiderLight(
-        @ColumnInfo(name = "firstName") val firstName: String,
-        @ColumnInfo(name = "lastName") val lastName: String,
-        @ColumnInfo(name = "club") val club: String = "",
-        @ColumnInfo(name = "dateOfBirth") val dateOfBirth: OffsetDateTime,
-        @ColumnInfo(name = "gender") val gender: Gender,
-        @ColumnInfo(name = "id") val id: Long? = null
-){
-    fun getCategoryStandard(): RiderCategoryStandard{
-        return RiderCategoryStandard(gender, OffsetDateTime.now().year - dateOfBirth.year )
     }
 }
+
 
 

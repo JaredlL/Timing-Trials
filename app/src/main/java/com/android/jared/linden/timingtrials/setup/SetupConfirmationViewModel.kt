@@ -2,7 +2,7 @@ package com.android.jared.linden.timingtrials.setup
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.android.jared.linden.timingtrials.MainViewModel
+import com.android.jared.linden.timingtrials.TitleViewModel
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.util.ConverterUtils
@@ -22,14 +22,14 @@ interface ISetupConformationViewModel{
 class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupConformationViewModel{
 
    override val timeTrial = ttSetup.timeTrial
-    val timeTrialDefinition = Transformations.map(timeTrial){it.timeTrialHeader}
+    val timeTrialDefinition = Transformations.map(timeTrial){it?.timeTrialHeader}
 
     override val title = Transformations.map(timeTrialDefinition){ tt ->
         "Starting ${tt?.ttName}"
     }
 
     override val lapsCourse = Transformations.map(timeTrialDefinition){ tt->
-        "${tt?.laps} laps of ${tt.course?.courseName}"
+        "${tt?.laps} laps of ${tt?.course?.courseName}"
     }
 
    override val ridersInterval = Transformations.map(timeTrial){
@@ -60,7 +60,6 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
         timeTrialDefinition.value?.let {
             return if(it.startTime.isAfter(OffsetDateTime.now())){
                 ttSetup.updateDefinition(it.copy(status = TimeTrialStatus.IN_PROGRESS))
-
                 true
             }else{
                 false
@@ -74,10 +73,10 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
     }
 }
 
-class ResumeOldConfirmationViewModel (private val mainViewModel: MainViewModel) : ISetupConformationViewModel{
+class ResumeOldConfirmationViewModel (private val mainViewModel: TitleViewModel) : ISetupConformationViewModel{
 
 
-    override val timeTrial = mainViewModel.setupTimeTrial
+    override val timeTrial = mainViewModel.nonFinishedTimeTrial
     val timeTrialDefinition = Transformations.map(timeTrial){it?.timeTrialHeader}
 
     override val title = Transformations.map(timeTrialDefinition){ tt ->

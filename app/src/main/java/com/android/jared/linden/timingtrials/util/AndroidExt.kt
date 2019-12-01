@@ -16,7 +16,7 @@ fun <T : Any> AppCompatActivity.argument(key: String) =
 
 
 inline fun <reified T: ViewModel> Fragment.getViewModel(crossinline factory: () -> T): T = T::class.java.let { clazz ->
-    ViewModelProviders.of(this, object: ViewModelProvider.Factory {
+    ViewModelProvider(this, object: ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == clazz) {
                 @Suppress("UNCHECKED_CAST")
@@ -28,7 +28,7 @@ inline fun <reified T: ViewModel> Fragment.getViewModel(crossinline factory: () 
 }
 
 inline fun <reified T: ViewModel> FragmentActivity.getViewModel(crossinline factory: () -> T): T = T::class.java.let { clazz ->
-    ViewModelProviders.of(this, object: ViewModelProvider.Factory {
+    ViewModelProvider(this, object: ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass == clazz) {
                 @Suppress("UNCHECKED_CAST")
@@ -39,9 +39,6 @@ inline fun <reified T: ViewModel> FragmentActivity.getViewModel(crossinline fact
     }).get(clazz)
 }
 
-inline fun <reified T: ViewModel> FragmentActivity.getViewModel2(crossinline factory: () -> T): T = T::class.java.let { clazz ->
-    ViewModelProvider.AndroidViewModelFactory(this.application).create(clazz)
-}
 
 //inline fun <reified T1: Any, reified T2:Any> MediatorLiveData<T1>.createLink(mutableValue: MutableLiveData<T1>, observedObject: MediatorLiveData<T2>, crossinline onUpdateObject:(T1) -> Unit, crossinline onObjectUpdated:() -> T1){
 //    this.addSource(mutableValue){
@@ -55,27 +52,27 @@ inline fun <reified T: ViewModel> FragmentActivity.getViewModel2(crossinline fac
 //    }
 //}
 
-inline fun <reified T1: Any, reified T2:Any> MutableLiveData<T1>.createLink(observedObject: MediatorLiveData<T2>, crossinline updateObject:(T1) -> Pair<T1?, T2?>?, crossinline onObjectUpdated:() -> T1): MutableLiveData<T1>{
-    this.let { rec->
-        val valMed: MediatorLiveData<T1> = MediatorLiveData<T1>().apply {
-            addSource(rec){
-                val new = updateObject(it)
-                 if(new?.first != it){
-                     observedObject.value = new?.second
-                 }
-            }
-            addSource(observedObject){obj->
-                obj?.let {
-                    if(rec.value != it)
-                        rec.value = onObjectUpdated()
-                }
-            }
-        }.also { it.observeForever {  } }
-        return rec
-    }
-
-
-}
+//inline fun <reified T1: Any, reified T2:Any> MutableLiveData<T1>.createLink(observedObject: MediatorLiveData<T2>, crossinline updateObject:(T1) -> Pair<T1?, T2?>?, crossinline onObjectUpdated:() -> T1): MutableLiveData<T1>{
+//    this.let { rec->
+//        val valMed: MediatorLiveData<T1> = MediatorLiveData<T1>().apply {
+//            addSource(rec){
+//                val new = updateObject(it)
+//                 if(new?.first != it){
+//                     observedObject.value = new?.second
+//                 }
+//            }
+//            addSource(observedObject){obj->
+//                obj?.let {
+//                    if(rec.value != it)
+//                        rec.value = onObjectUpdated()
+//                }
+//            }
+//        }.also { it.observeForever {  } }
+//        return rec
+//    }
+//
+//
+//}
 
 val Activity.injector get() = (application as TimingTrialsApplication).component
 val Fragment.injector get() = (requireActivity().application as TimingTrialsApplication).component

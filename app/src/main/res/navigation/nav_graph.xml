@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/titleFragment">
+
+    <fragment
+        android:id="@+id/titleFragment"
+        android:name="com.android.jared.linden.timingtrials.TitleFragment"
+        tools:layout="@layout/fragment_title"
+        android:label="Title Fragment">
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_dataBaseViewPagerFragment2"
+            app:destination="@id/dataBaseViewPagerFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/titleFragment" />
+        <action
+            android:id="@+id/action_titleFragment_to_setupViewPagerFragment2"
+            app:destination="@id/setupViewPagerFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/titleFragment" />
+        <action
+            android:id="@+id/action_titleFragment_to_selectCourseFragment"
+            app:destination="@id/selectCourseFragment" />
+        <action
+            android:id="@+id/action_titleFragment_to_resultFragment"
+            app:destination="@id/resultFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit" />
+    </fragment>
+    <fragment
+        android:id="@+id/editRiderFragment"
+        android:name="com.android.jared.linden.timingtrials.edititem.EditRiderFragment"
+        android:label="Edit Rider"
+        tools:layout="@layout/fragment_rider">
+
+        <argument
+            android:name="riderId"
+            android:defaultValue="0L"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/dataBaseViewPagerFragment"
+        android:name="com.android.jared.linden.timingtrials.viewdata.DataBaseViewPagerFragment"
+        android:label="Timing Trials Database"
+        tools:layout="@layout/fragment_list_generic">
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment2_to_editRiderFragment"
+            app:destination="@id/editRiderFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/dataBaseViewPagerFragment" />
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_editCourseFragment"
+            app:destination="@id/editCourseFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_resultFragment"
+            app:destination="@id/resultFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_globalResultFragment"
+            app:destination="@id/globalResultFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_importFragment"
+            app:destination="@id/importFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+    <fragment
+        android:id="@+id/editCourseFragment"
+        android:name="com.android.jared.linden.timingtrials.edititem.EditCourseFragment"
+        android:label="Edit Course"
+        tools:layout="@layout/fragment_course">
+        <argument
+            android:name="courseId"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="label"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/setupViewPagerFragment"
+        android:name="com.android.jared.linden.timingtrials.setup.SetupViewPagerFragment"
+        android:label="Setup Timetrial"
+        tools:layout="@layout/fragment_setup_time_trial">
+        <action
+            android:id="@+id/action_setupViewPagerFragment2_to_editRiderFragment"
+            app:destination="@id/editRiderFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/setupViewPagerFragment"
+            app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_setupViewPagerFragment2_to_editCourseFragment"
+            app:destination="@id/editCourseFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_setupViewPagerFragment_to_selectCourseFragment"
+            app:destination="@id/selectCourseFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit" />
+    </fragment>
+    <fragment
+        android:id="@+id/selectCourseFragment"
+        tools:layout="@layout/fragment_course_list"
+        android:name="com.android.jared.linden.timingtrials.setup.SelectCourseFragment"
+        android:label="SelectCourseFragment" >
+        <action
+            android:id="@+id/action_selectCourseFragment_to_editCourseFragment"
+            app:destination="@id/editCourseFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_selectCourseFragment_to_setupViewPagerFragment"
+            app:destination="@id/setupViewPagerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="com.android.jared.linden.timingtrials.timetrialresults.ResultFragment"
+        tools:layout="@layout/fragment_timetrial_result"
+        android:label="ResultFragment" >
+        <argument
+            android:name="timeTrialId"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/globalResultFragment"
+        android:name="com.android.jared.linden.timingtrials.globalresults.GlobalResultFragment"
+        android:label="Results"
+        tools:layout="@layout/fragment_timetrial_result">
+        <argument
+            android:name="itemId"
+            app:argType="long" />
+        <argument
+            android:name="itemTypeId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/importFragment"
+        android:name="com.android.jared.linden.timingtrials.transfer.ImportFragment"
+        android:label="Import Data"
+        tools:layout="@layout/fragment_import" />
+</navigation>

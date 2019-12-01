@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
 import com.android.jared.linden.timingtrials.databinding.FragmentTimerRiderStatusBinding
-import com.android.jared.linden.timingtrials.timetrialresults.ResultActivity
 import com.android.jared.linden.timingtrials.ui.RiderStatus
 import com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper
 import com.android.jared.linden.timingtrials.util.*
@@ -27,14 +26,13 @@ import kotlinx.android.synthetic.main.fragment_timer_rider_status.*
  */
 class RiderStatusFragment : Fragment() {
 
-    private val timeTrialId by argument<Long>(ITEM_ID_EXTRA)
     private lateinit var timingViewModel: TimingViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
 
-        timingViewModel = requireActivity().getViewModel { injector.timingViewModel() }
+        timingViewModel = requireActivity().getViewModel { requireActivity().injector.timingViewModel() }
 
         val adapter = RiderStatusAdapter(requireActivity())
         val viewManager = GridLayoutManager(context, 4)
@@ -67,9 +65,9 @@ class RiderStatusFragment : Fragment() {
             viewResultsButton.setOnClickListener {
                 val ttId = timingViewModel.timeTrial.value?.timeTrialHeader?.id
                 timingViewModel.finishTt()
-                val resultIntent = Intent(requireActivity(), ResultActivity::class.java)
-                resultIntent.putExtra(ITEM_ID_EXTRA, ttId)
-                startActivity(resultIntent)
+
+//                resultIntent.putExtra(ITEM_ID_EXTRA, ttId)
+//                startActivity(resultIntent)
                 activity?.finish()
             }
         }

@@ -98,6 +98,6 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
     }
 
     override fun getItemCount(): Int {
-        return mEvents.count()
+        return mEvents.size
     }
 }

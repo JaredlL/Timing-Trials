@@ -30,7 +30,7 @@ class OrderRidersFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
 
-        viewModel = requireActivity().getViewModel { injector.timeTrialSetupViewModel() }.orderRidersViewModel
+        viewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.orderRidersViewModel
         
         mAdapter = OrderableRiderListAdapter(requireContext()).apply { onMove = {x,y -> viewModel.moveItem(x, y)} }
 

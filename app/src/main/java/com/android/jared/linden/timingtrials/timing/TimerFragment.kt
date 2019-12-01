@@ -31,7 +31,7 @@ class TimerFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
 
-        timingViewModel = requireActivity().getViewModel { injector.timingViewModel() }
+        timingViewModel = requireActivity().getViewModel { requireActivity().injector.timingViewModel() }
 
         val adapter = EventListAdapter(requireActivity())
         val viewManager = LinearLayoutManager(context)
@@ -41,7 +41,7 @@ class TimerFragment : Fragment() {
                 val oldCount  = adapter.itemCount
                 val newList = tl.timeLine.map { ev -> EventViewWrapper(ev, res.timeTrial)}
 
-                adapter.setEvents(newList.toList())
+                adapter.setEvents(newList)
 
                 newList.forEach {evw->
 
@@ -64,6 +64,10 @@ class TimerFragment : Fragment() {
             if(res == null){
                 textView18.text = "TT is null"
             }
+        })
+
+        timingViewModel.timeString.observe(viewLifecycleOwner, Observer {
+            val b = "g"
         })
 
 

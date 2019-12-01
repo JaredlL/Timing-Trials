@@ -13,7 +13,7 @@ import androidx.lifecycle.Observer
 import com.android.jared.linden.timingtrials.*
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.FragmentListGenericBinding
-import com.android.jared.linden.timingtrials.ui.CourseListViewWrapper
+import com.android.jared.linden.timingtrials.ui.SelectableCourseViewModel
 import com.android.jared.linden.timingtrials.util.*
 
 
@@ -43,14 +43,14 @@ class GenericListFragment : Fragment() {
                 viewFactory = RiderViewHolderFactory()
                 adapter = GenericListAdapter(requireContext(), viewFactory)
                 listViewModel.allRiders.observe(viewLifecycleOwner, Observer{res->
-                    res?.let {(adapter as? GenericListAdapter<RiderLight>)?.setItems(it)}
+                    res?.let {(adapter as? GenericListAdapter<Rider>)?.setItems(it)}
                 })
             }
             ITEM_COURSE -> {
                 viewFactory = CourseViewHolderFactory()
                 adapter = GenericListAdapter(requireContext(), viewFactory)
                 listViewModel.allCourses.observe(viewLifecycleOwner, Observer{res->
-                    res?.let {(adapter as? GenericListAdapter<CourseListViewWrapper>)?.setItems(it)}
+                    res?.let {(adapter as? GenericListAdapter<SelectableCourseViewModel>)?.setItems(it)}
                 })
             }
             ITEM_TIMETRIAL ->{
@@ -66,7 +66,7 @@ class GenericListFragment : Fragment() {
 
         val binding = DataBindingUtil.inflate<FragmentListGenericBinding>(inflater, R.layout.fragment_list_generic, container, false).apply{
             lifecycleOwner = (this@GenericListFragment)
-            listHeading.addView(viewFactory.createTitle(inflater, container))
+            listHeading.addView(viewFactory.createTitle(inflater, container), 0, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
             genericRecyclerView.adapter = adapter
             genericRecyclerView.layoutManager = viewManager
             viewFactory.performFabAction(genericListFab)
