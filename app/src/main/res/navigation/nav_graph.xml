@@ -38,7 +38,7 @@
     <fragment
         android:id="@+id/editRiderFragment"
         android:name="com.android.jared.linden.timingtrials.edititem.EditRiderFragment"
-        android:label="Edit Rider"
+
         tools:layout="@layout/fragment_rider">
 
         <argument
