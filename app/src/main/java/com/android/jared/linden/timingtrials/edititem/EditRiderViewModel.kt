@@ -23,6 +23,8 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
     val club = MutableLiveData<String>("")
     val genders = Gender.values().map { it.fullString() }
 
+    private val currentId = MutableLiveData<Long>(0L)
+
     init {
         mutableRider.addSource(mutableRider){
             it?.let { rider->
@@ -90,18 +92,29 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
                 }
             }
         }
-    }
+        mutableRider.addSource(Transformations.switchMap(currentId){
+            if(it != mutableRider.value?.id){
+                repository.getRider(it)
+            }else{
+                null
+            }
 
-    fun initialise(riderId: Long){
-        if(mutableRider.value == null){
-            mutableRider.addSource(repository.getRider(riderId)){result: Rider? ->
-                result?.let {
-                    mutableRider.value = result
+        }){res->
+            res?.let { rider->
+                if(mutableRider.value != rider){
+                    mutableRider.value = rider
                 }
             }
         }
-
     }
+
+    fun changeRider(riderId: Long){
+        if(currentId.value != riderId){
+            currentId.value = riderId
+        }
+    }
+
+
 
     fun addOrUpdate(){
         viewModelScope.launch(Dispatchers.IO) {

@@ -27,9 +27,10 @@ class EditRiderFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
 
-        val riderViewModel = requireActivity().getViewModel { requireActivity().injector.riderViewModel().apply { initialise(args.riderId) } }
+        val riderViewModel = requireActivity().getViewModel { requireActivity().injector.riderViewModel() }
         riderViewModel.mutableRider.observe(viewLifecycleOwner, Observer {  })
 
+        riderViewModel.changeRider(args.riderId)
 
         val mAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
 

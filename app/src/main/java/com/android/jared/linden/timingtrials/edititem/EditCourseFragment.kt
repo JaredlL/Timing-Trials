@@ -32,11 +32,13 @@ class EditCourseFragment : Fragment() {
 
         val courseId = args.courseId
 
-        courseViewModel = requireActivity().getViewModel { requireActivity().injector.courseViewModel() }.apply { initialise(courseId) }
+        courseViewModel = requireActivity().getViewModel { requireActivity().injector.courseViewModel() }
+
+        courseViewModel.changeCourse(courseId)
         courseViewModel.mutableCourse.observe(viewLifecycleOwner, Observer {  })
 
         //Set title
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = if(args.courseId == 0L) getString(R.string.add_rider) else getString(R.string.edit_rider)
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = if(args.courseId == 0L) getString(R.string.add_course) else getString(R.string.edit_course)
 
         val binding = DataBindingUtil.inflate<FragmentCourseBinding>(inflater, R.layout.fragment_course, container, false).apply {
             viewModel = courseViewModel
