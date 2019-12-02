@@ -16,9 +16,6 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
     private val typeIdLiveData:MutableLiveData<Pair<String, Long>>  = MutableLiveData()
     private val dataSource = ResultDataSource(timeTrialRepository, riderRepository, courseRepository, globalResultRepository)
 
-    fun init(itemType: String, id: Long){
-        typeIdLiveData.value = Pair(itemType, id)
-    }
 
     fun getResutData(itemType: String, id: Long): LiveData<GlobalResultData>{
         return dataSource.getResultData(Pair(itemType, id))

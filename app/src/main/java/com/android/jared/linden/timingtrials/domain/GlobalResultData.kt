@@ -118,11 +118,11 @@ class CourseResultDataFactory(private val courseRepository: ICourseRepository, p
 
     //EG Rider, Date, Time
     override fun getHeading():IGenericListItem{
-        return  SimpleListItem("Course", "Date", "Time")
+        return  SimpleListItem("Rider", "Date", "Time")
     }
 
     override fun getResultList(itemId: Long): LiveData<List<IGenericListItem>> {
-        return Transformations.map(globalResultRepository.getRiderResults(itemId)){res->
+        return Transformations.map(globalResultRepository.getCourseResults(itemId)){res->
             res?.let{ list ->
                 list.map { listItemForCourseResult(it) }
             }
@@ -132,7 +132,7 @@ class CourseResultDataFactory(private val courseRepository: ICourseRepository, p
     //RiderName, Date, Time
     private fun listItemForCourseResult(result: IResult):IGenericListItem{
         return SimpleListItem(result.rider.fullName(),
-                "${result.dateSet?.let { ConverterUtils.dateToDisplay(it) } ?: ""} ${result.categoryString}",
+                result.dateSet?.let { ConverterUtils.dateToDisplay(it) } ?: "",
                 ConverterUtils.toSecondsDisplayString(result.resultTime))
     }
 }

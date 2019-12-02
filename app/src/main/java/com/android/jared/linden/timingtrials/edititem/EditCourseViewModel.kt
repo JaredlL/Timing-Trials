@@ -19,6 +19,7 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
     val courseName = MutableLiveData<String>("")
     val cttName = MutableLiveData<String>("")
 
+    private val currentId = MutableLiveData<Long>(0L)
 
     init {
         mutableCourse.addSource(mutableCourse){
@@ -50,6 +51,23 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
             }
         }
 
+        mutableCourse.addSource(Transformations.switchMap(currentId){
+            if(it != mutableCourse.value?.id){
+                repository.getCourse(it)
+            }else{
+                null
+            }
+
+        }){res->
+            res?.let { course->
+                if(mutableCourse.value != course){
+                    mutableCourse.value = course
+                    updateLengthString(course.length)
+                }
+            }
+        }
+
+
     }
 
 
@@ -73,16 +91,10 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
 
     var selectedItemPosition = 0
 
-    fun initialise(courseId: Long){
-        if(mutableCourse.value == null){
-            mutableCourse.addSource(repository.getCourse(courseId)){result: Course ->
-                result.let {
-                    mutableCourse.value = result
-                    updateLengthString(it.length)
-                }
-            }
+    fun changeCourse(courseId: Long){
+        if(currentId.value != courseId){
+            currentId.value = courseId
         }
-
     }
 
 
