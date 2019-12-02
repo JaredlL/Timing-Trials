@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -44,14 +45,15 @@ class GlobalResultFragment : Fragment()
             genericRecyclerView.layoutManager = viewManager
         }
 
-        genericItemViewModel.resultsToDisplay.observe(viewLifecycleOwner, Observer {res->
+        genericItemViewModel.getResutData(args.itemTypeId, args.itemId).observe(viewLifecycleOwner, Observer {res->
             res?.let {
-                adapter.setItems(it)
+                (requireActivity() as AppCompatActivity).supportActionBar?.title = res.title
+                binding.listHeading.item = res.resultHeading
+                adapter.setItems(it.resultsList)
             }
         })
 
 
-        genericItemViewModel.init(args.itemTypeId, args.itemId)
 
 
 
