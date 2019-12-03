@@ -3,11 +3,25 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/doneButton"
-        android:icon="@drawable/ic_action_done"
-        android:title="Save"
+        android:id="@+id/resultScreenshot"
+        android:icon="@drawable/ic_camera_alt_black_24dp"
+        android:title="Screenshot"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/resultMenuSpreadsheet"
+        android:title="Export Spreadsheet"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/resultMenuJson"
+        android:title="Export JSON"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/resultMenuCsv"
+        android:title="Export CSV"
+        app:showAsAction="never" />
 
 </menu>
 

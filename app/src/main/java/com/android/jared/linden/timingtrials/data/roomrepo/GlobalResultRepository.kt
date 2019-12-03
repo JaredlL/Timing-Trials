@@ -17,6 +17,8 @@ interface IGlobalResultRepository{
 
     fun getCourseResults(courseId: Long): LiveData<List<FilledResult>>
 
+    fun timeTrialHasResults(timeTrialId: Long): LiveData<Boolean>
+
     suspend fun insertNewResults(newResults: List<IResult>)
 
     suspend fun getResultsForTimeTrial(timeTrialId: Long): List<GlobalResult>
@@ -44,6 +46,12 @@ class GlobalResultRepository @Inject constructor(private val  globalResultDao: G
 
     override suspend fun getResultsForTimeTrial(timeTrialId: Long): List<GlobalResult> {
         return globalResultDao.getResultsForTimeTrialIDSuspend(timeTrialId)
+    }
+
+    override fun timeTrialHasResults(timeTrialId: Long): LiveData<Boolean> {
+        return Transformations.map(globalResultDao.getAnyResultForTimeTrial(timeTrialId)){
+            it != null
+        }
     }
 
 }

@@ -18,8 +18,6 @@ import org.threeten.bp.Instant
 import java.util.*
 import android.R.string.cancel
 import android.app.NotificationManager
-import android.R
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 

@@ -1,5 +1,6 @@
 package com.android.jared.linden.timingtrials.timetrialresults
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -8,7 +9,10 @@ import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.view.*
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -18,11 +22,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentTimetrialResultBinding
-import com.android.jared.linden.timingtrials.edititem.EditRiderFragmentArgs
-import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import kotlinx.android.synthetic.main.fragment_timetrial_result.*
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -51,12 +52,26 @@ class ResultFragment : Fragment() {
             fragResultRecyclerView.layoutManager = viewManager
             fragResultRecyclerView.adapter = adapter
             fragResultRecyclerView.addItemDecoration(DividerItemDecoration(requireActivity(), LinearLayoutManager.VERTICAL))
+            insertResultsButton.setOnClickListener {
+                resultViewModel.insertResults()
+            }
         }
 
 
+        resultViewModel.resultsAreInserted.observe(viewLifecycleOwner, Observer {
+            if(it == false){
+                binding.insertResultsButton.visibility = View.VISIBLE
+            }else{
+                binding.insertResultsButton.visibility = View.GONE
+            }
+        })
 
-
-
+        resultViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
+            res?.let {
+                binding.titleText.text = "${it.timeTrialHeader.ttName} ${resources.getString(R.string.results)}"
+                binding.courseText.text = "${it.timeTrialHeader.course?.courseName} ${it.timeTrialHeader.course?.length} KM"
+            }
+        })
 
 
         resultViewModel.results.observe(viewLifecycleOwner, Observer {res->
@@ -91,8 +106,11 @@ class ResultFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.doneButton -> {
-                resultViewModel.insertResults()
+            R.id.resultScreenshot -> {
+                view?.let {
+                    takeScreenShot(it)
+                }
+
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -102,7 +120,7 @@ class ResultFragment : Fragment() {
     fun takeScreenShot(view: View){
         try {
             val now = Date()
-            android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
+            val mstring = android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
             // image naming and path  to include sd card  appending name you choose for file
             val mPath = requireActivity().applicationInfo.dataDir + "/" + now + ".jpg"
 
@@ -121,19 +139,25 @@ class ResultFragment : Fragment() {
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
             outputStream.flush()
             outputStream.close()
+            val col = MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL)
 
-            openScreenshot(imageFile)
+            val dets = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, "Chunks.jpg")
+            }
+
+            val data = requireActivity().contentResolver.insert(col, dets)
+            openScreenshot(data)
         } catch (e:Throwable) {
             // Several error may come out with file handling or DOM
+            Toast.makeText(requireActivity(), e.localizedMessage, Toast.LENGTH_SHORT).show()
             e.printStackTrace()
         }
     }
 
-    private fun openScreenshot(imageFile: File) {
+    private fun openScreenshot(imageFile: Uri?) {
         val intent = Intent()
         intent.action = Intent.ACTION_VIEW
-        val uri = Uri.fromFile(imageFile)
-        intent.setDataAndType(uri, "image/*")
+        intent.setDataAndType(imageFile, "image/*")
         startActivity(intent)
     }
 

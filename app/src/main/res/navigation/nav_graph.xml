@@ -38,7 +38,6 @@
     <fragment
         android:id="@+id/editRiderFragment"
         android:name="com.android.jared.linden.timingtrials.edititem.EditRiderFragment"
-
         tools:layout="@layout/fragment_rider">
 
         <argument
@@ -144,10 +143,14 @@
         android:id="@+id/resultFragment"
         android:name="com.android.jared.linden.timingtrials.timetrialresults.ResultFragment"
         tools:layout="@layout/fragment_timetrial_result"
-        android:label="ResultFragment" >
+        android:label="Results" >
         <argument
             android:name="timeTrialId"
             app:argType="long" />
+        <deepLink
+            android:id="@+id/deepLink"
+            app:uri="timingtrials/timetrial_results"
+            android:autoVerify="true" />
     </fragment>
     <fragment
         android:id="@+id/globalResultFragment"

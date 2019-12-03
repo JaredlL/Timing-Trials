@@ -33,6 +33,12 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
 
     }
 
+    val resultsAreInserted: LiveData<Boolean> = Transformations.switchMap(timeTrial) {
+        resultRepository.timeTrialHasResults(it.timeTrialHeader.id?:0)
+    }
+
+
+
     val resultSettings: MutableLiveData<ResultDisplaySettings> = MutableLiveData()
 
     fun initialise(timeTrialId: Long){

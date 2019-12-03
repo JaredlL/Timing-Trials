@@ -38,6 +38,9 @@ interface GlobalResultDao {
 
     @Query("SELECT * FROM globalresult_table WHERE timeTrialId = :timeTrialId")
     suspend fun getResultsForTimeTrialIDSuspend(timeTrialId: Long): List<GlobalResult>
+
+    @Query("SELECT * FROM globalresult_table WHERE timeTrialId = :timeTrialId LIMIT 1")
+    fun getAnyResultForTimeTrial(timeTrialId: Long): LiveData<GlobalResult>
 }
 
 

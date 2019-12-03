@@ -10,12 +10,14 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import androidx.navigation.NavDeepLinkBuilder
 import com.android.jared.linden.timingtrials.MainActivity
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
+import com.android.jared.linden.timingtrials.timetrialresults.ResultFragmentArgs
 import com.android.jared.linden.timingtrials.util.EventObserver
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
@@ -141,6 +143,14 @@ class TimingActivity : AppCompatActivity() {
                     applicationContext.unbindService(connection)
                     service.stop()
                     mBound = false
+                    val args = ResultFragmentArgs(timeTrialHeader.id?:0)
+                    val pendingIntent = NavDeepLinkBuilder(this)
+                            .setGraph(R.navigation.nav_graph)
+                            .setDestination(R.id.resultFragment)
+                            .setArguments(args.toBundle())
+                            .setComponentName(MainActivity::class.java)
+                            .createPendingIntent()
+                    pendingIntent.send()
                 }
                 finish()
             }

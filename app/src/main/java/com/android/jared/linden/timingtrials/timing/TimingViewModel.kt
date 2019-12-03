@@ -29,7 +29,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     val statusString: MutableLiveData<String> = MutableLiveData()
     val messageData: MutableLiveData<Event<String>> = MutableLiveData()
 
-    private var currentTt: TimeTrial? = null
+    //private var currentTt: TimeTrial? = null
     private var currentTimeLine: TimeLine? = null
     private var currentTimeString = ""
     private var currentStatusString = ""
@@ -41,7 +41,6 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         timeTrial.addSource(timeTrialRepository.nonFinishedTimeTrial) { timing ->
 
             if(timing != null && timing.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS && !timing.equalsOtherExcludingIds(timeTrial.value)) {
-                currentTt = timing
                 timeTrial.value = timing
                 currentTimeLine = TimeLine(timing, Instant.now().toEpochMilli() - timing.timeTrialHeader.startTime.toInstant().toEpochMilli())
                 timeLine.value = currentTimeLine
@@ -57,14 +56,14 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     fun onRiderPassed(){
 
-        currentTt?.let { tte->
+        timeTrial.value?.let { tte->
             val now = Instant.now().toEpochMilli() - tte.timeTrialHeader.startTime.toInstant().toEpochMilli()
             if (tte.helper.riderStartTimes.firstKey() > now){
                 showMessage("First rider has not started yet")
             }else{
                 val newEvents = tte.eventList.toMutableList()
                 newEvents.add(RiderPassedEvent(timeTrialId = tte.timeTrialHeader.id?:0, riderId = null, timeStamp =  now))
-                currentTt = tte.copy(eventList = newEvents)
+                updateTimeTrial(tte.copy(eventList = newEvents))
             }
 
         }
@@ -78,7 +77,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                    val res = helper.assignRiderToEvent(riderId, eid)
                     if(res.succeeded)
                     {
-                        currentTt = res.tt
+                        updateTimeTrial(res.tt)
                         eventAwaitingSelection = null
                     }else{
                         showMessage(res.message)
@@ -99,7 +98,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     var isCorotineAlive = AtomicBoolean()
 
     private fun updateTimeTrial(newtt: TimeTrial){
-        //_mTimeTrial.value = newtt
+        timeTrial.value = newtt
             if(!isCorotineAlive.get()){
                 queue.add(newtt)
                 viewModelScope.launch(Dispatchers.IO) {
@@ -119,7 +118,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     }
 
     fun updateLoop(millisSinceStart: Long){
-        currentTt?.let { tt->
+        timeTrial.value?.let { tt->
 
             val startts = System.currentTimeMillis()
 
@@ -174,16 +173,15 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     fun finishTt(){
         //timer.cancel()
-        viewModelScope.launch(Dispatchers.IO) {
+
+
             timeTrial.value?.let {
                 val headerCopy = it.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED)
-                timeTrialRepository.update(it.copy(timeTrialHeader = headerCopy))
+                updateTimeTrial(it.copy(timeTrialHeader = headerCopy))
             }
-        }
     }
 
     fun discardTt(){
-        //timer.cancel()
         System.out.println("JAREDMSG -> TIMINGVM Deleting TT")
         viewModelScope.launch(Dispatchers.IO) {
             var deleted = false
@@ -203,18 +201,18 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     }
 
     fun backToSetup(){
-        currentTt?.let {
+        timeTrial.value?.let {
             val headerCopy = it.timeTrialHeader.copy(status = TimeTrialStatus.SETTING_UP)
             updateTimeTrial(it.copy(timeTrialHeader = headerCopy, eventList = listOf()))
         }
 
     }
 
-//    @ExperimentalCoroutinesApi
-//    override fun onCleared() {
-//        super.onCleared()
-//        viewModelScope.cancel()
-//    }
+    @ExperimentalCoroutinesApi
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.cancel()
+    }
 
 
 
