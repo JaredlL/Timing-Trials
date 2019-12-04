@@ -1,18 +1,23 @@
 package com.android.jared.linden.timingtrials.timetrialresults
 
+import android.annotation.TargetApi
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.view.*
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -27,6 +32,7 @@ import com.android.jared.linden.timingtrials.util.injector
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import java.util.jar.Manifest
 
 class ResultFragment : Fragment() {
 
@@ -117,12 +123,18 @@ class ResultFragment : Fragment() {
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Toast.makeText(requireActivity(), "Permission Request", Toast.LENGTH_SHORT).show()
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
     fun takeScreenShot(view: View){
         try {
             val now = Date()
             val mstring = android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
             // image naming and path  to include sd card  appending name you choose for file
-            val mPath = requireActivity().applicationInfo.dataDir + "/" + now + ".jpg"
+            val mPath = requireActivity().applicationInfo.dataDir + "/" + mstring + ".jpg"
 
             // create bitmap screen capture
             //val v1 = getWindow().getDecorView().getRootView()
@@ -132,20 +144,39 @@ class ResultFragment : Fragment() {
             val canvas = Canvas(bitmap)
             view.draw(canvas)
 
-            val imageFile = File(mPath)
+            //val imageFile = File(mPath)
 
-            val outputStream = FileOutputStream(imageFile)
-            val quality = 100
-            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            outputStream.flush()
-            outputStream.close()
-            val col = MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL)
+            //val outputStream = FileOutputStream(imageFile)
+            //val quality = 100
+            //bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+            //outputStream.flush()
+            //outputStream.close()
 
-            val dets = ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME, "Chunks.jpg")
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                if(ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                    if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                        Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
+                    }else{
+                        ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
+                    }
+                }
+                requireActivity().checkSelfPermission(VOLUME_EXTERNAL)
+            }else{
+
             }
 
-            val data = requireActivity().contentResolver.insert(col, dets)
+            val col = "${MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL)}/$mstring.jpg"
+
+            val out = FileOutputStream(col)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
+
+            val dets = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, "$mstring.jpg")
+            }
+
+            val data = requireActivity().contentResolver.insert(MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL), dets)
+            out.flush()
+            out.close()
             openScreenshot(data)
         } catch (e:Throwable) {
             // Several error may come out with file handling or DOM
