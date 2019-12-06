@@ -16,6 +16,10 @@ data class TimeTrialHeader(val ttName: String,
                            val status: TimeTrialStatus = TimeTrialStatus.SETTING_UP,
                            @PrimaryKey(autoGenerate = true) override val id: Long? = null) : ITimingTrialsEntity {
 
+
+    @delegate: Ignore
+    val startTimeMilis: Long by lazy { startTime.toInstant().toEpochMilli() }
+
     companion object {
         fun createBlank(): TimeTrialHeader {
             val instant = Instant.now().truncatedTo(ChronoUnit.MINUTES).plus(15, ChronoUnit.MINUTES)
@@ -34,6 +38,7 @@ data class TimeTrial(
         @Relation(parentColumn = "id", entityColumn = "timeTrialId", entity = RiderPassedEvent::class)
         val eventList: List<RiderPassedEvent> = listOf()
 ) {
+
 
 
     @Ignore

@@ -118,7 +118,7 @@ class TimingActivity : AppCompatActivity() {
                 value = it
             }
         }.observe(this, Observer {
-            viewModel.updateLoop(it)
+            viewModel.updateLoop()
         })
     }
 
@@ -126,7 +126,7 @@ class TimingActivity : AppCompatActivity() {
         when(timeTrialHeader.status){
             TimeTrialStatus.SETTING_UP -> {
                 if(mBound){
-                    System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
+                    println("JAREDMSG -> Timing Activity -> Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
                     applicationContext.unbindService(connection)
                     service.stop()
                     mBound = false
@@ -134,12 +134,12 @@ class TimingActivity : AppCompatActivity() {
                 finish()
             }
             TimeTrialStatus.IN_PROGRESS -> {
-                System.out.println("JAREDMSG -> Timing Activity -> Got in progress TT and Service is up, lets roll")
+                println("JAREDMSG -> Timing Activity -> Got in progress TT and Service is up, lets roll")
                 service.startTiming(timeTrialHeader)
             }
             TimeTrialStatus.FINISHED -> {
                 if(mBound){
-                    System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
+                    println("JAREDMSG -> Timing Activity -> Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
                     applicationContext.unbindService(connection)
                     service.stop()
                     mBound = false

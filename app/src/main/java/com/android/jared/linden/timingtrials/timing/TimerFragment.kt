@@ -9,7 +9,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.android.jared.linden.timingtrials.BR
+import androidx.databinding.library.baseAdapters.BR
+
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentTimerBinding
@@ -17,7 +18,6 @@ import com.android.jared.linden.timingtrials.ui.EventViewWrapper
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_timer.*
-import org.threeten.bp.Instant
 
 /**
  * A simple [Fragment] subclass.
@@ -67,7 +67,7 @@ class TimerFragment : Fragment() {
         })
 
         timingViewModel.timeString.observe(viewLifecycleOwner, Observer {
-            val b = "g"
+
         })
 
 

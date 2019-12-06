@@ -16,7 +16,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
         if(event != null && timeTrialRider!=null){
 
             if(getRiderStartTime(timeTrialRider) > eventTimestamp) return RiderAssignmentResult(false, "Rider must have started", timeTrial)
-            val riderPassedEvents = timeTrial.eventList.asSequence().filter { it.riderId == timeTrialRider.id }.count()
+            val riderPassedEvents = timeTrial.eventList.asSequence().filter { it.riderId == timeTrialRider.rider.id }.count()
             if(riderPassedEvents >= timeTrial.timeTrialHeader.laps) return RiderAssignmentResult(false, "Rider has already finished", timeTrial)
 
             val newEvent = event.copy(riderId = riderId)

@@ -41,7 +41,7 @@ class TimingService : Service(){
     inner class TimeTrialTask(val timeTrial: TimeTrialHeader) : TimerTask(){
         override fun run() {
             val now = Instant.now()
-            val millisSinceStart = now.toEpochMilli() - timeTrial.startTime.toInstant().toEpochMilli()
+            val millisSinceStart = now.toEpochMilli() - timeTrial.startTimeMilis
             val secs = toSecondsDisplayString(millisSinceStart)
             if(prevString != secs){
                 updateNotificationTitle(timeTrial.ttName, secs)

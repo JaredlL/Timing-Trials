@@ -61,11 +61,11 @@ class TestViewModel@Inject constructor(
         if(!inserting.get()  && timeTrial.timeTrialHeader.ttName != "Test Timing TimeTrial"){
             inserting.set(true)
             viewModelScope.launch(Dispatchers.IO) {
-                val rList = riderRepository.allRidersLightSuspend()
+                val rList = riderRepository.allRidersLightSuspend().take(3)
                 val courses = courseRepository.getAllCoursesSuspend()
                 val cop1 = timeTrial.copy(timeTrialHeader = timeTrial.timeTrialHeader
                         .copy(ttName = "Test Timing TimeTrial",
-                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
+                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(5), ZoneId.systemDefault()),
                                 firstRiderStartOffset = 0,
                                 interval = 2,
                                 course = courses[3],

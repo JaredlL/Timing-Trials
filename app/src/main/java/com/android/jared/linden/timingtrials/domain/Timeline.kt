@@ -55,6 +55,6 @@ class TimeLine(val timeTrial: TimeTrial, val timeStamp: Long)
         (timeTrial.riderList.asSequence()
                 .map {ttr -> StartEvent(timeTrial.helper.getRiderStartTime(ttr), ttr.rider.id) } + timeTrial.helper.riderEventMap.asSequence()
                 .flatMap { rep -> rep.value.asSequence().mapIndexed { index, riderPassedEvent -> if(index + 1 < timeTrial.timeTrialHeader.laps || riderPassedEvent.riderId == null){PassEvent(riderPassedEvent)} else{FinishEvent(riderPassedEvent)} } })
-                .sortedBy { it.timeStamp }.takeWhile { it.timeStamp < timeStamp }.toList()
+                .sortedBy { it.timeStamp }.takeWhile { it.timeStamp <= timeStamp }.toList()
 
 }
