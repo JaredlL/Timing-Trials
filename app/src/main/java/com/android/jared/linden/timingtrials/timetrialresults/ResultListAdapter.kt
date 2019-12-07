@@ -40,6 +40,7 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
                 bind(it, position)
             }
         }
+       // holder.setIsRecyclable(false)
     }
 
     override fun getItemId(position: Int): Long {
@@ -52,7 +53,7 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
     }
 
     override fun getItemViewType(position: Int): Int {
-        return super.getItemViewType(position)
+        return 1
     }
 
     override fun getItemCount(): Int {

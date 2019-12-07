@@ -10,11 +10,11 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.REQUEST_IMPORT_FILE
 import com.android.jared.linden.timingtrials.data.ITEM_COURSE
 import com.android.jared.linden.timingtrials.data.ITEM_RIDER
 import com.android.jared.linden.timingtrials.data.ITEM_TIMETRIAL
 import com.android.jared.linden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
-import com.android.jared.linden.timingtrials.transfer.RESULT_IMPORT_FILE
 import com.google.android.material.tabs.TabLayoutMediator
 
 class DataBaseViewPagerFragment: Fragment() {
@@ -66,7 +66,7 @@ class DataBaseViewPagerFragment: Fragment() {
             R.id.app_bar_import -> {
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
                 intent.type = "*/*"
-                requireActivity().startActivityForResult(intent, RESULT_IMPORT_FILE)
+                requireActivity().startActivityForResult(intent, REQUEST_IMPORT_FILE)
                 true
             }
             else -> super.onOptionsItemSelected(item)

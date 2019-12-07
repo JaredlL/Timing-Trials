@@ -8,9 +8,13 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.android.jared.linden.timingtrials.transfer.RESULT_IMPORT_FILE
+import com.android.jared.linden.timingtrials.timetrialresults.ResultFragment
 import kotlinx.android.synthetic.main.activity_main.*
+
+
+const val REQUEST_CREATE_FILE_CSV = 1
+const val REQUEST_IMPORT_FILE = 2
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,8 +40,17 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         when(requestCode){
-            RESULT_IMPORT_FILE->{
+            REQUEST_IMPORT_FILE ->{
                 Toast.makeText(this, data?.data?.path, Toast.LENGTH_SHORT).show()
+            }
+            REQUEST_CREATE_FILE_CSV->{
+                val frag = supportFragmentManager.findFragmentById(R.id.resultFragment)
+                if(frag is ResultFragment){
+                    data?.data?.path?.let {
+                        frag.writeToFile(it)
+                    }
+
+                }
             }
         }
 

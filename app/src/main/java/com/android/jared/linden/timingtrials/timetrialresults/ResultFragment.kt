@@ -5,8 +5,10 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -14,6 +16,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.MediaStore.VOLUME_EXTERNAL
+import android.util.TypedValue
 import android.view.*
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -26,24 +29,29 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.REQUEST_CREATE_FILE_CSV
+import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.databinding.FragmentTimetrialResultBinding
+import com.android.jared.linden.timingtrials.domain.CsvTransfer
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import kotlinx.android.synthetic.main.fragment_timetrial_result.*
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.util.*
-import java.util.jar.Manifest
 
 class ResultFragment : Fragment() {
 
     private val args: ResultFragmentArgs by navArgs()
 
     lateinit var resultViewModel: ResultViewModel
+    lateinit var viewManager: GridLayoutManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
 
-        val viewManager = GridLayoutManager(requireActivity(), 2)
+        viewManager = GridLayoutManager(requireActivity(), 2)
         val adapter = ResultListAdapter(requireActivity())
         adapter.setHasStableIds(true)
 
@@ -58,6 +66,7 @@ class ResultFragment : Fragment() {
             fragResultRecyclerView.layoutManager = viewManager
             fragResultRecyclerView.adapter = adapter
             fragResultRecyclerView.addItemDecoration(DividerItemDecoration(requireActivity(), LinearLayoutManager.VERTICAL))
+            //fragResultRecyclerView.recycledViewPool.setMaxRecycledViews(1,0)
             insertResultsButton.setOnClickListener {
                 resultViewModel.insertResults()
             }
@@ -116,7 +125,19 @@ class ResultFragment : Fragment() {
                 view?.let {
                     takeScreenShot(it)
                 }
-
+                true
+            }
+            R.id.resultMenuCsv ->{
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    putExtra(Intent.EXTRA_TITLE, "${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.csv")
+                    //MIME types
+                    type = "text/csv"
+                    // Optionally, specify a URI for the directory that should be opened in
+                    // the system file picker before your app creates the document.
+                    //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
+                }
+                requireActivity().startActivityForResult(intent, REQUEST_CREATE_FILE_CSV)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -128,62 +149,191 @@ class ResultFragment : Fragment() {
         Toast.makeText(requireActivity(), "Permission Request", Toast.LENGTH_SHORT).show()
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
-    fun takeScreenShot(view: View){
+    fun writeCsv(tt: TimeTrial, results:List<ResultRowViewModel>, path: String){
+
         try {
-            val now = Date()
-            val mstring = android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
-            // image naming and path  to include sd card  appending name you choose for file
-            val mPath = requireActivity().applicationInfo.dataDir + "/" + mstring + ".jpg"
+            if(haveOrRequestFilePermission()){
+                val fileName = "${tt.timeTrialHeader.ttName}.csv"
+                val fullPath = File(path, fileName)
+                val trans = CsvTransfer(tt, results)
+                trans.writeToPath(fullPath)
 
-            // create bitmap screen capture
-            //val v1 = getWindow().getDecorView().getRootView()
-
-            val bitmap = Bitmap.createBitmap(view.width,
-                    view.height, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-            view.draw(canvas)
-
-            //val imageFile = File(mPath)
-
-            //val outputStream = FileOutputStream(imageFile)
-            //val quality = 100
-            //bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            //outputStream.flush()
-            //outputStream.close()
-
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-                if(ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                    if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-                        Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
-                    }else{
-                        ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
-                    }
-                }
-                requireActivity().checkSelfPermission(VOLUME_EXTERNAL)
-            }else{
-
+                val intent = Intent()
+                intent.action = Intent.ACTION_VIEW
+                intent.setDataAndType(Uri.fromFile(fullPath), "text/*")
+                startActivity(intent)
             }
-
-            val col = "${MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL)}/$mstring.jpg"
-
-            val out = FileOutputStream(col)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
-
-            val dets = ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME, "$mstring.jpg")
-            }
-
-            val data = requireActivity().contentResolver.insert(MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL), dets)
-            out.flush()
-            out.close()
-            openScreenshot(data)
-        } catch (e:Throwable) {
-            // Several error may come out with file handling or DOM
-            Toast.makeText(requireActivity(), e.localizedMessage, Toast.LENGTH_SHORT).show()
-            e.printStackTrace()
+        }
+        catch(e: IOException)
+        {
+            e.printStackTrace();
+            Toast.makeText(requireActivity(), "Save failed", Toast.LENGTH_SHORT).show()
         }
     }
+
+    fun writeToFile(path:String){
+        val tt = resultViewModel.timeTrial.value
+        val results = resultViewModel.results.value
+        if(tt != null && results != null){
+            writeCsv(tt, results, path)
+        }
+
+    }
+
+   fun convertDpToPixels(dp: Float): Int {
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().displayMetrics))
+    }
+
+    fun takeScreenShot(view: View){
+        var toggleButtonVisibility = false
+        if (insertResultsButton.visibility == View.VISIBLE) {
+            insertResultsButton.visibility = View.GONE
+            toggleButtonVisibility = true
+        }
+
+        try {
+
+
+           // val sv = horizontalScrollView
+           // val view = sv.getChildAt(0)
+            val now = Date()
+            val nowChars = android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
+
+            val ttName = resultViewModel.timeTrial.value?.let {
+                it.timeTrialHeader.ttName
+            }
+
+            val imgName = "${ttName?:nowChars}.jpg"
+
+
+            //https://dev.to/pranavpandey/android-create-bitmap-from-a-view-3lck
+            view.measure(View.MeasureSpec.makeMeasureSpec(convertDpToPixels(1000F), View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(convertDpToPixels(2000F), View.MeasureSpec.EXACTLY))
+
+            view.layout(0,0, view.measuredWidth, view.measuredHeight)
+            val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
+
+            val canvas = Canvas(bitmap)
+
+           if( view.background!=null) {
+               view.background.draw(canvas)
+            }else{
+               canvas.drawColor(Color.WHITE)
+           }
+            view.draw(canvas)
+
+
+
+
+
+
+            when(Build.VERSION.SDK_INT){
+
+                //29
+                Build.VERSION_CODES.Q -> saveScreenshotQ(bitmap, imgName)
+
+                //26-28
+                in(Build.VERSION_CODES.O..Build.VERSION_CODES.P) -> saveScreenshotO(bitmap, imgName)
+
+                else -> throw Exception("Version Unsupported")
+
+            }
+
+
+
+        } catch (e:Throwable) {
+            // Several error may come out with file handling or DOM
+            throw Exception(e)
+
+        }
+        finally {
+            if(toggleButtonVisibility){
+                insertResultsButton.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    //API 29
+    @TargetApi(Build.VERSION_CODES.Q)
+    fun saveScreenshotQ(bitmap: Bitmap, imageName:String){
+
+        val filePath = File(MediaStore.VOLUME_EXTERNAL_PRIMARY + imageName)
+        val imageOut = FileOutputStream(filePath)
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, imageOut)
+
+        val dets = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
+            put(MediaStore.Images.Media.TITLE, imageName)
+            put(MediaStore.Images.Media.BUCKET_DISPLAY_NAME, "Timing Trials")
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+            put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+        }
+
+        val data = requireActivity().contentResolver.insert(MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL), dets)
+        imageOut.flush()
+        imageOut.close()
+        openScreenshot(data)
+    }
+
+    fun haveOrRequestFilePermission(): Boolean{
+       return if(ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+//            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+//                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
+//            }else{
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
+             false
+            // }
+        }else{
+             true
+        }
+    }
+
+    //API 26
+    @TargetApi(Build.VERSION_CODES.O)
+    fun saveScreenshotO(bitmap: Bitmap, imageName:String){
+
+        if(haveOrRequestFilePermission()) {
+            val path = requireActivity().getExternalFilesDir(null)
+            val filePath = File(path, imageName)
+
+            val imageOut = FileOutputStream(filePath)
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, imageOut)
+
+            val contentResolver = requireActivity().contentResolver
+            val insertedImageString = MediaStore.Images.Media.insertImage(contentResolver, filePath.path, imageName, "Timing Trials")
+
+            val values = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
+                put(MediaStore.Images.Media.TITLE, imageName)
+                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+                put(MediaStore.MediaColumns.DATA, filePath.path)
+            }
+            requireActivity().contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+
+            openScreenshot(Uri.parse(insertedImageString))
+
+//                val dets = ContentValues().apply {
+//                    put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
+//                }
+
+//                MediaScannerConnection.scanFile(requireActivity(), arrayOf(filePath.toString()), null) {s,u->
+//                    val data = requireActivity().contentResolver.insert(MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL), dets)
+//                    openScreenshot(data)
+//                }
+//                 val data = requireActivity().contentResolver.insert(MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL), dets)
+//
+//                imageOut.flush()
+//                imageOut.close()
+//                openScreenshot(data)
+
+
+        }
+
+    }
+
+
 
     private fun openScreenshot(imageFile: Uri?) {
         val intent = Intent()

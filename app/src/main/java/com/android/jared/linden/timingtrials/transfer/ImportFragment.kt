@@ -11,11 +11,12 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.REQUEST_IMPORT_FILE
 import com.android.jared.linden.timingtrials.databinding.FragmentImportBinding
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 
-const val RESULT_IMPORT_FILE = 4
+
 
 class ImportFragment : Fragment() {
 
@@ -32,7 +33,7 @@ class ImportFragment : Fragment() {
                 val intent = Intent(ACTION_OPEN_DOCUMENT)
                 intent.type = "*/*"
                 //intent.categories.add(CATEGORY_OPENABLE)
-                requireActivity().startActivityForResult(intent, RESULT_IMPORT_FILE)
+                requireActivity().startActivityForResult(intent, REQUEST_IMPORT_FILE)
             }
 
 
