@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 const val REQUEST_CREATE_FILE_CSV = 1
 const val REQUEST_IMPORT_FILE = 2
+const val REQUEST_CREATE_FILE_SPREADSHEET = 3
 
 
 class MainActivity : AppCompatActivity() {
@@ -42,15 +43,6 @@ class MainActivity : AppCompatActivity() {
         when(requestCode){
             REQUEST_IMPORT_FILE ->{
                 Toast.makeText(this, data?.data?.path, Toast.LENGTH_SHORT).show()
-            }
-            REQUEST_CREATE_FILE_CSV->{
-                val frag = supportFragmentManager.findFragmentById(R.id.resultFragment)
-                if(frag is ResultFragment){
-                    data?.data?.path?.let {
-                        frag.writeToFile(it)
-                    }
-
-                }
             }
         }
 

@@ -137,48 +137,54 @@ class ResultFragment : Fragment() {
                     // the system file picker before your app creates the document.
                     //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
                 }
-                requireActivity().startActivityForResult(intent, REQUEST_CREATE_FILE_CSV)
+                startActivityForResult(intent, REQUEST_CREATE_FILE_CSV)
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            REQUEST_CREATE_FILE_CSV->{
+                val b = data?.extras?.keySet()
+                    data?.data?.let {
+                        writeCsv(it)
+                    }
+            }
+        }
+    }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         Toast.makeText(requireActivity(), "Permission Request", Toast.LENGTH_SHORT).show()
     }
 
-    fun writeCsv(tt: TimeTrial, results:List<ResultRowViewModel>, path: String){
+    private fun writeCsv(uri: Uri){
 
-        try {
-            if(haveOrRequestFilePermission()){
-                val fileName = "${tt.timeTrialHeader.ttName}.csv"
-                val fullPath = File(path, fileName)
-                val trans = CsvTransfer(tt, results)
-                trans.writeToPath(fullPath)
-
-                val intent = Intent()
-                intent.action = Intent.ACTION_VIEW
-                intent.setDataAndType(Uri.fromFile(fullPath), "text/*")
-                startActivity(intent)
-            }
-        }
-        catch(e: IOException)
-        {
-            e.printStackTrace();
-            Toast.makeText(requireActivity(), "Save failed", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    fun writeToFile(path:String){
         val tt = resultViewModel.timeTrial.value
         val results = resultViewModel.results.value
-        if(tt != null && results != null){
-            writeCsv(tt, results, path)
-        }
 
+        if(tt != null && results != null){
+            try {
+                val p = requireActivity().contentResolver.openOutputStream(uri)
+                if(haveOrRequestFilePermission() && p != null){
+                    val trans = CsvTransfer(tt, results)
+                    trans.writeToPath(p)
+                    val intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    intent.setDataAndType(uri, "text/*")
+                    startActivity(intent)
+                }
+            }
+            catch(e: IOException)
+            {
+                e.printStackTrace()
+                Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
+
 
    fun convertDpToPixels(dp: Float): Int {
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().displayMetrics))
