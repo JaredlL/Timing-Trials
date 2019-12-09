@@ -34,7 +34,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial){
     }
 
     fun addRidersAsTimeTrialRiders(riders: List<Rider>): TimeTrial{
-        return timeTrial.copy(riderList =  riders.asSequence().mapIndexed { index, rider -> TimeTrialRider(rider, timeTrial.timeTrialHeader.id?:0L, number = index + 1) }.toList())
+        return timeTrial.copy(riderList =  riders.asSequence().mapIndexed { index, rider -> TimeTrialRider(rider, timeTrial.timeTrialHeader.id?:0L, number = index + 1, index = index, startTimeOffset = timeTrial.timeTrialHeader.firstRiderStartOffset + timeTrial.timeTrialHeader.interval * index) }.toList())
     }
 
     val finishedRidersFromEvents: List<TimeTrialRider> by lazy {

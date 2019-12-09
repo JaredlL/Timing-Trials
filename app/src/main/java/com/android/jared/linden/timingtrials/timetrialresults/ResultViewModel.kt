@@ -106,7 +106,7 @@ class ResultRowViewModel{
     constructor(result: IResult)
      {
         row.add(ResultCell(MutableLiveData("${result.rider.firstName} ${result.rider.lastName}")))
-        row.add(ResultCell(MutableLiveData(result.categoryString)))
+        row.add(ResultCell(MutableLiveData(result.category)))
         row.add(ResultCell(MutableLiveData(result.riderClub)))
         row.add(ResultCell(MutableLiveData(ConverterUtils.toTenthsDisplayString(result.resultTime))))
 

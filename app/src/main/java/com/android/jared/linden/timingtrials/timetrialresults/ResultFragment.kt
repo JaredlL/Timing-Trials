@@ -31,7 +31,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.REQUEST_CREATE_FILE_CSV
 import com.android.jared.linden.timingtrials.databinding.FragmentTimetrialResultBinding
-import com.android.jared.linden.timingtrials.domain.CsvTransfer
+import com.android.jared.linden.timingtrials.domain.csv.CsvResultWriter
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_timetrial_result.*
@@ -148,7 +148,6 @@ class ResultFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         when(requestCode){
             REQUEST_CREATE_FILE_CSV->{
-                val b = data?.extras?.keySet()
                     data?.data?.let {
                         writeCsv(it)
                     }
@@ -167,10 +166,12 @@ class ResultFragment : Fragment() {
 
         if(tt != null && results != null){
             try {
-                val p = requireActivity().contentResolver.openOutputStream(uri)
-                if(haveOrRequestFilePermission() && p != null){
-                    val trans = CsvTransfer(tt, results)
-                    trans.writeToPath(p)
+                val outputStream = requireActivity().contentResolver.openOutputStream(uri)
+                if(haveOrRequestFilePermission() && outputStream != null){
+                    val trans = CsvResultWriter(tt, results)
+                    trans.writeToPath(outputStream)
+
+
                     val intent = Intent()
                     intent.action = Intent.ACTION_VIEW
                     intent.setDataAndType(uri, "text/*")

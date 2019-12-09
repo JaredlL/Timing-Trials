@@ -11,8 +11,9 @@ data class Rider(
         val firstName: String,
         val lastName: String,
         val club: String = "",
-        val dateOfBirth: OffsetDateTime,
-        val gender: Gender,
+        val dateOfBirth: OffsetDateTime? = null,
+        val category: String? = null,
+        val gender: Gender = Gender.UNKNOWN,
         @PrimaryKey(autoGenerate = true) override val id: Long? = null
 ) : ITimingTrialsEntity  {
 
@@ -22,13 +23,9 @@ data class Rider(
         return "$firstName $lastName"
     }
 
-    fun getCategoryStandard(): RiderCategoryStandard{
-        return RiderCategoryStandard(gender, OffsetDateTime.now().year - dateOfBirth.year )
-    }
-
     companion object {
 
-        fun createBlank() = Rider("", "", "", OffsetDateTime.now().minusYears(20), Gender.UNKNOWN)
+        fun createBlank() = Rider("", "")
 
     }
 }

@@ -95,7 +95,7 @@ class SetupViewModel @Inject constructor(
 
 
         }
-        override fun getOrderableRiders(): LiveData<List<Rider>> = Transformations.map(_mTimeTrial){it?.riderList?.map { r -> r.rider }}
+        override fun getOrderableRiders(): LiveData<List<TimeTrialRider>> = Transformations.map(_mTimeTrial){it?.riderList}
     }
 
     override val selectCourseViewModel: ISelectCourseViewModel = ISelectCourseViewModel.SelectCourseViewModelImpl(this)
@@ -133,7 +133,7 @@ class SetupViewModel @Inject constructor(
                         val newList = oldSelected.filter { i -> (retainedIds.contains(i.key))}.values.toList()
                         ttdef.let {
                            // it.riderList = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id, index+1,(60 + index * it.timeTrialHeader.interval).toLong()) }
-                            val ml = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id?:0L, index+1) }
+                            val ml = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id?:0L, index = index, number = index + 1) }
                             updateTimeTrial(it.copy(riderList = ml))
                         }
                     }

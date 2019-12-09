@@ -6,7 +6,9 @@ import com.android.jared.linden.timingtrials.data.Gender
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
 import kotlinx.coroutines.*
-import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZoneOffset
 import javax.inject.Inject
 
 
@@ -41,8 +43,9 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
                 if(club.value != rider.club){
                     club.value = rider.club
                 }
-                if(yearOfBirth.value != rider.dateOfBirth.year.toString()){
-                    yearOfBirth.value = rider.dateOfBirth.year.toString()
+                val yobString = rider.dateOfBirth?.year?.toString() ?:""
+                if(yearOfBirth.value != yobString){
+                    yearOfBirth.value = yobString
                 }
             }
         }
@@ -76,8 +79,9 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
         mutableRider.addSource(yearOfBirth){res->
             res?.let { str->
                 mutableRider.value?.let { rider->
-                    if(rider.dateOfBirth.year.toString() != str){
-                       mutableRider.value = rider.copy(dateOfBirth = rider.dateOfBirth.withYear(str.toIntOrNull()?:0))
+                    val strInt = str.toIntOrNull()
+                    if(rider.dateOfBirth?.year != strInt && strInt != null){
+                       mutableRider.value = rider.copy(dateOfBirth = OffsetDateTime.of(strInt, 0, 0, 0, 0, 0, 0, ZoneOffset.of(ZoneId.systemDefault().id)))
                     }
                 }
             }

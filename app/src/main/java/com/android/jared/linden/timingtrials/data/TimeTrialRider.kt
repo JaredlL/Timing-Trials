@@ -10,15 +10,16 @@ import org.threeten.bp.OffsetDateTime
         foreignKeys = [ForeignKey(entity =TimeTrialHeader::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = ForeignKey.CASCADE, deferred = false)])
 data class TimeTrialRider(@Embedded(prefix = "rider_") val rider: Rider,
                           val timeTrialId: Long,
+                          val index: Int,
                           val number: Int,
                           val startTimeOffset: Int = 0,
                           val partOfTeam: Boolean = false,
                           val notes: String = "",
                           @PrimaryKey(autoGenerate = true) val id: Long? = null){
 
-    fun getCategory(time: OffsetDateTime): RiderCategoryStandard{
-        return RiderCategoryStandard(rider.gender, time.year - rider.dateOfBirth.year)
-    }
+//    fun getCategory(time: OffsetDateTime): RiderCategoryStandard{
+//        return RiderCategoryStandard(rider.gender, time.year - rider.dateOfBirth.year)
+//    }
 }
 
 

@@ -15,7 +15,10 @@ import com.android.jared.linden.timingtrials.data.ITEM_COURSE
 import com.android.jared.linden.timingtrials.data.ITEM_RIDER
 import com.android.jared.linden.timingtrials.data.ITEM_TIMETRIAL
 import com.android.jared.linden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
 import com.google.android.material.tabs.TabLayoutMediator
+import java.io.IOException
 
 class DataBaseViewPagerFragment: Fragment() {
 
@@ -65,13 +68,39 @@ class DataBaseViewPagerFragment: Fragment() {
         return when (item.itemId) {
             R.id.app_bar_import -> {
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                intent.type = "*/*"
-                requireActivity().startActivityForResult(intent, REQUEST_IMPORT_FILE)
+                intent.type = "text/csv"
+                startActivityForResult(intent, REQUEST_IMPORT_FILE)
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            REQUEST_IMPORT_FILE ->{
+                data?.data?.let {uri->
+                  //  try {
+                    val importVm = requireActivity().getViewModel { requireActivity().injector.importViewModel()}
+                        val inputStream = requireActivity().contentResolver.openInputStream(uri)
+                        if(inputStream != null){
+                            importVm.readInput(uri.path, inputStream)
+                        }
+           //         }
+//                    catch(e: IOException)
+//                    {
+//                        e.printStackTrace()
+//                        Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
+//                    }
+                }
+            }
+        }
+    }
+
+
+
+
 
 }
 

@@ -1,6 +1,7 @@
 package com.android.jared.linden.timingtrials.data.source
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.liveData
 import androidx.room.*
 import com.android.jared.linden.timingtrials.data.*
@@ -38,7 +39,14 @@ abstract class TimeTrialDao(db: RoomDatabase) {
 
 
     fun getNonFinishedTt() : LiveData<TimeTrial?>{
-        return getNonFinishedTtLive()
+        return Transformations.map(getNonFinishedTtLive()){tt->
+            if(tt!=null){
+                return@map tt.copy(riderList = tt.riderList.map { it.copy(startTimeOffset = tt.timeTrialHeader.firstRiderStartOffset + tt.timeTrialHeader.interval * it.index )})
+            }else{
+                null
+            }
+
+        }
     }
 
 

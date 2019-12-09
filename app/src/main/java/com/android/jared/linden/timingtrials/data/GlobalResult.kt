@@ -16,7 +16,8 @@ import java.lang.Exception
 data class GlobalResult(val riderId: Long,
                         val courseId: Long,
                         val riderClub: String,
-                        val categoryString: String,
+                        val category: String,
+                        val gender: Gender,
                         val laps: Int,
                         val resultTime: Long,
                         val splits: List<Long>,
@@ -36,7 +37,8 @@ data class GlobalResult(val riderId: Long,
                         riderId,
                         courseId,
                         res.riderClub,
-                        res.categoryString,
+                        res.category,
+                        res.gender,
                         res.laps,
                         res.resultTime,
                         res.splits,
@@ -69,8 +71,11 @@ data class FilledResult(@Embedded val globalResult:GlobalResult,
     override val riderClub: String
         get() = globalResult.riderClub
 
-    override val categoryString: String
-        get() = globalResult.categoryString
+    override val category: String
+        get() = globalResult.category
+
+    override val gender: Gender
+        get() = globalResult.gender
 
     override val laps: Int
         get() = globalResult.laps
@@ -98,7 +103,7 @@ data class FilledResult(@Embedded val globalResult:GlobalResult,
                               timeTrial: TimeTrialHeader,
                               notes:String):FilledResult{
             if (rider.id != null && course.id != null){
-                val global = GlobalResult(rider.id, course.id, rider.club, rider.getCategoryStandard().categoryId(), timeTrial.laps, resultTime, splits, timeTrial.startTime, timeTrial.id, notes)
+                val global = GlobalResult(rider.id, course.id, rider.club, rider.category?:"", rider.gender, timeTrial.laps, resultTime, splits, timeTrial.startTime, timeTrial.id, notes)
                 return FilledResult(global, rider, course, timeTrial)
             }else{
                 throw Exception("Error creating new result - Rider or Course id was null")
@@ -114,7 +119,7 @@ data class FilledResult(@Embedded val globalResult:GlobalResult,
                               timeTrial: TimeTrialHeader,
                               notes:String):FilledResult{
             if (rider.id != null && course.id != null){
-                val global = GlobalResult(rider.id, course.id, rider.club, rider.getCategoryStandard().categoryId(), timeTrial.laps, resultTime, splits, timeTrial.startTime, timeTrial.id, notes)
+                val global = GlobalResult(rider.id, course.id, rider.club, rider.category?:"",rider.gender,  timeTrial.laps, resultTime, splits, timeTrial.startTime, timeTrial.id, notes)
                 return FilledResult(global, rider, course, timeTrial)
             }else{
                 throw Exception("Error creating new result - Rider or Course id was null")
@@ -130,7 +135,8 @@ interface IResult{
     val rider:Rider
     val course: Course
     val riderClub: String
-    val categoryString: String
+    val category: String
+    val gender: Gender
     val laps: Int
     val resultTime: Long
     val splits: List<Long>
