@@ -30,7 +30,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.REQUEST_CREATE_FILE_CSV
-import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.databinding.FragmentTimetrialResultBinding
 import com.android.jared.linden.timingtrials.domain.CsvTransfer
 import com.android.jared.linden.timingtrials.util.getViewModel
@@ -47,13 +46,14 @@ class ResultFragment : Fragment() {
 
     lateinit var resultViewModel: ResultViewModel
     lateinit var viewManager: GridLayoutManager
+    lateinit var resultGridAdapter: ResultListAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
 
         viewManager = GridLayoutManager(requireActivity(), 2)
-        val adapter = ResultListAdapter(requireActivity())
-        adapter.setHasStableIds(true)
+        resultGridAdapter = ResultListAdapter(requireActivity())
+        resultGridAdapter.setHasStableIds(true)
 
         requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
@@ -64,7 +64,7 @@ class ResultFragment : Fragment() {
 
             fragResultRecyclerView.isNestedScrollingEnabled = false
             fragResultRecyclerView.layoutManager = viewManager
-            fragResultRecyclerView.adapter = adapter
+            fragResultRecyclerView.adapter = resultGridAdapter
             fragResultRecyclerView.addItemDecoration(DividerItemDecoration(requireActivity(), LinearLayoutManager.VERTICAL))
             //fragResultRecyclerView.recycledViewPool.setMaxRecycledViews(1,0)
             insertResultsButton.setOnClickListener {
@@ -104,7 +104,7 @@ class ResultFragment : Fragment() {
                             }
                         }
                     })
-                    adapter.setResults(newRes)
+                    resultGridAdapter.setResults(newRes)
                 }
 
             }
@@ -211,10 +211,15 @@ class ResultFragment : Fragment() {
 
             val imgName = "${ttName?:nowChars}.jpg"
 
+            val scrollViewWidth = horizontalScrollView.getChildAt(0).width
+
+            val sr = fragResultRecyclerView.computeVerticalScrollRange()
+
+            val gridHeight = if(sr == 0) fragResultRecyclerView.height else sr
 
             //https://dev.to/pranavpandey/android-create-bitmap-from-a-view-3lck
-            view.measure(View.MeasureSpec.makeMeasureSpec(convertDpToPixels(1000F), View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(convertDpToPixels(2000F), View.MeasureSpec.EXACTLY))
+            view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(gridHeight+200, View.MeasureSpec.EXACTLY))
 
             view.layout(0,0, view.measuredWidth, view.measuredHeight)
             val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)

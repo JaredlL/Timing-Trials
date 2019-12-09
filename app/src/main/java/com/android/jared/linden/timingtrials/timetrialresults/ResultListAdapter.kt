@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Typeface
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -40,7 +41,7 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
                 bind(it, position)
             }
         }
-       // holder.setIsRecyclable(false)
+
     }
 
     override fun getItemId(position: Int): Long {
@@ -62,12 +63,16 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
 
     private var mResults: List<ResultCell> = listOf()
     private var rowLength = 0
+
     val layoutInflater = LayoutInflater.from(context)
+    var rowCount = 0
+    //var itemHeight = 0
 
     fun setResults(newResults: List<ResultRowViewModel>){
 
         rowLength = newResults.first().row.size
         mResults = newResults.flatMap { it.row }
+        rowCount = newResults.size
         notifyDataSetChanged()
     }
 

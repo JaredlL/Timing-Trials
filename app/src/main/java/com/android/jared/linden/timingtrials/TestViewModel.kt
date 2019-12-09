@@ -117,6 +117,38 @@ class TestViewModel@Inject constructor(
         }
     }
 
+    fun insertFinishedTt3(){
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val exist = timeTrialRepository.getTimeTrialByName("Test Result TT 2")
+            if(exist == null){
+
+                val rList = riderRepository.allRidersLightSuspend()
+                val courses = courseRepository.getAllCoursesSuspend()
+
+                val _mTimeTrial =TimeTrial.createBlank().copy(timeTrialHeader = TimeTrialHeader.createBlank()
+                        .copy(ttName = "Result TT 3",
+                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
+                                firstRiderStartOffset = 0,
+                                interval = 2,
+                                course = courses[2],
+                                laps = 1,
+                                status = TimeTrialStatus.FINISHED))
+
+
+                val newTt = _mTimeTrial.helper.addRidersAsTimeTrialRiders(rList.take(4))
+                val withEvents = addFakeEvents(newTt)
+                val id = timeTrialRepository.insert(withEvents)
+                testInsertedEvent.postValue(Event(id))
+            }else{
+                testInsertedEvent.postValue(Event(exist.timeTrialHeader.id))
+            }
+
+
+        }
+    }
+
 
     val testInsertedEvent: MutableLiveData<Event<Long?>> = MutableLiveData()
     fun insertFinishedTt2(){

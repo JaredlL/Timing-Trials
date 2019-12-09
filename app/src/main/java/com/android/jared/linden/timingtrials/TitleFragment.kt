@@ -95,6 +95,16 @@ class TitleFragment : Fragment()
                     }
                 })
             }
+
+            button2.setOnClickListener {
+                testViewModel.insertFinishedTt3()
+                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
+                    it?.let {id->
+                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
+                        findNavController().navigate(action)
+                    }
+                })
+            }
         }
 
 
