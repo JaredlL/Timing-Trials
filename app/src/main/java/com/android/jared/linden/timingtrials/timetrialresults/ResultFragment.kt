@@ -30,7 +30,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.REQUEST_CREATE_FILE_CSV
+import com.android.jared.linden.timingtrials.REQUEST_CREATE_FILE_JSON
 import com.android.jared.linden.timingtrials.databinding.FragmentTimetrialResultBinding
+import com.android.jared.linden.timingtrials.domain.JsonResultsWriter
 import com.android.jared.linden.timingtrials.domain.csv.CsvResultWriter
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
@@ -140,6 +142,19 @@ class ResultFragment : Fragment() {
                 startActivityForResult(intent, REQUEST_CREATE_FILE_CSV)
                 true
             }
+            R.id.resultMenuJson->{
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    putExtra(Intent.EXTRA_TITLE, "${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.json")
+                    //MIME types
+                    type = "text/*"
+                    // Optionally, specify a URI for the directory that should be opened in
+                    // the system file picker before your app creates the document.
+                    //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
+                }
+                startActivityForResult(intent, REQUEST_CREATE_FILE_JSON)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -151,6 +166,11 @@ class ResultFragment : Fragment() {
                     data?.data?.let {
                         writeCsv(it)
                     }
+            }
+            REQUEST_CREATE_FILE_JSON->{
+                data?.data?.let {
+                    writeJson(it)
+                }
             }
         }
     }
@@ -175,6 +195,32 @@ class ResultFragment : Fragment() {
                     val intent = Intent()
                     intent.action = Intent.ACTION_VIEW
                     intent.setDataAndType(uri, "text/csv")
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    startActivity(intent)
+                }
+            }
+            catch(e: IOException)
+            {
+                e.printStackTrace()
+                Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun writeJson(uri: Uri){
+        val tt = resultViewModel.timeTrial.value
+        val results = resultViewModel.results.value
+
+        if(tt != null && results != null){
+            try {
+                val outputStream = requireActivity().contentResolver.openOutputStream(uri)
+                if(haveOrRequestFilePermission() && outputStream != null){
+
+                    JsonResultsWriter().writeToPath(outputStream, tt)
+
+                    val intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    intent.setDataAndType(uri, "text/*")
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     startActivity(intent)
                 }

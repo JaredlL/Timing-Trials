@@ -10,9 +10,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.threeten.bp.LocalDate
 import org.threeten.bp.OffsetDateTime
 
-@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, RiderPassedEvent::class, TimeTrialRider::class, GlobalResult::class], version = 31, exportSchema = false)
+@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, RiderPassedEvent::class, TimeTrialRider::class, GlobalResult::class], version = 32, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 
@@ -121,7 +122,7 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
         }
 
         fun createBaseRider(fname:String, lname:String, club:String, dob:Int, gender: Gender):Rider{
-            val bd: OffsetDateTime = OffsetDateTime.now().minusYears((2019 - dob).toLong())
+            val bd: LocalDate = LocalDate.of(dob, 1, 1)
 
             return Rider(fname, lname, club, bd,StandardCategoryGetter.getCategory(gender,2019 - dob), gender)
         }

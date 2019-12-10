@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 const val REQUEST_CREATE_FILE_CSV = 1
 const val REQUEST_IMPORT_FILE = 2
 const val REQUEST_CREATE_FILE_SPREADSHEET = 3
+const val REQUEST_CREATE_FILE_JSON = 4
 
 
 class MainActivity : AppCompatActivity() {

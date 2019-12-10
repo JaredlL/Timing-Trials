@@ -18,6 +18,7 @@ data class TimeTrialHeader(val ttName: String,
 
 
     @delegate: Ignore
+    @delegate: Transient
     val startTimeMilis: Long by lazy { startTime.toInstant().toEpochMilli() }
 
     companion object {
@@ -41,8 +42,8 @@ data class TimeTrial(
 
 
 
-    @Ignore
-    val helper = TimeTrialHelper(this)
+    @Ignore @Transient
+     val helper = TimeTrialHelper(this)
 
     fun equalsOtherExcludingIds(other: TimeTrial?): Boolean{
         if(other == null) return false
