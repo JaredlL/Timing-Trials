@@ -1,12 +1,11 @@
 package com.android.jared.linden.timingtrials.edititem
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -22,15 +21,17 @@ class EditRiderFragment : Fragment() {
 
 
     private val args: EditRiderFragmentArgs by navArgs()
+    private lateinit var riderViewModel: EditRiderViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
 
-        val riderViewModel = requireActivity().getViewModel { requireActivity().injector.riderViewModel() }
+        riderViewModel = requireActivity().getViewModel { requireActivity().injector.riderViewModel() }
         riderViewModel.mutableRider.observe(viewLifecycleOwner, Observer {  })
 
         riderViewModel.changeRider(args.riderId)
+        setHasOptionsMenu(true)
 
         val mAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
 
@@ -58,15 +59,40 @@ class EditRiderFragment : Fragment() {
                 }
 
             }
-            deleteButton.setOnClickListener {
-                riderViewModel.delete()
-                findNavController().popBackStack()
-            }
 
         }
 
 
         return binding.root
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_delete_deleteitem -> {
+                showDeleteDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun showDeleteDialog(){
+        AlertDialog.Builder(requireContext())
+                .setTitle(resources.getString(R.string.delete_rider))
+                .setMessage(resources.getString(R.string.confirm_delete_rider_message))
+                .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
+                    riderViewModel.delete()
+                    findNavController().popBackStack()
+                }
+                .setNegativeButton("Dismiss"){_,_->
+
+                }
+                .create().show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        //menu.clear()
+        inflater.inflate(R.menu.menu_delete, menu)
     }
 
 

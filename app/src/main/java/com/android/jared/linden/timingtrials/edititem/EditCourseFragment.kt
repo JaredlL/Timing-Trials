@@ -1,11 +1,10 @@
 package com.android.jared.linden.timingtrials.edititem
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -34,6 +33,7 @@ class EditCourseFragment : Fragment() {
 
         courseViewModel = requireActivity().getViewModel { requireActivity().injector.courseViewModel() }
 
+        setHasOptionsMenu(true)
         courseViewModel.changeCourse(courseId)
         courseViewModel.mutableCourse.observe(viewLifecycleOwner, Observer {  })
 
@@ -58,6 +58,35 @@ class EditCourseFragment : Fragment() {
         return binding.root
 
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        //menu.clear()
+        inflater.inflate(R.menu.menu_delete, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_delete_deleteitem -> {
+                showDeleteDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun showDeleteDialog(){
+        AlertDialog.Builder(requireContext())
+                .setTitle(resources.getString(R.string.delete_course))
+                .setMessage(resources.getString(R.string.confirm_delete_course_message))
+                .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
+                    courseViewModel.deleteCourse()
+                    findNavController().popBackStack()
+                }
+                .setNegativeButton("Dismiss"){_,_->
+
+                }
+                .create().show()
     }
 
 

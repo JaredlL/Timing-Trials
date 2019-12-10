@@ -60,6 +60,10 @@
     <string name="timingtrials_database">Timing Trials Database</string>
     <string name="rider_start_offset">First rider start offset</string>
     <string name="delete">Delete</string>
+    <string name="delete_rider">Delete Rider</string>
+    <string name="confirm_delete_rider_message">Are you sure? ALL results associated with this rider will be lost!</string>
+    <string name="confirm_delete_course_message">Are you sure? ALL results associated with this course will be lost!</string>
+    <string name="delete_course">Delete Course</string>
     <string name="title_activity_global_result">GlobalResultActivity</string>
     <string name="resume_setup">Resume setting up</string>
     <string name="results">Results</string>

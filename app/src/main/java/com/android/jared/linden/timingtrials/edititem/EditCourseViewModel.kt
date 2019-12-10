@@ -99,6 +99,14 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
 
 
 
+    fun deleteCourse(){
+        viewModelScope.launch(Dispatchers.IO) {
+
+            mutableCourse.value?.let {
+                repository.delete(it)
+            }
+        }
+    }
 
 
     fun addOrUpdate(){
