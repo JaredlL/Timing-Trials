@@ -18,7 +18,7 @@ class CsvResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowView
 
     fun writeRow(row: ResultRowViewModel, writer: PrintWriter){
         for (v in row.row.dropLast(1)){
-            writer.append(surroundQuotes(v.content.value))
+            writer.append("${surroundQuotes(v.content.value)},")
         }
         writer.appendln(surroundQuotes(row.row.last().content.value))
     }

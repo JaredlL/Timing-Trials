@@ -68,7 +68,7 @@ class DataBaseViewPagerFragment: Fragment() {
         return when (item.itemId) {
             R.id.app_bar_import -> {
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                intent.type = "text/csv"
+                intent.type = "text/*"
                 startActivityForResult(intent, REQUEST_IMPORT_FILE)
                 true
             }
