@@ -36,7 +36,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
     override val courseName: LiveData<String> = Transformations.map(ttSetup.timeTrial){ tt->
         tt?.let{
 
-            tt.timeTrialHeader.course?.courseName
+            tt.course?.courseName
         }
     }
     override val startTime = MutableLiveData<OffsetDateTime>()
@@ -93,7 +93,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
         }
         addSource(timeTrialName) { newName ->
             timeTrialHeader.value?.let {
-                if(it.ttName != newName) { ttSetup.updateDefinition(it.copy(ttName = newName))
+                if(it.ttName != newName) { updateDefinition( it.copy(ttName = newName))
                 }
             }
         }
@@ -101,14 +101,14 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
             os.toIntOrNull()?.let{newos ->
                 timeTrialHeader.value?.let { tt->
                     if(tt.firstRiderStartOffset != newos) {
-                        ttSetup.updateDefinition(tt.copy(firstRiderStartOffset = newos))
+                        updateDefinition(tt.copy(firstRiderStartOffset = newos))
                     }
                 }}
         }
         addSource(startTime) {newStartTime->
             timeTrialHeader.value?.let { tt->
                 if(tt.startTime != newStartTime) {
-                    ttSetup.updateDefinition(tt.copy(startTime = newStartTime))
+                    updateDefinition(tt.copy(startTime = newStartTime))
                 }
             }
         }
@@ -116,7 +116,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
             timeTrialHeader.value?.let { tt ->
                 interval.toIntOrNull()?.let{
                     if(tt.interval != it){
-                        ttSetup.updateDefinition(tt.copy(interval = it))
+                        updateDefinition(tt.copy(interval = it))
                     }
                 }
             }
@@ -126,9 +126,16 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
             laps.toIntOrNull()?.let{newLaps ->
                 timeTrialHeader.value?.let { tt->
                     if(tt.laps != newLaps) {
-                        ttSetup.updateDefinition(tt.copy(laps = newLaps))
+                        updateDefinition(tt.copy(laps = newLaps))
                     }
                 }}
+        }
+
+    }
+    fun updateDefinition(newTimeTrialHeader: TimeTrialHeader){
+        ttSetup.timeTrial.value?.let {current->
+            val new = current.updateHeader(newTimeTrialHeader)
+            ttSetup.updateTimeTrial(new)
         }
     }
 

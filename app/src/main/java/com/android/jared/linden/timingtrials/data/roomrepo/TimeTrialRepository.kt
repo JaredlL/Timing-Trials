@@ -8,6 +8,7 @@ import androidx.lifecycle.Transformations
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
+import com.android.jared.linden.timingtrials.data.TimeTrialWithCourse
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
 import kotlinx.coroutines.*
 import java.sql.Time
@@ -18,10 +19,12 @@ import javax.inject.Singleton
 interface ITimeTrialRepository{
 
     suspend fun insert(timeTrial: TimeTrial):Long
-    suspend fun update(timeTrial: TimeTrial)
+    suspend fun update(timeTrialHeader: TimeTrialHeader)
+    suspend fun updateFull(timeTrial: TimeTrial)
     suspend fun getTimeTrialByName(name: String): TimeTrial?
     suspend fun delete(timeTrial: TimeTrial)
-    val nonFinishedTimeTrial: LiveData<TimeTrial?>
+    //val nonFinishedTimeTrial: LiveData<TimeTrialWithCourse?>
+    val nonFinishedFullTimeTrial: LiveData<TimeTrial?>
     fun getLiveTimeTrialByName(name:String): LiveData<TimeTrial>
     fun getTimeTrialById(id: Long): LiveData<TimeTrial>
     val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>>
@@ -36,6 +39,15 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
         return timeTrialDao.getTimeTrialByName(name)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun updateFull(timeTrial: TimeTrial) {
+        System.out.println("JAREDMSG -> TTREPO -> Updating ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
+        if((timeTrial.timeTrialHeader.id ?: 0L) == 0L){
+            throw Exception("TT ID cannot be null")
+        }
+        timeTrialDao.update(timeTrial)
+    }
 
     override val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>> = timeTrialDao.getAllTimeTrials()
 
@@ -56,14 +68,13 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
 
     private val inserting: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    override val nonFinishedTimeTrial: LiveData<TimeTrial?>
-        get() = nonFinishedMediator
+
 
     private val nonFinishedMediator = MediatorLiveData<TimeTrial>()
 
     private val insertingBool = AtomicBoolean()
     init {
-        nonFinishedMediator.addSource(timeTrialDao.getNonFinishedTt()){timeTrial->
+        nonFinishedMediator.addSource(timeTrialDao.getNonFinishedFullTtLive()){timeTrial->
             println("JAREDMSG -> TTREPO -> Getting time trial ${timeTrial?.timeTrialHeader?.id} ${timeTrial?.timeTrialHeader?.ttName}")
             if(timeTrial == null) {
                 if (!insertingBool.get()) {
@@ -82,6 +93,10 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
         }
     }
 
+    override val nonFinishedFullTimeTrial: LiveData<TimeTrial?> = Transformations.map(nonFinishedMediator){tt->
+        tt?.copy(riderList = tt.riderList.sortedBy { it.timeTrialData.index }) ?: tt
+    }
+
 
 
 
@@ -93,12 +108,12 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    override suspend fun update(timeTrial: TimeTrial) {
-        System.out.println("JAREDMSG -> TTREPO -> Updating ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
-        if((timeTrial.timeTrialHeader.id ?: 0L) == 0L){
+    override suspend fun update(timeTrialHeader: TimeTrialHeader) {
+        System.out.println("JAREDMSG -> TTREPO -> Updating ${timeTrialHeader.id} ${timeTrialHeader.ttName} into DB from background thread")
+        if((timeTrialHeader.id ?: 0L) == 0L){
             throw Exception("TT ID cannot be null")
         }
-        timeTrialDao.update(timeTrial)
+        timeTrialDao.update(timeTrialHeader)
     }
 
 

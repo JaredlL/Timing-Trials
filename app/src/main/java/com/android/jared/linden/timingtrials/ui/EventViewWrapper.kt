@@ -11,7 +11,7 @@ class EventViewWrapper(val event: ITimelineEvent, val timeTrial: TimeTrial) : Ba
 
     val timeStampString = ConverterUtils.toTenthsDisplayString(event.timeStamp)
 
-    private fun getRider(): TimeTrialRider? = event.riderId?.let {  timeTrial.riderList.firstOrNull{ r -> r.rider.id == event.riderId}}
+    //private fun getRider(): TimeTrialRider? = event.riderId?.let {  timeTrial.riderList.firstOrNull{ r -> r.rider.id == event.riderId}}
 
     var getSelected: (ITimelineEvent) -> Boolean = { _ -> false}
     var onSelectionChanged = { _: ITimelineEvent, _:Boolean -> Unit}
@@ -24,14 +24,14 @@ class EventViewWrapper(val event: ITimelineEvent, val timeTrial: TimeTrial) : Ba
         onSelectionChanged(event, value)
     }
 
-    private val riderName: String = getRider()?.let { "[${it.number}] ${it.rider.firstName} ${it.rider.lastName}" }?: "Null"
+    private val riderName: String = event.rider?.let { "[${it.timeTrialData.number}] ${it.riderData.firstName} ${it.riderData.lastName}" }?: "Null"
 
     val displayString: String = when(event.eventType){
         TimelineEventType.RIDER_STARTED -> "$riderName Started"
         TimelineEventType.RIDER_FINISHED -> "$riderName Finished"
         TimelineEventType.RIDER_PASSED ->
         {
-            if(event.riderId != null){
+            if(event.rider != null){
                 "$riderName Has Passed"
             }else{
                 "Assign Rider"

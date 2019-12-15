@@ -98,14 +98,16 @@ class Converters {
 
     @TypeConverter
     fun longListToString(splits: List<Long>?): String?{
-        return splits?.let { Gson().toJson(splits)}
+        return splits?.joinToString(separator = ",")
     }
 
     @TypeConverter
     fun longListFromString(splitsString:String?): List<Long>? {
-        return splitsString?.let{
-            val listType = object : TypeToken<List<Long>>() {}.type
-            Gson().fromJson<List<Long>>(splitsString, listType)}
+        return if(splitsString.isNullOrBlank()){
+             listOf()
+        }else{
+             splitsString.split(",").map { it.toLong() }
+        }
 
     }
 

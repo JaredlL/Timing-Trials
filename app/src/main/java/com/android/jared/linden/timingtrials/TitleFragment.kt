@@ -63,48 +63,48 @@ class TitleFragment : Fragment()
                 Navigation.findNavController(this.root).navigate(action)
             }
 
-            testSetupButton.setOnClickListener {
-                titleViewModel.nonFinishedTimeTrial.value?.let {
-                    testViewModel.testSetup(it)
-                }
-            }
-
-
-            testTimingButton.setOnClickListener {
-                titleViewModel.nonFinishedTimeTrial.value?.let {
-                    testViewModel.testTiming(it)
-                }
-            }
-
-            testResults1.setOnClickListener {
-                testViewModel.insertFinishedTt2()
-                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
-                    it?.let {id->
-                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
-                        findNavController().navigate(action)
-                    }
-                })
-            }
-
-            testResult2.setOnClickListener {
-                testViewModel.insertFinishedTt()
-                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
-                    it?.let {id->
-                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
-                        findNavController().navigate(action)
-                    }
-                })
-            }
-
-            button2.setOnClickListener {
-                testViewModel.insertFinishedTt3()
-                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
-                    it?.let {id->
-                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
-                        findNavController().navigate(action)
-                    }
-                })
-            }
+//            testSetupButton.setOnClickListener {
+//                titleViewModel.nonFinishedTimeTrial.value?.let {
+//                    testViewModel.testSetup(it)
+//                }
+//            }
+//
+//
+//            testTimingButton.setOnClickListener {
+//                titleViewModel.nonFinishedTimeTrial.value?.let {
+//                    testViewModel.testTiming(it)
+//                }
+//            }
+//
+//            testResults1.setOnClickListener {
+//                testViewModel.insertFinishedTt2()
+//                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
+//                    it?.let {id->
+//                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
+//                        findNavController().navigate(action)
+//                    }
+//                })
+//            }
+//
+//            testResult2.setOnClickListener {
+//                testViewModel.insertFinishedTt()
+//                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
+//                    it?.let {id->
+//                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
+//                        findNavController().navigate(action)
+//                    }
+//                })
+//            }
+//
+//            button2.setOnClickListener {
+//                testViewModel.insertFinishedTt3()
+//                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
+//                    it?.let {id->
+//                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
+//                        findNavController().navigate(action)
+//                    }
+//                })
+//            }
         }
 
 

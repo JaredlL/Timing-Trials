@@ -22,7 +22,7 @@ class JsonResultsWriter{
 
 data class TimeTrialResultOutput(@Transient val timeTrial: TimeTrial){
     val header = timeTrial.timeTrialHeader
-    val results = timeTrial.helper.results3.map { ResultOutput(it) }
+    //val results = timeTrial.helper.results3.map { ResultOutput(it) }
 }
 
 data class ResultOutput(@Transient val result: IResult)

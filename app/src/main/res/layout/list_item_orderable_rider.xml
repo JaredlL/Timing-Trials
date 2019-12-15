@@ -7,7 +7,7 @@
     <data>
         <variable
             name="rider"
-            type="com.android.jared.linden.timingtrials.data.TimeTrialRider"/>
+            type="com.android.jared.linden.timingtrials.data.FilledTimeTrialRider"/>
 
     </data>
 
@@ -25,7 +25,7 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@{rider.rider.firstName +' ' + rider.rider.lastName}"
+            android:text="@{rider.riderData.firstName +' ' + rider.riderData.lastName}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textView13"
             app:layout_constraintTop_toTopOf="parent"
@@ -41,7 +41,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
             android:layout_toLeftOf="@id/view"
-            android:text="@{'+' + Integer.toString(rider.startTimeOffset)}"
+            android:text="@{'+' + Integer.toString(rider.timeTrialData.startTimeOffset)}"
             app:layout_constraintBottom_toTopOf="@+id/divider4"
             app:layout_constraintEnd_toStartOf="@+id/view"
             app:layout_constraintTop_toTopOf="parent"
@@ -68,7 +68,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/number_back"
-            android:text="@{Integer.toString(rider.number)}"
+            android:text="@{Integer.toString(rider.timeTrialData.number)}"
             android:textAlignment="center"
             android:textColor="@android:color/black"
             android:textSize="18sp"

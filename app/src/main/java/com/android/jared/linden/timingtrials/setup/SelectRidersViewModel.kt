@@ -2,14 +2,18 @@ package com.android.jared.linden.timingtrials.setup
 
 
 import androidx.lifecycle.*
+import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialRider
 
 
 interface ISelectRidersViewModel{
     //var allSelectableRiders: LiveData<List<SelectableRiderViewWrapper>>
     val selectedRidersInformation: LiveData<SelectedRidersInformation>
-    fun updateSelectedRiders(selectedRiders: List<Rider>)
+    //fun updateSelectedRiders(selectedRiders: List<Rider>)
+    fun addRiderToTt(newSelectedRider: Rider)
+    fun removeRiderFromTt(riderToRemove: Rider)
 }
 
 class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRidersViewModel {
@@ -43,15 +47,32 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
 
     override val selectedRidersInformation: LiveData<SelectedRidersInformation> = selectedRidersMediator
 
-    override fun updateSelectedRiders(selectedRiders: List<Rider>) {
-        ttSetup.timeTrial.value?.let { tt->
-            val updatedTimeTrial = tt.helper.addRidersAsTimeTrialRiders(selectedRiders)
-            ttSetup.updateTimeTrial(updatedTimeTrial)
-        }
+//    override fun updateSelectedRiders(selectedRiders: List<Rider>) {
+//        ttSetup.timeTrial.value?.let { tt->
+//            val updatedTimeTrial = tt.helper.addRidersAsTimeTrialRiders(selectedRiders)
+//            ttSetup.updateTimeTrial(updatedTimeTrial)
+//        }
+//
+//    }
 
+    override fun addRiderToTt(newSelectedRider: Rider) {
+        ttSetup.timeTrial.value?.let { tt->
+            ttSetup.updateTimeTrial(tt.addRider(newSelectedRider))
+        }
+    }
+
+    override fun removeRiderFromTt(riderToRemove: Rider) {
+        ttSetup.timeTrial.value?.let { tt->
+            ttSetup.updateTimeTrial(tt.removeRider(riderToRemove))
+        }
     }
 
     init {
+//        selectedRidersMediator.addSource(ttSetup.timeTrial){
+//            it?.let {
+//                selectedRidersMediator.value = SelectedRidersInformation(it.riderList, it)
+//            }
+//        }
         selectedRidersMediator.addSource(ttSetup.riderRepository.allRidersLight){result->
             val tt = ttSetup.timeTrial.value
             if(result!=null && tt!=null){

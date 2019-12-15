@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDate
 import org.threeten.bp.OffsetDateTime
 
-@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, RiderPassedEvent::class, TimeTrialRider::class, GlobalResult::class], version = 32, exportSchema = false)
+@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, TimeTrialRider::class, GlobalResult::class], version = 34, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 
@@ -21,6 +21,7 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
     abstract fun courseDao(): CourseDao
     abstract fun timeTrialDao(): TimeTrialDao
     abstract fun globalResultDao(): GlobalResultDao
+    abstract fun timeTrialRiderDao(): TimeTrialRiderDao
 
     val mDbIsPopulated = MutableLiveData(false)
 
@@ -140,7 +141,6 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
         fun populateTt(timeTrialDao: TimeTrialDao, riderDao: RiderDao, courseDao: CourseDao){
 
             timeTrialDao.deleteAllR()
-            timeTrialDao.deleteAllE()
             timeTrialDao.deleteAll()
         }
 

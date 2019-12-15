@@ -52,7 +52,7 @@ class SetupTimeTrialFragment : Fragment() {
 
             startTtButton.setOnClickListener{
                 propsViewModel.timeTrial.value?.let {
-                    if(it.riderList.count() == 0){
+                    if(it.riderList.isEmpty()){
                         Toast.makeText(requireActivity(), "TT Needs at least 1 rider", Toast.LENGTH_LONG).show()
                         //container.currentItem = 1
                         return@let
@@ -76,9 +76,9 @@ class SetupTimeTrialFragment : Fragment() {
 
         }
 
-        propsViewModel.timeTrialHeader.observe(viewLifecycleOwner, Observer {tt->
+        propsViewModel.timeTrial.observe(viewLifecycleOwner, Observer {tt->
           tt?.let {
-              if (it.ttName == "" && it.course == null) {
+              if (it.timeTrialHeader.ttName == "" && it.course == null) {
                   showCourseFrag()
               }
           }

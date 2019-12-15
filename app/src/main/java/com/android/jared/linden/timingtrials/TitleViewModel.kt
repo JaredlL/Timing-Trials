@@ -15,14 +15,14 @@ import javax.inject.Inject
 
 class TitleViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel() {
 
-    val nonFinishedTimeTrial = Transformations.map(timeTrialRepository.nonFinishedTimeTrial){tt->
+    val nonFinishedTimeTrial = Transformations.map(timeTrialRepository.nonFinishedFullTimeTrial){tt->
         tt
     }
 
     fun clearTimeTrial(timeTrial: TimeTrial){
         viewModelScope.launch(Dispatchers.IO) {
             val cleared = TimeTrial.createBlank().copy(timeTrialHeader = TimeTrialHeader.createBlank().copy(id = timeTrial.timeTrialHeader.id))
-            timeTrialRepository.update(cleared)
+            timeTrialRepository.updateFull(cleared)
         }
     }
 

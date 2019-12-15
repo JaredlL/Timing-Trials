@@ -93,7 +93,7 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
 
     override fun getItemViewType(position: Int): Int {
         val ev = mEvents[position].event
-        return if (ev.eventType == TimelineEventType.RIDER_PASSED && ev.riderId == null) R.layout.list_item_event_button else R.layout.list_item_event_text
+        return if (ev.eventType == TimelineEventType.RIDER_PASSED && ev.rider == null) R.layout.list_item_event_button else R.layout.list_item_event_text
         //return mEvents[position].event.eventType.ordinal
     }
 

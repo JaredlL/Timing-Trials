@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.databinding.ListItemOrderableRiderBinding
@@ -24,12 +25,12 @@ class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<Orderab
     override fun getItemId(position: Int): Long {
         // requires static value, it means need to keep the same value
         // even if the item position has been changed.
-        return mRiders[position].id ?: 0L
+        return mRiders[position].riderData.id ?: 0L
     }
 
     inner class OrderableRiderViewHolder(val binding: ListItemOrderableRiderBinding): AbstractDraggableItemViewHolder(binding.root){
 
-        fun bind(rd:TimeTrialRider, position: Int){
+        fun bind(rd:FilledTimeTrialRider, position: Int){
             binding.apply {
                 rider = rd
                 //pos = position + 1
@@ -38,10 +39,10 @@ class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<Orderab
     }
 
     private val layoutInflater = LayoutInflater.from(context)
-    private var mRiders: List<TimeTrialRider> = listOf()
+    private var mRiders: List<FilledTimeTrialRider> = listOf()
     var onMove: (from:Int, to:Int) -> Unit = {_,_ -> Unit}
 
-    fun setRiders(newRiders: List<TimeTrialRider>){
+    fun setRiders(newRiders: List<FilledTimeTrialRider>){
         mRiders = newRiders
         notifyDataSetChanged()
     }

@@ -56,8 +56,15 @@ class SelectRidersFragment : Fragment() {
             }
         }
 
-        adapter.riderSelectionChanged ={selectedRiders->
-            viewModel.updateSelectedRiders(selectedRiders)
+//        adapter.riderSelectionChanged ={selectedRiders->
+//            viewModel.updateSelectedRiders(selectedRiders)
+//        }
+
+        adapter.addRiderToSelection = {
+            viewModel.addRiderToTt(it)
+        }
+        adapter.removeRiderFromSelection = {
+            viewModel.removeRiderFromTt(it)
         }
 
         viewModel.selectedRidersInformation.observe(viewLifecycleOwner, Observer {result->

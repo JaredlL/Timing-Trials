@@ -15,44 +15,46 @@ interface ISelectCourseViewModel{
 class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCourseViewModel {
 
 
-    private fun selectedCourse(): Course? {
-        return ttSetup.timeTrial.value?.timeTrialHeader?.course
-    }
-
 
     override fun getAllCourses(): LiveData<SelectableCourseData> = Transformations.switchMap(ttSetup.timeTrial) {
         Transformations.map(ttSetup.courseRepository.allCoursesLight) { courseList ->
-            SelectableCourseData(courseList.map { c -> SelectableCourseViewModel(c) }, selectedCourse()?.id)
+            SelectableCourseData(courseList.map { c -> SelectableCourseViewModel(c) }, it?.course?.id)
         }
     }
 
 
     override fun setSelectedCourse(course: Course) {
 
-        if (selectedCourse()?.id != course.id) {
-            val oldCourseName = selectedCourse()?.courseName ?: ""
 
-            ttSetup.timeTrial.value?.let { ttd ->
-                val tt = ttd.timeTrialHeader
-                if (tt.ttName == "") {
-                    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-                    val dateString = ZonedDateTime.now().format(formatter)
 
-                    ttSetup.updateDefinition(tt.copy(ttName = course.courseName + " " + dateString, course = course))
+            ttSetup.timeTrial.value?.let { currentTimeTrial ->
+                if (currentTimeTrial.course?.id != course.id) {
+                    val oldCourseName =currentTimeTrial.course?. courseName ?: ""
 
-                } else if (oldCourseName != "" && tt.ttName.contains(oldCourseName, false)) {
+                    val tt = currentTimeTrial.timeTrialHeader
+                    if (tt.ttName == "") {
+                        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                        val dateString = ZonedDateTime.now().format(formatter)
+                        val newHeader = tt.copy(ttName = course.courseName + " " + dateString)
+                        val newTt = currentTimeTrial.updateHeader(newHeader).updateCourse(course)
+                        ttSetup.updateTimeTrial(newTt)
 
-                    val oldTtName = tt.ttName
-                    val newDef = tt.copy(
-                            ttName = oldTtName.replace(oldCourseName, course.courseName),
-                            course = course)
+                    } else if (oldCourseName != "" && tt.ttName.contains(oldCourseName, false)) {
 
-                    ttSetup.updateDefinition(newDef)
-                } else {
-                    ttSetup.updateDefinition(tt.copy(course = course))
+                        val oldTtName = tt.ttName
+                        val newDef = tt.copy(
+                                ttName = oldTtName.replace(oldCourseName, course.courseName),
+                                courseId = course.id)
+
+                        val newTtWithCourse = currentTimeTrial.updateHeader(newDef).updateCourse(course)
+
+                        ttSetup.updateTimeTrial(newTtWithCourse)
+                    } else {
+                        ttSetup.updateTimeTrial(currentTimeTrial.updateCourse(course))
+                    }
                 }
             }
         }
     }
 }
-}
+

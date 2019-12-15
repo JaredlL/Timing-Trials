@@ -1,6 +1,5 @@
 package com.android.jared.linden.timingtrials.timing
 
-import androidx.core.util.size
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
@@ -10,12 +9,9 @@ import com.android.jared.linden.timingtrials.util.ConverterUtils
 import com.android.jared.linden.timingtrials.util.Event
 import kotlinx.coroutines.*
 import org.threeten.bp.Instant
-import java.lang.Exception
-import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import kotlin.math.abs
 
 interface IEventSelectionData{
     var eventAwaitingSelection: Long?
@@ -41,9 +37,9 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
 
     init {
-        timeTrial.addSource(timeTrialRepository.nonFinishedTimeTrial) {new ->
+        timeTrial.addSource(timeTrialRepository.nonFinishedFullTimeTrial) {new ->
             if(new != null && !isCorotineAlive.get() && !new.equalsOtherExcludingIds(timeTrial.value)) {
-                println("JAREDMSG -> TIMINGVM -> TimingTt self updating TT, ${new.eventList.size} events")
+                println("JAREDMSG -> TIMINGVM -> TimingTt self updating TT, ${new.timeTrialHeader.timeStamps} unassigned")
                 timeTrial.value = new
             }
         }
@@ -70,18 +66,18 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             if (tte.helper.riderStartTimes.firstKey() > now){
                 showMessage("First rider has not started yet")
             }else{
-                val newEvents = tte.eventList + listOf(RiderPassedEvent(timeTrialId = tte.timeTrialHeader.id?:0, riderId = null, timeStamp =  now))
-                updateTimeTrial(tte.copy(eventList = newEvents))
+                val newHeader = tte.timeTrialHeader.copy(timeStamps = tte.timeTrialHeader.timeStamps + now)
+                updateTimeTrial(tte.copy(timeTrialHeader = newHeader))
             }
         }
     }
 
     fun tryAssignRider(ttRider: TimeTrialRider){
         timeTrial.value?.let{tt->
-            ttRider.rider.id?.let {riderId->
+
                 eventAwaitingSelection?.let { eid->
                     val helper = TimeTrialHelper(tt)
-                   val res = helper.assignRiderToEvent(riderId, eid)
+                   val res = helper.assignRiderToEvent(ttRider, eid)
                     if(res.succeeded)
                     {
                         updateTimeTrial(res.tt)
@@ -90,7 +86,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                         showMessage(res.message)
                     }
                 }
-            }
+
         }
 
     }
@@ -103,7 +99,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     private fun updateTimeTrial(newtt: TimeTrial){
         timeTrial.value = newtt
-        println("JAREDMSG -> TIMINGVM -> Update TT, ${newtt.eventList.size} events")
+        println("JAREDMSG -> TIMINGVM -> Update TT, ${newtt.riderList.size} riders")
             if(!isCorotineAlive.get()){
                 queue.add(newtt)
                 viewModelScope.launch(Dispatchers.IO) {
@@ -114,7 +110,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                             ttToInsert = queue.poll()
                         }
                        ttToInsert?.let {
-                           timeTrialRepository.update(it)
+                           timeTrialRepository.updateFull(it)
                        }
                     }
                     isCorotineAlive.set(false)
@@ -183,7 +179,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     fun backToSetup(){
         timeTrial.value?.let {
             val headerCopy = it.timeTrialHeader.copy(status = TimeTrialStatus.SETTING_UP)
-            updateTimeTrial(it.copy(timeTrialHeader = headerCopy, eventList = listOf()))
+            updateTimeTrial(it.copy(timeTrialHeader = headerCopy))
         }
 
     }
@@ -215,7 +211,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                 val nextStartRider = sparse.valueAt(nextIndex)
                 val millisToNextRider = (nextStartMilli - millisSinceStart)
 
-                    val riderString = "(${nextStartRider.number}) ${nextStartRider.rider.firstName} ${nextStartRider.rider.lastName}"
+                    val riderString = "(${nextStartRider.timeTrialData.number}) ${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName}"
                     return when(millisToNextRider){
 
                         in 0L..10000 -> {
@@ -225,7 +221,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                             }else{
                                 x = 0
                             }
-                            "${nextStartRider.rider.firstName} ${nextStartRider.rider.lastName} - ${x+1}!"
+                            "${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName} - ${x+1}!"
                             }
                         in 5..ttIntervalMilis/4 ->
                             "$riderString starts in ${ttIntervalMilis/4000} seconds!"
@@ -235,7 +231,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                         {
                             if(prevIndex >= 0){
                                 val prevRider = sparse.valueAt(prevIndex)
-                                "(${prevRider.rider.firstName} ${prevRider.rider.lastName}) GO GO GO!!!"
+                                "(${prevRider.riderData.firstName} ${prevRider.riderData.lastName}) GO GO GO!!!"
                             }else{
                                 "Next rider is $riderString"
                             }
@@ -247,7 +243,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
                 //return "NULL"
             }else{
-                return "${tte.helper.finishedRidersFromEvents.size} riders have finished, ${tte.riderList.size - tte.helper.finishedRidersFromEvents.size} riders on course"
+                return "${tte.helper.finishedRiders.size} riders have finished, ${tte.riderList.size - tte.helper.finishedRiders.size} riders on course"
             }
 
     }
