@@ -36,16 +36,15 @@ class DataBaseViewPagerFragment: Fragment() {
             tab.text = getTabTitle(position)
         }.attach()
 
-        //(activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
 
         return binding.root
     }
 
     private fun getTabIcon(position: Int): Int {
         return when (position) {
-            RIDER_PAGE_INDEX -> R.drawable.ic_action_done
-            COURSE_PAGE_INDEX -> R.drawable.ic_dashboard_black_24dp
-            TIMETRIAL_PAGE_INDEX -> R.drawable.ic_home_black_24dp
+            RIDER_PAGE_INDEX -> R.drawable.ic_directions_bike_black_24dp
+            COURSE_PAGE_INDEX -> R.drawable.ic_directions_black_24dp
+            TIMETRIAL_PAGE_INDEX -> R.drawable.ic_timer_black_24dp
             else -> throw IndexOutOfBoundsException()
         }
     }
@@ -105,10 +104,10 @@ class DataBaseViewPagerFragment: Fragment() {
 }
 
 
+const val TIMETRIAL_PAGE_INDEX = 0
+const val RIDER_PAGE_INDEX = 1
+const val COURSE_PAGE_INDEX = 2
 
-const val RIDER_PAGE_INDEX = 0
-const val COURSE_PAGE_INDEX = 1
-const val TIMETRIAL_PAGE_INDEX = 2
 
 class TimeTrialDBPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 

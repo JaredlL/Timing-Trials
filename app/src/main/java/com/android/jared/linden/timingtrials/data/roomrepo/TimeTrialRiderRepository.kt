@@ -30,7 +30,7 @@ class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao
         return timeTrialRiderDao.getRiderResults(riderId)
     }
 
-    fun getCourseReults(courseId: Long): LiveData<List<TimeTrialRiderResult>>{
+    fun getCourseResults(courseId: Long): LiveData<List<TimeTrialRiderResult>>{
         return timeTrialRiderDao.getCourseResults(courseId)
     }
 

@@ -60,7 +60,7 @@ data class TimeTrial(
 
     fun updateCourse(newCourse: Course):TimeTrial{
         val newHeader = this.timeTrialHeader.copy(courseId = newCourse.id)
-        return this.copy(course = newCourse, timeTrialHeader = newHeader)
+        return this.copy(course = newCourse, timeTrialHeader = newHeader, riderList = this.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(courseId = newCourse.id)) })
     }
 
     fun updateHeader(newTimeTrialHeader: TimeTrialHeader): TimeTrial{

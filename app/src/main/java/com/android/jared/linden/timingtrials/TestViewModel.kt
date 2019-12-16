@@ -70,7 +70,8 @@ class TestViewModel@Inject constructor(
                                 interval = 2,
                                 courseId = courses[3].id,
                                 laps = 2,
-                                status = TimeTrialStatus.IN_PROGRESS))
+                                status = TimeTrialStatus.IN_PROGRESS),
+                        course = courses[3])
                 val newTt = cop1.addRiders(rList)
                 timeTrialRepository.updateFull(newTt)
                 inserting.set(false)
@@ -95,17 +96,20 @@ class TestViewModel@Inject constructor(
                 val rList = riderRepository.allRidersLightSuspend()
                 val courses = courseRepository.getAllCoursesSuspend()
 
-                val _mTimeTrial =TimeTrial.createBlank().copy(timeTrialHeader = TimeTrialHeader.createBlank()
+                val _mTimeTrial =TimeTrial.createBlank().copy(
+                        timeTrialHeader = TimeTrialHeader.createBlank()
                         .copy(ttName = "Test Result TT 2",
                                 startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
                                 firstRiderStartOffset = 0,
                                 interval = 2,
                                 courseId = courses[2].id,
                                 laps = 4,
-                                status = TimeTrialStatus.FINISHED))
+                                status = TimeTrialStatus.FINISHED),
+                        course = courses[2])
 
 
-                val rListWithIds = _mTimeTrial.addRiders(rList).riderList.mapIndexed { index, filledTimeTrialRider -> filledTimeTrialRider.copy(timeTrialData = filledTimeTrialRider.timeTrialData.copy(id = index.toLong())) }
+                val rListWithIds = _mTimeTrial.addRiders(rList).riderList.mapIndexed { index, filledTimeTrialRider ->
+                    filledTimeTrialRider.copy(timeTrialData = filledTimeTrialRider.timeTrialData.copy(id = index.toLong())) }
 
                 val copy = _mTimeTrial.copy(riderList = rListWithIds)
                 var current = copy
@@ -181,7 +185,8 @@ class TestViewModel@Inject constructor(
                                 interval = 2,
                                 courseId = courses[3].id,
                                 laps = 1,
-                                status = TimeTrialStatus.FINISHED))
+                                status = TimeTrialStatus.FINISHED)).updateCourse(courses[3])
+
 
 
                 val rListWithIds = _mTimeTrial.addRiders(rList).riderList.mapIndexed { index, filledTimeTrialRider -> filledTimeTrialRider.copy(timeTrialData = filledTimeTrialRider.timeTrialData.copy(id = index.toLong())) }

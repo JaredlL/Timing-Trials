@@ -105,7 +105,7 @@ abstract class TimeTrialDao(db: RoomDatabase) {
 
     @Query("SELECT * from timetrial_table ORDER BY startTime ASC") abstract fun getAllTimeTrialsSuspend(): List<TimeTrialHeader>
 
-    @Query("SELECT * from timetrial_table ORDER BY startTime ASC") abstract fun getAllTimeTrials(): LiveData<List<TimeTrialHeader>>
+    @Query("SELECT * from timetrial_table ORDER BY status ASC, startTime ASC") abstract fun getAllTimeTrials(): LiveData<List<TimeTrialHeader>>
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE id = :ttId LIMIT 1") abstract fun getTimeTrialById(ttId: Long): LiveData<TimeTrial>
 

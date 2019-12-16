@@ -78,8 +78,8 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
         <action
-            android:id="@+id/action_dataBaseViewPagerFragment_to_importFragment"
-            app:destination="@id/importFragment"
+            android:id="@+id/action_dataBaseViewPagerFragment_to_setupViewPagerFragment"
+            app:destination="@id/setupViewPagerFragment"
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -124,6 +124,10 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <argument
+            android:name="timeTrialId"
+            app:argType="long"
+            android:defaultValue="-1L" />
     </fragment>
     <fragment
         android:id="@+id/selectCourseFragment"
@@ -164,9 +168,4 @@
             android:name="itemTypeId"
             app:argType="string" />
     </fragment>
-    <fragment
-        android:id="@+id/importFragment"
-        android:name="com.android.jared.linden.timingtrials.transfer.ImportFragment"
-        android:label="Import Data"
-        tools:layout="@layout/fragment_import" />
 </navigation>

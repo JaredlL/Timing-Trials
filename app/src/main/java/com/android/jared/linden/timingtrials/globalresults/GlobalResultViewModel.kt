@@ -17,7 +17,7 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
     private val dataSource = ResultDataSource(timeTrialRepository, riderRepository, courseRepository, timeTrialRiderRepository)
 
 
-    fun getResutData(itemType: String, id: Long): LiveData<GlobalResultData>{
+    fun getResultData(itemType: String, id: Long): LiveData<GlobalResultData>{
         return dataSource.getResultData(Pair(itemType, id))
     }
 

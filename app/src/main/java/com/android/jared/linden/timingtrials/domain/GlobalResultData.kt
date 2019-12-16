@@ -119,7 +119,7 @@ class CourseResultDataFactory(private val courseRepository: ICourseRepository, p
     }
 
     override fun getResultList(itemId: Long): LiveData<List<IGenericListItem>> {
-        return Transformations.map(timeTrialRiderRepository.getCourseReults(itemId)){res->
+        return Transformations.map(timeTrialRiderRepository.getCourseResults(itemId)){res->
             res?.let{ list ->
                 list.map { listItemForCourseResult(it) }
             }

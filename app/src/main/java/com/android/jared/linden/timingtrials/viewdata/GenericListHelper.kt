@@ -12,6 +12,7 @@ import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemTimetrialBinding
 import com.android.jared.linden.timingtrials.ui.SelectableCourseViewModel
+import com.android.jared.linden.timingtrials.util.ConverterUtils
 
 
 class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, ListItemRiderBinding>(binding) {
@@ -122,10 +123,19 @@ class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHol
 
     override fun bind(data: TimeTrialHeader){
         _binding.apply{
-            viewModel = data
+            viewModel = TimeTrialListItem(data)
             timetrialLayout.setOnClickListener {
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToResultFragment(data.id?:0)
-                Navigation.findNavController(_binding.root).navigate(action)
+
+                    if(data.status == TimeTrialStatus.FINISHED){
+                        val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToResultFragment(data.id?:0)
+                        Navigation.findNavController(_binding.root).navigate(action)
+                    }else{
+                        val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSetupViewPagerFragment(data.id?:0)
+                        Navigation.findNavController(_binding.root).navigate(action)
+                    }
+
+
+
             }
             executePendingBindings()
 
@@ -133,9 +143,21 @@ class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHol
     }
 }
 
+data class TimeTrialListItem(val timeTrialHeader: TimeTrialHeader){
+    val nameString: String = timeTrialHeader.ttName
+    val dateString: String = if(timeTrialHeader.status == TimeTrialStatus.SETTING_UP){
+        "Setting Up"
+    }else{
+        ConverterUtils.dateToDisplay(timeTrialHeader.startTime)
+    }
+}
+
 class TimeTrialViewHolderFactory: GenericViewHolderFactory<TimeTrialHeader>() {
     override fun performFabAction(fab: View) {
-        fab.visibility = View.GONE
+        fab.setOnClickListener {
+            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSetupViewPagerFragment(-1L)
+            Navigation.findNavController(fab).navigate(action)
+        }
     }
 
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
@@ -144,7 +166,7 @@ class TimeTrialViewHolderFactory: GenericViewHolderFactory<TimeTrialHeader>() {
     }
 
     override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: TimeTrialHeader): View {
-        val binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false).apply { viewModel = data }
+        val binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false).apply { viewModel = TimeTrialListItem(data) }
         return binding.root
     }
 

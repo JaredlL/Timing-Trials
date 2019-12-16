@@ -45,7 +45,7 @@ class GlobalResultFragment : Fragment()
             genericRecyclerView.layoutManager = viewManager
         }
 
-        genericItemViewModel.getResutData(args.itemTypeId, args.itemId).observe(viewLifecycleOwner, Observer {res->
+        genericItemViewModel.getResultData(args.itemTypeId, args.itemId).observe(viewLifecycleOwner, Observer {res->
             res?.let {
                 (requireActivity() as AppCompatActivity).supportActionBar?.title = res.title
                 binding.listHeading.item = res.resultHeading

@@ -45,9 +45,9 @@ class SetupViewPagerFragment: Fragment() {
 
     private fun getTabIcon(position: Int): Int {
         return when (position) {
-            RIDER_PAGE_INDEX -> R.drawable.ic_action_done
-            ORDER_RIDER_INDEX -> R.drawable.ic_dashboard_black_24dp
-            TIMETRIAL_PAGE_INDEX -> R.drawable.ic_home_black_24dp
+            RIDER_PAGE_INDEX -> R.drawable.ic_directions_bike_black_24dp
+            ORDER_RIDER_INDEX -> R.drawable.ic_filter_1_black_24dp
+            TIMETRIAL_PAGE_INDEX -> R.drawable.ic_timer_black_24dp
             else -> throw IndexOutOfBoundsException()
         }
     }
