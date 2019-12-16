@@ -68,7 +68,7 @@ data class TimeTrial(
     }
 
     fun updateRiderList(newRiderList: List<FilledTimeTrialRider>): TimeTrial{
-        val ensureCorrect = newRiderList.mapIndexed {i,r-> r.updateTimeTrialData( r.timeTrialData.copy(timeTrialId = this.timeTrialHeader.id, index = i, number = i+1)) }
+        val ensureCorrect = newRiderList.mapIndexed {i,r-> r.updateTimeTrialData( r.timeTrialData.copy(timeTrialId = this.timeTrialHeader.id, courseId = this.course?.id, index = i, number = i+1)) }
         return  this.copy(riderList = ensureCorrect)
     }
 
@@ -76,12 +76,16 @@ data class TimeTrial(
         val newTtRider = FilledTimeTrialRider.createFromRiderAndTimeTrial(newRider, this)
         return this.updateRiderList(this.riderList + newTtRider )
     }
+
+    fun addRiders(newRiders: List<Rider>): TimeTrial{
+       return updateRiderList(newRiders.map { FilledTimeTrialRider.createFromRiderAndTimeTrial(it,this) })
+    }
+
     fun removeRider(riderToRemove: Rider): TimeTrial{
         return this.updateRiderList(this.riderList.filterNot { it.riderData.id == riderToRemove.id })
     }
 
-    @Ignore @Transient
-    val ttWithCourse = TimeTrialWithCourse(timeTrialHeader, course)
+
 
     @Ignore @Transient
      val helper = TimeTrialHelper(this)

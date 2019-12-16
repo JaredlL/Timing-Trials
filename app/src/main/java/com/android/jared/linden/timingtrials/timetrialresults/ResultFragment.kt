@@ -68,20 +68,9 @@ class ResultFragment : Fragment() {
             fragResultRecyclerView.layoutManager = viewManager
             fragResultRecyclerView.adapter = resultGridAdapter
             fragResultRecyclerView.addItemDecoration(DividerItemDecoration(requireActivity(), LinearLayoutManager.VERTICAL))
-            //fragResultRecyclerView.recycledViewPool.setMaxRecycledViews(1,0)
-            insertResultsButton.setOnClickListener {
-                //resultViewModel.insertResults()
-            }
+
         }
 
-
-        resultViewModel.resultsAreInserted.observe(viewLifecycleOwner, Observer {
-            if(it == false){
-                binding.insertResultsButton.visibility = View.VISIBLE
-            }else{
-                binding.insertResultsButton.visibility = View.GONE
-            }
-        })
 
         resultViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
             res?.let {
@@ -91,26 +80,26 @@ class ResultFragment : Fragment() {
         })
 
 
-//        resultViewModel.results.observe(viewLifecycleOwner, Observer {res->
-//            res?.let {newRes->
-//                if(newRes.isNotEmpty()){
-//                    val rowLength = newRes.first().row.size
-//
-//                    viewManager.spanCount = rowLength + 2
-//                    viewManager.spanSizeLookup = (object : GridLayoutManager.SpanSizeLookup(){
-//                        override fun getSpanSize(position: Int): Int {
-//                            return if (position.rem(rowLength) == 0 || position.rem(rowLength) == 2) {
-//                                2
-//                            }else {
-//                                1
-//                            }
-//                        }
-//                    })
-//                    resultGridAdapter.setResults(newRes)
-//                }
-//
-//            }
-//        })
+        resultViewModel.results.observe(viewLifecycleOwner, Observer {res->
+            res?.let {newRes->
+                if(newRes.isNotEmpty()){
+                    val rowLength = newRes.first().row.size
+
+                    viewManager.spanCount = rowLength + 2
+                    viewManager.spanSizeLookup = (object : GridLayoutManager.SpanSizeLookup(){
+                        override fun getSpanSize(position: Int): Int {
+                            return if (position.rem(rowLength) == 0 || position.rem(rowLength) == 2) {
+                                2
+                            }else {
+                                1
+                            }
+                        }
+                    })
+                    resultGridAdapter.setResults(newRes)
+                }
+
+            }
+        })
 
 
 
@@ -239,11 +228,6 @@ class ResultFragment : Fragment() {
     }
 
     fun takeScreenShot(view: View){
-        var toggleButtonVisibility = false
-        if (insertResultsButton.visibility == View.VISIBLE) {
-            insertResultsButton.visibility = View.GONE
-            toggleButtonVisibility = true
-        }
 
         try {
 
@@ -306,9 +290,7 @@ class ResultFragment : Fragment() {
 
         }
         finally {
-            if(toggleButtonVisibility){
-                insertResultsButton.visibility = View.VISIBLE
-            }
+
         }
     }
 

@@ -6,10 +6,7 @@ import androidx.lifecycle.Transformations
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.data.IResult
 import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
-import com.android.jared.linden.timingtrials.data.roomrepo.IGlobalResultRepository
-import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
-import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.*
 import com.android.jared.linden.timingtrials.ui.IGenericListItem
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 
@@ -38,10 +35,10 @@ data class SimpleListItem(val item1: String = "", val item2: String = "", val it
         get() = item3
 }
 
-class ResultDataSource(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository, private val courseRepository: ICourseRepository, private val globalResultRepository: IGlobalResultRepository){
+class ResultDataSource(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository, private val courseRepository: ICourseRepository, private val timeTrialRiderRepository: TimeTrialRiderRepository){
 
-    private val riderResultFact = RiderResultDataFactory(riderRepository, globalResultRepository)
-    private val courseResultfact = CourseResultDataFactory(courseRepository, globalResultRepository)
+    private val riderResultFact = RiderResultDataFactory(riderRepository, timeTrialRiderRepository)
+    private val courseResultfact = CourseResultDataFactory(courseRepository, timeTrialRiderRepository)
 
     private val factList: List<IResultDataFactory> = listOf(riderResultFact, courseResultfact)
 
@@ -68,7 +65,7 @@ class ResultDataSource(private val timeTrialRepository: ITimeTrialRepository, pr
 
 }
 
-class RiderResultDataFactory(private val riderRepository: IRiderRepository, private val globalResultRepository: IGlobalResultRepository): IResultDataFactory{
+class RiderResultDataFactory(private val riderRepository: IRiderRepository, private val timeTrialRiderRepository: TimeTrialRiderRepository): IResultDataFactory{
 
     override fun isValidForData(itemType: String): Boolean {
         return itemType == Rider::class.java.simpleName
@@ -86,7 +83,7 @@ class RiderResultDataFactory(private val riderRepository: IRiderRepository, priv
     }
 
     override fun getResultList(itemId: Long): LiveData<List<IGenericListItem>> {
-        return Transformations.map(globalResultRepository.getRiderResults(itemId)){res->
+        return Transformations.map(timeTrialRiderRepository.getRiderResults(itemId)){res->
             res?.let{ list ->
                 list.map { listItemForRiderResult(it) }
             }
@@ -101,7 +98,7 @@ class RiderResultDataFactory(private val riderRepository: IRiderRepository, priv
     }
 }
 
-class CourseResultDataFactory(private val courseRepository: ICourseRepository, private val globalResultRepository: IGlobalResultRepository): IResultDataFactory{
+class CourseResultDataFactory(private val courseRepository: ICourseRepository, private val timeTrialRiderRepository: TimeTrialRiderRepository): IResultDataFactory{
 
     override fun isValidForData(itemType: String): Boolean {
         return itemType == Course::class.java.simpleName
@@ -122,7 +119,7 @@ class CourseResultDataFactory(private val courseRepository: ICourseRepository, p
     }
 
     override fun getResultList(itemId: Long): LiveData<List<IGenericListItem>> {
-        return Transformations.map(globalResultRepository.getCourseResults(itemId)){res->
+        return Transformations.map(timeTrialRiderRepository.getCourseReults(itemId)){res->
             res?.let{ list ->
                 list.map { listItemForCourseResult(it) }
             }

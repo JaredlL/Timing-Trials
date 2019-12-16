@@ -3,8 +3,8 @@ package com.android.jared.linden.timingtrials.data.source
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
-import com.android.jared.linden.timingtrials.data.GlobalResult
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
+import com.android.jared.linden.timingtrials.data.TimeTrialRiderResult
 
 
 @Dao
@@ -25,7 +25,15 @@ interface TimeTrialRiderDao {
     @Delete
     fun delete(timeTrialRider: TimeTrialRider)
 
-   @Transaction @Query("SELECT * FROM timetrial_rider_table WHERE timeTrialId = :timeTrialId ORDER BY `index`")
+    @Transaction @Query("SELECT * FROM timetrial_rider_table WHERE timeTrialId = :timeTrialId ORDER BY `index`")
     fun getTimeTrialRiders(timeTrialId: Long): LiveData<List<FilledTimeTrialRider>>
+
+    @Transaction @Query ("SELECT * FROM timetrial_rider_table WHERE timeTrialId = :riderId ORDER BY `finishTime`")
+    fun getRiderResults(riderId: Long): LiveData<List<TimeTrialRiderResult>>
+
+    @Transaction @Query ("SELECT * FROM timetrial_rider_table WHERE courseId = :courseId ORDER BY `finishTime`")
+    fun getCourseResults(courseId: Long): LiveData<List<TimeTrialRiderResult>>
+
+
 
 }

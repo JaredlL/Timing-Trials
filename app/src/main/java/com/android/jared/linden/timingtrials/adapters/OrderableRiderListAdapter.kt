@@ -6,9 +6,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
-import com.android.jared.linden.timingtrials.data.Rider
-import com.android.jared.linden.timingtrials.data.TimeTrialRider
+import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.ListItemOrderableRiderBinding
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange
@@ -33,6 +31,7 @@ class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<Orderab
         fun bind(rd:FilledTimeTrialRider, position: Int){
             binding.apply {
                 rider = rd
+                startTime = mTimeTrialHeader.firstRiderStartOffset + mTimeTrialHeader.interval * rd.timeTrialData.index
                 //pos = position + 1
             }
         }
@@ -40,10 +39,12 @@ class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<Orderab
 
     private val layoutInflater = LayoutInflater.from(context)
     private var mRiders: List<FilledTimeTrialRider> = listOf()
+    private var mTimeTrialHeader: TimeTrialHeader = TimeTrialHeader.createBlank()
     var onMove: (from:Int, to:Int) -> Unit = {_,_ -> Unit}
 
-    fun setRiders(newRiders: List<FilledTimeTrialRider>){
-        mRiders = newRiders
+    fun setData(newData: TimeTrial){
+        mRiders = newData.riderList
+        mTimeTrialHeader = newData.timeTrialHeader
         notifyDataSetChanged()
     }
 

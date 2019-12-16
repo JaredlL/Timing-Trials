@@ -9,12 +9,12 @@ import com.android.jared.linden.timingtrials.ui.IGenericListItem
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import javax.inject.Inject
 
-class GlobalResultViewModel @Inject constructor(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository,private val courseRepository: ICourseRepository, private val globalResultRepository: IGlobalResultRepository) : ViewModel() {
+class GlobalResultViewModel @Inject constructor(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository,private val courseRepository: ICourseRepository, private val timeTrialRiderRepository: TimeTrialRiderRepository) : ViewModel() {
 
 
 
     private val typeIdLiveData:MutableLiveData<Pair<String, Long>>  = MutableLiveData()
-    private val dataSource = ResultDataSource(timeTrialRepository, riderRepository, courseRepository, globalResultRepository)
+    private val dataSource = ResultDataSource(timeTrialRepository, riderRepository, courseRepository, timeTrialRiderRepository)
 
 
     fun getResutData(itemType: String, id: Long): LiveData<GlobalResultData>{

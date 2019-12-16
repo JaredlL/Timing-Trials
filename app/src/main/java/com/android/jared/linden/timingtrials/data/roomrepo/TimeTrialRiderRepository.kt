@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
+import com.android.jared.linden.timingtrials.data.TimeTrialRiderResult
 import com.android.jared.linden.timingtrials.data.source.TimeTrialRiderDao
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,6 +24,14 @@ class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao
 
     fun delete(timeTrialRider: TimeTrialRider) {
         timeTrialRiderDao.delete(timeTrialRider)
+    }
+
+    fun getRiderResults(riderId: Long): LiveData<List<TimeTrialRiderResult>>{
+        return timeTrialRiderDao.getRiderResults(riderId)
+    }
+
+    fun getCourseReults(courseId: Long): LiveData<List<TimeTrialRiderResult>>{
+        return timeTrialRiderDao.getCourseResults(courseId)
     }
 
     fun getRidersForTimeTrial(ttHeader: TimeTrialHeader): LiveData<List<FilledTimeTrialRider>>{

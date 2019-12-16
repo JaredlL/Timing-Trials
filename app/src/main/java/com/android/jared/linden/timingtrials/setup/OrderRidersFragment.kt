@@ -34,8 +34,8 @@ class OrderRidersFragment : Fragment() {
         
         mAdapter = OrderableRiderListAdapter(requireContext()).apply { onMove = {x,y -> viewModel.moveItem(x, y)} }
 
-        viewModel.getOrderableRiders().observe(viewLifecycleOwner, Observer { riders ->
-            riders?.let {mAdapter.setRiders(it)}
+        viewModel.getOrderableRiderData().observe(viewLifecycleOwner, Observer { ttData ->
+            ttData?.let {mAdapter.setData(ttData )}
         })
 
         return inflater.inflate(R.layout.fragment_order_riders, container, false)

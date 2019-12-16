@@ -23,8 +23,15 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     private val liveMilisSinceStart: MutableLiveData<Long> = MutableLiveData()
 
     val timeLine: MediatorLiveData<TimeLine> = MediatorLiveData()
+    var prevMilis = 0L
+    var prevString = ""
     val timeString: LiveData<String> = Transformations.map(liveMilisSinceStart){
-        ConverterUtils.toTenthsDisplayString(it)
+        if(((it % 1000) / 100) != prevMilis){
+            prevMilis = it
+            prevString = ConverterUtils.toTenthsDisplayString(it)
+        }
+        prevString
+
     }
     val statusString: MutableLiveData<String> = MutableLiveData()
     val messageData: MutableLiveData<Event<String>> = MutableLiveData()
@@ -137,8 +144,8 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
             val endtime = System.currentTimeMillis() - startts
             looptime += endtime
-            if(iters++ == 10000){
-                println("JAREDMSG -> TIMINGVM -> Time for 10000 loops =  $looptime")
+            if(iters++ == 100){
+                println("JAREDMSG -> TIMINGVM -> Time for 100 loops =  $looptime")
                 looptime = 0
                 iters = 0
             }

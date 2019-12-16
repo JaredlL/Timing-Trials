@@ -22,11 +22,58 @@ data class TimeTrialRider(val riderId: Long,
                           val gender: Gender = Gender.UNKNOWN,
                           val club: String = "",
                           val notes: String = "",
+                          val resultNote: String? = null,
                           @PrimaryKey(autoGenerate = true) val id: Long? = null){
 
 }
 
-data class RiderInfo(val firstName: String, val lastName: String, val gender: Gender)
+
+
+data class TimeTrialRiderResult(
+        @Embedded val timeTrialData: TimeTrialRider,
+
+        @Relation(parentColumn = "riderId", entityColumn = "id", entity = Rider::class)
+        val riderData: Rider,
+
+        @Relation(parentColumn = "timeTrialId", entityColumn = "id", entity = TimeTrialHeader::class)
+        val timeTrialHeader: TimeTrialHeader,
+
+        @Relation(parentColumn = "courseId", entityColumn = "id", entity = Course::class)
+        val resCourse: Course?):IResult {
+
+    override val rider: Rider
+        get() = riderData
+
+    override val category: String
+        get() = timeTrialData.category?:""
+
+    override val course: Course
+        get() = resCourse?:Course.createBlank()
+
+    override val dateSet: OffsetDateTime?
+        get() = timeTrialHeader.startTime
+
+    override val gender: Gender
+        get() = timeTrialData.gender
+
+    override val laps: Int
+        get() = timeTrialHeader.laps
+
+    override val notes: String
+        get() = timeTrialData.notes
+
+    override val resultTime: Long
+        get() = timeTrialData.finishTime?:Long.MAX_VALUE
+
+    override val splits: List<Long>
+        get() = if( timeTrialData.splits.isNotEmpty()) listOf(timeTrialData.splits.first()) + timeTrialData.splits.zipWithNext{a,b -> b-a} else listOf()
+
+    override val riderClub: String
+        get() = timeTrialData.club
+
+    override val timeTrial: TimeTrialHeader?
+        get() = timeTrialHeader
+}
 
 data class FilledTimeTrialRider(
         @Embedded val timeTrialData: TimeTrialRider,
@@ -36,6 +83,10 @@ data class FilledTimeTrialRider(
 ){
     fun updateTimeTrialData(newTimeTrialData: TimeTrialRider): FilledTimeTrialRider{
         return this.copy(timeTrialData = newTimeTrialData)
+    }
+
+    fun addSplit(split: Long): FilledTimeTrialRider{
+        return this.copy(timeTrialData = this.timeTrialData.copy(splits = this.timeTrialData.splits + split))
     }
 
 

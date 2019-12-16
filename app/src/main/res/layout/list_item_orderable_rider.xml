@@ -8,6 +8,10 @@
         <variable
             name="rider"
             type="com.android.jared.linden.timingtrials.data.FilledTimeTrialRider"/>
+        
+        <variable
+            name="startTime"
+            type="java.lang.Integer" />
 
     </data>
 
@@ -41,7 +45,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
             android:layout_toLeftOf="@id/view"
-            android:text="@{'+' + Integer.toString(rider.timeTrialData.startTimeOffset)}"
+            android:text="@{'+' + Integer.toString(startTime)}"
             app:layout_constraintBottom_toTopOf="@+id/divider4"
             app:layout_constraintEnd_toStartOf="@+id/view"
             app:layout_constraintTop_toTopOf="parent"

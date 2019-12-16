@@ -86,20 +86,15 @@ class SetupViewModel @Inject constructor(
                     mutList.removeAt(fromPosition)
                 }
                 val updateList = mutList.mapIndexed { i,r-> r.copy(timeTrialData = r.timeTrialData.copy(index = i)) }
-//                val changedList = updateList.asSequence().zip(currentTimeTrial.riderList.asSequence()){a,b ->
-//                    if(a.timeTrialData.id != b.timeTrialData.id) {
-//                        return@zip a
-//                    }else{
-//                        return@zip null
-//                    }
-//                }.mapNotNull { it }.toList()
-
                 updateTimeTrial(currentTimeTrial.updateRiderList(updateList))
             }
 
 
         }
-        override fun getOrderableRiders(): LiveData<List<FilledTimeTrialRider>> = Transformations.map(_mTimeTrial){it?.riderList}
+
+        override fun getOrderableRiderData(): LiveData<TimeTrial?> {
+           return _mTimeTrial
+        }
     }
 
     override val selectCourseViewModel: ISelectCourseViewModel = ISelectCourseViewModel.SelectCourseViewModelImpl(this)
@@ -107,44 +102,6 @@ class SetupViewModel @Inject constructor(
     override val timeTrialPropertiesViewModel: ITimeTrialPropertiesViewModel = TimeTrialPropertiesViewModelImpl(this)
     override val setupConformationViewModel: ISetupConformationViewModel = SetupConfirmationViewModel(this)
 
-
-
-
-    init {
-
-        /**
-         * Need to remember which ids were selected when a rider is added/removed
-         * Also need to update selected riders if they are modfied in the DB
-         */
-//        _mTimeTrial.addSource(riderRepository.allRidersLight) { result: List<Rider>? ->
-//            result?.let {newRiders->
-//                _mTimeTrial.value?.let { ttdef->
-//                    val currentSelected = ttdef.riderList.map { r -> r.riderData }
-//                    if(currentSelected.count() > 0){
-//
-//                        val oldSelected: LinkedHashMap<Long, Rider> =  LinkedHashMap(currentSelected.associateBy { r -> r.id ?: 0 })
-//                        val retainedIds: MutableSet<Long> = mutableSetOf()
-//                        newRiders.forEach{rider ->
-//                            rider.id?.let {id ->
-//                                if (oldSelected.containsKey(id)) {
-//                                    //Update selected rider details
-//                                    oldSelected[id] = rider
-//                                    retainedIds.add(id)
-//                                }
-//                            }
-//                        }
-//                        //Only keep riders which are still in the DB
-//                        val newList = oldSelected.filter { i -> (retainedIds.contains(i.key))}.values.toList()
-//                        ttdef.let {
-//                           // it.riderList = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id, index+1,(60 + index * it.timeTrialHeader.interval).toLong()) }
-//                            val ml = newList.mapIndexed { index, r-> TimeTrialRider(r, it.timeTrialHeader.id?:0L, index = index, number = index + 1) }
-//                            updateTimeTrial(it.copy(riderList = ml))
-//                        }
-//                    }
-//                }
-//            }
-//        }
-    }
 
     @ExperimentalCoroutinesApi
     override fun onCleared() {

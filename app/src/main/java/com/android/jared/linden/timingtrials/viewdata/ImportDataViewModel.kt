@@ -2,10 +2,7 @@ package com.android.jared.linden.timingtrials.viewdata
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
-import com.android.jared.linden.timingtrials.data.roomrepo.IGlobalResultRepository
-import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
-import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.BufferedReader
@@ -16,7 +13,7 @@ import javax.inject.Inject
 class ImportViewModel @Inject constructor(private val riderRespository: IRiderRepository,
                                           private val courseRepository: ICourseRepository,
                                           private val timeTrialRepository: ITimeTrialRepository,
-                                          private val  resultRepository: IGlobalResultRepository): ViewModel() {
+                                          private val  resultRepository: TimeTrialRiderRepository): ViewModel() {
 
 
 

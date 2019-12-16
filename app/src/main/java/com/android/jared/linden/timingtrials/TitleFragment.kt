@@ -70,11 +70,11 @@ class TitleFragment : Fragment()
 //            }
 //
 //
-//            testTimingButton.setOnClickListener {
-//                titleViewModel.nonFinishedTimeTrial.value?.let {
-//                    testViewModel.testTiming(it)
-//                }
-//            }
+            testTimingButton.setOnClickListener {
+                titleViewModel.nonFinishedTimeTrial.value?.let {
+                    testViewModel.testTiming(it)
+                }
+            }
 //
 //            testResults1.setOnClickListener {
 //                testViewModel.insertFinishedTt2()
@@ -86,15 +86,15 @@ class TitleFragment : Fragment()
 //                })
 //            }
 //
-//            testResult2.setOnClickListener {
-//                testViewModel.insertFinishedTt()
-//                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
-//                    it?.let {id->
-//                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
-//                        findNavController().navigate(action)
-//                    }
-//                })
-//            }
+            testResult2.setOnClickListener {
+                testViewModel.insertFinishedTt()
+                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
+                    it?.let {id->
+                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
+                        findNavController().navigate(action)
+                    }
+                })
+            }
 //
 //            button2.setOnClickListener {
 //                testViewModel.insertFinishedTt3()

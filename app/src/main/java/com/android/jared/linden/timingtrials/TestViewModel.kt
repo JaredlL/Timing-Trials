@@ -57,27 +57,27 @@ class TestViewModel@Inject constructor(
 //            }
 //    }
 
-//    fun testTiming(timeTrial: TimeTrial){
-//        if(!inserting.get()  && timeTrial.timeTrialHeader.ttName != "Test Timing TimeTrial"){
-//            inserting.set(true)
-//            viewModelScope.launch(Dispatchers.IO) {
-//                val rList = riderRepository.allRidersLightSuspend().take(3)
-//                val courses = courseRepository.getAllCoursesSuspend()
-//                val cop1 = timeTrial.copy(timeTrialHeader = timeTrial.timeTrialHeader
-//                        .copy(ttName = "Test Timing TimeTrial",
-//                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(5), ZoneId.systemDefault()),
-//                                firstRiderStartOffset = 0,
-//                                interval = 2,
-//                                course = courses[3],
-//                                laps = 2,
-//                                status = TimeTrialStatus.IN_PROGRESS))
-//                val newTt = cop1.helper.addRidersAsTimeTrialRiders(rList)
-//                timeTrialRepository.update(newTt)
-//                inserting.set(false)
-//                insertedTest.postValue(true)
-//            }
-//        }
-//    }
+    fun testTiming(timeTrial: TimeTrial){
+        if(!inserting.get()  && timeTrial.timeTrialHeader.ttName != "Test Timing TimeTrial"){
+            inserting.set(true)
+            viewModelScope.launch(Dispatchers.IO) {
+                val rList = riderRepository.allRidersLightSuspend().take(6)
+                val courses = courseRepository.getAllCoursesSuspend()
+                val cop1 = timeTrial.copy(timeTrialHeader = timeTrial.timeTrialHeader
+                        .copy(ttName = "Test Timing TimeTrial",
+                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(5), ZoneId.systemDefault()),
+                                firstRiderStartOffset = 0,
+                                interval = 2,
+                                courseId = courses[3].id,
+                                laps = 2,
+                                status = TimeTrialStatus.IN_PROGRESS))
+                val newTt = cop1.addRiders(rList)
+                timeTrialRepository.updateFull(newTt)
+                inserting.set(false)
+                insertedTest.postValue(true)
+            }
+        }
+    }
 
 
 
@@ -85,37 +85,54 @@ class TestViewModel@Inject constructor(
 
 
 
-//    fun insertFinishedTt(){
-//
-//        viewModelScope.launch(Dispatchers.IO) {
-//
-//            val exist = timeTrialRepository.getTimeTrialByName("Test Result TT 2")
-//            if(exist == null){
-//
-//                val rList = riderRepository.allRidersLightSuspend()
-//                val courses = courseRepository.getAllCoursesSuspend()
-//
-//                val _mTimeTrial =TimeTrial.createBlank().copy(timeTrialHeader = TimeTrialHeader.createBlank()
-//                        .copy(ttName = "Test Result TT 2",
-//                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
-//                                firstRiderStartOffset = 0,
-//                                interval = 2,
-//                                course = courses[2],
-//                                laps = 4,
-//                                status = TimeTrialStatus.FINISHED))
-//
-//
-//                val newTt = _mTimeTrial.helper.addRidersAsTimeTrialRiders(rList)
-//                val withEvents = addFakeEvents(newTt)
-//               val id = timeTrialRepository.insert(withEvents)
-//                testInsertedEvent.postValue(Event(id))
-//            }else{
-//                testInsertedEvent.postValue(Event(exist.timeTrialHeader.id))
-//            }
-//
-//
-//        }
-//    }
+    fun insertFinishedTt(){
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val exist = timeTrialRepository.getTimeTrialByName("Test Result TT 2")
+            if(exist == null){
+
+                val rList = riderRepository.allRidersLightSuspend()
+                val courses = courseRepository.getAllCoursesSuspend()
+
+                val _mTimeTrial =TimeTrial.createBlank().copy(timeTrialHeader = TimeTrialHeader.createBlank()
+                        .copy(ttName = "Test Result TT 2",
+                                startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
+                                firstRiderStartOffset = 0,
+                                interval = 2,
+                                courseId = courses[2].id,
+                                laps = 4,
+                                status = TimeTrialStatus.FINISHED))
+
+
+                val rListWithIds = _mTimeTrial.addRiders(rList).riderList.mapIndexed { index, filledTimeTrialRider -> filledTimeTrialRider.copy(timeTrialData = filledTimeTrialRider.timeTrialData.copy(id = index.toLong())) }
+
+                val copy = _mTimeTrial.copy(riderList = rListWithIds)
+                var current = copy
+                for(rider in copy.riderList){
+                    val startTime = copy.helper.getRiderStartTime(rider.timeTrialData)
+                    for(i in (1..copy.timeTrialHeader.laps)){
+                        val timeStamp = startTime + i * 2000L + rider.timeTrialData.index * 200L
+                        current = current.updateHeader(current.timeTrialHeader.copy(timeStamps = listOf(timeStamp)))
+                        current = current.helper.assignRiderToEvent(rider.timeTrialData, current.timeTrialHeader.timeStamps.last()).tt
+                    }
+                }
+
+                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = null)) }
+
+               val id = timeTrialRepository.insert(current.copy(riderList = rListWithoutIds))
+                testInsertedEvent.postValue(Event(id))
+            }else{
+                testInsertedEvent.postValue(Event(exist.timeTrialHeader.id))
+            }
+
+
+        }
+    }
+
+    fun updateHeader(timeTrial: TimeTrial, newHeader: TimeTrialHeader):TimeTrial{
+        return timeTrial.copy(timeTrialHeader = newHeader)
+    }
 
 //    fun insertFinishedTt3(){
 //
@@ -150,7 +167,7 @@ class TestViewModel@Inject constructor(
 //    }
 
 
-//    val testInsertedEvent: MutableLiveData<Event<Long?>> = MutableLiveData()
+    val testInsertedEvent: MutableLiveData<Event<Long?>> = MutableLiveData()
 //    fun insertFinishedTt2(){
 //        viewModelScope.launch(Dispatchers.IO) {
 //

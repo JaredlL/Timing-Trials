@@ -10,32 +10,31 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.Exception
 
-class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val riderRepository: IRiderRepository, val courseRepository: ICourseRepository, val resultRepository: IGlobalResultRepository) : ViewModel() {
+class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val riderRepository: IRiderRepository, val courseRepository: ICourseRepository, val resultRepository: TimeTrialRiderRepository) : ViewModel() {
 
 
 
     val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
 
 
-//    val results = Transformations.map(timeTrial){tt->
-//        if(tt != null && tt.timeTrialHeader.status == TimeTrialStatus.FINISHED) {
-//
-////            val checker = RecordChecker(tt, riderRepository, courseRepository)
-////            viewModelScope.launch(Dispatchers.IO) {
-////                checker.checkRecords()
-////               checker.courseToUpdate?.let {  courseRepository.update(it)}
-////                riderRepository.updateRiders(checker.ridersToUpdate)
-////            }
-//            (sequenceOf(getHeading(tt)) + tt.helper.results3.asSequence().sortedBy { it.resultTime }.map { res-> ResultRowViewModel(res) }).toList()
-//        }else{
-//            null
-//        }
-//
-//    }
+    val results = Transformations.map(timeTrial){tt->
+        if(tt != null && tt.timeTrialHeader.status == TimeTrialStatus.FINISHED) {
 
-    val resultsAreInserted: LiveData<Boolean> = Transformations.switchMap(timeTrial) {
-        resultRepository.timeTrialHasResults(it.timeTrialHeader.id?:0)
+//            val checker = RecordChecker(tt, riderRepository, courseRepository)
+//            viewModelScope.launch(Dispatchers.IO) {
+//                checker.checkRecords()
+//               checker.courseToUpdate?.let {  courseRepository.update(it)}
+//                riderRepository.updateRiders(checker.ridersToUpdate)
+//            }
+
+            (sequenceOf(getHeading(tt)) + tt.helper.results.asSequence().sortedBy { it.resultTime }.map { res-> ResultRowViewModel(res) }).toList()
+        }else{
+            null
+        }
+
     }
+
+
 
 
 
@@ -80,19 +79,19 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
 //
 //    }
 
-//    fun getHeading(tt: TimeTrial): ResultRowViewModel{
-//        val mutList: MutableList<String> = mutableListOf()
-//
-//        mutList.add("Rider")
-//        mutList.add("Category")
-//        mutList.add("Club")
-//        mutList.add("Total Time")
-//        tt.helper.results3.firstOrNull()?.let {
-//            if(it.splits.size > 1) it.splits.forEachIndexed{ index, _ -> if(index - 1 <it.splits.size) mutList.add("Split ${index + 1}") }
-//        }
-//        mutList.add("Notes")
-//        return ResultRowViewModel(mutList)
-//    }
+    fun getHeading(tt: TimeTrial): ResultRowViewModel{
+        val mutList: MutableList<String> = mutableListOf()
+
+        mutList.add("Rider")
+        mutList.add("Category")
+        mutList.add("Club")
+        mutList.add("Total Time")
+        tt.helper.results.firstOrNull()?.let {
+            if(it.splits.size > 1) it.splits.forEachIndexed{ index, _ -> if(index - 1 <it.splits.size) mutList.add("Split ${index + 1}") }
+        }
+        mutList.add("Notes")
+        return ResultRowViewModel(mutList)
+    }
 
 }
 
