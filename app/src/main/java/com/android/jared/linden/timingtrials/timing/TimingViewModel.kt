@@ -43,7 +43,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
 
     init {
-        timeTrial.addSource(timeTrialRepository.nonFinishedFullTimeTrial) {new ->
+        timeTrial.addSource(timeTrialRepository.getTimingTimeTrial()) {new ->
             if(new != null && !isCorotineAlive.get() && !new.equalsOtherExcludingIds(timeTrial.value)) {
                 println("JAREDMSG -> TIMINGVM -> TimingTt self updating TT, ${new.timeTrialHeader.timeStamps} unassigned")
                 timeTrial.value = new

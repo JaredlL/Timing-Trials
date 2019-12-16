@@ -57,13 +57,13 @@ class TestViewModel@Inject constructor(
 //            }
 //    }
 
-    fun testTiming(timeTrial: TimeTrial){
-        if(!inserting.get()  && timeTrial.timeTrialHeader.ttName != "Test Timing TimeTrial"){
+    fun testTiming(timeTrialHeader: TimeTrialHeader){
+        if(!inserting.get()  && timeTrialHeader.ttName != "Test Timing TimeTrial"){
             inserting.set(true)
             viewModelScope.launch(Dispatchers.IO) {
                 val rList = riderRepository.allRidersLightSuspend().take(6)
                 val courses = courseRepository.getAllCoursesSuspend()
-                val cop1 = timeTrial.copy(timeTrialHeader = timeTrial.timeTrialHeader
+                val cop1 = TimeTrial.createBlank().copy(timeTrialHeader = timeTrialHeader
                         .copy(ttName = "Test Timing TimeTrial",
                                 startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(5), ZoneId.systemDefault()),
                                 firstRiderStartOffset = 0,

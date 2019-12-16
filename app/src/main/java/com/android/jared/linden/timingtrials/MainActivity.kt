@@ -4,11 +4,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.android.jared.linden.timingtrials.timetrialresults.ResultFragment
+import com.android.jared.linden.timingtrials.timing.TimingActivity
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -22,8 +26,7 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onSupportNavigateUp(): Boolean {
-        return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
+        return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -36,6 +39,16 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController, appBarConfiguration)
+
+        val vm = getViewModel { injector.mainViewModel()}
+        vm.timingTimeTrial.observe(this, Observer {
+            it?.let {
+                val intent = Intent(this, TimingActivity::class.java)
+                startActivity(intent)
+            }
+
+        })
+
     }
 
 

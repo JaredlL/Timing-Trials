@@ -53,7 +53,6 @@ class TimingService : Service(){
                 prevSecs = secsLong
             }
             timerTick.postValue(millisSinceStart)
-            println("JAREDMSG -> TIMINGSERVICE update string")
         }
     }
 
@@ -76,6 +75,7 @@ class TimingService : Service(){
         System.out.println("JAREDMSG -> Timing Service -> Trying to end service")
         timerTask?.cancel()
         timer.cancel()
+        timerTask = null
         notificationManager.cancel(NOTIFICATION_ID)
         stopForeground(true)
         stopSelf()
@@ -104,6 +104,7 @@ class TimingService : Service(){
     override fun onDestroy() {
         super.onDestroy()
         timerTask?.cancel()
+        timerTask = null
         timer.cancel()
     }
 

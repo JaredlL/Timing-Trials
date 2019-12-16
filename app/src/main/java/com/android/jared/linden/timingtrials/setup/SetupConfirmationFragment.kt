@@ -63,43 +63,43 @@ class SetupConfirmationFragment : DialogFragment() {
     }
 }
 
-class UseOldConfirmationFragment : DialogFragment() {
-
-    //private lateinit var confirmationViewModel: ISetupConformationViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-
-       val confirmationViewModel = requireActivity().getViewModel { injector.mainViewModel() }.resumeOldViewModel
-
-        confirmationViewModel.title.observe(viewLifecycleOwner, Observer { dialog?.setTitle(it) })
-
-        val binding = DataBindingUtil.inflate<FragmentSetupConfirmationBinding>(inflater, R.layout.fragment_setup_confirmation, container, false).apply{
-            lifecycleOwner = (this@UseOldConfirmationFragment)
-            viewModel = confirmationViewModel
-            cancelButton.setOnClickListener {
-                confirmationViewModel.negativeFunction()
-                val intent = Intent(requireActivity(), MainActivity::class.java)
-                startActivity(intent)
-                this@UseOldConfirmationFragment.dismiss()
-            }
-
-            okButton.setOnClickListener{
-                val intent = Intent(requireActivity(), MainActivity::class.java)
-                intent.putExtra(ITEM_ID_EXTRA, confirmationViewModel.timeTrialDefinition.value?.id)
-                startActivity(intent)
-                this@UseOldConfirmationFragment.dismiss()
-            }
-
-
-        }
-
-        return binding.root
-    }
-}
+//class UseOldConfirmationFragment : DialogFragment() {
+//
+//    //private lateinit var confirmationViewModel: ISetupConformationViewModel
+//
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog)
+//    }
+//
+//    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+//                              savedInstanceState: Bundle?): View? {
+//        // Inflate the layout for this fragment
+//
+//       val confirmationViewModel = requireActivity().getViewModel { injector.mainViewModel() }.resumeOldViewModel
+//
+//        confirmationViewModel.title.observe(viewLifecycleOwner, Observer { dialog?.setTitle(it) })
+//
+//        val binding = DataBindingUtil.inflate<FragmentSetupConfirmationBinding>(inflater, R.layout.fragment_setup_confirmation, container, false).apply{
+//            lifecycleOwner = (this@UseOldConfirmationFragment)
+//            viewModel = confirmationViewModel
+//            cancelButton.setOnClickListener {
+//                confirmationViewModel.negativeFunction()
+//                val intent = Intent(requireActivity(), MainActivity::class.java)
+//                startActivity(intent)
+//                this@UseOldConfirmationFragment.dismiss()
+//            }
+//
+//            okButton.setOnClickListener{
+//                val intent = Intent(requireActivity(), MainActivity::class.java)
+//                intent.putExtra(ITEM_ID_EXTRA, confirmationViewModel.timeTrialDefinition.value?.id)
+//                startActivity(intent)
+//                this@UseOldConfirmationFragment.dismiss()
+//            }
+//
+//
+//        }
+//
+//        return binding.root
+//    }
+//}

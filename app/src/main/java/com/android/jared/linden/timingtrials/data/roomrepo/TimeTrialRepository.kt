@@ -2,31 +2,33 @@ package com.android.jared.linden.timingtrials.data.roomrepo
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
-import com.android.jared.linden.timingtrials.data.TimeTrialWithCourse
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
-import kotlinx.coroutines.*
-import java.sql.Time
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 
 interface ITimeTrialRepository{
 
     suspend fun insert(timeTrial: TimeTrial):Long
+
+    suspend fun insertNewHeader(timeTrialHeader: TimeTrialHeader):Long
+
     suspend fun update(timeTrialHeader: TimeTrialHeader)
     suspend fun updateFull(timeTrial: TimeTrial)
     suspend fun getTimeTrialByName(name: String): TimeTrial?
     suspend fun delete(timeTrial: TimeTrial)
+
+    suspend fun deleteHeader(timeTrialHeader: TimeTrialHeader)
     //val nonFinishedTimeTrial: LiveData<TimeTrialWithCourse?>
-    val nonFinishedFullTimeTrial: LiveData<TimeTrial?>
+    fun getSetupTimeTrialById(timeTrialId: Long): LiveData<TimeTrial?>
+
+    fun getTimingTimeTrial():LiveData<TimeTrial?>
+
     fun getLiveTimeTrialByName(name:String): LiveData<TimeTrial>
-    fun getTimeTrialById(id: Long): LiveData<TimeTrial>
+    fun getResultTimeTrialById(id: Long): LiveData<TimeTrial?>
     val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>>
 }
 
@@ -65,37 +67,44 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
        return timeTrialDao.insertFull(timeTrial)
     }
 
-
-    private val inserting: MutableLiveData<Boolean> = MutableLiveData(false)
-
-
-
-    private val nonFinishedMediator = MediatorLiveData<TimeTrial>()
-
-    private val insertingBool = AtomicBoolean()
-    init {
-        nonFinishedMediator.addSource(timeTrialDao.getNonFinishedFullTtLive()){timeTrial->
-            println("JAREDMSG -> TTREPO -> Getting time trial ${timeTrial?.timeTrialHeader?.id} ${timeTrial?.timeTrialHeader?.ttName}")
-            if(timeTrial == null) {
-                if (!insertingBool.get()) {
-                    insertingBool.set(true)
-                    println("JAREDMSG -> TTREPO -> Set inserting to TRUE")
-                    CoroutineScope(Dispatchers.IO).launch {
-                        println("JAREDMSG -> TTREPO Corotine launched, going to insert")
-                        val id = timeTrialDao.insert(TimeTrialHeader.createBlank())
-                        println("JAREDMSG -> TTREPO TT Inserted ${id} -> Set inserting to FALSE")
-                        insertingBool.set(false)
-                    }
-                }
-            }
-            println("JAREDMSG -> TTREPO -> SET nonFinishedMediator to ${timeTrial?.timeTrialHeader?.id} ${timeTrial?.timeTrialHeader?.ttName}")
-            nonFinishedMediator.value = timeTrial
-        }
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun insertNewHeader(timeTrial: TimeTrialHeader):Long {
+        System.out.println("JAREDMSG -> TTREPO -> Inserting New TT Header into DB from background thread")
+        return timeTrialDao.insert(timeTrial)
     }
 
-    override val nonFinishedFullTimeTrial: LiveData<TimeTrial?> = Transformations.map(nonFinishedMediator){tt->
-        tt?.copy(riderList = tt.riderList.sortedBy { it.timeTrialData.index }) ?: tt
-    }
+
+//    private val inserting: MutableLiveData<Boolean> = MutableLiveData(false)
+//
+//
+//
+//    private val nonFinishedMediator = MediatorLiveData<TimeTrial>()
+//
+//    private val insertingBool = AtomicBoolean()
+//    init {
+//        nonFinishedMediator.addSource(timeTrialDao.getNonFinishedFullTtLive()){timeTrial->
+//            println("JAREDMSG -> TTREPO -> Getting time trial ${timeTrial?.timeTrialHeader?.id} ${timeTrial?.timeTrialHeader?.ttName}")
+//            if(timeTrial == null) {
+//                if (!insertingBool.get()) {
+//                    insertingBool.set(true)
+//                    println("JAREDMSG -> TTREPO -> Set inserting to TRUE")
+//                    CoroutineScope(Dispatchers.IO).launch {
+//                        println("JAREDMSG -> TTREPO Corotine launched, going to insert")
+//                        val id = timeTrialDao.insert(TimeTrialHeader.createBlank())
+//                        println("JAREDMSG -> TTREPO TT Inserted ${id} -> Set inserting to FALSE")
+//                        insertingBool.set(false)
+//                    }
+//                }
+//            }
+//            println("JAREDMSG -> TTREPO -> SET nonFinishedMediator to ${timeTrial?.timeTrialHeader?.id} ${timeTrial?.timeTrialHeader?.ttName}")
+//            nonFinishedMediator.value = timeTrial
+//        }
+//    }
+
+//    override val nonFinishedFullTimeTrial: LiveData<TimeTrial?> = Transformations.map(nonFinishedMediator){tt->
+//        tt?.copy(riderList = tt.riderList.sortedBy { it.timeTrialData.index }) ?: tt
+//    }
 
 
 
@@ -117,8 +126,21 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     }
 
 
-   override fun getTimeTrialById(id: Long) : LiveData<TimeTrial> {
-       return timeTrialDao.getTimeTrialById(id)
+   override fun getResultTimeTrialById(id: Long) : LiveData<TimeTrial?> {
+       return timeTrialDao.getResultTimeTrialById(id)
+    }
+
+    override fun getSetupTimeTrialById(timeTrialId: Long): LiveData<TimeTrial?>{
+        return timeTrialDao.getSetupTimeTrialById(timeTrialId)
+    }
+
+    override fun getTimingTimeTrial(): LiveData<TimeTrial?> {
+        return Transformations.map(timeTrialDao.getTimingTimeTrials()){
+            if(it.size > 1){
+                throw Exception("Multiple Timing TimeTrials In DB!!!")
+            }
+            it.firstOrNull()
+        }
     }
 
 
@@ -126,6 +148,12 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @WorkerThread
     override suspend fun delete(timeTrial: TimeTrial) {
         timeTrialDao.delete(timeTrial)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun deleteHeader(timeTrialHeader: TimeTrialHeader) {
+        timeTrialDao.delete(timeTrialHeader)
     }
 
 

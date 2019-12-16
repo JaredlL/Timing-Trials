@@ -71,6 +71,11 @@ class DataBaseViewPagerFragment: Fragment() {
                 startActivityForResult(intent, REQUEST_IMPORT_FILE)
                 true
             }
+            R.id.app_bar_test->{
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToTitleFragment()
+                findNavController().navigate(action)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

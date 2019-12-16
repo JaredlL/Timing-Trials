@@ -4,17 +4,24 @@ import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.*
 import com.android.jared.linden.timingtrials.util.ConverterUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import kotlin.Exception
 
 class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val riderRepository: IRiderRepository, val courseRepository: ICourseRepository, val resultRepository: TimeTrialRiderRepository) : ViewModel() {
 
 
+    private val idLiveData: MutableLiveData<Long?> = MutableLiveData()
 
-    val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
+    fun changeTimeTrial(newId: Long){
+        if(idLiveData.value != newId){
+            idLiveData.postValue(newId)
+        }
+    }
+
+    val timeTrial = Transformations.switchMap(idLiveData){
+        it?.let { id->
+            timeTrialRepository.getResultTimeTrialById(id)
+        }
+    }
 
 
     val results = Transformations.map(timeTrial){tt->
@@ -32,14 +39,8 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
 
     val resultSettings: MutableLiveData<ResultDisplaySettings> = MutableLiveData()
 
-    fun initialise(timeTrialId: Long){
-        if(timeTrial.value?.timeTrialHeader?.id != timeTrialId){
-            timeTrial.addSource(timeTrialRepository.getTimeTrialById(timeTrialId)){
-                timeTrial.value = it
-            }
-        }
 
-    }
+
 
 
     fun getHeading(tt: TimeTrial): ResultRowViewModel{

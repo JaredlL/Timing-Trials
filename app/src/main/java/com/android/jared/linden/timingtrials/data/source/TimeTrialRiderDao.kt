@@ -28,10 +28,10 @@ interface TimeTrialRiderDao {
     @Transaction @Query("SELECT * FROM timetrial_rider_table WHERE timeTrialId = :timeTrialId ORDER BY `index`")
     fun getTimeTrialRiders(timeTrialId: Long): LiveData<List<FilledTimeTrialRider>>
 
-    @Transaction @Query ("SELECT * FROM timetrial_rider_table WHERE riderId = :riderId ORDER BY `finishTime`")
+    @Transaction @Query ("SELECT * FROM timetrial_rider_table WHERE riderId = :riderId AND finishTime IS NOT NULL ORDER BY `finishTime`")
     fun getRiderResults(riderId: Long): LiveData<List<TimeTrialRiderResult>>
 
-    @Transaction @Query ("SELECT * FROM timetrial_rider_table WHERE courseId = :courseId ORDER BY `finishTime`")
+    @Transaction @Query ("SELECT * FROM timetrial_rider_table WHERE courseId = :courseId AND finishTime IS NOT NULL ORDER BY `finishTime`")
     fun getCourseResults(courseId: Long): LiveData<List<TimeTrialRiderResult>>
 
 

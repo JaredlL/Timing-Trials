@@ -92,6 +92,7 @@ class SetupTimeTrialFragment : Fragment() {
     }
 
     private fun showCourseFrag(){
+
         val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragmentToSelectCourseFragment()
         findNavController().navigate(action)
     }

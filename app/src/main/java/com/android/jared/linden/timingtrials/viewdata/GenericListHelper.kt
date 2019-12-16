@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.Navigation
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.*
@@ -13,6 +14,7 @@ import com.android.jared.linden.timingtrials.databinding.ListItemRiderBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemTimetrialBinding
 import com.android.jared.linden.timingtrials.ui.SelectableCourseViewModel
 import com.android.jared.linden.timingtrials.util.ConverterUtils
+import com.android.jared.linden.timingtrials.util.EventObserver
 
 
 class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, ListItemRiderBinding>(binding) {
@@ -152,11 +154,15 @@ data class TimeTrialListItem(val timeTrialHeader: TimeTrialHeader){
     }
 }
 
-class TimeTrialViewHolderFactory: GenericViewHolderFactory<TimeTrialHeader>() {
+class TimeTrialViewHolderFactory(val viewModel: ListViewModel, val lifeCyleOwner: LifecycleOwner): GenericViewHolderFactory<TimeTrialHeader>() {
     override fun performFabAction(fab: View) {
         fab.setOnClickListener {
-            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSetupViewPagerFragment(-1L)
-            Navigation.findNavController(fab).navigate(action)
+            viewModel.timeTrialInsertedEvent.observe(lifeCyleOwner, EventObserver{
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
+                Navigation.findNavController(fab).navigate(action)
+            })
+            viewModel.insertNewTimeTrial()
+
         }
     }
 

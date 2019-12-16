@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.adapters.CourseListAdapter
 import com.android.jared.linden.timingtrials.data.*
@@ -22,15 +23,24 @@ import com.android.jared.linden.timingtrials.util.*
 
 class SelectCourseFragment : Fragment() {
 
-
+    private lateinit var setupViewModel: SetupViewModel
     private lateinit var viewModel: ISelectCourseViewModel
     private lateinit var adapter: CourseListAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
 
+    private val args: SelectCourseFragmentArgs by navArgs()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        viewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectCourseViewModel
+        setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
+
+        if(args.timeTrialId != -1L){
+            setupViewModel.changeTimeTrial(args.timeTrialId)
+        }
+
+
+        viewModel = setupViewModel.selectCourseViewModel
         viewManager = LinearLayoutManager(context)
         adapter = CourseListAdapter(requireContext())
         adapter.editCourse = ::editCourse
@@ -38,8 +48,11 @@ class SelectCourseFragment : Fragment() {
             courses?.let{adapter.setCourses(it)}
         })
         adapter.courseSelected = { blobs ->
-            findNavController().popBackStack()
+
             viewModel.setSelectedCourse(blobs)
+            val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToSetupViewPagerFragment()
+            findNavController().navigate(action)
+
 
         }
 

@@ -111,8 +111,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-632" />
-                            <option name="y" value="575" />
+                            <option name="x" value="-1411" />
+                            <option name="y" value="1295" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -132,12 +132,22 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_dataBaseViewPagerFragment_to_importFragment">
+                            <entry key="action_dataBaseViewPagerFragment_to_resultFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_dataBaseViewPagerFragment_to_resultFragment">
+                            <entry key="action_dataBaseViewPagerFragment_to_selectCourseFragment2">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_dataBaseViewPagerFragment_to_setupViewPagerFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_dataBaseViewPagerFragment_to_titleFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -183,25 +193,13 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="importFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="384" />
-                            <option name="y" value="1436" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
                   <entry key="resultFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-361" />
-                            <option name="y" value="1421" />
+                            <option name="x" value="251" />
+                            <option name="y" value="1301" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -247,8 +245,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-431" />
-                            <option name="y" value="20" />
+                            <option name="x" value="-117" />
+                            <option name="y" value="-66" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -278,8 +276,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-1432" />
-                            <option name="y" value="279" />
+                            <option name="x" value="-1380" />
+                            <option name="y" value="3" />
                           </Point>
                         </option>
                         <option name="myPositions">

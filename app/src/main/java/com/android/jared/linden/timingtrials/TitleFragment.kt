@@ -35,7 +35,7 @@ class TitleFragment : Fragment()
 
         titleViewModel.nonFinishedTimeTrial.observe(viewLifecycleOwner, Observer {tt->
             tt?.let { timeTrial->
-                if(timeTrial.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS){
+                if(timeTrial.status == TimeTrialStatus.IN_PROGRESS){
                     val tIntent = Intent(requireActivity(), TimingActivity::class.java)
                     startActivity(tIntent)
                 }
@@ -47,7 +47,7 @@ class TitleFragment : Fragment()
             startTtSetupButton.setOnClickListener{
                 titleViewModel.nonFinishedTimeTrial.observe(viewLifecycleOwner, Observer {result->
                     result?.let {timeTrial->
-                        if(timeTrial.timeTrialHeader.copy(id = null) != TimeTrialHeader.createBlank()){
+                        if(timeTrial.copy(id = null) != TimeTrialHeader.createBlank()){
                             showSetupDialog(timeTrial)
                         }else{
                             val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
@@ -63,11 +63,9 @@ class TitleFragment : Fragment()
                 Navigation.findNavController(this.root).navigate(action)
             }
 
-//            testSetupButton.setOnClickListener {
-//                titleViewModel.nonFinishedTimeTrial.value?.let {
-//                    testViewModel.testSetup(it)
-//                }
-//            }
+            testSetupButton.setOnClickListener {
+                findNavController().popBackStack()
+            }
 //
 //
             testTimingButton.setOnClickListener {
@@ -110,10 +108,10 @@ class TitleFragment : Fragment()
         return binding.root
     }
 
-   private fun showSetupDialog(timeTrial: TimeTrial){
+   private fun showSetupDialog(timeTrial: TimeTrialHeader){
         AlertDialog.Builder(requireActivity())
                 .setTitle(resources.getString(R.string.resume_setup))
-                .setMessage("${resources.getString(R.string.resume_setup)} ${timeTrial.timeTrialHeader.ttName}?")
+                .setMessage("${resources.getString(R.string.resume_setup)} ${timeTrial.ttName}?")
                 .setPositiveButton(resources.getString(R.string.ok)) { _, _ ->
 
                     val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()

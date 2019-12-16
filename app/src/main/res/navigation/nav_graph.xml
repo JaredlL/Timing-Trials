@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/titleFragment">
+    app:startDestination="@id/dataBaseViewPagerFragment">
 
     <fragment
         android:id="@+id/titleFragment"
@@ -48,7 +48,7 @@
     <fragment
         android:id="@+id/dataBaseViewPagerFragment"
         android:name="com.android.jared.linden.timingtrials.viewdata.DataBaseViewPagerFragment"
-        android:label="Timing Trials Database"
+        android:label="Timing Trials"
         tools:layout="@layout/fragment_list_generic">
         <action
             android:id="@+id/action_dataBaseViewPagerFragment2_to_editRiderFragment"
@@ -69,7 +69,9 @@
             android:id="@+id/action_dataBaseViewPagerFragment_to_resultFragment"
             app:destination="@id/resultFragment"
             app:enterAnim="@anim/fragment_close_enter"
-            app:exitAnim="@anim/fragment_close_exit" />
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/action_dataBaseViewPagerFragment_to_globalResultFragment"
             app:destination="@id/globalResultFragment"
@@ -83,7 +85,18 @@
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/dataBaseViewPagerFragment" />
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_selectCourseFragment2"
+            app:destination="@id/selectCourseFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_titleFragment"
+            app:destination="@id/titleFragment" />
     </fragment>
     <fragment
         android:id="@+id/editCourseFragment"
@@ -141,7 +154,14 @@
             app:exitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/action_selectCourseFragment_to_setupViewPagerFragment"
-            app:destination="@id/setupViewPagerFragment" />
+            app:destination="@id/setupViewPagerFragment"
+            app:popUpTo="@+id/nav_graph"
+            app:popUpToInclusive="true" />/>
+
+        <argument
+            android:name="timeTrialId"
+            app:argType="long"
+            android:defaultValue="-1L" />
     </fragment>
     <fragment
         android:id="@+id/resultFragment"

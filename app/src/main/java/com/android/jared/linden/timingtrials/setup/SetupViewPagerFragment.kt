@@ -18,6 +18,7 @@ import com.android.jared.linden.timingtrials.util.injector
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.tabs.TabLayoutMediator
 
 class SetupViewPagerFragment: Fragment() {
@@ -25,12 +26,21 @@ class SetupViewPagerFragment: Fragment() {
 
     //private lateinit var setupViewModel: SetupViewModel
 
+    private val args: SetupViewPagerFragmentArgs by navArgs()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val binding = FragmentDatabaseViewPagerBinding.inflate(inflater, container, false)
         val tabLayout = binding.tabs
         val viewPager = binding.viewPager2
         viewPager.adapter = SetupPagerAdapter(this)
+
+        val setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
+
+        setupViewModel.changeTimeTrial(args.timeTrialId)
+
+
+
 
         viewPager.offscreenPageLimit = 2
         // Set the icon and text for each tab

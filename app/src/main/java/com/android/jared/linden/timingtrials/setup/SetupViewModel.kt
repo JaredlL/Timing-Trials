@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
-interface ITimeTrialSetupViewModel{
+interface ITimeTrialSetupViewModel {
     val orderRidersViewModel: IOrderRidersViewModel
     val selectCourseViewModel: ISelectCourseViewModel
     val selectRidersViewModel: ISelectRidersViewModel
@@ -18,74 +18,98 @@ interface ITimeTrialSetupViewModel{
     val setupConformationViewModel: ISetupConformationViewModel
 }
 
+
+
 class SetupViewModel @Inject constructor(
         val timeTrialRepository: ITimeTrialRepository,
         val riderRepository: IRiderRepository,
         val courseRepository: ICourseRepository
-) : ViewModel(), ITimeTrialSetupViewModel{
+) : ViewModel(), ITimeTrialSetupViewModel {
 
 
     private val _mTimeTrial = MediatorLiveData<TimeTrial?>()
-    val timeTrial: LiveData<TimeTrial?> = Transformations.map(_mTimeTrial){tt->
-       tt
+    val timeTrial: LiveData<TimeTrial?> = Transformations.map(_mTimeTrial){
+        it
     }
-    init {
-        _mTimeTrial.addSource(timeTrialRepository.nonFinishedFullTimeTrial) { res ->
-            res?.let {tt->
-                val current = _mTimeTrial.value
-                if(!isCarolineAlive.get() && tt != current){
-                    System.out.println("JAREDMSG -> SETUPVIEWMODEL -> current data = ${_mTimeTrial.value?.timeTrialHeader?.id} new = ${tt.timeTrialHeader.id}")
-                    _mTimeTrial.value = tt
-            }
+
+
+    private val currentId: MutableLiveData<Long?> = MutableLiveData()
+
+    private val idSwitcher = Transformations.switchMap(currentId){
+        it?.let {ttId->
+            timeTrialRepository.getSetupTimeTrialById(ttId)
         }
     }
+
+    fun changeTimeTrial(timeTrialId: Long){
+        if(currentId.value != timeTrialId){
+            currentId.value = timeTrialId
+        }
     }
 
 
-    var queue = ConcurrentLinkedQueue<TimeTrial>()
+
+    init {
+        _mTimeTrial.addSource(idSwitcher) { res ->
+            res?.let { tt ->
+                val current = _mTimeTrial.value
+                val ordered = tt.copy(riderList = tt.riderList.sortedBy { it.timeTrialData.index })
+                if (!isCarolineAlive.get() && ordered != current) {
+                    System.out.println("JAREDMSG -> SETUPVIEWMODEL -> current data = ${_mTimeTrial.value?.timeTrialHeader?.id} new = ${tt.timeTrialHeader.id}")
+                    _mTimeTrial.value = ordered
+                }
+            }
+        }
+
+
+
+    }
+
+
+    private val queue = ConcurrentLinkedQueue<TimeTrial>()
     private var isCarolineAlive = AtomicBoolean()
 
-    fun updateTimeTrial(newTimeTrial: TimeTrial){
+    fun updateTimeTrial(newTimeTrial: TimeTrial) {
 
         val previousTimeTrial = _mTimeTrial.value
         _mTimeTrial.value = newTimeTrial
-        if(previousTimeTrial != null){
+        if (previousTimeTrial != null) {
             _mTimeTrial.value = newTimeTrial
 
-            if(!isCarolineAlive.get()){
+            if (!isCarolineAlive.get()) {
                 queue.add(newTimeTrial)
                 viewModelScope.launch(Dispatchers.IO) {
                     isCarolineAlive.set(true)
-                    while (queue.peek() != null){
+                    while (queue.peek() != null) {
                         var ttToInsert = queue.peek()
-                        while (queue.peek() != null){
+                        while (queue.peek() != null) {
                             ttToInsert = queue.poll()
                         }
-                        ttToInsert?.let {  timeTrialRepository.updateFull(it)}
+                        ttToInsert?.let { timeTrialRepository.updateFull(it) }
 
                     }
                     isCarolineAlive.set(false)
                 }
-            }else{
+            } else {
                 queue.add(newTimeTrial)
             }
         }
     }
 
 
-    override val orderRidersViewModel: IOrderRidersViewModel = object: IOrderRidersViewModel {
+    override val orderRidersViewModel: IOrderRidersViewModel = object : IOrderRidersViewModel {
         override fun moveItem(fromPosition: Int, toPosition: Int) {
-            _mTimeTrial.value?.let { currentTimeTrial->
+            _mTimeTrial.value?.let { currentTimeTrial ->
                 val mutList = currentTimeTrial.riderList.toMutableList()
 
-                if(fromPosition > toPosition){
+                if (fromPosition > toPosition) {
                     mutList.add(toPosition, mutList[fromPosition])
                     mutList.removeAt(fromPosition + 1)
-                }else{
+                } else {
                     mutList.add(toPosition + 1, mutList[fromPosition])
                     mutList.removeAt(fromPosition)
                 }
-                val updateList = mutList.mapIndexed { i,r-> r.copy(timeTrialData = r.timeTrialData.copy(index = i)) }
+                val updateList = mutList.mapIndexed { i, r -> r.copy(timeTrialData = r.timeTrialData.copy(index = i)) }
                 updateTimeTrial(currentTimeTrial.updateRiderList(updateList))
             }
 
@@ -93,7 +117,7 @@ class SetupViewModel @Inject constructor(
         }
 
         override fun getOrderableRiderData(): LiveData<TimeTrial?> {
-           return _mTimeTrial
+            return _mTimeTrial
         }
     }
 

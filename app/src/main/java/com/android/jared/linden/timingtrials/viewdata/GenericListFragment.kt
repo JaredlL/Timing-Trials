@@ -36,7 +36,7 @@ class GenericListFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
 
-        listViewModel = getViewModel { injector.listViewModel() }
+        listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
         when(itemType){
             ITEM_RIDER -> {
@@ -54,7 +54,7 @@ class GenericListFragment : Fragment() {
                 })
             }
             ITEM_TIMETRIAL ->{
-                viewFactory = TimeTrialViewHolderFactory()
+                viewFactory = TimeTrialViewHolderFactory(listViewModel, viewLifecycleOwner)
                 adapter = GenericListAdapter(requireContext(), viewFactory)
                 listViewModel.allTimeTrials.observe(viewLifecycleOwner, Observer{res->
                     res?.let {(adapter as? GenericListAdapter<TimeTrialHeader>)?.setItems(it)}

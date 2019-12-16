@@ -60,7 +60,7 @@ class ResultFragment : Fragment() {
         requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
 
-        resultViewModel = requireActivity().getViewModel {  requireActivity().injector.resultViewModel() }.apply { initialise(args.timeTrialId) }
+        resultViewModel = requireActivity().getViewModel {  requireActivity().injector.resultViewModel() }.apply { changeTimeTrial(args.timeTrialId) }
 
         val binding = DataBindingUtil.inflate<FragmentTimetrialResultBinding>(inflater, R.layout.fragment_timetrial_result, container, false).apply {
 

@@ -49,17 +49,6 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     }
 
 
-    fun getNonFinishedTt() : LiveData<TimeTrialWithCourse?>{
-        return Transformations.map(getNonFinishedTtLive()){tt->
-            if(tt!=null){
-                return@map tt
-                //return@map tt.copy(riderList = tt.riderList.map { it.copy(startTimeOffset = tt.timeTrialHeader.firstRiderStartOffset + tt.timeTrialHeader.interval * it.index )})
-            }else{
-                null
-            }
-
-        }
-    }
 
 
     @Transaction
@@ -103,26 +92,20 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     @Query("DELETE FROM timetrial_table") abstract fun deleteAll()
     @Query("DELETE FROM timetrial_rider_table") abstract fun deleteAllR()
 
-    @Query("SELECT * from timetrial_table ORDER BY startTime ASC") abstract fun getAllTimeTrialsSuspend(): List<TimeTrialHeader>
 
     @Query("SELECT * from timetrial_table ORDER BY status ASC, startTime ASC") abstract fun getAllTimeTrials(): LiveData<List<TimeTrialHeader>>
 
-    @Transaction @Query("SELECT * FROM timetrial_table WHERE id = :ttId LIMIT 1") abstract fun getTimeTrialById(ttId: Long): LiveData<TimeTrial>
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE id = :ttId AND  status == 0 LIMIT 1") abstract fun getSetupTimeTrialById(ttId: Long): LiveData<TimeTrial?>
+
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE id = :ttId AND  status == 2 LIMIT 1") abstract fun getResultTimeTrialById(ttId: Long): LiveData<TimeTrial?>
+
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE status == 1") abstract fun getTimingTimeTrials(): LiveData<List<TimeTrial>>
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName LIMIT 1") abstract fun getTimeTrialByName(timeTrialName: String): TimeTrial?
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName LIMIT 1") abstract fun getLiveTimeTrialByName(timeTrialName: String): LiveData<TimeTrial>
 
     //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
-    @Transaction @Query("SELECT * FROM timetrial_table WHERE status !=2 LIMIT 1") abstract fun _getNonFinishedTimeTrial(): TimeTrial?
-
-    @Transaction @Query("SELECT * FROM timetrial_table WHERE status !=2 LIMIT 1") abstract fun getNonFinishedTtLive(): LiveData<TimeTrialWithCourse?>
-
-    @Transaction @Query("SELECT * FROM timetrial_table WHERE status !=2 LIMIT 1") abstract fun getNonFinishedFullTtLive(): LiveData<TimeTrial?>
-
-
-    @Query("SELECT * FROM timetrial_table WHERE status != 2") abstract fun _getAllUncompleteTimeTrial(): List<TimeTrialHeader>
-
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE id = :timeTrialId LIMIT 1") abstract fun getFullTimeTrial(timeTrialId: Long): LiveData<TimeTrial>
 
