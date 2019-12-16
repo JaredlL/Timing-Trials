@@ -30,11 +30,7 @@ object ConverterUtils{
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         return dateTime.format(formatter)
     }
-//
-//    fun toTenthsDisplayString(instant: Instant): String{
-//        val  f:DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss:S").withZone(ZoneId.systemDefault())
-//        return (f.format(instant))
-//    }
+
 
     fun toSecondsDisplayString(miliseconds: Long): String{
         val milis = abs(miliseconds)
@@ -45,14 +41,9 @@ object ConverterUtils{
     fun toTenthsDisplayString(miliseconds: Long): String{
         val milis = abs(miliseconds)
         val secs =  (milis/1000)
-        return String.format("%d:%02d:%02d:%1d", secs / 3600, (secs % 3600) / 60, (secs % 60),  (milis % 1000) / 100)
+        return String.format("%d:%02d:%02d.%1d", secs / 3600, (secs % 3600) / 60, (secs % 60),  (milis % 1000) / 100)
     }
 
-    fun toTenthsDisplayString(duration:Duration): String{
-        val milis =Math.abs(duration.toMillis())
-        val secs = Math.abs(duration.seconds)
-        return String.format("%d:%02d:%02d:%1d", secs / 3600, (secs % 3600) / 60, (secs % 60),  (milis % 1000) / 100)
-    }
 
 
 

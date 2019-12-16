@@ -11,8 +11,6 @@ class EventViewWrapper(val event: ITimelineEvent, val timeTrial: TimeTrial) : Ba
 
     val timeStampString = ConverterUtils.toTenthsDisplayString(event.timeStamp)
 
-    //private fun getRider(): TimeTrialRider? = event.riderId?.let {  timeTrial.riderList.firstOrNull{ r -> r.rider.id == event.riderId}}
-
     var getSelected: (ITimelineEvent) -> Boolean = { _ -> false}
     var onSelectionChanged = { _: ITimelineEvent, _:Boolean -> Unit}
 

@@ -23,8 +23,8 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     private val liveMilisSinceStart: MutableLiveData<Long> = MutableLiveData()
 
     val timeLine: MediatorLiveData<TimeLine> = MediatorLiveData()
-    var prevMilis = 0L
-    var prevString = ""
+    private var prevMilis = 0L
+    private var prevString = ""
     val timeString: LiveData<String> = Transformations.map(liveMilisSinceStart){
         if(((it % 1000) / 100) != prevMilis){
             prevMilis = it
@@ -39,7 +39,6 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
 
     private var currentStatusString = ""
-
     override var eventAwaitingSelection: Long? = null
 
 
@@ -155,13 +154,10 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     }
 
     fun finishTt(){
-        //timer.cancel()
-
-
-            timeTrial.value?.let {
-                val headerCopy = it.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED)
-                updateTimeTrial(it.copy(timeTrialHeader = headerCopy))
-            }
+        timeTrial.value?.let {
+            val headerCopy = it.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED)
+            updateTimeTrial(it.copy(timeTrialHeader = headerCopy))
+        }
     }
 
     fun discardTt(){

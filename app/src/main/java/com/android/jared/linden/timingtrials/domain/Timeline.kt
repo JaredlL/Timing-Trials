@@ -29,9 +29,11 @@ class TimeLine(val timeTrial: TimeTrial, val timeStamp: Long)
     }
 
     fun getRiderStatus(rider:TimeTrialRider): RiderStatus{
-        if(timeStamp < timeTrial.helper.getRiderStartTime(rider)) return RiderStatus.NOT_STARTED
-        else if(rider.splits.size < timeTrial.timeTrialHeader.laps) return RiderStatus.RIDING
-        else return RiderStatus.FINISHED
+        return when {
+            timeStamp < timeTrial.helper.getRiderStartTime(rider) -> RiderStatus.NOT_STARTED
+            rider.splits.size < timeTrial.timeTrialHeader.laps -> RiderStatus.RIDING
+            else -> RiderStatus.FINISHED
+        }
     }
 
     val index = timeTrial.helper.sparseRiderStartTimes.indexOfKey(timeStamp)

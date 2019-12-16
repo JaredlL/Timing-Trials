@@ -86,9 +86,9 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
     var editRider = {_: Long -> Unit}
     var riderSelectionChanged = {_:List<Rider> -> Unit}
 
-    var removeRiderFromSelection = {rider:Rider -> Unit}
+    var removeRiderFromSelection = {_:Rider -> Unit}
 
-    var addRiderToSelection = {rider:Rider -> Unit}
+    var addRiderToSelection = {_:Rider -> Unit}
 
     fun setRiders(newInfo: SelectedRidersInformation){
         val newSelected = newInfo.timeTrial.riderList.map { it.riderData }

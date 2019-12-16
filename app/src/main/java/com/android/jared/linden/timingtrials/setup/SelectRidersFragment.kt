@@ -56,10 +56,6 @@ class SelectRidersFragment : Fragment() {
             }
         }
 
-//        adapter.riderSelectionChanged ={selectedRiders->
-//            viewModel.updateSelectedRiders(selectedRiders)
-//        }
-
         adapter.addRiderToSelection = {
             viewModel.addRiderToTt(it)
         }

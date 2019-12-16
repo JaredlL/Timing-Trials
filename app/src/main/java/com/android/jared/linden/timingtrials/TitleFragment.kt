@@ -75,17 +75,16 @@ class TitleFragment : Fragment()
                     testViewModel.testTiming(it)
                 }
             }
-//
-//            testResults1.setOnClickListener {
-//                testViewModel.insertFinishedTt2()
-//                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
-//                    it?.let {id->
-//                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
-//                        findNavController().navigate(action)
-//                    }
-//                })
-//            }
-//
+
+            testResults1.setOnClickListener {
+                testViewModel.insertFinishedTt2()
+                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
+                    it?.let {id->
+                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
+                        findNavController().navigate(action)
+                    }
+                })
+            }
             testResult2.setOnClickListener {
                 testViewModel.insertFinishedTt()
                 testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{

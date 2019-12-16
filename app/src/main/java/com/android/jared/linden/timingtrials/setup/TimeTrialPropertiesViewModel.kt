@@ -31,7 +31,6 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
     override val timeTrial = ttSetup.timeTrial
    override val timeTrialHeader = Transformations.map(ttSetup.timeTrial){it?.timeTrialHeader}
 
-    //private val timeTrialValue = ttSetup.setupTimeTrial.value.timeTrialHeader
 
     override val courseName: LiveData<String> = Transformations.map(ttSetup.timeTrial){ tt->
         tt?.let{
@@ -138,91 +137,6 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
             ttSetup.updateTimeTrial(new)
         }
     }
-
-
-
-
-
-
-//    val firstRiderOffsetMediator = MediatorLiveData<String>().apply {
-//        addSource(timeTrialHeader) { tt->
-//            tt?.let {
-//                if (firstRiderOffset.value != it.firstRiderStartOffset.toString()) {
-//                    firstRiderOffset.value = it.firstRiderStartOffset.toString()
-//                }
-//            }
-//
-//        }
-//        addSource(firstRiderOffset) {os->
-//            os.toIntOrNull()?.let{newos ->
-//                timeTrialHeader.value?.let { tt->
-//                    if(tt.firstRiderStartOffset != newos) {
-//                        ttSetup.updateDefinition(tt.copy(firstRiderStartOffset = newos))
-//                    }
-//                }}
-//        }
-//    }
-
-
-
-//    val lapsMediator = MediatorLiveData<String>().apply {
-//        addSource(timeTrialHeader) { tt->
-//            tt?.let {
-//                if (laps.value != it.laps.toString()) {
-//                    laps.value = it.laps.toString()
-//                }
-//            }
-//
-//        }
-//        addSource(laps) {laps->
-//            laps.toIntOrNull()?.let{newLaps ->
-//                timeTrialHeader.value?.let { tt->
-//                if(tt.laps != newLaps) {
-//                    ttSetup.updateDefinition(tt.copy(laps = newLaps))
-//                }
-//            }}
-//        }
-//    }
-
-
-//    val intervalMediator = MediatorLiveData<String>().apply {
-//        addSource(interval) {interval->
-//            timeTrialHeader.value?.let { tt ->
-//                interval.toIntOrNull()?.let{
-//                    if(tt.interval != it){
-//                        ttSetup.updateDefinition(tt.copy(interval = it))
-//                    }
-//                }
-//            }
-//        }
-//        addSource(timeTrialHeader) { tt->
-//            tt?.let {
-//                if (interval.value != it.interval.toString()) {
-//                    interval.value = it.interval.toString()
-//                }
-//            }
-//
-//        }
-//    }
-
-
-//    val startTimeMediator = MediatorLiveData<OffsetDateTime>().apply {
-//        addSource(timeTrialHeader) { tt->
-//            tt?.let {
-//                if (startTime.value != it.startTime) {
-//                    startTime.value = it.startTime
-//                }
-//            }
-//
-//        }
-//        addSource(startTime) {newStartTime->
-//            timeTrialHeader.value?.let { tt->
-//                if(tt.startTime != newStartTime) {
-//                    ttSetup.updateDefinition(tt.copy(startTime = newStartTime))
-//                }
-//            }
-//        }
-//    }
 
 
 

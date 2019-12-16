@@ -10,17 +10,43 @@ class CsvResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowView
     fun writeToPath(filePath: OutputStream){
         val writer = PrintWriter(filePath)
         writer.appendln(surroundQuotes("Powered by Timing Trials"))
-        writer.appendln(surroundQuotes("Results for ${timeTrial.timeTrialHeader.ttName}"))
-        for(r in results) writeRow(r, writer)
+        writeTimeTrialRow(writer)
+        writeCourseRow(writer)
+        for(r in results.dropLast(1)) writeRowNewLine(r, writer)
+        writeLastRow(results.last(), writer)
         writer.flush()
         writer.close()
     }
 
-    fun writeRow(row: ResultRowViewModel, writer: PrintWriter){
+    private fun writeTimeTrialRow(writer: PrintWriter){
+        writer.append(surroundQuotes("Results for ${timeTrial.timeTrialHeader.ttName},"))
+        writer.appendln(surroundQuotes("On ${timeTrial.timeTrialHeader.startTime}"))
+    }
+
+    private fun writeCourseRow(writer: PrintWriter){
+        writer.append(surroundQuotes("${timeTrial.timeTrialHeader.laps} laps,"))
+        val course = timeTrial.course
+        if(course != null){
+            writer.append(surroundQuotes("${course.courseName} ${course.cttName},"))
+            writer.appendln(surroundQuotes("${course.length/1000L} km"))
+        }else{
+            writer.appendln(surroundQuotes("Unknown Course"))
+        }
+
+    }
+
+    private fun writeRowNewLine(row: ResultRowViewModel, writer: PrintWriter){
         for (v in row.row.dropLast(1)){
             writer.append("${surroundQuotes(v.content.value)},")
         }
         writer.appendln(surroundQuotes(row.row.last().content.value))
+    }
+
+    private fun writeLastRow(row: ResultRowViewModel, writer: PrintWriter){
+        for (v in row.row.dropLast(1)){
+            writer.append("${surroundQuotes(v.content.value)},")
+        }
+        writer.append(surroundQuotes(row.row.last().content.value))
     }
 
     private fun surroundQuotes(string: String?): String{

@@ -39,25 +39,6 @@ class SetupViewPagerFragment: Fragment() {
             tab.text = getTabTitle(position)
         }.attach()
 
-        //(activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
-
-//        setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
-//
-//        setupViewModel.timeTrial.observe(viewLifecycleOwner, Observer { tt->
-//            tt?.let {
-//                if(tt.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS){
-//                    val intent = Intent(requireActivity(), TimingActivity::class.java)
-//                    startActivity(intent)
-//                    requireActivity().finish()
-//                }
-//            }
-//        })
-
-//        setupViewModel.timeTrialPropertiesViewModel.onBeginTt = {
-//
-//
-//
-//        }
 
         return binding.root
     }

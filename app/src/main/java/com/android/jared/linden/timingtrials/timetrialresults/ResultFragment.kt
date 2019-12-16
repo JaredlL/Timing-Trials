@@ -153,12 +153,12 @@ class ResultFragment : Fragment() {
         when(requestCode){
             REQUEST_CREATE_FILE_CSV->{
                     data?.data?.let {
-                      //  writeCsv(it)
+                        writeCsv(it)
                     }
             }
             REQUEST_CREATE_FILE_JSON->{
                 data?.data?.let {
-                   // writeJson(it)
+                    writeJson(it)
                 }
             }
         }
@@ -168,59 +168,59 @@ class ResultFragment : Fragment() {
         Toast.makeText(requireActivity(), "Permission Request", Toast.LENGTH_SHORT).show()
     }
 
-//    private fun writeCsv(uri: Uri){
-//
-//        val tt = resultViewModel.timeTrial.value
-//        val results = resultViewModel.results.value
-//
-//        if(tt != null && results != null){
-//            try {
-//                val outputStream = requireActivity().contentResolver.openOutputStream(uri)
-//                if(haveOrRequestFilePermission() && outputStream != null){
-//                    val trans = CsvResultWriter(tt, results)
-//                    trans.writeToPath(outputStream)
-//
-//
-//                    val intent = Intent()
-//                    intent.action = Intent.ACTION_VIEW
-//                    intent.setDataAndType(uri, "text/csv")
-//                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//                    startActivity(intent)
-//                }
-//            }
-//            catch(e: IOException)
-//            {
-//                e.printStackTrace()
-//                Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
-//
-//    private fun writeJson(uri: Uri){
-//        val tt = resultViewModel.timeTrial.value
-//        val results = resultViewModel.results.value
-//
-//        if(tt != null && results != null){
-//            try {
-//                val outputStream = requireActivity().contentResolver.openOutputStream(uri)
-//                if(haveOrRequestFilePermission() && outputStream != null){
-//
-//                    JsonResultsWriter().writeToPath(outputStream, tt)
-//
-//                    val intent = Intent()
-//                    intent.action = Intent.ACTION_VIEW
-//                    intent.setDataAndType(uri, "text/*")
-//                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//                    startActivity(intent)
-//                }
-//            }
-//            catch(e: IOException)
-//            {
-//                e.printStackTrace()
-//                Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
+    private fun writeCsv(uri: Uri){
+
+        val tt = resultViewModel.timeTrial.value
+        val results = resultViewModel.results.value
+
+        if(tt != null && results != null){
+            try {
+                val outputStream = requireActivity().contentResolver.openOutputStream(uri)
+                if(haveOrRequestFilePermission() && outputStream != null){
+                    val trans = CsvResultWriter(tt, results)
+                    trans.writeToPath(outputStream)
+
+
+                    val intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    intent.setDataAndType(uri, "text/csv")
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    startActivity(intent)
+                }
+            }
+            catch(e: IOException)
+            {
+                e.printStackTrace()
+                Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun writeJson(uri: Uri){
+        val tt = resultViewModel.timeTrial.value
+        val results = resultViewModel.results.value
+
+        if(tt != null && results != null){
+            try {
+                val outputStream = requireActivity().contentResolver.openOutputStream(uri)
+                if(haveOrRequestFilePermission() && outputStream != null){
+
+                    JsonResultsWriter().writeToPath(outputStream, tt)
+
+                    val intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    intent.setDataAndType(uri, "text/*")
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    startActivity(intent)
+                }
+            }
+            catch(e: IOException)
+            {
+                e.printStackTrace()
+                Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
 
    fun convertDpToPixels(dp: Float): Int {

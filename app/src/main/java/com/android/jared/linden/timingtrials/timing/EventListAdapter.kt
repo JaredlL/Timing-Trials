@@ -48,8 +48,8 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
     }
 
 
-    var mEvents: List<EventViewWrapper> = listOf()
-    val layoutInflater = LayoutInflater.from(context)
+    private var mEvents: List<EventViewWrapper> = listOf()
+    private val layoutInflater = LayoutInflater.from(context)
 
     fun setEvents(newEvents: List<EventViewWrapper>){
         mEvents = newEvents

@@ -28,11 +28,10 @@ class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<Orderab
 
     inner class OrderableRiderViewHolder(val binding: ListItemOrderableRiderBinding): AbstractDraggableItemViewHolder(binding.root){
 
-        fun bind(rd:FilledTimeTrialRider, position: Int){
+        fun bind(rd:FilledTimeTrialRider){
             binding.apply {
                 rider = rd
                 startTime = mTimeTrialHeader.firstRiderStartOffset + mTimeTrialHeader.interval * rd.timeTrialData.index
-                //pos = position + 1
             }
         }
     }
@@ -57,7 +56,7 @@ class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<Orderab
         mRiders.get(position).let { rider ->
             with(holder){
                 itemView.tag = rider
-                bind(rider, position)
+                bind(rider)
             }
         }
     }
