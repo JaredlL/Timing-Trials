@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import com.android.jared.linden.timingtrials.di.AppComponent
 import com.android.jared.linden.timingtrials.di.DaggerAppComponent
 import com.jakewharton.threetenabp.AndroidThreeTen
+import timber.log.Timber
 
 
 class TimingTrialsApplication: Application(), DaggerComponentProvider {
@@ -16,6 +17,10 @@ class TimingTrialsApplication: Application(), DaggerComponentProvider {
     override fun onCreate() {
         super.onCreate()
         AndroidThreeTen.init(this)
+
+        if(BuildConfig.DEBUG){
+            Timber.plant(Timber.DebugTree())
+        }
     }
 
 

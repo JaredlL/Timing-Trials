@@ -43,7 +43,7 @@ class EditRiderFragment : Fragment() {
         })
 
         //Set title
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = if(args.riderId == 0L) getString(R.string.add_rider) else getString(R.string.edit_rider)
+        (requireActivity() as AppCompatActivity).title = if(args.riderId == 0L) getString(R.string.add_rider) else getString(R.string.edit_rider)
 
 
         val binding = DataBindingUtil.inflate<FragmentRiderBinding>(inflater, R.layout.fragment_rider, container, false).apply {

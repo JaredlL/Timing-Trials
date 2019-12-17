@@ -9,6 +9,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.android.jared.linden.timingtrials.timetrialresults.ResultFragment
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
@@ -35,8 +36,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val collapsingToolbar = collapsing_toolbar_layout
         val navController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration(navController.graph)
+        collapsingToolbar.setupWithNavController(toolbar, navController, appBarConfiguration)
+
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
