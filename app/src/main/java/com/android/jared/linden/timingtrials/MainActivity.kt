@@ -53,6 +53,17 @@ class MainActivity : AppCompatActivity() {
 
         })
 
+        navController.addOnDestinationChangedListener{_,dest,_->
+            when(dest.id){
+                R.id.editCourseFragment->{
+                    app_bar_layout.setExpanded(true)
+                }
+                R.id.editRiderFragment->{
+                    app_bar_layout.setExpanded(true)
+                }
+            }
+        }
+
     }
 
 
