@@ -21,7 +21,9 @@ class GenericListItemAdapter internal constructor(val context: Context): Recycle
 
             binding.apply{
                 item = genericItem
+                textView2.setOnClickListener {
 
+                }
                 executePendingBindings()
             }
         }

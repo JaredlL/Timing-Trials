@@ -6,4 +6,10 @@ interface IGenericListItem {
     val itemText3: String
 
 
+
+}
+
+interface IGenericListItemClick{
+    val id:Long
+    val itemType:Int
 }

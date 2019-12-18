@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -14,6 +15,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.util.TypedValue
@@ -181,10 +183,24 @@ class ResultFragment : Fragment() {
                     trans.writeToPath(outputStream)
 
 
-                    val intent = Intent()
+                    var intent = Intent()
                     intent.action = Intent.ACTION_VIEW
                     intent.setDataAndType(uri, "text/csv")
+                    //intent.data = uri
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                    val activities: List<ResolveInfo> = requireActivity().packageManager.queryIntentActivities(
+                            intent,
+                            PackageManager.MATCH_DEFAULT_ONLY
+                    )
+                    if(activities.isEmpty()){
+                        intent = Intent()
+                        intent.action = Intent.ACTION_VIEW
+                        intent.setDataAndType(uri, "text/*")
+                        //intent.data = uri
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+
                     startActivity(intent)
                 }
             }
@@ -237,11 +253,10 @@ class ResultFragment : Fragment() {
             val now = Date()
             val nowChars = android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
 
-            val ttName = resultViewModel.timeTrial.value?.let {
-                it.timeTrialHeader.ttName
-            }
+            val ttName = resultViewModel.timeTrial.value?.timeTrialHeader?.ttName
 
-            val imgName = "${ttName?:nowChars}.jpg"
+
+            val imgName = "${ttName?:nowChars}.jpeg"
 
             val scrollViewWidth = horizontalScrollView.getChildAt(0).width
 
@@ -301,7 +316,7 @@ class ResultFragment : Fragment() {
         val filePath = File(MediaStore.VOLUME_EXTERNAL_PRIMARY + imageName)
         val imageOut = FileOutputStream(filePath)
 
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, imageOut)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 80, imageOut)
 
         val dets = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
@@ -335,12 +350,16 @@ class ResultFragment : Fragment() {
     fun saveScreenshotO(bitmap: Bitmap, imageName:String){
 
         if(haveOrRequestFilePermission()) {
+            //val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             val path = requireActivity().getExternalFilesDir(null)
+
             val filePath = File(path, imageName)
 
             val imageOut = FileOutputStream(filePath)
 
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, imageOut)
+
+
 
             val contentResolver = requireActivity().contentResolver
             val insertedImageString = MediaStore.Images.Media.insertImage(contentResolver, filePath.path, imageName, "Timing Trials")
@@ -348,10 +367,16 @@ class ResultFragment : Fragment() {
             val values = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
                 put(MediaStore.Images.Media.TITLE, imageName)
+                put(MediaStore.Images.Media.CONTENT_TYPE, "image/jpeg")
                 put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
                 put(MediaStore.MediaColumns.DATA, filePath.path)
+                put(MediaStore.Images.Media.SIZE, filePath.length())
+                //put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
             }
             requireActivity().contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+
+            imageOut.flush()
+            imageOut.close()
 
             openScreenshot(Uri.parse(insertedImageString))
 
@@ -378,8 +403,9 @@ class ResultFragment : Fragment() {
 
     private fun openScreenshot(imageFile: Uri?) {
         val intent = Intent()
-        intent.action = Intent.ACTION_VIEW
         intent.setDataAndType(imageFile, "image/*")
+        intent.action = Intent.ACTION_VIEW
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivity(intent)
     }
 

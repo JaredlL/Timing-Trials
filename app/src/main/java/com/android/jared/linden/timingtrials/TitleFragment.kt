@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -32,6 +33,12 @@ class TitleFragment : Fragment()
     {
         titleViewModel = requireActivity().getViewModel {  requireActivity().injector.mainViewModel() }
         testViewModel =  requireActivity().getViewModel {  requireActivity().injector.testViewModel() }
+
+        (requireActivity() as MainActivity).mMainFab.setOnClickListener {
+            Toast.makeText(it.context, "i", Toast.LENGTH_SHORT).show()
+        }
+        (requireActivity() as MainActivity).mMainFab.setImageResource(R.drawable.ic_timer_black_24dp)
+
 
         titleViewModel.nonFinishedTimeTrial.observe(viewLifecycleOwner, Observer {tt->
             tt?.let { timeTrial->
@@ -93,15 +100,15 @@ class TitleFragment : Fragment()
                 })
             }
 //
-//            button2.setOnClickListener {
-//                testViewModel.insertFinishedTt3()
-//                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
-//                    it?.let {id->
-//                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
-//                        findNavController().navigate(action)
-//                    }
-//                })
-//            }
+            button2.setOnClickListener {
+                testViewModel.insertFinishedTt3()
+                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
+                    it?.let {id->
+                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
+                        findNavController().navigate(action)
+                    }
+                })
+            }
         }
 
 

@@ -14,6 +14,7 @@ import com.android.jared.linden.timingtrials.timetrialresults.ResultFragment
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -21,7 +22,6 @@ const val REQUEST_CREATE_FILE_CSV = 1
 const val REQUEST_IMPORT_FILE = 2
 const val REQUEST_CREATE_FILE_SPREADSHEET = 3
 const val REQUEST_CREATE_FILE_JSON = 4
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
+
+    lateinit var mMainFab: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController, appBarConfiguration)
-
+        mMainFab = mainFab
         val vm = getViewModel { injector.mainViewModel()}
         vm.timingTimeTrial.observe(this, Observer {
             it?.let {

@@ -214,7 +214,11 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                 val nextStartRider = sparse.valueAt(nextIndex)
                 val millisToNextRider = (nextStartMilli - millisSinceStart)
 
-                    val riderString = "(${nextStartRider.timeTrialData.number}) ${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName}"
+                    val riderString = if(tte.timeTrialHeader.interval == 0){
+                        "(${nextStartRider.timeTrialData.number}) ${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName}"
+                    }else{
+                        "All Riders"
+                    }
                     return when(millisToNextRider){
 
                         in 0L..10000 -> {
