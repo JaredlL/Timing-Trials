@@ -7,21 +7,21 @@ buildscript {
         kotlinVersion = '1.3.61'
         supportLibraryVersion = '1.1.0-rc01'
         constraintLayoutVersion = '2.0.0-beta4'
-        roomVersion = '2.2.2'
+        roomVersion = '2.2.3'
         lifecycleVersion = '2.2.0-rc03'
         lifecycleExtVersion = '2.2.0-rc03'
         recyclerViewVersion = '1.1.0'
-        coroutinesVersion = '1.3.2'
+        coroutinesVersion = '1.3.3'
         ktxVersion = '1.0.1'
         materialVersion = '1.2.0-alpha02'
         activityVersion = '1.1.0-rc03'
-        fragmentVersion = '1.2.0-rc03'
+        fragmentVersion = '1.2.0-rc04'
         coreVersion = '1.2.0-rc01'
-        navigationVersion = '2.2.0-rc03'
+        navigationVersion = '2.2.0-rc04'
 
         advRecyclerVersion='1.0.0'
         gsonVersion= '2.8.6'
-        daggerVersion= '2.25.2'
+        daggerVersion= '2.25.3'
     }
 
 
