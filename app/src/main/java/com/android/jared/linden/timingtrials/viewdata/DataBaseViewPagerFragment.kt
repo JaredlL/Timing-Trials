@@ -69,6 +69,8 @@ class DataBaseViewPagerFragment: Fragment() {
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
                 intent.type = "text/*"
                 startActivityForResult(intent, REQUEST_IMPORT_FILE)
+
+                Toast.makeText(requireContext(), "Select CSV File", Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.app_bar_test->{
