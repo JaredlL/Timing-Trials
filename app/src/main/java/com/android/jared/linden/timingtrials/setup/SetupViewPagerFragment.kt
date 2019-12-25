@@ -1,25 +1,23 @@
 package com.android.jared.linden.timingtrials.setup
 
-import android.content.Intent
 
-
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.android.jared.linden.timingtrials.MainActivity
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
-import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import androidx.lifecycle.Observer
-import androidx.navigation.Navigation
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayoutMediator
+
 
 class SetupViewPagerFragment: Fragment() {
 
@@ -40,6 +38,31 @@ class SetupViewPagerFragment: Fragment() {
         setupViewModel.changeTimeTrial(args.timeTrialId)
 
 
+//        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+//            override fun onTabReselected(tab: TabLayout.Tab?) {
+//                when (tab?.position) {
+//                    RIDER_PAGE_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.VISIBLE
+//                    ORDER_RIDER_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.GONE
+//                    TIMETRIAL_PAGE_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.GONE
+//                    else -> throw IndexOutOfBoundsException()
+//                }
+//            }
+//
+//            override fun onTabUnselected(tab: TabLayout.Tab?) {
+//
+//            }
+//
+//            override fun onTabSelected(tab: TabLayout.Tab?) {
+//                when (tab?.position) {
+//                    RIDER_PAGE_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.VISIBLE
+//                    ORDER_RIDER_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.GONE
+//                    TIMETRIAL_PAGE_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.GONE
+//                    else -> throw IndexOutOfBoundsException()
+//                }
+//            }
+//
+//        })
+
 
 
         viewPager.offscreenPageLimit = 2
@@ -47,26 +70,51 @@ class SetupViewPagerFragment: Fragment() {
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.setIcon(getTabIcon(position))
             tab.text = getTabTitle(position)
+            //manageFabVisibility(position)
         }.attach()
+
+
 
 
         return binding.root
     }
 
+//    private fun setupNewFab() {
+//        val rootCoordinator: CoordinatorLayout = (activity as MainActivity).rootCoordinator
+//        val inflater = requireActivity().getSystemService(Activity.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+//        val fab = inflater.inflate(R.layout.my_fab_definition, rootCoordinator, false) as FloatingActionButton
+//        fab.setOnClickListener { v: View? -> myAction() }
+//        rootCoordinator.addView(fab)
+//    }
+
+//    private fun manageFabVisibility(position: Int){
+//        when (position) {
+//            RIDER_PAGE_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.VISIBLE
+//            ORDER_RIDER_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.GONE
+//            TIMETRIAL_PAGE_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.GONE
+//            else -> throw IndexOutOfBoundsException()
+//        }
+//    }
+
     private fun getTabIcon(position: Int): Int {
         return when (position) {
-            RIDER_PAGE_INDEX -> R.drawable.ic_directions_bike_black_24dp
+            RIDER_PAGE_INDEX -> R.drawable.ic_done_black_24dp
             ORDER_RIDER_INDEX -> R.drawable.ic_filter_1_black_24dp
-            TIMETRIAL_PAGE_INDEX -> R.drawable.ic_timer_black_24dp
+            TIMETRIAL_PAGE_INDEX -> R.drawable.ic_build_black_24dp
             else -> throw IndexOutOfBoundsException()
         }
     }
 
     private fun getTabTitle(position: Int): String? {
         return when (position) {
-            RIDER_PAGE_INDEX -> getString(R.string.select_riders)
-            ORDER_RIDER_INDEX -> getString(R.string.order_riders)
-            TIMETRIAL_PAGE_INDEX->getString(R.string.setup_timetrial)
+            RIDER_PAGE_INDEX -> {
+                getString(R.string.select_riders)
+            }
+            ORDER_RIDER_INDEX -> {
+                getString(R.string.order_riders)
+            }
+            TIMETRIAL_PAGE_INDEX->{
+                getString(R.string.setup_timetrial)}
             else -> null
         }
     }

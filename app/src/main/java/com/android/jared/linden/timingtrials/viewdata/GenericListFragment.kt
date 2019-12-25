@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.jared.linden.timingtrials.MainActivity
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.FragmentListGenericBinding
@@ -25,6 +26,7 @@ import com.android.jared.linden.timingtrials.util.injector
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.android.synthetic.main.fragment_list_generic.*
 
 
 /**
@@ -72,6 +74,8 @@ class GenericListFragment : Fragment() {
             }
         }
 
+
+
         viewManager = LinearLayoutManager(context)
 
         val binding = DataBindingUtil.inflate<FragmentListGenericBinding>(inflater, R.layout.fragment_list_generic, container, false).apply{
@@ -87,7 +91,14 @@ class GenericListFragment : Fragment() {
     }
 
 
-
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//
+//        val p = genericListFab.layoutParams as CoordinatorLayout.LayoutParams
+//        p.anchorId = listHeading.id
+//        genericListFab.layoutParams = p
+//        (requireActivity() as MainActivity).
+//    }
 
     companion object {
         fun newInstance(itemType: String): GenericListFragment {

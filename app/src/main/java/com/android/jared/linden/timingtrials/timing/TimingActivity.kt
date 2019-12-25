@@ -66,7 +66,10 @@ class TimingActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
+
         viewModel = getViewModel { injector.timingViewModel() }
+
+        supportActionBar?.title = "Timetrial in progress"
 
 
         mBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)

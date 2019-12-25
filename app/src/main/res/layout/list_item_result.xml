@@ -26,6 +26,7 @@
             android:layout_marginTop="4dp"
             android:text="@{viewModel.content}"
             android:textSize="16sp"
+            android:maxLength="25"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="00:01:53:2" />

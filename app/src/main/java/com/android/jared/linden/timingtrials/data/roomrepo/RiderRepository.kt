@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import com.android.jared.linden.timingtrials.data.Gender
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.source.RiderDao
-import com.android.jared.linden.timingtrials.viewdata.LineToRiderConverter
 import javax.inject.Inject
 import javax.inject.Singleton
 

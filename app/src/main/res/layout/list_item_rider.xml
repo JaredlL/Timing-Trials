@@ -28,6 +28,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_conversion_wrapHeight="50"
+            android:maxLength="15"
             tools:layout_conversion_wrapWidth="169"
             tools:text="Firstname" />
 
@@ -48,6 +49,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_conversion_wrapHeight="50"
+            android:maxLength="15"
             tools:layout_conversion_wrapWidth="147 "
             tools:text="category" />
 
@@ -57,6 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
             android:layout_marginTop="8dp"
+            android:maxLength="15"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:text="@{rider.club ?? @string/club}"

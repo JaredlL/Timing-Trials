@@ -25,20 +25,6 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Begins At" />
 
-        <TextView
-            android:id="@+id/textView19"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:text="@{viewModel.timeString}"
-            android:textSize="36sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView18"
-            tools:text="00:03:45" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/eventRecyclerView"
             android:layout_width="0dp"
@@ -55,15 +41,17 @@
 
         <Button
             android:id="@+id/button3"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:background="@drawable/background_event_button"
             android:onClick="@{() -> viewModel.onRiderPassed()}"
-            android:text="@string/rider_passed"
+            android:text="@{viewModel.timeString}"
+            android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView19"
-            tools:text="Rider Passed!" />
+            app:layout_constraintTop_toBottomOf="@+id/textView18"
+            tools:text="00:00:00.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -2,19 +2,17 @@ package com.android.jared.linden.timingtrials
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.android.jared.linden.timingtrials.timetrialresults.ResultFragment
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -32,7 +30,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    lateinit var mMainFab: FloatingActionButton
+    //lateinit var mMainFab: FloatingActionButton
+    lateinit var rootCoordinator: CoordinatorLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +44,8 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController, appBarConfiguration)
-        mMainFab = mainFab
+        //mMainFab = mainFab
+        rootCoordinator = mainActivityCoordinator
         val vm = getViewModel { injector.mainViewModel()}
         vm.timingTimeTrial.observe(this, Observer {
             it?.let {
@@ -58,10 +58,13 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener{_,dest,_->
             when(dest.id){
                 R.id.editCourseFragment->{
-                    app_bar_layout.setExpanded(true)
+                    main_app_bar_layout.setExpanded(true)
                 }
                 R.id.editRiderFragment->{
-                    app_bar_layout.setExpanded(true)
+                    main_app_bar_layout.setExpanded(true)
+                }
+                R.id.globalResultFragment->{
+                    main_app_bar_layout.setExpanded(true)
                 }
             }
         }

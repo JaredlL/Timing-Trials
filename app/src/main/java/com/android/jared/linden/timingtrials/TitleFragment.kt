@@ -34,10 +34,10 @@ class TitleFragment : Fragment()
         titleViewModel = requireActivity().getViewModel {  requireActivity().injector.mainViewModel() }
         testViewModel =  requireActivity().getViewModel {  requireActivity().injector.testViewModel() }
 
-        (requireActivity() as MainActivity).mMainFab.setOnClickListener {
-            Toast.makeText(it.context, "i", Toast.LENGTH_SHORT).show()
-        }
-        (requireActivity() as MainActivity).mMainFab.setImageResource(R.drawable.ic_timer_black_24dp)
+//        (requireActivity() as MainActivity).mMainFab.setOnClickListener {
+//            Toast.makeText(it.context, "i", Toast.LENGTH_SHORT).show()
+//        }
+        //(requireActivity() as MainActivity).mMainFab.setImageResource(R.drawable.ic_timer_black_24dp)
 
 
         titleViewModel.nonFinishedTimeTrial.observe(viewLifecycleOwner, Observer {tt->
