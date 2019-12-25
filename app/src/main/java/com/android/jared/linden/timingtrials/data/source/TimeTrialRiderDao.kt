@@ -11,7 +11,7 @@ import com.android.jared.linden.timingtrials.data.TimeTrialRiderResult
 interface TimeTrialRiderDao {
 
     @Insert
-    fun insert(timeTrialRider: TimeTrialRider)
+    fun insert(timeTrialRider: TimeTrialRider): Long
 
     @Insert
     fun insertMultiple(timeTrialRiderList: TimeTrialRider)
@@ -34,6 +34,8 @@ interface TimeTrialRiderDao {
     @Transaction @Query ("SELECT * FROM timetrial_rider_table WHERE courseId = :courseId AND finishTime IS NOT NULL ORDER BY `finishTime`")
     fun getCourseResults(courseId: Long): LiveData<List<TimeTrialRiderResult>>
 
+    @Query("SELECT * FROM timetrial_rider_table WHERE courseId == :courseId AND timeTrialId == :timeTrialId AND riderId == :riderId")
+    fun getByRiderCourseTimeTrialIds(riderId: Long, courseId:Long, timeTrialId: Long): List<TimeTrialRider>
 
 
 }

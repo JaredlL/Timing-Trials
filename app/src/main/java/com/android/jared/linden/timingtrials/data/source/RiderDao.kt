@@ -8,7 +8,7 @@ import com.android.jared.linden.timingtrials.data.Rider
 interface RiderDao {
 
     @Insert
-    fun insert(rider: Rider)
+    fun insert(rider: Rider):Long
 
     @Update
     fun update(rider: Rider)
@@ -26,6 +26,8 @@ interface RiderDao {
     @Query("SELECT *  from rider_table ORDER BY firstName COLLATE NOCASE ASC") fun getAllRidersLight(): LiveData<List<Rider>>
 
     @Query  ("SELECT *  from rider_table ORDER BY firstName COLLATE NOCASE ASC") fun getAllRidersLightSuspend(): List<Rider>
+
+    @Query("SELECT * FROM rider_table WHERE firstName == :firstName AND lastName == :lastName") fun ridersFromFirstLastName(firstName: String, lastName: String): List<Rider>
 
     @Query("SELECT DISTINCT club from rider_table") fun getAllClubs(): LiveData<List<String>>
 

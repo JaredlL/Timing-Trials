@@ -18,8 +18,8 @@ class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao
     }
 
 
-    fun insert (timeTrialRider: TimeTrialRider){
-        timeTrialRiderDao.update(timeTrialRider)
+    fun insert (timeTrialRider: TimeTrialRider): Long{
+        return timeTrialRiderDao.insert(timeTrialRider)
     }
 
     fun delete(timeTrialRider: TimeTrialRider) {
@@ -32,6 +32,10 @@ class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao
 
     fun getCourseResults(courseId: Long): LiveData<List<TimeTrialRiderResult>>{
         return timeTrialRiderDao.getCourseResults(courseId)
+    }
+
+    suspend fun getByRiderCourseTimeTrialIds(riderId: Long, courseId:Long, timeTrialId: Long): List<TimeTrialRider>{
+        return timeTrialRiderDao.getByRiderCourseTimeTrialIds(riderId, courseId, timeTrialId)
     }
 
     fun getRidersForTimeTrial(ttHeader: TimeTrialHeader): LiveData<List<FilledTimeTrialRider>>{

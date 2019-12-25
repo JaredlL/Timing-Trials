@@ -16,13 +16,15 @@ interface ICourseRepository {
 
     suspend fun getCourseSuspend(courseId: Long): Course
 
+    suspend fun getCoursesByName(courseName: String): List<Course>
+
     fun getCourse(courseId: Long) : LiveData<Course>
 
     fun getFirst() : LiveData<Course>
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insert(course: Course)
+    suspend fun insert(course: Course): Long
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
@@ -59,6 +61,11 @@ class RoomCourseRepository @Inject constructor(private val courseDao: CourseDao)
         return courseDao.getAllCoursesSuspend()
     }
 
+    override suspend fun getCoursesByName(courseName: String): List<Course> {
+        return courseDao.getCoursesByName(courseName)
+    }
+
+
     override fun getFirst() : LiveData<Course> {
        return  courseDao.getFirst()
     }
@@ -69,8 +76,8 @@ class RoomCourseRepository @Inject constructor(private val courseDao: CourseDao)
     // thread, blocking the UI.
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    override suspend fun insert(course: Course) {
-        courseDao.insert(course)
+    override suspend fun insert(course: Course):Long {
+       return courseDao.insert(course)
     }
 
     @Suppress("RedundantSuspendModifier")

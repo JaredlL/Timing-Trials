@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.android.jared.linden.timingtrials.data.Gender
 import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.source.RiderDao
+import com.android.jared.linden.timingtrials.viewdata.LineToRiderConverter
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,7 +24,7 @@ interface IRiderRepository {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insert(rider: Rider)
+    suspend fun insert(rider: Rider): Long
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
@@ -44,6 +45,9 @@ interface IRiderRepository {
     suspend fun insertOrUpdate(rider: Rider)
 
     suspend fun ridersFromIds(ids: List<Long>): List<Rider>
+
+    suspend fun ridersFromFirstLastName(firstName:String, lastName:String): List<Rider>
+
 }
 @Singleton
 class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : IRiderRepository {
@@ -66,12 +70,16 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
     // thread, blocking the UI.
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    override suspend fun insert(rider: Rider) {
-        riderDao.insert(rider)
+    override suspend fun insert(rider: Rider):Long {
+        return riderDao.insert(rider)
     }
 
     override suspend fun ridersFromIds(ids: List<Long>): List<Rider> {
        return riderDao.getRidersByIds(ids)
+    }
+
+    override suspend fun ridersFromFirstLastName(firstName: String, lastName: String): List<Rider> {
+        return riderDao.ridersFromFirstLastName(firstName, lastName)
     }
 
 

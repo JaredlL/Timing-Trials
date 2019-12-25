@@ -103,6 +103,8 @@ abstract class TimeTrialDao(db: RoomDatabase) {
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName LIMIT 1") abstract fun getTimeTrialByName(timeTrialName: String): TimeTrial?
 
+    @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName") abstract fun getHeadersByName(timeTrialName: String): List<TimeTrialHeader>
+
     @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName LIMIT 1") abstract fun getLiveTimeTrialByName(timeTrialName: String): LiveData<TimeTrial>
 
     //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
