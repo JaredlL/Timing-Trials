@@ -7,6 +7,7 @@ import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -52,7 +53,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun updateFull(timeTrial: TimeTrial) {
-        System.out.println("JAREDMSG -> TTREPO -> Updating ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
+        Timber.d("JAREDMSG -> TTREPO -> Updating ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
         if((timeTrial.timeTrialHeader.id ?: 0L) == 0L){
             throw Exception("TT ID cannot be null")
         }
@@ -68,17 +69,17 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun insert(timeTrial: TimeTrial):Long {
-        System.out.println("JAREDMSG -> TTREPO -> Inserting New TT ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
-        if(timeTrial.timeTrialHeader.status != TimeTrialStatus.FINISHED){
-            throw Exception("Cannot insertFull non finished TT")
-        }
+        Timber.d("JAREDMSG -> TTREPO -> Inserting New TT ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
+//        if(timeTrial.timeTrialHeader.status != TimeTrialStatus.FINISHED){
+//            throw Exception("Cannot insertFull non finished TT")
+//        }
        return timeTrialDao.insertFull(timeTrial)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun insertNewHeader(timeTrial: TimeTrialHeader):Long {
-        System.out.println("JAREDMSG -> TTREPO -> Inserting New TT Header into DB from background thread")
+        Timber.d("JAREDMSG -> TTREPO -> Inserting New TT Header into DB from background thread")
         return timeTrialDao.insert(timeTrial)
     }
 

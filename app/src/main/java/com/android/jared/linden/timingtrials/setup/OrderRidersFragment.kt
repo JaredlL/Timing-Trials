@@ -47,6 +47,7 @@ class OrderRidersFragment : Fragment() {
         val dragDropManager = RecyclerViewDragDropManager().apply {
             setInitiateOnMove(false)
             setInitiateOnLongPress(true)
+            setLongPressTimeout(300)
         }
 
         val wrappedAdapter = dragDropManager.createWrappedAdapter(mAdapter)

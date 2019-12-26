@@ -8,8 +8,11 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
+import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.databinding.ListItemEventButtonBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemEventTextBinding
+import com.android.jared.linden.timingtrials.domain.ITimelineEvent
 import com.android.jared.linden.timingtrials.domain.TimelineEventType
 import com.android.jared.linden.timingtrials.ui.EventViewWrapper
 
@@ -33,20 +36,32 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
             _binding.apply {
                 event = eventWrapper
 
-                if(eventWrapper.event.eventType == TimelineEventType.RIDER_PASSED){
-                    text1.setTextColor(Color.BLUE)
+                when (eventWrapper.event.eventType) {
+                    TimelineEventType.RIDER_PASSED -> {
+                        text1.setTextColor(Color.BLUE)
+                    }
+                    TimelineEventType.RIDER_FINISHED -> {
+                        text1.setTextColor(Color.MAGENTA)
+                    }
+                    else -> {
+                        text1.setTextColor(Color.BLACK)
+                    }
                 }
-                else if(eventWrapper.event.eventType == TimelineEventType.RIDER_FINISHED){
-                    text1.setTextColor(Color.MAGENTA)
-                }else{
-                    text1.setTextColor(Color.BLACK)
+                val event = eventWrapper.event
+                if(event.rider != null){
+                    text1.setOnLongClickListener {
+                        longClick(event)
+                        true
+                    }
                 }
+
                 executePendingBindings()
             }
 
         }
     }
 
+    var longClick = {_: ITimelineEvent -> Unit}
 
     private var mEvents: List<EventViewWrapper> = listOf()
     private val layoutInflater = LayoutInflater.from(context)

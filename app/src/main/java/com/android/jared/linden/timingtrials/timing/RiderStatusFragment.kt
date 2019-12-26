@@ -6,7 +6,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 
@@ -36,12 +38,12 @@ class RiderStatusFragment : Fragment() {
         val viewManager = GridLayoutManager(context, 4)
 
         timingViewModel.timeLine.observe(viewLifecycleOwner, Observer {tt->
-            val newList = tt.timeTrial.riderList.asSequence().filter { tt.getRiderStatus(it.timeTrialData) != RiderStatus.FINISHED }.map { r -> RiderStatusViewWrapper(r.timeTrialData, tt ).apply {
+            val newList = tt.timeTrial.riderList.asSequence().filter { tt.getRiderStatus(it.timeTrialData) != RiderStatus.FINISHED }.sortedBy { it.timeTrialData.number }.map { r -> RiderStatusViewWrapper(r.timeTrialData, tt ).apply {
                 onPressedCallback = {
                     timingViewModel.tryAssignRider(it)
                 }
             }
-            }.sortedBy { it.number }.toList()
+            }.toList()
             if (newList.isNotEmpty()){
                 viewResultsButton.visibility = View.GONE
             }else{
@@ -50,6 +52,9 @@ class RiderStatusFragment : Fragment() {
             adapter.setRiderStatus(newList)
         })
 
+        adapter.onLongClick = {
+
+        }
 
 
         val binding = DataBindingUtil.inflate<FragmentTimerRiderStatusBinding>(inflater, R.layout.fragment_timer_rider_status, container, false).apply {
@@ -66,11 +71,26 @@ class RiderStatusFragment : Fragment() {
         return binding.root
     }
 
+
+
     companion object {
         fun newInstance(): RiderStatusFragment {
             return RiderStatusFragment()
         }
     }
 
+
+}
+
+class RiderStatusDialog: DialogFragment(){
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
 
 }

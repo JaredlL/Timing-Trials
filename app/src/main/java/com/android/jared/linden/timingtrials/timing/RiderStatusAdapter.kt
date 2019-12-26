@@ -6,7 +6,9 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderStatusBinding
+import com.android.jared.linden.timingtrials.ui.RiderStatus
 import com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper
 
 class RiderStatusAdapter internal constructor(val context: Context): RecyclerView.Adapter<RiderStatusAdapter.RiderStatusViewHolder>(){
@@ -17,6 +19,19 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
         fun bind(status: RiderStatusViewWrapper){
             _binding.apply {
                 viewModel = status
+
+                riderStatusTextView.background = if(status.riderStatus() == RiderStatus.NOT_STARTED){
+                    context.getDrawable(R.drawable.background_rider_status_inactive)
+                }else{
+                    context.getDrawable(R.drawable.background_rider_status_active)
+                }
+
+                riderStatusTextView.setOnLongClickListener {
+                    onLongClick(status.rider)
+                    true
+                }
+
+
                 executePendingBindings()
             }
 
@@ -25,6 +40,8 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
 
     var mStatus: List<RiderStatusViewWrapper> = listOf()
     val layoutInflater = LayoutInflater.from(context)
+
+    var onLongClick = {rider: TimeTrialRider -> Unit}
 
     fun setRiderStatus(newStatus: List<RiderStatusViewWrapper>){
         mStatus = newStatus

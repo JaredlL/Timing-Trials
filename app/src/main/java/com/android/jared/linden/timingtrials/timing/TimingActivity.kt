@@ -25,6 +25,7 @@ import com.google.android.material.snackbar.Snackbar
 
 import kotlinx.android.synthetic.main.activity_timing.*
 import org.threeten.bp.Instant
+import timber.log.Timber
 import java.lang.Exception
 
 class TimingActivity : AppCompatActivity() {
@@ -129,7 +130,7 @@ class TimingActivity : AppCompatActivity() {
         when(timeTrialHeader.status){
             TimeTrialStatus.SETTING_UP -> {
                 if(mBound){
-                    println("JAREDMSG -> Timing Activity -> Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
+                    Timber.d("Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
                     applicationContext.unbindService(connection)
                     service.stop()
                     mBound = false
@@ -137,12 +138,11 @@ class TimingActivity : AppCompatActivity() {
                 finish()
             }
             TimeTrialStatus.IN_PROGRESS -> {
-                println("JAREDMSG -> Timing Activity -> Got in progress TT and Service is up, lets roll")
                 service.startTiming(timeTrialHeader)
             }
             TimeTrialStatus.FINISHED -> {
                 if(mBound){
-                    println("JAREDMSG -> Timing Activity -> Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
+                    Timber.d("Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
                     applicationContext.unbindService(connection)
                     service.stop()
                     mBound = false

@@ -3,12 +3,14 @@ package com.android.jared.linden.timingtrials.timing
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
+import com.android.jared.linden.timingtrials.domain.ITimelineEvent
 import com.android.jared.linden.timingtrials.domain.TimeLine
 import com.android.jared.linden.timingtrials.domain.TimeTrialHelper
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import com.android.jared.linden.timingtrials.util.Event
 import kotlinx.coroutines.*
 import org.threeten.bp.Instant
+import timber.log.Timber
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -45,7 +47,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     init {
         timeTrial.addSource(timeTrialRepository.getTimingTimeTrial()) {new ->
             if(new != null && !isCorotineAlive.get() && !new.equalsOtherExcludingIds(timeTrial.value)) {
-                println("JAREDMSG -> TIMINGVM -> TimingTt self updating TT, ${new.timeTrialHeader.timeStamps} unassigned")
+                Timber.d("JAREDMSG -> TIMINGVM -> TimingTt self updating TT, ${new.timeTrialHeader.timeStamps} unassigned")
                 timeTrial.value = new
             }
         }
@@ -97,6 +99,24 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     }
 
+    fun unassignRiderFromEvent(event: ITimelineEvent){
+        event.rider?.let { rider->
+            timeTrial.value?.let { tt->
+                val newtt = tt.copy(riderList = tt.riderList.map {
+                    if(it.timeTrialData.id == rider.timeTrialData.id)
+                    {
+                        it.copy(timeTrialData = it.timeTrialData.copy(splits = it.timeTrialData.splits.minus(event.timeStamp)))
+                    }
+                    else{
+                        it
+                    }
+                }, timeTrialHeader = tt.timeTrialHeader.copy(timeStamps = tt.timeTrialHeader.timeStamps + event.timeStamp))
+
+                updateTimeTrial(newtt)
+            }
+        }
+    }
+
     var iters =0
     var looptime = 0L
 
@@ -105,7 +125,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     private fun updateTimeTrial(newtt: TimeTrial){
         timeTrial.value = newtt
-        println("JAREDMSG -> TIMINGVM -> Update TT, ${newtt.riderList.size} riders")
+        Timber.d("JAREDMSG -> TIMINGVM -> Update TT, ${newtt.riderList.size} riders")
             if(!isCorotineAlive.get()){
                 queue.add(newtt)
                 viewModelScope.launch(Dispatchers.IO) {
@@ -144,7 +164,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             val endtime = System.currentTimeMillis() - startts
             looptime += endtime
             if(iters++ == 100){
-                println("JAREDMSG -> TIMINGVM -> Time for 100 loops =  $looptime")
+                Timber.d("JAREDMSG -> TIMINGVM -> Time for 100 loops =  $looptime")
                 looptime = 0
                 iters = 0
             }
@@ -161,7 +181,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     }
 
     fun discardTt(){
-        println("JAREDMSG -> TIMINGVM -> Deleting TT")
+        Timber.d("JAREDMSG -> TIMINGVM -> Deleting TT")
         viewModelScope.launch(Dispatchers.IO) {
             var deleted = false
             while (!deleted){

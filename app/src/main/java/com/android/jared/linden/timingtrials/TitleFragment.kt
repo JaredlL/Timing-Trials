@@ -76,9 +76,8 @@ class TitleFragment : Fragment()
 //
 //
             testTimingButton.setOnClickListener {
-                titleViewModel.nonFinishedTimeTrial.value?.let {
-                    testViewModel.testTiming(it)
-                }
+
+                testViewModel.testTiming()
             }
 
             testResults1.setOnClickListener {
