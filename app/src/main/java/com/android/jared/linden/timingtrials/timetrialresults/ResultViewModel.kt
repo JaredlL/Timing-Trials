@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.*
 import com.android.jared.linden.timingtrials.util.ConverterUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val riderRepository: IRiderRepository, val courseRepository: ICourseRepository, val resultRepository: TimeTrialRiderRepository) : ViewModel() {
@@ -42,6 +44,15 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
 
 
 
+    fun delete(){
+        timeTrial.value?.let {
+            viewModelScope.launch(Dispatchers.IO) {
+                timeTrialRepository.delete(it)
+            }
+
+        }
+
+    }
 
     fun getHeading(tt: TimeTrial): ResultRowViewModel{
         val mutList: MutableList<String> = mutableListOf()

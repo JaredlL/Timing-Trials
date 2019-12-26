@@ -38,21 +38,23 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
 
                 when (eventWrapper.event.eventType) {
                     TimelineEventType.RIDER_PASSED -> {
-                        text1.setTextColor(Color.BLUE)
+                        text1.setTextColor(context.resources.getColor(R.color.colorPrimary))
                     }
                     TimelineEventType.RIDER_FINISHED -> {
-                        text1.setTextColor(Color.MAGENTA)
+                        text1.setTextColor(context.resources.getColor(R.color.colorAccent))
                     }
                     else -> {
-                        text1.setTextColor(Color.BLACK)
+                        text1.setTextColor(context.resources.getColor(R.color.mainBackground))
                     }
                 }
                 val event = eventWrapper.event
-                if(event.rider != null){
-                    text1.setOnLongClickListener {
+                if(event.rider != null && event.eventType != TimelineEventType.RIDER_STARTED){
+                    listItemEventTextContraint.setOnLongClickListener {
                         longClick(event)
                         true
                     }
+                }else{
+                    listItemEventTextContraint.setOnLongClickListener { false }
                 }
 
                 executePendingBindings()

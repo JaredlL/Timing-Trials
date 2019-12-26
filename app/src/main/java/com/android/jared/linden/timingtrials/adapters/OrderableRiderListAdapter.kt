@@ -1,19 +1,25 @@
 package com.android.jared.linden.timingtrials.adapters
 
 import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.*
+import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
+import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.databinding.ListItemOrderableRiderBinding
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder
 
 
-class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<OrderableRiderListAdapter.OrderableRiderViewHolder>(),
+class OrderableRiderListAdapter(val context: Context) : RecyclerView.Adapter<OrderableRiderListAdapter.OrderableRiderViewHolder>(),
         DraggableItemAdapter<OrderableRiderListAdapter.OrderableRiderViewHolder> {
 
     init {
@@ -70,7 +76,13 @@ class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<Orderab
     }
 
     override fun onItemDragStarted(position: Int) {
+        val v = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v!!.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else { //deprecated in API 26
+            v!!.vibrate(50)
+        }
     }
 
     override fun onMoveItem(fromPosition: Int, toPosition: Int) {

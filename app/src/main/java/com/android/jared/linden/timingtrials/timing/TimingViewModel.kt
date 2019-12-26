@@ -102,17 +102,9 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     fun unassignRiderFromEvent(event: ITimelineEvent){
         event.rider?.let { rider->
             timeTrial.value?.let { tt->
-                val newtt = tt.copy(riderList = tt.riderList.map {
-                    if(it.timeTrialData.id == rider.timeTrialData.id)
-                    {
-                        it.copy(timeTrialData = it.timeTrialData.copy(splits = it.timeTrialData.splits.minus(event.timeStamp)))
-                    }
-                    else{
-                        it
-                    }
-                }, timeTrialHeader = tt.timeTrialHeader.copy(timeStamps = tt.timeTrialHeader.timeStamps + event.timeStamp))
 
-                updateTimeTrial(newtt)
+
+                updateTimeTrial(tt.helper.unassignRiderFromEvent(rider.timeTrialData, event.timeStamp))
             }
         }
     }

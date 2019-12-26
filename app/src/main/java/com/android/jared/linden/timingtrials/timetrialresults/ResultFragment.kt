@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -144,6 +145,11 @@ class ResultFragment : Fragment() {
                     //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
                 }
                 startActivityForResult(intent, REQUEST_CREATE_FILE_JSON)
+                true
+            }
+            R.id.resultMenuDelete->{
+                resultViewModel.delete()
+                findNavController().popBackStack()
                 true
             }
             else -> super.onOptionsItemSelected(item)

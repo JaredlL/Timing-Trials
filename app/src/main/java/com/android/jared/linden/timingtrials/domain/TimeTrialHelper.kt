@@ -34,6 +34,23 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
         return RiderAssignmentResult(true, "Success", timeTrial.copy(riderList = newRiderList, timeTrialHeader = newHeader))
     }
 
+    fun unassignRiderFromEvent(ttRider: TimeTrialRider, eventTimestamp: Long): TimeTrial{
+
+        val convertedTimeStamp = eventTimestamp - getRiderStartTime(ttRider)
+
+        return timeTrial.copy(riderList = timeTrial.riderList.map {
+            if(it.timeTrialData.id == ttRider.id)
+            {
+                it.copy(timeTrialData = it.timeTrialData.copy(splits = it.timeTrialData.splits.minus(convertedTimeStamp)))
+            }
+            else{
+                it
+            }
+        }, timeTrialHeader = timeTrial.timeTrialHeader.copy(timeStamps = timeTrial.timeTrialHeader.timeStamps + eventTimestamp))
+
+
+    }
+
 
     val finishedRiders: List<TimeTrialRider> by lazy {
         timeTrial.riderList.asSequence().map { it.timeTrialData }.filter { it.splits.size == timeTrial.timeTrialHeader.laps }.toList()

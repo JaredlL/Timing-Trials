@@ -162,10 +162,21 @@ class TimingActivity : AppCompatActivity() {
 
     var prevBackPress = 0L
     override fun onBackPressed() {
+        val tt = viewModel.timeTrial.value
+
+        if(tt==null)
+        {
+            applicationContext.unbindService(connection)
+            mService.value?.stop()
+            mBound = false
+            finish()
+        }
+
         if(System.currentTimeMillis() > prevBackPress + 2000){
             Toast.makeText(this, "Tap again to end", Toast.LENGTH_SHORT).show()
             prevBackPress = System.currentTimeMillis()
         }else{
+
 
             viewModel.timeTrial.value?.let{
                 if(it.timeTrialHeader.startTime.toInstant() > Instant.now()){
