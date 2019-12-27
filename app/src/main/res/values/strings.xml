@@ -60,9 +60,15 @@
     <string name="timingtrials_database">Timing Trials Database</string>
     <string name="rider_start_offset">First rider start offset</string>
     <string name="delete">Delete</string>
+    <string name="undo">Undo</string>
+    <string name="undo_dnf">Undo DNF?</string>
+    <string name="undo_dns">Undo DNS?</string>
+    <string name="undo_dns_description">Undo and set rider to active?</string>
     <string name="delete_rider">Delete Rider</string>
+    <string name="delete_timetrial">Delete TimeTrial</string>
     <string name="confirm_delete_rider_message">Are you sure? ALL results associated with this rider will be lost!</string>
     <string name="confirm_delete_course_message">Are you sure? ALL results associated with this course will be lost!</string>
+    <string name="confirm_delete_timetrial_message">Are you sure? These results will be deleted, This cannot be undone!</string>
     <string name="delete_course">Delete Course</string>
     <string name="title_activity_global_result">GlobalResultActivity</string>
     <string name="resume_setup">Resume setting up</string>

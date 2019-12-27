@@ -71,7 +71,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     fun onRiderPassed(){
         timeTrial.value?.let { tte->
             val now = Instant.now().toEpochMilli() - tte.timeTrialHeader.startTimeMilis
-            if (tte.helper.riderStartTimes.firstKey() > now){
+            if (tte.helper.sortedRiderStartTimes.firstKey() > now){
                 showMessage("First rider has not started yet")
             }else{
                 val newHeader = tte.timeTrialHeader.copy(timeStamps = tte.timeTrialHeader.timeStamps + now)
@@ -79,6 +79,8 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             }
         }
     }
+
+
 
     fun tryAssignRider(ttRider: TimeTrialRider){
         timeTrial.value?.let{tt->
@@ -102,8 +104,6 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     fun unassignRiderFromEvent(event: ITimelineEvent){
         event.rider?.let { rider->
             timeTrial.value?.let { tt->
-
-
                 updateTimeTrial(tt.helper.unassignRiderFromEvent(rider.timeTrialData, event.timeStamp))
             }
         }
@@ -117,7 +117,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     private fun updateTimeTrial(newtt: TimeTrial){
         timeTrial.value = newtt
-        Timber.d("JAREDMSG -> TIMINGVM -> Update TT, ${newtt.riderList.size} riders")
+        Timber.d("Update TT, ${newtt.riderList.size} riders")
             if(!isCorotineAlive.get()){
                 queue.add(newtt)
                 viewModelScope.launch(Dispatchers.IO) {
@@ -156,7 +156,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             val endtime = System.currentTimeMillis() - startts
             looptime += endtime
             if(iters++ == 100){
-                Timber.d("JAREDMSG -> TIMINGVM -> Time for 100 loops =  $looptime")
+                Timber.d("Time for 100 loops =  $looptime")
                 looptime = 0
                 iters = 0
             }
@@ -164,6 +164,37 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         }
 
     }
+
+    fun moveRiderToBack(rider: TimeTrialRider){
+        timeTrial.value?.let {
+            updateTimeTrial(it.helper.moveRiderToBack(rider))
+        }
+    }
+
+    fun riderDns(rider: TimeTrialRider){
+        timeTrial.value?.let {
+            updateTimeTrial(it.helper.riderDns(rider))
+        }
+    }
+
+    fun riderDnf(rider: TimeTrialRider){
+        timeTrial.value?.let {
+            updateTimeTrial(it.helper.riderDnf(rider))
+        }
+    }
+
+    fun setRiderStartTime(riderId: Long, startTime: Long){
+        timeTrial.value?.let {
+            updateTimeTrial(it.helper.setRiderStartTime(riderId, startTime))
+        }
+    }
+
+    fun undoDnf(rider: TimeTrialRider){
+        timeTrial.value?.let {
+            updateTimeTrial(it.helper.undoDnf(rider))
+        }
+    }
+
 
     fun finishTt(){
         timeTrial.value?.let {

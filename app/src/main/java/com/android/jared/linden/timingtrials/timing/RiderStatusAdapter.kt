@@ -20,14 +20,16 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
             _binding.apply {
                 viewModel = status
 
-                riderStatusTextView.background = if(status.riderStatus() == RiderStatus.NOT_STARTED){
-                    context.getDrawable(R.drawable.background_rider_status_inactive)
-                }else{
-                    context.getDrawable(R.drawable.background_rider_status_active)
+                riderStatusTextView.background = when(status.status){
+                    RiderStatus.NOT_STARTED -> context.getDrawable(R.drawable.background_rider_status_inactive)
+                    RiderStatus.RIDING -> context.getDrawable(R.drawable.background_rider_status_active)
+                    RiderStatus.DNS -> context.getDrawable(R.drawable.background_rider_status_dnf)
+                    RiderStatus.DNF -> context.getDrawable(R.drawable.background_rider_status_dnf)
+                    else-> context.getDrawable(R.drawable.background_rider_status_inactive)
                 }
 
                 riderStatusTextView.setOnLongClickListener {
-                    onLongClick(status.rider)
+                    onLongClick(status)
                     true
                 }
 
@@ -41,7 +43,7 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
     var mStatus: List<RiderStatusViewWrapper> = listOf()
     val layoutInflater = LayoutInflater.from(context)
 
-    var onLongClick = {rider: TimeTrialRider -> Unit}
+    var onLongClick = {rider: RiderStatusViewWrapper -> Unit}
 
     fun setRiderStatus(newStatus: List<RiderStatusViewWrapper>){
         mStatus = newStatus
@@ -56,6 +58,11 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
             }
         }
     }
+
+    override fun getItemId(position: Int): Long {
+        return mStatus[position].rider.riderId
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RiderStatusViewHolder {
         val binding: ListItemRiderStatusBinding = DataBindingUtil.inflate(layoutInflater, R.layout.list_item_rider_status, parent, false)

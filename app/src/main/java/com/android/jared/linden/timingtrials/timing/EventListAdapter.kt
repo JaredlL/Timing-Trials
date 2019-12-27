@@ -95,6 +95,10 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
         }
     }
 
+    override fun getItemId(position: Int): Long {
+        return mEvents[position].event.timeStamp
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when(viewType){
             R.layout.list_item_event_button ->{

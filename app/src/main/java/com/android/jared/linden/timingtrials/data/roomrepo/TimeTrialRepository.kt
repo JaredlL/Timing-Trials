@@ -84,37 +84,6 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     }
 
 
-//    private val inserting: MutableLiveData<Boolean> = MutableLiveData(false)
-//
-//
-//
-//    private val nonFinishedMediator = MediatorLiveData<TimeTrial>()
-//
-//    private val insertingBool = AtomicBoolean()
-//    init {
-//        nonFinishedMediator.addSource(timeTrialDao.getNonFinishedFullTtLive()){timeTrial->
-//            println("JAREDMSG -> TTREPO -> Getting time trial ${timeTrial?.timeTrialHeader?.id} ${timeTrial?.timeTrialHeader?.ttName}")
-//            if(timeTrial == null) {
-//                if (!insertingBool.get()) {
-//                    insertingBool.set(true)
-//                    println("JAREDMSG -> TTREPO -> Set inserting to TRUE")
-//                    CoroutineScope(Dispatchers.IO).launch {
-//                        println("JAREDMSG -> TTREPO Corotine launched, going to insert")
-//                        val id = timeTrialDao.insert(TimeTrialHeader.createBlank())
-//                        println("JAREDMSG -> TTREPO TT Inserted ${id} -> Set inserting to FALSE")
-//                        insertingBool.set(false)
-//                    }
-//                }
-//            }
-//            println("JAREDMSG -> TTREPO -> SET nonFinishedMediator to ${timeTrial?.timeTrialHeader?.id} ${timeTrial?.timeTrialHeader?.ttName}")
-//            nonFinishedMediator.value = timeTrial
-//        }
-//    }
-
-//    override val nonFinishedFullTimeTrial: LiveData<TimeTrial?> = Transformations.map(nonFinishedMediator){tt->
-//        tt?.copy(riderList = tt.riderList.sortedBy { it.timeTrialData.index }) ?: tt
-//    }
-
 
 
 
@@ -127,7 +96,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun update(timeTrialHeader: TimeTrialHeader) {
-        System.out.println("JAREDMSG -> TTREPO -> Updating ${timeTrialHeader.id} ${timeTrialHeader.ttName} into DB from background thread")
+        Timber.d("JAREDMSG -> TTREPO -> Updating ${timeTrialHeader.id} ${timeTrialHeader.ttName} into DB from background thread")
         if((timeTrialHeader.id ?: 0L) == 0L){
             throw Exception("TT ID cannot be null")
         }

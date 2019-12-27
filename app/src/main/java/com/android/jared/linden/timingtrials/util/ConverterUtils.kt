@@ -39,6 +39,7 @@ object ConverterUtils{
     }
 
     fun toTenthsDisplayString(miliseconds: Long): String{
+        if(miliseconds == Long.MAX_VALUE) return ""
         val milis = abs(miliseconds)
         val secs =  (milis/1000)
         return String.format("%d:%02d:%02d.%1d", secs / 3600, (secs % 3600) / 60, (secs % 60),  (milis % 1000) / 100)

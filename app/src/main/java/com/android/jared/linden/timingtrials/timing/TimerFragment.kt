@@ -70,6 +70,8 @@ class TimerFragment : Fragment() {
             }
         })
 
+        adapter.setHasStableIds(true)
+
         adapter.longClick = {
 
                 showEventDialog(it)

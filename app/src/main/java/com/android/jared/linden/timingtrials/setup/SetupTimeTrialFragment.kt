@@ -4,6 +4,7 @@ package com.android.jared.linden.timingtrials.setup
 import android.app.Dialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.text.format.DateFormat
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -137,7 +138,7 @@ class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener 
         val minute = ldt.minute
 
         // Create a new instance of TimePickerDialog and return it
-        return TimePickerDialog(activity, this, hour, minute, true)
+        return TimePickerDialog(activity, this, hour, minute, DateFormat.is24HourFormat(activity))
     }
 
     override fun onTimeSet(view: TimePicker, hourOfDay: Int, minute: Int) {

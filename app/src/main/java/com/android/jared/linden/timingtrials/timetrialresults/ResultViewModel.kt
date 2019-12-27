@@ -28,7 +28,7 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
 
     val results = Transformations.map(timeTrial){tt->
         if(tt != null && tt.timeTrialHeader.status == TimeTrialStatus.FINISHED) {
-            (sequenceOf(getHeading(tt)) + tt.helper.results.asSequence().sortedBy { it.resultTime }.map { res-> ResultRowViewModel(res, tt.timeTrialHeader.laps) }).toList()
+            (sequenceOf(getHeading(tt)) + tt.helper.results.asSequence().map { res-> ResultRowViewModel(res, tt.timeTrialHeader.laps) }).toList()
         }else{
             null
         }

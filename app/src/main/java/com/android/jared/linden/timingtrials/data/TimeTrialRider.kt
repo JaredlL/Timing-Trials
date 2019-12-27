@@ -63,7 +63,15 @@ data class TimeTrialRiderResult(
         get() = timeTrialData.notes
 
     override val resultTime: Long
-        get() = timeTrialData.finishTime?:Long.MAX_VALUE
+        get() = if(timeTrialData.finishTime == null){
+            Long.MAX_VALUE
+        }else{
+            if(timeTrialData.finishTime < 0){
+                Long.MAX_VALUE
+            }else{
+                timeTrialData.finishTime
+            }
+        }
 
     override val splits: List<Long>
         get() = if( timeTrialData.splits.isNotEmpty()) listOf(timeTrialData.splits.first()) + timeTrialData.splits.zipWithNext{a,b -> b-a} else listOf()
@@ -73,6 +81,7 @@ data class TimeTrialRiderResult(
 
     override val timeTrial: TimeTrialHeader?
         get() = timeTrialHeader
+
 }
 
 data class FilledTimeTrialRider(

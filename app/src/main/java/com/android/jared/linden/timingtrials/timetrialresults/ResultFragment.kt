@@ -21,6 +21,7 @@ import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.util.TypedValue
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -148,8 +149,7 @@ class ResultFragment : Fragment() {
                 true
             }
             R.id.resultMenuDelete->{
-                resultViewModel.delete()
-                findNavController().popBackStack()
+                showDeleteDialog()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -174,6 +174,20 @@ class ResultFragment : Fragment() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         Toast.makeText(requireActivity(), "Permission Request", Toast.LENGTH_SHORT).show()
+    }
+
+    fun showDeleteDialog(){
+        AlertDialog.Builder(requireContext())
+                .setTitle(resources.getString(R.string.delete_timetrial))
+                .setMessage(resources.getString(R.string.confirm_delete_timetrial_message))
+                .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
+                    resultViewModel.delete()
+                    findNavController().popBackStack()
+                }
+                .setNegativeButton("Dismiss"){_,_->
+
+                }
+                .create().show()
     }
 
     private fun writeCsv(uri: Uri){
