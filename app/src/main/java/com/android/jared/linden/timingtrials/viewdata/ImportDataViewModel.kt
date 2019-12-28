@@ -45,11 +45,12 @@ class ImportViewModel @Inject constructor(private val riderRespository: IRiderRe
         val lineToCourse = LineToCourseConverter()
         val lineToRider = LineToRiderConverter()
 
-        var currentLine = reader.readLine()
+        var currentLine:String? = reader.readLine().replace(""""""", "")
         val timeTrialList: MutableList<ImportTimeTrial> = mutableListOf()
         var state = READING_TT
 
         while (currentLine != null){
+
             if(lineToTt.isHeading(currentLine)){
                 lineToTt.setHeading(currentLine)
                 timeTrialList.add(ImportTimeTrial())
@@ -89,6 +90,10 @@ class ImportViewModel @Inject constructor(private val riderRespository: IRiderRe
                 }
             }
             currentLine = reader.readLine()
+            if(currentLine != null){
+                currentLine = currentLine.replace(""""""", "")
+                currentLine = currentLine.replace("""'""", "")
+            }
         }
 
         timeTrialList.forEach {

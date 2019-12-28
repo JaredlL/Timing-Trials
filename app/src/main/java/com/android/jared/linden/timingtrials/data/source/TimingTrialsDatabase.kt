@@ -36,9 +36,8 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
                         TimingTrialsDatabase::class.java,
                         "timingtrials_database")
                         .fallbackToDestructiveMigration()
-                        .addCallback(TimingTrialsDatabaseCallback(scope))
+                        //.addCallback(TimingTrialsDatabaseCallback(scope))
                         .build()
-                System.out.println("JAREDMSG -> CREATE DB")
 
                 INSTANCE = instance
                 instance
@@ -61,14 +60,13 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
                 super.onOpen(db)
                 // If you want to keep the data through app restarts,
                 // comment out the following line.
-                System.out.println("JAREDMSG -> OPEN DB")
+
                 INSTANCE?.let { database ->
                     scope.launch(Dispatchers.IO) {
                             populateRiders(database.riderDao())
                             populateCourses(database.courseDao())
                             populateTt(database.timeTrialDao(), database.riderDao(), database.courseDao())
                             database.mDbIsPopulated.postValue(true)
-                            System.out.println("JAREDMSG -> POPULATE DB")
                     }
                 }
             }
@@ -79,6 +77,7 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             // Start the app with a clean database every time.
             // Not needed if you only populate on creation.
             riderDao.deleteAll()
+            return
             riderDao.insert(createBaseRider("Jared", "Linden", "RDFCC", 1990, Gender.MALE))
             riderDao.insert(createBaseRider("Adam", "Taylor", "RDFCC", 1976, Gender.MALE))
             riderDao.insert(createBaseRider("John", "Linden", "RDFCC", 1955, Gender.MALE))
@@ -129,6 +128,7 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
 
         fun populateCourses(courseDao: CourseDao){
             courseDao.deleteAll()
+            return
             courseDao.insert(Course("Lydbrook 10", 16093.4, "UC603"))
             courseDao.insert(Course("Hilly Lydbrook", 24140.2, "UC612"))
             courseDao.insert(Course("Cannop", 19312.1, "UC611"))

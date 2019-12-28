@@ -18,7 +18,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/genericTextView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -31,7 +31,7 @@
             tools:text="Firstname" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/genericTextView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -51,7 +51,7 @@
             tools:text="category" />
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/genericTextView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"

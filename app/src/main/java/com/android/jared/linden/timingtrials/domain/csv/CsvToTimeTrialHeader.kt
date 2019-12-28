@@ -40,7 +40,7 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
                     date = LocalDate.parse(dateString, formatter)
                     break
                 }catch(e:Exception) {
-
+                    val b = e
                 }
             }
             val offsetDateTime = date?.let { OffsetDateTime.of(it, LocalTime.of(19,0,0), ZoneId.systemDefault().rules.getOffset(Instant.now()))}

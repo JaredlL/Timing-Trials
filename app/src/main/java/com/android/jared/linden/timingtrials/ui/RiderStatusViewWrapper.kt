@@ -1,5 +1,6 @@
 package com.android.jared.linden.timingtrials.ui
 
+import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.domain.TimeLine
@@ -13,8 +14,9 @@ enum class RiderStatus {
 
 }
 
-class RiderStatusViewWrapper(val rider: TimeTrialRider, val timeLine: TimeLine){
+class RiderStatusViewWrapper(val filledRider: FilledTimeTrialRider, val timeLine: TimeLine){
 
+    val rider = filledRider.timeTrialData
     val number: String = rider.number.toString()
 
     val startTimeMilis: Long = timeLine.timeTrial.timeTrialHeader.startTimeMilis + timeLine.timeTrial.helper.getRiderStartTime(rider)

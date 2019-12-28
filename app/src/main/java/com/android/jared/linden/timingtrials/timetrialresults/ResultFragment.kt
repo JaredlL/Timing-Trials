@@ -61,7 +61,7 @@ class ResultFragment : Fragment() {
         resultGridAdapter = ResultListAdapter(requireActivity())
         resultGridAdapter.setHasStableIds(true)
 
-        requireActivity().invalidateOptionsMenu()
+        //requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
 
         resultViewModel = requireActivity().getViewModel {  requireActivity().injector.resultViewModel() }.apply { changeTimeTrial(args.timeTrialId) }
@@ -278,7 +278,8 @@ class ResultFragment : Fragment() {
 
             val imgName = "${ttName?:nowChars}.jpeg"
 
-            val scrollViewWidth = horizontalScrollView.getChildAt(0).width
+            //val scrollViewWidth = horizontalScrollView.getChildAt(0).width
+            val scrollViewWidth = 200
 
             val sr = fragResultRecyclerView.computeVerticalScrollRange()
 

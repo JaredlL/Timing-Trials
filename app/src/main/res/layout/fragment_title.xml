@@ -67,7 +67,7 @@
             android:layout_marginStart="125dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="125dp"
-            android:text="Test Setup"
+            android:text="Delete All"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/viewDatabaseButton" />

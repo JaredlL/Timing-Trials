@@ -49,7 +49,7 @@ class RiderStatusFragment : Fragment() {
         val viewManager = GridLayoutManager(context, 4)
 
         timingViewModel.timeLine.observe(viewLifecycleOwner, Observer {tt->
-            val newList = tt.timeTrial.riderList.asSequence().filter { tt.getRiderStatus(it.timeTrialData) != RiderStatus.FINISHED }.map { r -> RiderStatusViewWrapper(r.timeTrialData, tt ).apply {
+            val newList = tt.timeTrial.riderList.asSequence().filter { tt.getRiderStatus(it.timeTrialData) != RiderStatus.FINISHED }.map { r -> RiderStatusViewWrapper(r, tt ).apply {
                 onPressedCallback = {
                     timingViewModel.tryAssignRider(it)
                 }
@@ -105,16 +105,16 @@ class RiderStatusFragment : Fragment() {
     fun chooseRiderOptions(riderStatus: RiderStatusViewWrapper){
 
         when(riderStatus.status){
-            RiderStatus.NOT_STARTED -> createRiderActionsDialog(riderStatus.rider)
-            RiderStatus.RIDING -> createRiderActionsDialog(riderStatus.rider)
-            RiderStatus.FINISHED -> createRiderActionsDialog(riderStatus.rider)
+            RiderStatus.NOT_STARTED -> createRiderActionsDialog(riderStatus)
+            RiderStatus.RIDING -> createRiderActionsDialog(riderStatus)
+            RiderStatus.FINISHED -> createRiderActionsDialog(riderStatus)
             RiderStatus.DNF -> createDnfRiderDialog(riderStatus)
             RiderStatus.DNS -> createDnfRiderDialog(riderStatus)
         }
 
     }
 
-    private fun createRiderActionsDialog(rider: TimeTrialRider){
+    private fun createRiderActionsDialog(rs: RiderStatusViewWrapper){
 
 
         val tt = timingViewModel.timeTrial.value ?: return
@@ -122,7 +122,7 @@ class RiderStatusFragment : Fragment() {
         val milisNow = System.currentTimeMillis()
         val milisTtLast = tt.timeTrialHeader.startTimeMilis + tt.helper.sortedRiderStartTimes.lastKey()
 
-        val dnfDnsstring = if(milisNow > tt.helper.getRiderStartTime(rider) + tt.timeTrialHeader.startTimeMilis){
+        val dnfDnsstring = if(milisNow > tt.helper.getRiderStartTime(rs.rider) + tt.timeTrialHeader.startTimeMilis){
             "Did not finish (DNF)"
         }else{
             "Did not start (DNS)"
@@ -148,8 +148,9 @@ class RiderStatusFragment : Fragment() {
 //                "Set custom start time")
 
 
+        val rider = rs.rider
          AlertDialog.Builder(requireContext()).
-                setTitle("Actions for ${rider.number}").
+                setTitle("Actions for [${rs.number}] ${rs.filledRider.riderData.fullName()}").
                 setItems(options) { dialog, which ->
                     // The 'which' argument contains the index position
                     // of the selected item

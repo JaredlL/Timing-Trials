@@ -21,7 +21,9 @@ class ListViewModel @Inject constructor(private val courseRepository: ICourseRep
 
     val allCourses: LiveData<List<SelectableCourseViewModel>> = Transformations.map(courseRepository.allCoursesLight){c -> c.map { SelectableCourseViewModel(it)}}
     val allRiders = riderRepository.allRidersLight
-    val allTimeTrials = timeTrialRepository.allTimeTrialsHeader
+    val allTimeTrials = Transformations.map(timeTrialRepository.allTimeTrialsHeader){tt->
+        tt.sortedByDescending { it.startTime }
+    }
 
     private val _mTimeTrialInsertedEvent: MutableLiveData<Event<Long>> = MutableLiveData()
 

@@ -99,11 +99,24 @@ class LineToRiderConverter: ILineToObjectConverter<ImportRider> {
 
             }else{
                 val splits = splitAtPoint.first().split(":").reversed()
-                val sec = splits.getOrNull(0)?.toIntOrNull()?.times(1000)?:0
-                val min = splits.getOrNull(1)?.toIntOrNull()?.times(1000 * 60)?:0
-                val hour = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
+                var ms = 0
+                var sec = 0
+                var min = 0
+                var hour = 0
 
-                return target.copy(finishTime = (hour + min + sec).toLong())
+                if(splits.firstOrNull()?.length == 1){
+                    ms = splits.getOrNull(0)?.let { ".$it" }?.toDoubleOrNull()?.let { it * 1000}?.toInt()?:0
+                    sec = splits.getOrNull(1)?.toIntOrNull()?.times(1000)?:0
+                    min = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60)?:0
+                    hour = splits.getOrNull(3)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
+                }else{
+                    sec = splits.getOrNull(0)?.toIntOrNull()?.times(1000)?:0
+                    min = splits.getOrNull(1)?.toIntOrNull()?.times(1000 * 60)?:0
+                    hour = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
+                }
+
+
+                return target.copy(finishTime = (hour + min + sec + ms).toLong())
             }
 
             //val ms = times.getOrNull(0)?.let { ".$it" }?.toDouble()?.let { it * 1000 }?.toInt()?:0
@@ -118,15 +131,42 @@ class LineToRiderConverter: ILineToObjectConverter<ImportRider> {
 
         override fun applyFieldFromString(valString: String, target: ImportRider): ImportRider {
 
-            val times = valString.split(":",".").reversed()
+            //val times = valString.split(":",".").reversed()
 
-            val ms = times.getOrNull(0)?.let { ".$it" }?.toDouble()?.let { it * 1000 }?.toInt()?:0
-            val sec = times.getOrNull(1)?.toIntOrNull()?:0 * 1000
-            val min = times.getOrNull(2)?.toIntOrNull()?:0 * 1000 * 60
-            val hour = times.getOrNull(3)?.toIntOrNull()?:0 * 1000 * 60 * 60
+            val splitAtPoint = valString.split(".")
+            if(splitAtPoint.size > 1){
+
+                val ms = splitAtPoint.last().let { ".$it" }.toDoubleOrNull()?.let { it * 1000}?.toInt()?:0
+
+                val splits = splitAtPoint.first().split(":").reversed()
+                val sec = splits.getOrNull(0)?.toIntOrNull()?.times(1000)?:0
+                val min = splits.getOrNull(1)?.toIntOrNull()?.times(1000 * 60)?:0
+                val hour = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
 
 
-            return target.copy(splits = target.splits + (hour + min + sec + ms).toLong())
+                return target.copy(splits = target.splits + (hour + min + sec + ms).toLong())
+
+            }else{
+                val splits = splitAtPoint.first().split(":").reversed()
+                var ms = 0
+                var sec = 0
+                var min = 0
+                var hour = 0
+
+                if(splits.firstOrNull()?.length == 1){
+                    ms = splits.getOrNull(0)?.let { ".$it" }?.toDoubleOrNull()?.let { it * 1000}?.toInt()?:0
+                    sec = splits.getOrNull(1)?.toIntOrNull()?.times(1000)?:0
+                    min = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60)?:0
+                    hour = splits.getOrNull(3)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
+                }else{
+                    sec = splits.getOrNull(0)?.toIntOrNull()?.times(1000)?:0
+                    min = splits.getOrNull(1)?.toIntOrNull()?.times(1000 * 60)?:0
+                    hour = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
+                }
+
+
+                return target.copy(splits = target.splits + (hour + min + sec + ms).toLong())
+            }
         }
     }
     class NotesNameFieldSetter(private val heading: List<String>): StringToObjectField<ImportRider>(){

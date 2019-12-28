@@ -52,16 +52,7 @@ class TitleFragment : Fragment()
         val binding =  DataBindingUtil.inflate<FragmentTitleBinding>(inflater, R.layout.fragment_title, container, false).apply{
 
             startTtSetupButton.setOnClickListener{
-                titleViewModel.nonFinishedTimeTrial.observe(viewLifecycleOwner, Observer {result->
-                    result?.let {timeTrial->
-                        if(timeTrial.copy(id = null) != TimeTrialHeader.createBlank()){
-                            showSetupDialog(timeTrial)
-                        }else{
-                            val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
-                            findNavController().navigate(action)
-                        }
-                    }
-                })
+                testViewModel.delete()
 
             }
 

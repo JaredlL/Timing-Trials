@@ -2,18 +2,22 @@ package com.android.jared.linden.timingtrials.domain
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.data.IResult
 import com.android.jared.linden.timingtrials.data.Rider
+import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.roomrepo.*
+import com.android.jared.linden.timingtrials.ui.GenericListItemField
+import com.android.jared.linden.timingtrials.ui.GenericListItemNext
 import com.android.jared.linden.timingtrials.ui.IGenericListItem
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 
 data class GlobalResultData(
-    val title: String = "",
-    val resultHeading: IGenericListItem = SimpleListItem(),
-    val resultsList: List<IGenericListItem> = listOf())
+        val title: String,
+        val resultHeading: IGenericListItem,
+        val resultsList: List<IGenericListItem>)
 
 interface IResultDataFactory{
 
@@ -24,16 +28,7 @@ interface IResultDataFactory{
 
 }
 
-data class SimpleListItem(val item1: String = "", val item2: String = "", val item3: String = ""): IGenericListItem{
-    override val itemText1: String
-        get() = item1
-
-    override val itemText2: String
-        get() = item2
-
-    override val itemText3: String
-        get() = item3
-}
+data class SimpleListItem(override val item1: GenericListItemField,override val item2: GenericListItemField,override val item3: GenericListItemField): IGenericListItem
 
 class ResultDataSource(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository, private val courseRepository: ICourseRepository, private val timeTrialRiderRepository: TimeTrialRiderRepository){
 
@@ -43,24 +38,35 @@ class ResultDataSource(private val timeTrialRepository: ITimeTrialRepository, pr
     private val factList: List<IResultDataFactory> = listOf(riderResultFact, courseResultfact)
 
 
-    fun getResultData(typeIdData: Pair<String, Long>): LiveData<GlobalResultData>{
-        val resultData = MediatorLiveData<GlobalResultData>()
-        val id = typeIdData.second
-        factList.firstOrNull { it.isValidForData(typeIdData.first) }?.let {fact->
-            resultData.value = GlobalResultData(resultHeading = fact.getHeading())
-            resultData.addSource(fact.getTitle(id)){res->
-                res?.let {str->
-                    resultData.value = resultData.value?.copy(title = str)
-                }
-            }
-            resultData.addSource(fact.getResultList(id)){res->
-                res?.let {lst->
-                    resultData.value = resultData.value?.copy(resultsList = lst)
-                }
+
+
+    fun getResutTitle(typeIdData: GenericListItemNext): LiveData<String>{
+         typeIdData.nextId?.let { id->
+            factList.firstOrNull { it.isValidForData(typeIdData.itemType) }?.let {fact->
+               return fact.getTitle(id)
             }
         }
-        return  resultData
+        return MutableLiveData("")
+    }
 
+    fun getResultList(typeIdData: GenericListItemNext): LiveData<List<IGenericListItem>>{
+        typeIdData.nextId?.let { id->
+            factList.firstOrNull { it.isValidForData(typeIdData.itemType) }?.let {fact->
+                return fact.getResultList(id)
+            }
+        }
+        return MutableLiveData(listOf())
+    }
+
+    fun getHeading(typeIdData: GenericListItemNext):IGenericListItem{
+
+            factList.firstOrNull { it.isValidForData(typeIdData.itemType) }?.let {fact->
+                return fact.getHeading()
+            }
+        val i1 = GenericListItemField("")
+        val i2 = GenericListItemField("")
+        val i3 = GenericListItemField("")
+        return  SimpleListItem(i1, i2, i3)
     }
 
 }
@@ -79,7 +85,10 @@ class RiderResultDataFactory(private val riderRepository: IRiderRepository, priv
         }
     }
     override fun getHeading():IGenericListItem{
-        return  SimpleListItem("Course", "Date", "Time")
+        val i1 = GenericListItemField("Course")
+        val i2 = GenericListItemField("Date")
+        val i3 = GenericListItemField("Time")
+        return  SimpleListItem(i1, i2, i3)
     }
 
     override fun getResultList(itemId: Long): LiveData<List<IGenericListItem>> {
@@ -91,9 +100,12 @@ class RiderResultDataFactory(private val riderRepository: IRiderRepository, priv
     }
 
     private fun listItemForRiderResult(result: IResult):IGenericListItem{
-        return  SimpleListItem(result.course.courseName,
-                result.dateSet?.let { ds-> ConverterUtils.dateToDisplay(ds) } ?: "",
-                ConverterUtils.toSecondsDisplayString(result.resultTime))
+
+        val i1 = GenericListItemField(text = result.course.courseName, next = GenericListItemNext(Course::class.java.simpleName, result.course.id))
+        val i2 = GenericListItemField(text = result.dateSet?.let { ds-> ConverterUtils.dateToDisplay(ds) } ?: "", next = GenericListItemNext(TimeTrial::class.java.simpleName, result.timeTrial?.id))
+        val i3 = GenericListItemField(text = ConverterUtils.toSecondsDisplayString(result.resultTime))
+
+        return  SimpleListItem(i1, i2, i3)
 
     }
 }
@@ -115,7 +127,11 @@ class CourseResultDataFactory(private val courseRepository: ICourseRepository, p
 
     //EG Rider, Date, Time
     override fun getHeading():IGenericListItem{
-        return  SimpleListItem("Rider", "Date", "Time")
+
+        val i1 = GenericListItemField("Rider")
+        val i2 = GenericListItemField("Date")
+        val i3 = GenericListItemField("Time")
+        return  SimpleListItem(i1, i2, i3)
     }
 
     override fun getResultList(itemId: Long): LiveData<List<IGenericListItem>> {
@@ -128,9 +144,12 @@ class CourseResultDataFactory(private val courseRepository: ICourseRepository, p
 
     //RiderName, Date, Time
     private fun listItemForCourseResult(result: IResult):IGenericListItem{
-        return SimpleListItem(result.rider.fullName(),
-                result.dateSet?.let { ConverterUtils.dateToDisplay(it) } ?: "",
-                ConverterUtils.toSecondsDisplayString(result.resultTime))
+
+        val i1 = GenericListItemField(text = result.rider.fullName(), next = GenericListItemNext(Rider::class.java.simpleName, result.rider.id))
+        val i2 = GenericListItemField(text = result.dateSet?.let { ds-> ConverterUtils.dateToDisplay(ds) } ?: "", next = GenericListItemNext(TimeTrial::class.java.simpleName, result.timeTrial?.id))
+        val i3 = GenericListItemField(text = ConverterUtils.toSecondsDisplayString(result.resultTime))
+
+        return  SimpleListItem(i1, i2, i3)
     }
 }
 

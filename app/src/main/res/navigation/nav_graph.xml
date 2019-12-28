@@ -187,5 +187,12 @@
         <argument
             android:name="itemTypeId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_globalResultFragment_to_resultFragment"
+            app:destination="@id/resultFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 </navigation>
