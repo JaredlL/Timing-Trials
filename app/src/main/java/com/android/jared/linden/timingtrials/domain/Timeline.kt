@@ -43,7 +43,7 @@ class TimeLine(val timeTrial: TimeTrial, val timeStamp: Long) {
     private fun gtl(): List<ITimelineEvent> {
         val startedEvents = timeTrial.riderList.asSequence()
                 .filter {
-                    (it.timeTrialData.finishTime != null && it.timeTrialData.finishTime < 0L).not()
+                    (it.timeTrialData.finishTime != null && it.timeTrialData.finishTime == -1L).not()
                 }
                 .map { ttr -> TimeLineEvent(timeTrial.helper.getRiderStartTime(ttr.timeTrialData), TimelineEventType.RIDER_STARTED, ttr) }
                 .filter { it.timeStamp <= timeStamp }

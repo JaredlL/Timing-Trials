@@ -78,10 +78,13 @@ class OrderableRiderListAdapter(val context: Context) : RecyclerView.Adapter<Ord
     override fun onItemDragStarted(position: Int) {
         val v = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v!!.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-        } else { //deprecated in API 26
-            v!!.vibrate(50)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            v!!.vibrate(VibrationEffect.createOneShot(25, VibrationEffect.EFFECT_TICK))
+        }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            v!!.vibrate(VibrationEffect.createOneShot(25, 25))
+        }
+        else { //deprecated in API 26
+            v!!.vibrate(25)
         }
     }
 

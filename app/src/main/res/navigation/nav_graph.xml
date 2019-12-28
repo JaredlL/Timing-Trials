@@ -144,9 +144,9 @@
     </fragment>
     <fragment
         android:id="@+id/selectCourseFragment"
-        tools:layout="@layout/fragment_course_list"
         android:name="com.android.jared.linden.timingtrials.setup.SelectCourseFragment"
-        android:label="SelectCourseFragment" >
+        android:label="Select Course"
+        tools:layout="@layout/fragment_course_list">
         <action
             android:id="@+id/action_selectCourseFragment_to_editCourseFragment"
             app:destination="@id/editCourseFragment"
@@ -160,8 +160,8 @@
 
         <argument
             android:name="timeTrialId"
-            app:argType="long"
-            android:defaultValue="-1L" />
+            android:defaultValue="-1L"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/resultFragment"

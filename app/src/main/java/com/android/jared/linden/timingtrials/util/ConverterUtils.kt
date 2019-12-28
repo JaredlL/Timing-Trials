@@ -32,15 +32,15 @@ object ConverterUtils{
     }
 
 
-    fun toSecondsDisplayString(miliseconds: Long): String{
-        val milis = abs(miliseconds)
-        val secs =  (milis/1000)
+    fun toSecondsDisplayString(milliseconds: Long): String{
+        val millis = abs(milliseconds)
+        val secs =  (millis/1000)
         return String.format("%d:%02d:%02d", secs / 3600, (secs % 3600) / 60, (secs % 60))
     }
 
-    fun toTenthsDisplayString(miliseconds: Long): String{
-        if(miliseconds == Long.MAX_VALUE) return ""
-        val milis = abs(miliseconds)
+    fun toTenthsDisplayString(milliseconds: Long): String{
+        if(milliseconds == Long.MAX_VALUE) return ""
+        val milis = abs(milliseconds)
         val secs =  (milis/1000)
         return String.format("%d:%02d:%02d.%1d", secs / 3600, (secs % 3600) / 60, (secs % 60),  (milis % 1000) / 100)
     }

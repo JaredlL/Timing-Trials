@@ -66,6 +66,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.globalResultFragment->{
                     main_app_bar_layout.setExpanded(true)
                 }
+                R.id.resultFragment->{
+                    main_app_bar_layout.setExpanded(true)
+                }
             }
         }
 

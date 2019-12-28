@@ -25,6 +25,10 @@ data class TimeTrialRider(val riderId: Long,
                           val resultNote: String? = null,
                           @PrimaryKey(autoGenerate = true) val id: Long? = null){
 
+    fun hasNotDnfed():Boolean{
+        return finishTime == null || finishTime >0
+    }
+
 }
 
 

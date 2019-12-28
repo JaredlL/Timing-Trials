@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TimePicker
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
@@ -25,6 +26,7 @@ import com.android.jared.linden.timingtrials.databinding.FragmentTimerRiderStatu
 import com.android.jared.linden.timingtrials.ui.RiderStatus
 import com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper
 import com.android.jared.linden.timingtrials.util.*
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_timer_rider_status.*
 import org.threeten.bp.*
 
@@ -154,7 +156,7 @@ class RiderStatusFragment : Fragment() {
 
                     when(which){
                         0 -> {
-                            if(milisNow > tt.helper.getRiderStartTime(rider)){
+                            if(milisNow > tt.helper.getRiderStartTime(rider) + tt.timeTrialHeader.startTimeMilis){
                                 timingViewModel.riderDnf(rider)
                             }else{
                                 timingViewModel.riderDns(rider)
@@ -163,9 +165,7 @@ class RiderStatusFragment : Fragment() {
                         }
                         1 -> timingViewModel.moveRiderToBack(rider)
                         2 -> {
-                            val tpdialog = TimingTimePickerFragment()
-                            tpdialog.arguments?.putLong(ITEM_ID_EXTRA, rider.id?:0)
-                            tpdialog.show(requireActivity().supportFragmentManager, "timingTimePicker")
+                            val tpd = TimingTimePickerFragment.newInstance(rider.id?:0, tt.timeTrialHeader.startTimeMilis).show(requireActivity().supportFragmentManager, "tpd")
                         }
 
                     }
@@ -198,10 +198,12 @@ class RiderStatusFragment : Fragment() {
     class TimingTimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener {
 
         var riderId :Long = 0
+        var ttStartTime :Long = 0
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             // Use the current time as the default values for the picker
 
             riderId = arguments?.getLong(ITEM_ID_EXTRA)?:0
+            ttStartTime = arguments?.getLong("TT_START_TME")?:0
             val dateTime = LocalDateTime.now()
 
             // Create a new instance of TimePickerDialog and return it
@@ -211,11 +213,32 @@ class RiderStatusFragment : Fragment() {
         override fun onTimeSet(view: TimePicker, hourOfDay: Int, minute: Int) {
             // Do something with the time chosen by the user
             val ldt = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault())
-            val ldt2 = LocalDateTime.of(ldt.year, ldt.month, ldt.dayOfMonth, hourOfDay, minute)
-            val vm = requireActivity().getViewModel { requireActivity().injector.timingViewModel() }
-            vm.setRiderStartTime(riderId, ldt2.toInstant(ZoneOffset.of(ZoneId.systemDefault().id)).toEpochMilli())
+            val ldt2 = LocalDateTime.of(ldt.year, ldt.month, ldt.dayOfMonth, hourOfDay, minute, 0)
+
+            val selectedMillis = ldt2.toEpochSecond(ZoneId.systemDefault().rules.getOffset(Instant.now()))*1000
+
+            if(selectedMillis < ttStartTime){
+                Toast.makeText(requireContext(), "Cannot set start time before TT start", Toast.LENGTH_SHORT).show()
+            }else{
+                val vm = requireActivity().getViewModel { requireActivity().injector.timingViewModel() }
+                vm.setRiderStartTime(riderId, selectedMillis)
+            }
+
 
         }
+
+        companion object {
+            fun newInstance(riderId: Long, ttStartTime: Long): TimingTimePickerFragment{
+                val new = TimingTimePickerFragment()
+                val args = Bundle().apply {
+                    putLong(ITEM_ID_EXTRA, riderId)
+                    putLong("TT_START_TME", ttStartTime)
+                }
+                new.arguments = args
+                return new
+            }
+        }
+
     }
 
 

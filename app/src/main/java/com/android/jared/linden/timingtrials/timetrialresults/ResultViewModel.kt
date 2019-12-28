@@ -58,14 +58,15 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
         val mutList: MutableList<String> = mutableListOf()
 
         mutList.add("Rider")
-        mutList.add("Category")
-        mutList.add("Club")
         mutList.add("Total Time")
         if(tt.timeTrialHeader.laps > 1){
             for(i in 1..tt.timeTrialHeader.laps){
                 mutList.add("Split $i")
             }
         }
+        mutList.add("Category")
+        mutList.add("Club")
+
 
         mutList.add("Notes")
         return ResultRowViewModel(mutList)
@@ -83,18 +84,22 @@ class ResultRowViewModel{
     constructor(result: IResult, laps:Int)
      {
         row.add(ResultCell(MutableLiveData("${result.rider.firstName} ${result.rider.lastName}")))
+         row.add(ResultCell(MutableLiveData(ConverterUtils.toTenthsDisplayString(result.resultTime))))
+
+         if(laps > 1){
+             for (i in 0 until laps){
+                 val splitVal = result.splits.getOrNull(i)
+                 val splitString = if(splitVal != null) ConverterUtils.toTenthsDisplayString(splitVal) else ""
+                 row.add(ResultCell(MutableLiveData(splitString)))
+             }
+         }
+
         row.add(ResultCell(MutableLiveData(result.category)))
         row.add(ResultCell(MutableLiveData(result.riderClub)))
-        row.add(ResultCell(MutableLiveData(ConverterUtils.toTenthsDisplayString(result.resultTime))))
 
 
-        if(laps > 1){
-            for (i in 0 until laps){
-                val splitVal = result.splits.getOrNull(i)
-                val splitString = if(splitVal != null) ConverterUtils.toTenthsDisplayString(splitVal) else ""
-                row.add(ResultCell(MutableLiveData(splitString)))
-            }
-        }
+
+
          row.add(ResultCell(MutableLiveData(result.notes)))
 
 

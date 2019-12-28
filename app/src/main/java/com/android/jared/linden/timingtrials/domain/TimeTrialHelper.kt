@@ -72,8 +72,9 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
         return timeTrial.copy(riderList = timeTrial.riderList.map {
             if(it.timeTrialData.id == riderId)
             {
-                val offset  = newStartTime - (getBaseRiderStartTime(it.timeTrialData) + timeTrial.timeTrialHeader.startTimeMilis)
-                it.copy(timeTrialData = it.timeTrialData.copy(startTimeOffset = offset.toInt()))
+                val baseRiderStartTime = getBaseRiderStartTime(it.timeTrialData) + timeTrial.timeTrialHeader.startTimeMilis
+                val offset  = newStartTime - baseRiderStartTime
+                it.copy(timeTrialData = it.timeTrialData.copy(startTimeOffset = (offset/1000).toInt()))
             }
             else{
                 it
@@ -110,17 +111,16 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
 
         val milisNow = System.currentTimeMillis()
 
-        val lastStartTime = timeTrial.timeTrialHeader.startTimeMilis + sortedRiderStartTimes.lastKey()
+        val lastStartTime = timeTrial.timeTrialHeader.startTimeMilis + sortedRiderStartTimes.filter { it.value.timeTrialData.hasNotDnfed() }.keys.last()
 
         val interval = (if(timeTrial.timeTrialHeader.interval == 0) 60 else timeTrial.timeTrialHeader.interval) * 1000
 
-        val nextStartTime = if(milisNow < lastStartTime + interval){
-            val e = if((lastStartTime + interval)%interval == 0L) 1 else 2
-            interval * ((lastStartTime + interval)/interval + e)
+        val nextStartTime = if(milisNow < (lastStartTime + interval)){
+
+            lastStartTime + interval
         }else{
-            val targ =  milisNow + interval
-            val e = if((targ + interval)%interval == 0L) 1 else 2
-            interval * ((targ + interval)/interval + e)
+            val millisSinceStart = milisNow - timeTrial.timeTrialHeader.startTimeMilis
+            (millisSinceStart / interval) * interval + interval *2 + timeTrial.timeTrialHeader.startTimeMilis
         }
 
         val offsetTime = nextStartTime -  getBaseRiderStartTime(rider) - timeTrial.timeTrialHeader.startTimeMilis

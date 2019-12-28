@@ -4,9 +4,7 @@ import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.domain.TimeLine
 import com.android.jared.linden.timingtrials.util.ConverterUtils
-import org.threeten.bp.Instant
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.ZoneId
+
 
 
 enum class RiderStatus {
@@ -30,7 +28,5 @@ class RiderStatusViewWrapper(val rider: TimeTrialRider, val timeLine: TimeLine){
     }
 
     val status = timeLine.getRiderStatus(rider)
-   //fun riderStatus(): RiderStatus {
-    //   return  timeLine.getRiderStatus(rider)
-    //}
+
 }
