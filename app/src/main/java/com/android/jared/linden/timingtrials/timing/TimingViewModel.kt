@@ -47,7 +47,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     init {
         timeTrial.addSource(timeTrialRepository.getTimingTimeTrial()) {new ->
             if(new != null && !isCorotineAlive.get() && !new.equalsOtherExcludingIds(timeTrial.value)) {
-                Timber.d("JAREDMSG -> TIMINGVM -> TimingTt self updating TT, ${new.timeTrialHeader.timeStamps} unassigned")
+                Timber.d("TimingTt self updating TT, ${new.timeTrialHeader.timeStamps} unassigned")
                 timeTrial.value = new
             }
         }
@@ -76,6 +76,9 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             }else{
                 val newHeader = tte.timeTrialHeader.copy(timeStamps = tte.timeTrialHeader.timeStamps + now)
                 updateTimeTrial(tte.copy(timeTrialHeader = newHeader))
+                if(eventAwaitingSelection == null){
+                    eventAwaitingSelection = now
+                }
             }
         }
     }

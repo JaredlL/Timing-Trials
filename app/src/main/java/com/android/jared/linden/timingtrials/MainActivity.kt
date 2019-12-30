@@ -39,10 +39,12 @@ class MainActivity : AppCompatActivity() {
 
         val collapsingToolbar = collapsing_toolbar_layout
         val navController = findNavController(R.id.nav_host_fragment)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
+        //appBarConfiguration = AppBarConfiguration(navController.graph)
+         appBarConfiguration = AppBarConfiguration(navController.graph, drawer_layout)
         collapsingToolbar.setupWithNavController(toolbar, navController, appBarConfiguration)
 
         setSupportActionBar(toolbar)
+        nav_view.setupWithNavController(navController)
         setupActionBarWithNavController(navController, appBarConfiguration)
         //mMainFab = mainFab
         rootCoordinator = mainActivityCoordinator

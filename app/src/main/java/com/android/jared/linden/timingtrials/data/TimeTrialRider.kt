@@ -102,6 +102,11 @@ data class FilledTimeTrialRider(
         return this.copy(timeTrialData = this.timeTrialData.copy(splits = this.timeTrialData.splits + split))
     }
 
+    fun firstNameAndFirstLetterOfSecond():String{
+        val lastL= riderData.lastName.first()
+        return riderData.firstName
+    }
+
 
     companion object{
         fun createFromRiderAndTimeTrial(rider: Rider, timeTrial: TimeTrial): FilledTimeTrialRider{

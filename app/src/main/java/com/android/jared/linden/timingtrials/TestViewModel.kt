@@ -58,9 +58,12 @@ class TestViewModel@Inject constructor(
 //    }
 
     fun delete(){
-        timingTrialsDatabase.courseDao().deleteAll()
-        timingTrialsDatabase.timeTrialDao().deleteAll()
-        timingTrialsDatabase.riderDao().deleteAll()
+        viewModelScope.launch(Dispatchers.IO) {
+            timingTrialsDatabase.courseDao().deleteAll()
+            timingTrialsDatabase.timeTrialDao().deleteAll()
+            timingTrialsDatabase.riderDao().deleteAll()
+        }
+
     }
 
     fun testTiming(){

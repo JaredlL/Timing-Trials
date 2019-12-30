@@ -52,7 +52,7 @@ class TitleFragment : Fragment()
         val binding =  DataBindingUtil.inflate<FragmentTitleBinding>(inflater, R.layout.fragment_title, container, false).apply{
 
             startTtSetupButton.setOnClickListener{
-                testViewModel.delete()
+
 
             }
 
@@ -62,6 +62,7 @@ class TitleFragment : Fragment()
             }
 
             testSetupButton.setOnClickListener {
+                testViewModel.delete()
                 findNavController().popBackStack()
             }
 //
