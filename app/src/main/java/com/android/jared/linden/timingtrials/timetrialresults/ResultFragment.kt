@@ -38,6 +38,7 @@ import com.android.jared.linden.timingtrials.REQUEST_CREATE_FILE_JSON
 import com.android.jared.linden.timingtrials.databinding.FragmentTimetrialResultBinding
 import com.android.jared.linden.timingtrials.domain.JsonResultsWriter
 import com.android.jared.linden.timingtrials.domain.csv.CsvResultWriter
+import com.android.jared.linden.timingtrials.util.Utils
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_timetrial_result.*
@@ -374,7 +375,12 @@ class ResultFragment : Fragment() {
             //val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             val path = requireActivity().getExternalFilesDir(null)
 
-            val filePath = File(path, imageName)
+
+            val fileName = Utils.createFileName(imageName)
+
+
+
+            val filePath = File(path, fileName)
 
             val imageOut = FileOutputStream(filePath)
 
@@ -383,11 +389,11 @@ class ResultFragment : Fragment() {
 
 
             val contentResolver = requireActivity().contentResolver
-            val insertedImageString = MediaStore.Images.Media.insertImage(contentResolver, filePath.path, imageName, "Timing Trials")
+            val insertedImageString = MediaStore.Images.Media.insertImage(contentResolver, filePath.path, fileName, "Timing Trials")
 
             val values = ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
-                put(MediaStore.Images.Media.TITLE, imageName)
+                put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+                put(MediaStore.Images.Media.TITLE, fileName)
                 put(MediaStore.Images.Media.CONTENT_TYPE, "image/jpeg")
                 put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
                 put(MediaStore.MediaColumns.DATA, filePath.path)

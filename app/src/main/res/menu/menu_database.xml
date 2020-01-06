@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/app_bar_import"
-        android:icon="@drawable/ic_search_black_24dp"
+        android:icon="@drawable/ic_file_download_black_24dp"
         android:title="@string/import_data"
         app:actionViewClass="android.widget.SearchView" />
     <item
@@ -12,8 +12,13 @@
         android:title="@string/export_data"
         app:actionViewClass="android.widget.SearchView" />
     <item
+        android:id="@+id/app_bar_settings"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/settings"
+        app:actionViewClass="android.widget.SearchView" />
+    <item
         android:id="@+id/app_bar_test"
-        android:icon="@drawable/ic_search_black_24dp"
+        android:icon="@drawable/ic_dashboard_black_24dp"
         android:title="Test"
         app:actionViewClass="android.widget.SearchView" />
 </menu>

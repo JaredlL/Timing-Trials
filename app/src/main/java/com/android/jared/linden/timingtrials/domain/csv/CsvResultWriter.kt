@@ -2,6 +2,7 @@ package com.android.jared.linden.timingtrials.domain.csv
 
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.timetrialresults.ResultRowViewModel
+import org.threeten.bp.format.DateTimeFormatter
 import java.io.*
 
 class CsvResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowViewModel>){
@@ -9,7 +10,7 @@ class CsvResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowView
 
     fun writeToPath(filePath: OutputStream){
         val writer = PrintWriter(filePath)
-        writer.appendln(surroundQuotes("Powered by Timing Trials"))
+        writer.appendln(surroundQuotes("Results, Powered by Timing Trials"))
         writeTimeTrialRow(writer)
         writeCourseRow(writer)
         for(r in results.dropLast(1)) writeRowNewLine(r, writer)
@@ -19,20 +20,19 @@ class CsvResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowView
     }
 
     private fun writeTimeTrialRow(writer: PrintWriter){
-        writer.append(surroundQuotes("Results for ${timeTrial.timeTrialHeader.ttName},"))
-        writer.appendln(surroundQuotes("On ${timeTrial.timeTrialHeader.startTime}"))
+        val formatter = DateTimeFormatter.ofPattern("d/M/y")
+        writer.appendln("TimeTrial Name,Date,Laps")
+        writer.appendln("${timeTrial.timeTrialHeader.ttName},${timeTrial.timeTrialHeader.startTime.format(formatter)},${timeTrial.timeTrialHeader.laps}")
     }
 
     private fun writeCourseRow(writer: PrintWriter){
-        writer.append(surroundQuotes("${timeTrial.timeTrialHeader.laps} laps,"))
         val course = timeTrial.course
         if(course != null){
-            writer.append(surroundQuotes("${course.courseName} ${course.cttName},"))
-            writer.appendln(surroundQuotes("${course.length/1000L} km"))
+            writer.appendln("Course Name,Course Length,CTT Name")
+            writer.appendln("${course.courseName}.${course.length/1000L},${course.cttName}")
         }else{
             writer.appendln(surroundQuotes("Unknown Course"))
         }
-
     }
 
     private fun writeRowNewLine(row: ResultRowViewModel, writer: PrintWriter){

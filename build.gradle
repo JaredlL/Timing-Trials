@@ -8,6 +8,7 @@ buildscript {
         supportLibraryVersion = '1.1.0-rc01'
         constraintLayoutVersion = '2.0.0-beta4'
         roomVersion = '2.2.3'
+        preferenceVersion='1.1.0'
         lifecycleVersion = '2.2.0-rc03'
         lifecycleExtVersion = '2.2.0-rc03'
         recyclerViewVersion = '1.1.0'

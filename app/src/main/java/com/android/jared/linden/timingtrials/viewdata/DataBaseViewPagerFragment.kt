@@ -63,24 +63,24 @@ class DataBaseViewPagerFragment: Fragment() {
         inflater.inflate(R.menu.menu_database, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.app_bar_import -> {
-                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                intent.type = "text/*"
-                startActivityForResult(intent, REQUEST_IMPORT_FILE)
-
-                Toast.makeText(requireContext(), "Select CSV File", Toast.LENGTH_SHORT).show()
-                true
-            }
-            R.id.app_bar_test->{
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToTitleFragment()
-                findNavController().navigate(action)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        return when (item.itemId) {
+//            R.id.app_bar_import -> {
+//                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+//                intent.type = "text/*"
+//                startActivityForResult(intent, REQUEST_IMPORT_FILE)
+//
+//                Toast.makeText(requireContext(), "Select CSV File", Toast.LENGTH_SHORT).show()
+//                true
+//            }
+//            R.id.app_bar_test->{
+//                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToTitleFragment()
+//                findNavController().navigate(action)
+//                true
+//            }
+//            else -> super.onOptionsItemSelected(item)
+//        }
+//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
