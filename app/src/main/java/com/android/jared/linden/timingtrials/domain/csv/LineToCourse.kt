@@ -30,7 +30,7 @@ class LineToCourseConverter: ILineToObjectConverter<Course> {
         try{
             val dataList = dataLine.split(",", ignoreCase =  true)
             val courseName = nameIndex?.let { dataList.getOrNull(it)}
-            val distance = distanceIndex?.let { dataList.getOrNull(it)?.toIntOrNull()?.times(conversion)}
+            val distance = distanceIndex?.let { dataList.getOrNull(it)?.toDoubleOrNull()?.times(conversion)}
             val cctName = cttNameIndex?.let { dataList.getOrNull(it) }
 
             return if(courseName.isNullOrBlank()){

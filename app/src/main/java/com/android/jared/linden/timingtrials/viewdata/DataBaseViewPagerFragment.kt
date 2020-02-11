@@ -82,27 +82,27 @@ class DataBaseViewPagerFragment: Fragment() {
 //        }
 //    }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode){
-            REQUEST_IMPORT_FILE ->{
-                data?.data?.let {uri->
-                  //  try {
-                    val importVm = requireActivity().getViewModel { requireActivity().injector.importViewModel()}
-                        val inputStream = requireActivity().contentResolver.openInputStream(uri)
-                        if(inputStream != null){
-                            importVm.readInput(uri.path, inputStream)
-                        }
-           //         }
-//                    catch(e: IOException)
-//                    {
-//                        e.printStackTrace()
-//                        Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
-//                    }
-                }
-            }
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        when(requestCode){
+//            REQUEST_IMPORT_FILE ->{
+//                data?.data?.let {uri->
+//                  //  try {
+//                    val importVm = requireActivity().getViewModel { requireActivity().injector.importViewModel()}
+//                        val inputStream = requireActivity().contentResolver.openInputStream(uri)
+//                        if(inputStream != null){
+//                            importVm.readInput(uri.path, inputStream)
+//                        }
+//           //         }
+////                    catch(e: IOException)
+////                    {
+////                        e.printStackTrace()
+////                        Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
+////                    }
+//                }
+//            }
+//        }
+//    }
 
 
 

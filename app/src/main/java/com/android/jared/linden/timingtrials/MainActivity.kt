@@ -144,6 +144,28 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            REQUEST_IMPORT_FILE ->{
+                data?.data?.let {uri->
+                    //  try {
+                    val importVm = getViewModel { injector.importViewModel()}
+                    val inputStream = contentResolver.openInputStream(uri)
+                    if(inputStream != null){
+                        importVm.readInput(uri.path, inputStream)
+                    }
+                    //         }
+//                    catch(e: IOException)
+//                    {
+//                        e.printStackTrace()
+//                        Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
+//                    }
+                }
+            }
+        }
+    }
+
 
 
 }

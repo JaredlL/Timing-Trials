@@ -212,7 +212,7 @@ class LineToRiderConverter: ILineToObjectConverter<ImportRider> {
 
 
         val splitsList = splitHeading.mapIndexedNotNull  { index, s ->
-            if (s.contains("split")) {
+            if (s.contains("split", ignoreCase = true)) {
                 SplitFieldSetter(splitHeading, index)
             }else{
                 null

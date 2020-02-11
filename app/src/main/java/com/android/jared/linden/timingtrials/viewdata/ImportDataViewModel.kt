@@ -200,6 +200,9 @@ class ImportViewModel @Inject constructor(private val riderRespository: IRiderRe
                 }
 
                 if(fTime > 0){
+
+
+
                     val timeTrialRider = TimeTrialRider(
                             riderId = it,
                             timeTrialId = headerInDb?.id,
@@ -207,7 +210,7 @@ class ImportViewModel @Inject constructor(private val riderRespository: IRiderRe
                             index = 0,
                             number = 0,
                             finishTime = fTime,
-                            splits = importRider.splits,
+                            splits = transformSplits(importRider.splits, importRider.finishTime),
                             category = importRider.category,
                             gender = importRider.gender,
                             club = importRider.club?:"",
@@ -221,6 +224,22 @@ class ImportViewModel @Inject constructor(private val riderRespository: IRiderRe
 
 
         }
+
+    }
+
+    fun transformSplits(splits: List<Long>, targetTime: Long): List<Long>{
+
+        if(splits.size <= 1) return splits
+
+        var newSplits: MutableList<Long> = mutableListOf()
+
+        var current = splits.first()
+        newSplits.add(current)
+        for (s in splits.drop(1)){
+            current += s
+            newSplits.add(current)
+        }
+        return newSplits
 
     }
 
