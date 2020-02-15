@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.jared.linden.timingtrials.IFabCallbacks
 
 
 import com.android.jared.linden.timingtrials.R
@@ -37,6 +38,7 @@ class OrderRidersFragment : Fragment() {
         viewModel.getOrderableRiderData().observe(viewLifecycleOwner, Observer { ttData ->
             ttData?.let {mAdapter.setData(ttData )}
         })
+        (requireActivity() as IFabCallbacks).setVisibility(View.GONE)
 
         return inflater.inflate(R.layout.fragment_order_riders, container, false)
     }

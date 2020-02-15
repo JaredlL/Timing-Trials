@@ -1,16 +1,18 @@
 package com.android.jared.linden.timingtrials
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -19,6 +21,9 @@ import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton.OnVisibilityChangedListener
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -27,7 +32,13 @@ const val REQUEST_IMPORT_FILE = 2
 const val REQUEST_CREATE_FILE_SPREADSHEET = 3
 const val REQUEST_CREATE_FILE_JSON = 4
 
-class MainActivity : AppCompatActivity() {
+interface IFabCallbacks{
+    fun setVisibility(visibility: Int)
+    fun setAction(action: () -> Unit)
+    fun setImage(resourceId: Int)
+}
+
+class MainActivity : AppCompatActivity(), IFabCallbacks {
 
 
     override fun onSupportNavigateUp(): Boolean {
@@ -45,11 +56,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         val collapsingToolbar = collapsing_toolbar_layout
         val navController = findNavController(R.id.nav_host_fragment)
         //appBarConfiguration = AppBarConfiguration(navController.graph)
          appBarConfiguration = AppBarConfiguration(navController.graph, drawer_layout)
         collapsingToolbar.setupWithNavController(toolbar, navController, appBarConfiguration)
+
+        main_app_bar_layout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            if (Math.abs(verticalOffset)-(appBarLayout?.totalScrollRange?:0) == 0) {
+                //  Collapsed
+                toolbarCollapsed = true
+                refreshFab()
+            } else {
+                //Expanded
+                toolbarCollapsed = false
+                refreshFab()
+
+            }
+        })
+
+        mainFab.setOnClickListener {
+            mAct()
+        }
 
         setSupportActionBar(toolbar)
         nav_view.setupWithNavController(navController)
@@ -166,6 +195,58 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    var toolbarCollapsed = false
+    var fabShouldShow = true
+    override fun setVisibility(visibility: Int) {
+        if(visibility == View.VISIBLE){
+            fabShouldShow = true
+        }else if(visibility != View.VISIBLE && mainFab.visibility == View.VISIBLE ){
+            fabShouldShow = false
+        }
+        refreshFab()
+    }
+
+    fun refreshFab(){
+        if((!toolbarCollapsed && fabShouldShow) && mainFab.visibility != View.VISIBLE){
+            mainFab.show()
+        }else if ((!fabShouldShow || toolbarCollapsed) && mainFab.visibility == View.VISIBLE) {
+            mainFab.hide()
+        }
+    }
+
+    var mAct: () -> Unit = {}
+    override fun setAction(action: () -> Unit) {
+        mAct = action
+    }
+
+    override fun setImage(resourceId: Int) {
+        mainFab.setImageResource(resourceId)
+    }
 
 
 }
+
+//class FAB_Hide_on_Scroll(context: Context?, attrs: AttributeSet?) : FloatingActionButton.Behavior() {
+//    override fun onNestedScroll(coordinatorLayout: CoordinatorLayout, child: FloatingActionButton, target: View, dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int) {
+//        super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed)
+//        //child -> Floating Action Button
+//        if (dyConsumed > 0 && child.visibility == View.VISIBLE) {
+//            child.hide(object : OnVisibilityChangedListener() {
+//
+//                override fun onHidden(fab: FloatingActionButton) {
+//                    super.onShown(fab)
+//                    //fab.visibility = View.INVISIBLE
+//                }
+//            })
+//
+//        } else if (dyConsumed < 0 && child.visibility != View.VISIBLE) {
+//            //child.show()
+//        }
+//    }
+//
+//    override fun onStartNestedScroll(coordinatorLayout: CoordinatorLayout, child: FloatingActionButton, directTargetChild: View, target: View, nestedScrollAxes: Int): Boolean {
+//        return nestedScrollAxes == ViewCompat.SCROLL_AXIS_VERTICAL
+//    }
+//
+//
+//}

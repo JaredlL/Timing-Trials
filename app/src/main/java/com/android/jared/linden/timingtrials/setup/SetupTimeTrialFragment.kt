@@ -36,7 +36,12 @@ class SetupTimeTrialFragment : Fragment() {
         propsViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.timeTrialPropertiesViewModel
 
         //Order is important
-        propsViewModel.setupMediator.observe(viewLifecycleOwner, Observer {  })
+        propsViewModel.setupMediator.observe(viewLifecycleOwner, object : Observer<Any> {
+            override fun onChanged(t: Any?) {
+
+            }
+
+        })
 
         val mAdapter = ArrayAdapter<String>(requireContext(),R.layout.support_simple_spinner_dropdown_item, listOf("15", "30", "60", "90", "120"))
         val binding = DataBindingUtil.inflate<FragmentSetupTimeTrialBinding>(inflater, R.layout.fragment_setup_time_trial, container, false).apply {

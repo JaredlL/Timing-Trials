@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.android.jared.linden.timingtrials.IFabCallbacks
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.adapters.CourseListAdapter
 import com.android.jared.linden.timingtrials.data.*
@@ -39,6 +40,14 @@ class SelectCourseFragment : Fragment() {
             setupViewModel.changeTimeTrial(args.timeTrialId)
         }
 
+        (requireActivity() as IFabCallbacks).apply {
+            setVisibility(View.VISIBLE)
+            setImage(R.drawable.ic_add_white_24dp)
+            setAction {
+                val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")
+                findNavController().navigate(action)
+            }
+        }
 
         viewModel = setupViewModel.selectCourseViewModel
         viewManager = LinearLayoutManager(context)
@@ -69,13 +78,13 @@ class SelectCourseFragment : Fragment() {
             courseHeading.checkBox.visibility = View.INVISIBLE
             courseRecyclerView.adapter = adapter
             courseRecyclerView.layoutManager = viewManager
-            courseListFab.setOnClickListener {
-                val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")
-                findNavController().navigate(action)
-
-                //editCourse(0)
-               // dismiss()
-            }
+//            courseListFab.setOnClickListener {
+//                val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")
+//                findNavController().navigate(action)
+//
+//                //editCourse(0)
+//               // dismiss()
+//            }
         }
 
 

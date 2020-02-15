@@ -2,6 +2,7 @@ package com.android.jared.linden.timingtrials.edititem
 
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -11,6 +12,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.android.jared.linden.timingtrials.IFabCallbacks
 
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentRiderBinding
@@ -45,17 +47,23 @@ class EditRiderFragment : Fragment() {
         //Set title
         (requireActivity() as AppCompatActivity).supportActionBar?.title = if(args.riderId == 0L) getString(R.string.add_rider) else getString(R.string.edit_rider)
 
+        val fabCallback = (requireActivity() as IFabCallbacks)
+
+        fabCallback.setImage(R.drawable.ic_done_white_24dp)
+        fabCallback.setVisibility(View.VISIBLE)
 
         val binding = DataBindingUtil.inflate<FragmentRiderBinding>(inflater, R.layout.fragment_rider, container, false).apply {
             viewModel = riderViewModel
             lifecycleOwner = (this@EditRiderFragment)
             autoCompleteClub.setAdapter(mAdapter)
-            editRiderFab.setOnClickListener {
+            fabCallback.setAction {
                 if(riderViewModel.mutableRider.value?.firstName != ""){
                     riderViewModel.addOrUpdate()
+
                     findNavController().popBackStack()
+
                 }else{
-                    Toast.makeText(activity, "Rider must have firstname set", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Rider must have firstname set", Toast.LENGTH_SHORT).show()
                 }
 
             }

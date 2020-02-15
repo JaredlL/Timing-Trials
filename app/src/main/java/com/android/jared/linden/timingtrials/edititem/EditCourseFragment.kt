@@ -1,22 +1,25 @@
 package com.android.jared.linden.timingtrials.edititem
 
+import android.content.Context
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.*
-import androidx.fragment.app.Fragment
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-
+import com.android.jared.linden.timingtrials.IFabCallbacks
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentCourseBinding
-import com.android.jared.linden.timingtrials.data.ITEM_ID_EXTRA
-import com.android.jared.linden.timingtrials.util.argument
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior
 
 
 class EditCourseFragment : Fragment() {
@@ -40,10 +43,15 @@ class EditCourseFragment : Fragment() {
         //Set title
         (requireActivity() as AppCompatActivity).supportActionBar?.title = if(args.courseId == 0L) getString(R.string.add_course) else getString(R.string.edit_course)
 
+        val fabCallback = (requireActivity() as IFabCallbacks)
+
+        fabCallback.setImage(R.drawable.ic_done_white_24dp)
+        fabCallback.setVisibility(View.VISIBLE)
+
         val binding = DataBindingUtil.inflate<FragmentCourseBinding>(inflater, R.layout.fragment_course, container, false).apply {
             viewModel = courseViewModel
             lifecycleOwner = (this@EditCourseFragment)
-            fab.setOnClickListener {
+            fabCallback.setAction {
 
                 if(courseViewModel.courseName.value.isNullOrBlank()) Toast.makeText(requireContext(), getString(R.string.course_requires_name), Toast.LENGTH_SHORT).show()
                 else{

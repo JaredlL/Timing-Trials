@@ -18,6 +18,7 @@
             android:id="@+id/main_app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:statusBarScrim="@android:color/transparent"
             android:theme="@style/AppTheme.AppBarOverlay">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -25,6 +26,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:titleEnabled="false"
+                app:statusBarScrim="@android:color/transparent"
+
                 app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
                 <androidx.appcompat.widget.Toolbar
@@ -57,6 +60,15 @@
 
         </FrameLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/mainFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+
+        android:src="@drawable/ic_done_white_24dp" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -64,8 +76,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:headerLayout="@layout/list_item_rider_status"
-        app:menu="@menu/menu_database"
+        app:headerLayout="@layout/nav_view_header"
+        app:menu="@menu/menu_sidenav"
         android:fitsSystemWindows="true" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

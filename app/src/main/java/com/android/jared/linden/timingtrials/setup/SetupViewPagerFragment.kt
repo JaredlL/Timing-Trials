@@ -8,8 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import com.android.jared.linden.timingtrials.IFabCallbacks
 import com.android.jared.linden.timingtrials.MainActivity
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
@@ -36,6 +39,14 @@ class SetupViewPagerFragment: Fragment() {
         val setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
 
         setupViewModel.changeTimeTrial(args.timeTrialId)
+
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+            override fun onPageSelected(position: Int) {
+                setFabStatus(position)
+            }
+        })
+
+
 
 
 //        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
@@ -77,6 +88,27 @@ class SetupViewPagerFragment: Fragment() {
 
 
         return binding.root
+    }
+
+    fun setFabStatus(position: Int){
+        val act = requireActivity() as IFabCallbacks
+        when (position) {
+
+            RIDER_PAGE_INDEX -> {
+                act.setVisibility(View.VISIBLE)
+                act.setImage(R.drawable.ic_add_white_24dp)
+                act.setAction {
+                    val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(0)
+                    findNavController().navigate(action)
+                }
+            }
+            ORDER_RIDER_INDEX ->  {
+                act.setVisibility(View.GONE)
+            }
+            TIMETRIAL_PAGE_INDEX-> {
+                act.setVisibility(View.GONE)
+            }
+        }
     }
 
 //    private fun setupNewFab() {

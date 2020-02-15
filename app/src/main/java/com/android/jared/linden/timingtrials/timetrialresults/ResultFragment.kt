@@ -32,6 +32,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.jared.linden.timingtrials.IFabCallbacks
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.REQUEST_CREATE_FILE_CSV
 import com.android.jared.linden.timingtrials.REQUEST_CREATE_FILE_JSON
@@ -64,6 +65,8 @@ class ResultFragment : Fragment() {
 
         //requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
+
+        (requireActivity() as? IFabCallbacks)?.setVisibility(View.GONE)
 
         resultViewModel = requireActivity().getViewModel {  requireActivity().injector.resultViewModel() }.apply { changeTimeTrial(args.timeTrialId) }
 

@@ -1,24 +1,24 @@
 package com.android.jared.linden.timingtrials.viewdata
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import com.android.jared.linden.timingtrials.IFabCallbacks
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.REQUEST_IMPORT_FILE
 import com.android.jared.linden.timingtrials.data.ITEM_COURSE
 import com.android.jared.linden.timingtrials.data.ITEM_RIDER
 import com.android.jared.linden.timingtrials.data.ITEM_TIMETRIAL
 import com.android.jared.linden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
+import com.android.jared.linden.timingtrials.util.EventObserver
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.google.android.material.tabs.TabLayoutMediator
-import java.io.IOException
+
 
 class DataBaseViewPagerFragment: Fragment() {
 
@@ -36,6 +36,11 @@ class DataBaseViewPagerFragment: Fragment() {
             tab.text = getTabTitle(position)
         }.attach()
 
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+            override fun onPageSelected(position: Int) {
+                setFabStatus(position)
+            }
+        })
 
         return binding.root
     }
@@ -55,6 +60,31 @@ class DataBaseViewPagerFragment: Fragment() {
             COURSE_PAGE_INDEX -> getString(R.string.courses)
             TIMETRIAL_PAGE_INDEX->getString(R.string.time_trials)
             else -> null
+        }
+    }
+
+
+    private  fun setFabStatus(position: Int){
+        val act = requireActivity() as IFabCallbacks
+        act.setVisibility(View.VISIBLE)
+        act.setImage(R.drawable.ic_add_white_24dp)
+        when (position) {
+            RIDER_PAGE_INDEX -> act.setAction {
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment(0)
+                findNavController().navigate(action)
+            }
+            COURSE_PAGE_INDEX -> act.setAction {
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(0, requireActivity().getString(R.string.new_course))
+                findNavController().navigate(action)
+            }
+            TIMETRIAL_PAGE_INDEX->act.setAction {
+                val viewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+                viewModel.timeTrialInsertedEvent.observe(viewLifecycleOwner, EventObserver{
+                    val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
+                    findNavController().navigate(action)
+                })
+                viewModel.insertNewTimeTrial()
+            }
         }
     }
 
@@ -132,4 +162,5 @@ class TimeTrialDBPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
     override fun createFragment(position: Int): Fragment {
         return tabFragmentsCreators[position]?.invoke() ?: throw IndexOutOfBoundsException()
     }
+
 }

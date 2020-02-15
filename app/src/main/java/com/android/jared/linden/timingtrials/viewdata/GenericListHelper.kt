@@ -156,14 +156,14 @@ data class TimeTrialListItem(val timeTrialHeader: TimeTrialHeader){
 
 class TimeTrialViewHolderFactory(val viewModel: ListViewModel, val lifeCyleOwner: LifecycleOwner): GenericViewHolderFactory<TimeTrialHeader>() {
     override fun performFabAction(fab: View) {
-        fab.setOnClickListener {
-            viewModel.timeTrialInsertedEvent.observe(lifeCyleOwner, EventObserver{
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
-                Navigation.findNavController(fab).navigate(action)
-            })
-            viewModel.insertNewTimeTrial()
-
-        }
+//        fab.setOnClickListener {
+//            viewModel.timeTrialInsertedEvent.observe(lifeCyleOwner, EventObserver{
+//                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
+//                Navigation.findNavController(fab).navigate(action)
+//            })
+//            viewModel.insertNewTimeTrial()
+//
+//        }
     }
 
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {

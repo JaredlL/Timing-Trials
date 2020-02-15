@@ -192,6 +192,11 @@
                         </option>
                         <option name="myPositions">
                           <map>
+                            <entry key="action_globalResultFragment_to_globalResultFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_globalResultFragment_to_resultFragment">
                               <value>
                                 <LayoutPositions />
