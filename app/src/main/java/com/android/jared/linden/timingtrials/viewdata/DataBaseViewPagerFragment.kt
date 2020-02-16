@@ -1,8 +1,13 @@
 package com.android.jared.linden.timingtrials.viewdata
 
+import android.app.SearchManager
+import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.widget.SearchView
+import android.widget.Toast
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
@@ -17,6 +22,7 @@ import com.android.jared.linden.timingtrials.databinding.FragmentDatabaseViewPag
 import com.android.jared.linden.timingtrials.util.EventObserver
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 
 
@@ -41,6 +47,8 @@ class DataBaseViewPagerFragment: Fragment() {
                 setFabStatus(position)
             }
         })
+        val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+        listViewModel.setFilterString("")
 
         return binding.root
     }
@@ -69,74 +77,64 @@ class DataBaseViewPagerFragment: Fragment() {
         act.setVisibility(View.VISIBLE)
         act.setImage(R.drawable.ic_add_white_24dp)
         when (position) {
-            RIDER_PAGE_INDEX -> act.setAction {
+            RIDER_PAGE_INDEX -> {
+                act.setAction {
                 val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment(0)
                 findNavController().navigate(action)
             }
-            COURSE_PAGE_INDEX -> act.setAction {
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(0, requireActivity().getString(R.string.new_course))
-                findNavController().navigate(action)
+                act.setImage(R.drawable.ic_add_white_24dp)
             }
-            TIMETRIAL_PAGE_INDEX->act.setAction {
+            COURSE_PAGE_INDEX -> {
+                act.setImage(R.drawable.ic_add_white_24dp)
+                act.setAction {
+                    val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(0, requireActivity().getString(R.string.new_course))
+                    findNavController().navigate(action)
+                }
+            }
+            TIMETRIAL_PAGE_INDEX->{
+                act.setImage(R.drawable.ic_timer_white_24dp)
+                act.setAction {
                 val viewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
-                viewModel.timeTrialInsertedEvent.observe(viewLifecycleOwner, EventObserver{
+                viewModel.timeTrialInsertedEvent.observe(viewLifecycleOwner, EventObserver {
                     val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
                     findNavController().navigate(action)
                 })
                 viewModel.insertNewTimeTrial()
             }
+            }
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        //menu.clear()
         inflater.inflate(R.menu.menu_database, menu)
+
+        val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        (menu.findItem(R.id.app_bar_search).actionView as SearchView).apply {
+            // Assumes current activity is the searchable activity
+            setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
+            isIconified=false // Do not iconify the widget; expand it by default
+            isIconifiedByDefault = false
+            val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+                override fun onQueryTextSubmit(searchText: String?): Boolean {
+                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+                    listViewModel.setFilterString(searchText?:"")
+                    return true
+                }
+
+                override fun onQueryTextChange(searchText: String?): Boolean {
+                   //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+                    listViewModel.setFilterString(searchText?:"")
+                    return true
+                }
+
+            })
+        }
+
+
+
     }
-
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        return when (item.itemId) {
-//            R.id.app_bar_import -> {
-//                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-//                intent.type = "text/*"
-//                startActivityForResult(intent, REQUEST_IMPORT_FILE)
-//
-//                Toast.makeText(requireContext(), "Select CSV File", Toast.LENGTH_SHORT).show()
-//                true
-//            }
-//            R.id.app_bar_test->{
-//                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToTitleFragment()
-//                findNavController().navigate(action)
-//                true
-//            }
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        when(requestCode){
-//            REQUEST_IMPORT_FILE ->{
-//                data?.data?.let {uri->
-//                  //  try {
-//                    val importVm = requireActivity().getViewModel { requireActivity().injector.importViewModel()}
-//                        val inputStream = requireActivity().contentResolver.openInputStream(uri)
-//                        if(inputStream != null){
-//                            importVm.readInput(uri.path, inputStream)
-//                        }
-//           //         }
-////                    catch(e: IOException)
-////                    {
-////                        e.printStackTrace()
-////                        Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
-////                    }
-//                }
-//            }
-//        }
-//    }
-
-
-
-
 
 }
 

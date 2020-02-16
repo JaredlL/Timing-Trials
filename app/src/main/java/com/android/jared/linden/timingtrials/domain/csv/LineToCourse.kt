@@ -4,7 +4,7 @@ import com.android.jared.linden.timingtrials.data.Course
 
 class LineToCourseConverter: ILineToObjectConverter<Course> {
     override fun isHeading(line: String): Boolean {
-        return line.splitToSequence(",", ignoreCase = true).any{it.contains("course", true)}
+        return line.splitToSequence(",", ignoreCase = true).any{it.contains("Course Name", true)}
     }
 
     val defaultConversion = 1000.0
@@ -30,6 +30,9 @@ class LineToCourseConverter: ILineToObjectConverter<Course> {
         try{
             val dataList = dataLine.split(",", ignoreCase =  true)
             val courseName = nameIndex?.let { dataList.getOrNull(it)}
+            if(courseName == "Lee"){
+                throw Exception("Ug?")
+            }
             val distance = distanceIndex?.let { dataList.getOrNull(it)?.toDoubleOrNull()?.times(conversion)}
             val cctName = cttNameIndex?.let { dataList.getOrNull(it) }
 

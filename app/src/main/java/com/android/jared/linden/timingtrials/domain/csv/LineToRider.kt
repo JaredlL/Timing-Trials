@@ -182,7 +182,7 @@ class LineToRiderConverter: ILineToObjectConverter<ImportRider> {
 
 
     override fun isHeading(line: String): Boolean {
-        return line.contains("rider", ignoreCase = true) || line.contains("athlete", ignoreCase = true)
+        return (line.contains("Rider", ignoreCase = true) || line.contains("athlete", ignoreCase = true)) && line.contains("name", ignoreCase = true)
     }
 
     var stringToFieldList: List<StringToObjectField<ImportRider>> = listOf()

@@ -54,21 +54,21 @@ class GenericListFragment : Fragment() {
             ITEM_RIDER -> {
                 viewFactory = RiderViewHolderFactory()
                 adapter = GenericListAdapter(requireContext(), viewFactory)
-                listViewModel.allRiders.observe(viewLifecycleOwner, Observer{res->
+                listViewModel.filteredAllRiders.observe(viewLifecycleOwner, Observer{res->
                     res?.let {(adapter as? GenericListAdapter<Rider>)?.setItems(it)}
                 })
             }
             ITEM_COURSE -> {
                 viewFactory = CourseViewHolderFactory()
                 adapter = GenericListAdapter(requireContext(), viewFactory)
-                listViewModel.allCourses.observe(viewLifecycleOwner, Observer{res->
+                listViewModel.filteredAllCourse.observe(viewLifecycleOwner, Observer{res->
                     res?.let {(adapter as? GenericListAdapter<SelectableCourseViewModel>)?.setItems(it)}
                 })
             }
             ITEM_TIMETRIAL ->{
                 viewFactory = TimeTrialViewHolderFactory(listViewModel, viewLifecycleOwner)
                 adapter = GenericListAdapter(requireContext(), viewFactory)
-                listViewModel.allTimeTrials.observe(viewLifecycleOwner, Observer{res->
+                listViewModel.filteredAllTimeTrials.observe(viewLifecycleOwner, Observer{res->
                     res?.let {(adapter as? GenericListAdapter<TimeTrialHeader>)?.setItems(it)}
                 })
             }

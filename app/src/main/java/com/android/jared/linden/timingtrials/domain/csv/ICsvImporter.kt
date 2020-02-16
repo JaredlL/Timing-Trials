@@ -4,7 +4,8 @@ import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.data.Gender
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 
-data class ImportResult(val result: Boolean, val message:String, val addedRiders: Int, val duplicateRiders: Int)
+
+data class ImportAttempt<T>(val sucess: Boolean, val data: T, val message: String?)
 
 data class ImportTimeTrial(var header: TimeTrialHeader? = null, var course: Course? = null, val importRiderList: MutableList<ImportRider> = mutableListOf())
 

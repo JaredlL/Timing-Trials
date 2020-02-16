@@ -38,12 +38,6 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
 
 
 
-
-    val resultSettings: MutableLiveData<ResultDisplaySettings> = MutableLiveData()
-
-
-
-
     fun delete(){
         timeTrial.value?.let {
             viewModelScope.launch(Dispatchers.IO) {
@@ -59,16 +53,15 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
 
         mutList.add("Rider")
         mutList.add("Total Time")
+        mutList.add("Club")
+        mutList.add("Category")
+        mutList.add("Notes")
         if(tt.timeTrialHeader.laps > 1){
             for(i in 1..tt.timeTrialHeader.laps){
                 mutList.add("Split $i")
             }
         }
-        mutList.add("Category")
-        mutList.add("Club")
 
-
-        mutList.add("Notes")
         return ResultRowViewModel(mutList)
     }
 
@@ -85,7 +78,9 @@ class ResultRowViewModel{
      {
         row.add(ResultCell(MutableLiveData("${result.rider.firstName} ${result.rider.lastName}")))
          row.add(ResultCell(MutableLiveData(ConverterUtils.toTenthsDisplayString(result.resultTime))))
-
+         row.add(ResultCell(MutableLiveData(result.riderClub)))
+         row.add(ResultCell(MutableLiveData(result.category)))
+         row.add(ResultCell(MutableLiveData(result.notes)))
          if(laps > 1){
              for (i in 0 until laps){
                  val splitVal = result.splits.getOrNull(i)
@@ -94,13 +89,6 @@ class ResultRowViewModel{
              }
          }
 
-        row.add(ResultCell(MutableLiveData(result.category)))
-        row.add(ResultCell(MutableLiveData(result.riderClub)))
-
-
-
-
-         row.add(ResultCell(MutableLiveData(result.notes)))
 
 
     }

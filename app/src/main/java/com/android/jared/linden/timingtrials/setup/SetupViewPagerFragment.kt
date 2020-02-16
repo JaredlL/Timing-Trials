@@ -2,10 +2,11 @@ package com.android.jared.linden.timingtrials.setup
 
 
 import android.app.Activity
+import android.app.SearchManager
+import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.SearchView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -46,35 +47,7 @@ class SetupViewPagerFragment: Fragment() {
             }
         })
 
-
-
-
-//        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
-//            override fun onTabReselected(tab: TabLayout.Tab?) {
-//                when (tab?.position) {
-//                    RIDER_PAGE_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.VISIBLE
-//                    ORDER_RIDER_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.GONE
-//                    TIMETRIAL_PAGE_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.GONE
-//                    else -> throw IndexOutOfBoundsException()
-//                }
-//            }
-//
-//            override fun onTabUnselected(tab: TabLayout.Tab?) {
-//
-//            }
-//
-//            override fun onTabSelected(tab: TabLayout.Tab?) {
-//                when (tab?.position) {
-//                    RIDER_PAGE_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.VISIBLE
-//                    ORDER_RIDER_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.GONE
-//                    TIMETRIAL_PAGE_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.GONE
-//                    else -> throw IndexOutOfBoundsException()
-//                }
-//            }
-//
-//        })
-
-
+        setHasOptionsMenu(true)
 
         viewPager.offscreenPageLimit = 2
         // Set the icon and text for each tab
@@ -101,13 +74,50 @@ class SetupViewPagerFragment: Fragment() {
                     val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(0)
                     findNavController().navigate(action)
                 }
+                optionsMenu?.clear()
+                setMenuSearch()
             }
             ORDER_RIDER_INDEX ->  {
                 act.setVisibility(View.GONE)
+                optionsMenu?.clear()
             }
             TIMETRIAL_PAGE_INDEX-> {
                 act.setVisibility(View.GONE)
+                optionsMenu?.clear()
             }
+        }
+    }
+
+    var optionsMenu: Menu? = null
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_database, menu)
+        optionsMenu = menu
+    }
+
+    private fun setMenuSearch(){
+        val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val b = optionsMenu?.findItem(R.id.app_bar_search)
+        (optionsMenu?.findItem(R.id.app_bar_search)?.actionView as SearchView).apply {
+            // Assumes current activity is the searchable activity
+            setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
+            isIconified=false // Do not iconify the widget; expand it by default
+            isIconifiedByDefault = false
+
+
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+                override fun onQueryTextSubmit(searchText: String?): Boolean {
+                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+                    //listViewModel.setFilterString(searchText?:"")
+                    return true
+                }
+
+                override fun onQueryTextChange(searchText: String?): Boolean {
+                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+                    //listViewModel.setFilterString(searchText?:"")
+                    return true
+                }
+
+            })
         }
     }
 

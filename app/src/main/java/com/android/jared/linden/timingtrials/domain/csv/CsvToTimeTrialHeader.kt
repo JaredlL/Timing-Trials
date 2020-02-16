@@ -8,7 +8,7 @@ import org.threeten.bp.format.DateTimeFormatter
 class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
 
     override fun isHeading(line:String): Boolean{
-        return line.splitToSequence(",", ignoreCase = true).any{it.contains("timetrial", true)}
+        return line.splitToSequence(",", ignoreCase = true).any{it.contains("TimeTrial Name", true)}
     }
 
     var nameIndex:Int? = null

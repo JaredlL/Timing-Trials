@@ -94,14 +94,18 @@ class RiderResultDataFactory(private val riderRepository: IRiderRepository, priv
     override fun getResultList(itemId: Long): LiveData<List<IGenericListItem>> {
         return Transformations.map(timeTrialRiderRepository.getRiderResults(itemId)){res->
             res?.let{ list ->
-                list.map { listItemForRiderResult(it) }
+                list.filter {it.resultTime != Long.MAX_VALUE }.map { listItemForRiderResult(it) }
             }
         }
     }
 
     private fun listItemForRiderResult(result: IResult):IGenericListItem{
 
-        val i1 = GenericListItemField(text = result.course.courseName, next = GenericListItemNext(Course::class.java.simpleName, result.course.id))
+        val i1 = if(result.laps == 1){
+            GenericListItemField(text = result.course.courseName, next = GenericListItemNext(Course::class.java.simpleName, result.course.id))
+        }else{
+            GenericListItemField(text = "${result.course.courseName} (X${result.laps})", next = GenericListItemNext(Course::class.java.simpleName, result.course.id))
+        }
         val i2 = GenericListItemField(text = result.dateSet?.let { ds-> ConverterUtils.dateToDisplay(ds) } ?: "", next = GenericListItemNext(TimeTrial::class.java.simpleName, result.timeTrial?.id))
         val i3 = GenericListItemField(text = ConverterUtils.toSecondsDisplayString(result.resultTime))
 
@@ -137,7 +141,7 @@ class CourseResultDataFactory(private val courseRepository: ICourseRepository, p
     override fun getResultList(itemId: Long): LiveData<List<IGenericListItem>> {
         return Transformations.map(timeTrialRiderRepository.getCourseResults(itemId)){res->
             res?.let{ list ->
-                list.map { listItemForCourseResult(it) }
+                list.filter { it.resultTime != Long.MAX_VALUE }.map { listItemForCourseResult(it) }
             }
         }
     }

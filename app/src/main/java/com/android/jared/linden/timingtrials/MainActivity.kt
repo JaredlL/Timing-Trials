@@ -1,15 +1,12 @@
 package com.android.jared.linden.timingtrials
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.AttributeSet
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
-import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -22,8 +19,6 @@ import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.floatingactionbutton.FloatingActionButton.OnVisibilityChangedListener
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -76,8 +71,9 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             }
         })
 
+
         mainFab.setOnClickListener {
-            mAct()
+            fabAction()
         }
 
         setSupportActionBar(toolbar)
@@ -195,18 +191,14 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }
     }
 
-    var toolbarCollapsed = false
-    var fabShouldShow = true
+    private var toolbarCollapsed = false
+    private var fabShouldShow = true
     override fun setVisibility(visibility: Int) {
-        if(visibility == View.VISIBLE){
-            fabShouldShow = true
-        }else if(visibility != View.VISIBLE && mainFab.visibility == View.VISIBLE ){
-            fabShouldShow = false
-        }
+        fabShouldShow = visibility == View.VISIBLE
         refreshFab()
     }
 
-    fun refreshFab(){
+    private fun refreshFab(){
         if((!toolbarCollapsed && fabShouldShow) && mainFab.visibility != View.VISIBLE){
             mainFab.show()
         }else if ((!fabShouldShow || toolbarCollapsed) && mainFab.visibility == View.VISIBLE) {
@@ -214,9 +206,9 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }
     }
 
-    var mAct: () -> Unit = {}
+    var fabAction: () -> Unit = {}
     override fun setAction(action: () -> Unit) {
-        mAct = action
+        fabAction = action
     }
 
     override fun setImage(resourceId: Int) {

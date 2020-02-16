@@ -124,12 +124,15 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
     fun addOrUpdate(){
         viewModelScope.launch(Dispatchers.IO) {
             mutableRider.value?.let { repository.insertOrUpdate(it) }
+            mutableRider.postValue(Rider.createBlank())
         }
+
     }
 
     fun delete(){
         viewModelScope.launch(Dispatchers.IO) {
             mutableRider.value?.let { repository.delete(it) }
+            mutableRider.postValue(Rider.createBlank())
         }
     }
 

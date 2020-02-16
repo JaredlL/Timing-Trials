@@ -27,7 +27,7 @@ interface RiderDao {
 
     @Query  ("SELECT *  from rider_table ORDER BY firstName COLLATE NOCASE ASC") fun getAllRidersLightSuspend(): List<Rider>
 
-    @Query("SELECT * FROM rider_table WHERE firstName == :firstName AND lastName == :lastName") fun ridersFromFirstLastName(firstName: String, lastName: String): List<Rider>
+    @Query("SELECT * FROM rider_table WHERE firstName == :firstName COLLATE NOCASE AND lastName == :lastName COLLATE NOCASE") fun ridersFromFirstLastName(firstName: String, lastName: String): List<Rider>
 
     @Query("SELECT DISTINCT club from rider_table") fun getAllClubs(): LiveData<List<String>>
 

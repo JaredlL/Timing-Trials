@@ -79,6 +79,7 @@
     <string name="export_data">Export Data</string>
     <string name="select_file">Select File....</string>
     <string name="insert_results">Insert to DB</string>
+    <string name="number_of_rides">Rides</string>
     <string name="export_csv">Export CSV</string>
     <string name="export_json">Export JSON</string>
     <string name="screenshot">Screenshot</string>
