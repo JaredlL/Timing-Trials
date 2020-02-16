@@ -12,6 +12,8 @@ interface ISelectRidersViewModel{
     val selectedRidersInformation: LiveData<SelectedRidersInformation>
     fun addRiderToTt(newSelectedRider: Rider)
     fun removeRiderFromTt(riderToRemove: Rider)
+    fun setRiderFilter(filter: String)
+    val riderFilter:MutableLiveData<String>
 }
 
 class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRidersViewModel {
@@ -23,6 +25,11 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
     override val selectedRidersInformation: LiveData<SelectedRidersInformation> = selectedRidersMediator
 
 
+   override val riderFilter = MutableLiveData<String>()
+
+    override fun setRiderFilter(filterString: String){
+        riderFilter.value = filterString
+    }
 
     override fun addRiderToTt(newSelectedRider: Rider) {
         ttSetup.timeTrial.value?.let { tt->
@@ -37,17 +44,27 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
     }
 
     init {
-        selectedRidersMediator.addSource(ttSetup.riderRepository.allRidersLight){result->
-            val tt = ttSetup.timeTrial.value
-            if(result!=null && tt!=null){
-                selectedRidersMediator.value = SelectedRidersInformation(result, tt)
-            }
+
+        selectedRidersMediator.addSource(riderFilter){filter->
+            updateselectedRiderInfo(ttSetup.riderRepository.allRidersLight.value, filter, ttSetup.timeTrial.value)
+        }
+
+        selectedRidersMediator.addSource(ttSetup.riderRepository.allRidersLight){allRiders->
+            updateselectedRiderInfo(allRiders, riderFilter.value, ttSetup.timeTrial.value)
         }
         selectedRidersMediator.addSource(ttSetup.timeTrial){ tt->
-            val riders = ttSetup.riderRepository.allRidersLight.value
-            if(tt!=null && riders!=null){
-                selectedRidersMediator.value = SelectedRidersInformation(riders, tt)
-            }
+            updateselectedRiderInfo(ttSetup.riderRepository.allRidersLight.value, riderFilter.value, tt)
+        }
+    }
+
+    fun updateselectedRiderInfo(allRiders: List<Rider>?, filterString: String?, timeTrial: TimeTrial?){
+        if(allRiders != null && timeTrial != null){
+           val filteredRiders = if(filterString.isNullOrBlank()){
+               allRiders
+           }else{
+               allRiders.filter { it.fullName().contains(filterString, ignoreCase = true) }
+           }
+            selectedRidersMediator.value = SelectedRidersInformation(filteredRiders, timeTrial)
         }
     }
 

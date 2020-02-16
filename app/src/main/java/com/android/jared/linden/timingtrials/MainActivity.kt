@@ -20,6 +20,7 @@ import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlin.math.abs
 
 
 const val REQUEST_CREATE_FILE_CSV = 1
@@ -59,11 +60,11 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         collapsingToolbar.setupWithNavController(toolbar, navController, appBarConfiguration)
 
         main_app_bar_layout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-            if (Math.abs(verticalOffset)-(appBarLayout?.totalScrollRange?:0) == 0) {
+            if (abs(verticalOffset)-(appBarLayout?.totalScrollRange?:0) == 0) {
                 //  Collapsed
                 toolbarCollapsed = true
                 refreshFab()
-            } else {
+            } else if(abs(verticalOffset) ==0) {
                 //Expanded
                 toolbarCollapsed = false
                 refreshFab()

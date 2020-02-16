@@ -47,7 +47,6 @@ class SetupViewPagerFragment: Fragment() {
             }
         })
 
-        setHasOptionsMenu(true)
 
         viewPager.offscreenPageLimit = 2
         // Set the icon and text for each tab
@@ -74,52 +73,74 @@ class SetupViewPagerFragment: Fragment() {
                     val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(0)
                     findNavController().navigate(action)
                 }
-                optionsMenu?.clear()
-                setMenuSearch()
+                setHasOptionsMenu(true)
             }
             ORDER_RIDER_INDEX ->  {
                 act.setVisibility(View.GONE)
-                optionsMenu?.clear()
+                setHasOptionsMenu(false)
+                //optionsMenu?.clear()
             }
             TIMETRIAL_PAGE_INDEX-> {
                 act.setVisibility(View.GONE)
-                optionsMenu?.clear()
+                setHasOptionsMenu(false)
+                //optionsMenu?.clear()
             }
         }
     }
 
-    var optionsMenu: Menu? = null
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_database, menu)
-        optionsMenu = menu
-    }
-
-    private fun setMenuSearch(){
         val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val b = optionsMenu?.findItem(R.id.app_bar_search)
-        (optionsMenu?.findItem(R.id.app_bar_search)?.actionView as SearchView).apply {
+        (menu.findItem(R.id.app_bar_search).actionView as SearchView).apply {
             // Assumes current activity is the searchable activity
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
             isIconified=false // Do not iconify the widget; expand it by default
             isIconifiedByDefault = false
-
-
+            val selectRiderVm = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
+            setQuery(selectRiderVm.riderFilter.value?:"", false)
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
                     //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
-                    //listViewModel.setFilterString(searchText?:"")
+                    selectRiderVm.setRiderFilter(searchText?:"")
                     return true
                 }
 
                 override fun onQueryTextChange(searchText: String?): Boolean {
-                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
-                    //listViewModel.setFilterString(searchText?:"")
+                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector. listViewModel() }
+                    selectRiderVm.setRiderFilter(searchText?:"")
                     return true
                 }
 
             })
         }
     }
+
+//    private fun setMenuSearch(){
+//        val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+//        val b = optionsMenu?.findItem(R.id.app_bar_search)
+//        (optionsMenu?.findItem(R.id.app_bar_search)?.actionView as SearchView).apply {
+//            // Assumes current activity is the searchable activity
+//            setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
+//            isIconified=false // Do not iconify the widget; expand it by default
+//            isIconifiedByDefault = false
+//
+//
+//            setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+//                override fun onQueryTextSubmit(searchText: String?): Boolean {
+//                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+//                    //listViewModel.setFilterString(searchText?:"")
+//                    return true
+//                }
+//
+//                override fun onQueryTextChange(searchText: String?): Boolean {
+//                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+//                    //listViewModel.setFilterString(searchText?:"")
+//                    return true
+//                }
+//
+//            })
+//        }
+//    }
 
 //    private fun setupNewFab() {
 //        val rootCoordinator: CoordinatorLayout = (activity as MainActivity).rootCoordinator

@@ -124,7 +124,7 @@ class DataBaseViewPagerFragment: Fragment() {
                 }
 
                 override fun onQueryTextChange(searchText: String?): Boolean {
-                   //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+                   //val listViewModel = requireActivity().getViewModel { requireActivity().injector. listViewModel() }
                     listViewModel.setFilterString(searchText?:"")
                     return true
                 }
