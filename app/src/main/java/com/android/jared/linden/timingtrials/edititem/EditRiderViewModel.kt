@@ -7,9 +7,6 @@ import com.android.jared.linden.timingtrials.data.Rider
 import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
 import kotlinx.coroutines.*
 import org.threeten.bp.LocalDate
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneId
-import org.threeten.bp.ZoneOffset
 import javax.inject.Inject
 
 
@@ -17,6 +14,8 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
 
 
     val clubs: LiveData<List<String>> = repository.allClubs
+    val categories: LiveData<List<String>> = repository.allCategories
+
     val mutableRider: MediatorLiveData<Rider> = MediatorLiveData()
 
     val firstName = MutableLiveData<String>("")
@@ -24,6 +23,7 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
     val yearOfBirth = MutableLiveData("")
     val selectedGenderPosition = MutableLiveData(2)
     val club = MutableLiveData<String>("")
+    val category = MutableLiveData<String>("")
     val genders = Gender.values().map { it.fullString() }
 
     private val currentId = MutableLiveData<Long>(0L)
@@ -43,6 +43,9 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
                 }
                 if(club.value != rider.club){
                     club.value = rider.club
+                }
+                if(category.value != rider.category){
+                    category.value = rider.category
                 }
                 val yobString = rider.dateOfBirth?.year?.toString() ?:""
                 if(yearOfBirth.value != yobString){
@@ -73,6 +76,15 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
                 mutableRider.value?.let { rider->
                     if(rider.club != str){
                         mutableRider.value = rider.copy(club = str)
+                    }
+                }
+            }
+        }
+        mutableRider.addSource(category){res->
+            res?.let { str->
+                mutableRider.value?.let { rider->
+                    if(rider.category != str){
+                        mutableRider.value = rider.copy(category = str)
                     }
                 }
             }

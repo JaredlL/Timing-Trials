@@ -211,7 +211,7 @@ class ImportViewModel @Inject constructor(private val riderRespository: IRiderRe
                             number = 0,
                             finishTime = fTime,
                             splits = transformSplits(importRider.splits, importRider.finishTime),
-                            category = importRider.category,
+                            category = importRider.category?:"",
                             gender = importRider.gender,
                             club = importRider.club?:"",
                             resultNote = importRider.notes?:""

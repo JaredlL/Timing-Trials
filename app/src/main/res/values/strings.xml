@@ -23,6 +23,8 @@
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
     <string name="club">Club</string>
+    <string name="current_club">Current Club</string>
+    <string name="current_category">Current Category</string>
     <string name="begin_tt">Begin TT!</string>
     <string name="ok">OK</string>
     <string name="resume">Resume</string>
@@ -90,4 +92,6 @@
     <string name="settings">Settings</string>
     <string name="distance_units">Distance Units</string>
     <string name="units_setting_description">Choose default units for distances</string>
+    <string name="cati">CATI</string>
+    <string name="senior">Senior</string>
 </resources>

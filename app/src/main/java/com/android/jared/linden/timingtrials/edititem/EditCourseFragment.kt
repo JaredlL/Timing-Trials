@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.*
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -58,7 +59,14 @@ class EditCourseFragment : Fragment() {
                     courseViewModel.addOrUpdate()
                     findNavController().popBackStack()
                 }
+            }
 
+            cttNameEdit.setOnEditorActionListener{_, actionId, keyEvent ->
+                if ((keyEvent != null && (keyEvent.keyCode == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    courseViewModel.addOrUpdate()
+                    findNavController().popBackStack()
+                }
+                return@setOnEditorActionListener false
             }
 
         }

@@ -2,7 +2,7 @@ package com.android.jared.linden.timingtrials.edititem
 
 import android.os.Bundle
 import android.view.*
-import android.view.inputmethod.InputMethodManager
+import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -35,14 +35,27 @@ class EditRiderFragment : Fragment() {
         riderViewModel.changeRider(args.riderId)
         setHasOptionsMenu(true)
 
-        val mAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
 
 
-        riderViewModel.clubs.observe(viewLifecycleOwner, Observer{
-            mAdapter.clear()
-            it.forEachIndexed { index, s -> mAdapter.insert(s, index)  }
-            mAdapter.notifyDataSetChanged()
+        val categoryAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
+        riderViewModel.categories.observe(viewLifecycleOwner, Observer{res->
+            res?.let {cats->
+                categoryAdapter.clear()
+                cats.filterNot { it.isBlank() }.forEachIndexed { index, s -> categoryAdapter.insert(s, index)  }
+                categoryAdapter.notifyDataSetChanged()
+            }
         })
+
+        val clubAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
+        riderViewModel.clubs.observe(viewLifecycleOwner, Observer{res->
+            res?.let {clubs->
+                clubAdapter.clear()
+                clubs.filterNot { it.isBlank() }.forEachIndexed { index, s -> clubAdapter.insert(s, index)  }
+                clubAdapter.notifyDataSetChanged()
+            }
+        })
+
+
 
         //Set title
         (requireActivity() as AppCompatActivity).supportActionBar?.title = if(args.riderId == 0L) getString(R.string.add_rider) else getString(R.string.edit_rider)
@@ -55,7 +68,8 @@ class EditRiderFragment : Fragment() {
         val binding = DataBindingUtil.inflate<FragmentRiderBinding>(inflater, R.layout.fragment_rider, container, false).apply {
             viewModel = riderViewModel
             lifecycleOwner = (this@EditRiderFragment)
-            autoCompleteClub.setAdapter(mAdapter)
+            autoCompleteClub.setAdapter(clubAdapter)
+            autoCompleteCategory.setAdapter(categoryAdapter)
             fabCallback.setAction {
                 if(riderViewModel.mutableRider.value?.firstName != ""){
                     riderViewModel.addOrUpdate()
@@ -66,6 +80,13 @@ class EditRiderFragment : Fragment() {
                     Toast.makeText(requireContext(), "Rider must have firstname set", Toast.LENGTH_SHORT).show()
                 }
 
+            }
+            autoCompleteCategory.setOnEditorActionListener{_, actionId, keyEvent ->
+                if ((keyEvent != null && (keyEvent.keyCode == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    riderViewModel.addOrUpdate()
+                    findNavController().popBackStack()
+                }
+                return@setOnEditorActionListener false
             }
 
         }

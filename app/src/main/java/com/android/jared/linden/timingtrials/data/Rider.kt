@@ -13,7 +13,7 @@ data class Rider(
         val lastName: String,
         val club: String = "",
         val dateOfBirth: LocalDate? = null,
-        val category: String? = null,
+        val category: String = "",
         val gender: Gender = Gender.UNKNOWN,
         @PrimaryKey(autoGenerate = true) override val id: Long? = null
 ) : ITimingTrialsEntity  {
