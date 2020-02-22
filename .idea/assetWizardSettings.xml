@@ -79,6 +79,7 @@
                                               <map>
                                                 <entry key="color" value="000000" />
                                                 <entry key="scalingPercent" value="75" />
+                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -90,9 +91,8 @@
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="backgroundColor" value="8ee4af" />
-                                      <entry key="foregroundImage" value="C:\Users\linde\Documents\Inkscape\TimingTrialsShadow.svg" />
+                                      <entry key="foregroundImage" value="C:\Users\linde\Documents\Inkscape\TimingTrials 1.6.svg" />
                                       <entry key="outputName" value="tt_logo" />
-                                      <entry key="showSafeZone" value="false" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -165,7 +165,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/file/ic_file_upload_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_find_replace_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -176,7 +176,7 @@
                         <option name="values">
                           <map>
                             <entry key="opacityPercent" value="80" />
-                            <entry key="outputName" value="ic_file_upload_black_24dp" />
+                            <entry key="outputName" value="ic_find_replace_black_24dp" />
                             <entry key="sourceFile" value="C:\Users\LindenJ" />
                           </map>
                         </option>

@@ -71,9 +71,8 @@ class EditRiderFragment : Fragment() {
             autoCompleteClub.setAdapter(clubAdapter)
             autoCompleteCategory.setAdapter(categoryAdapter)
             fabCallback.setAction {
-                if(riderViewModel.mutableRider.value?.firstName != ""){
+                if(!riderViewModel.mutableRider.value?.firstName?.trim().isNullOrBlank()){
                     riderViewModel.addOrUpdate()
-
                     findNavController().popBackStack()
 
                 }else{

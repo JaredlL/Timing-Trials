@@ -13,6 +13,7 @@ import com.android.jared.linden.timingtrials.TestViewModel
 import com.android.jared.linden.timingtrials.viewdata.ImportViewModel
 import dagger.BindsInstance
 import dagger.Component
+import dagger.Subcomponent
 import javax.inject.Singleton
 
 @Singleton
@@ -50,6 +51,18 @@ interface AppComponent{
 
 }
 
+//@Singleton
+//@Subcomponent(modules = [PrefsModule::class])
+//interface PrefsComponant{
+//
+//    @Subcomponent.Builder
+//    interface Builder{
+//        @BindsInstance
+//        fun activityPrefs(): Builder
+//        fun build(): PrefsComponant
+//    }
+//
+//}
 
 
 

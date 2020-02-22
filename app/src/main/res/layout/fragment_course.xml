@@ -10,9 +10,11 @@
             type="com.android.jared.linden.timingtrials.edititem.EditCourseViewModel"/>
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -23,6 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:text="Course Name"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -100,7 +103,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:inputType="textCapSentences"
                 android:text="@={viewModel.cttName}"
@@ -120,6 +122,8 @@
 <!--            android:layout_marginEnd="@dimen/fab_margin"-->
 <!--            android:src="@drawable/ic_done_white_24dp" />-->
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
 
 </layout>

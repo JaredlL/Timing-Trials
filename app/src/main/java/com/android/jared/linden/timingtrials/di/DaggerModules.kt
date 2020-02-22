@@ -1,6 +1,7 @@
 package com.android.jared.linden.timingtrials.di
 
 import android.content.Context
+import com.android.jared.linden.timingtrials.TTPrefs
 import com.android.jared.linden.timingtrials.data.roomrepo.*
 import com.android.jared.linden.timingtrials.data.source.*
 import dagger.Module
@@ -34,6 +35,7 @@ class RoomDatabaseModule{
     fun timeTrialRiderDao(db: TimingTrialsDatabase): TimeTrialRiderDao{
         return db.timeTrialRiderDao()
     }
+
 
 }
 

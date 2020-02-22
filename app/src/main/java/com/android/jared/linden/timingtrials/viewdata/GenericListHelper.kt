@@ -77,13 +77,13 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Se
             checkBox.visibility = View.GONE
 
             courseLayout.setOnLongClickListener {
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(data.course.id ?: 0, root.context.getString(R.string.edit_course))
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(data.id ?: 0, root.context.getString(R.string.edit_course))
                 Navigation.findNavController(_binding.root).navigate(action)
                 true
             }
 
             courseLayout.setOnClickListener {
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.course.id?:0, data.course.javaClass.simpleName)
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.id?:0, Course::class.java.simpleName)
                 Navigation.findNavController(_binding.root).navigate(action)
             }
 
@@ -93,15 +93,25 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Se
     }
 }
 
-class CourseViewHolderFactory: GenericViewHolderFactory<SelectableCourseViewModel>() {
+class CourseViewHolderFactory(private val unitString: String): GenericViewHolderFactory<SelectableCourseViewModel>() {
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
-        val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply { checkBox.visibility = View.GONE }
+        val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply {
+            val cName =layoutInflator.context.resources.getString(R.string.course_name)
+            val dist = "Distance ($unitString)"
+            val cttName = layoutInflator.context.resources.getString(R.string.cttname)
+            courseVm = SelectableCourseViewModel(cName, dist, cttName)
+            checkBox.visibility = View.GONE
+
+        }
         return binding.root
 
     }
 
     override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: SelectableCourseViewModel): View {
-        val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply { courseVm = data; checkBox.visibility = View.GONE }
+        val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply {
+            courseVm = data
+            checkBox.visibility = View.GONE
+        }
         return binding.root
     }
 
@@ -154,7 +164,7 @@ data class TimeTrialListItem(val timeTrialHeader: TimeTrialHeader){
     }
 }
 
-class TimeTrialViewHolderFactory(val viewModel: ListViewModel, val lifeCyleOwner: LifecycleOwner): GenericViewHolderFactory<TimeTrialHeader>() {
+class TimeTrialViewHolderFactory(): GenericViewHolderFactory<TimeTrialHeader>() {
     override fun performFabAction(fab: View) {
 //        fab.setOnClickListener {
 //            viewModel.timeTrialInsertedEvent.observe(lifeCyleOwner, EventObserver{

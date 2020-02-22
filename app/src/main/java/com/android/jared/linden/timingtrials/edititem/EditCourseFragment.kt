@@ -17,6 +17,7 @@ import androidx.navigation.fragment.navArgs
 import com.android.jared.linden.timingtrials.IFabCallbacks
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentCourseBinding
+import com.android.jared.linden.timingtrials.util.getLengthConverter
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.google.android.material.appbar.AppBarLayout
@@ -38,6 +39,7 @@ class EditCourseFragment : Fragment() {
         courseViewModel = requireActivity().getViewModel { requireActivity().injector.courseViewModel() }
 
         setHasOptionsMenu(true)
+        courseViewModel.setLengthConverter(getLengthConverter())
         courseViewModel.changeCourse(courseId)
         courseViewModel.mutableCourse.observe(viewLifecycleOwner, Observer {  })
 
@@ -54,7 +56,7 @@ class EditCourseFragment : Fragment() {
             lifecycleOwner = (this@EditCourseFragment)
             fabCallback.setAction {
 
-                if(courseViewModel.courseName.value.isNullOrBlank()) Toast.makeText(requireContext(), getString(R.string.course_requires_name), Toast.LENGTH_SHORT).show()
+                if(courseViewModel.courseName.value?.trim().isNullOrBlank()) Toast.makeText(requireContext(), getString(R.string.course_requires_name), Toast.LENGTH_SHORT).show()
                 else{
                     courseViewModel.addOrUpdate()
                     findNavController().popBackStack()

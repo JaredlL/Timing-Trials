@@ -19,6 +19,7 @@ import com.android.jared.linden.timingtrials.data.ITEM_COURSE
 import com.android.jared.linden.timingtrials.data.ITEM_RIDER
 import com.android.jared.linden.timingtrials.data.ITEM_TIMETRIAL
 import com.android.jared.linden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
+import com.android.jared.linden.timingtrials.domain.Filter
 import com.android.jared.linden.timingtrials.util.EventObserver
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
@@ -48,7 +49,7 @@ class DataBaseViewPagerFragment: Fragment() {
             }
         })
         val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
-        listViewModel.setFilterString("")
+        listViewModel.setFilter(Filter(""))
 
         return binding.root
     }
@@ -119,13 +120,13 @@ class DataBaseViewPagerFragment: Fragment() {
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
                     //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
-                    listViewModel.setFilterString(searchText?:"")
+                    listViewModel.setFilter(Filter(searchText?:""))
                     return true
                 }
 
                 override fun onQueryTextChange(searchText: String?): Boolean {
                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector. listViewModel() }
-                    listViewModel.setFilterString(searchText?:"")
+                    listViewModel.setFilter(Filter(searchText?:""))
                     return true
                 }
 

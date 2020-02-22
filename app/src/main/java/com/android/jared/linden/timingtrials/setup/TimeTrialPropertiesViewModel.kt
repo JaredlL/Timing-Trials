@@ -91,10 +91,13 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
 
         }
         addSource(timeTrialName) { newName ->
-            timeTrialHeader.value?.let {
-                if(it.ttName != newName) { updateDefinition( it.copy(ttName = newName))
+            newName?.trim()?.let{trimmed->
+                timeTrialHeader.value?.let {
+                    if(it.ttName != trimmed) { updateDefinition( it.copy(ttName = trimmed))
+                    }
                 }
             }
+
         }
         addSource(firstRiderOffset) {os->
             os.toIntOrNull()?.let{newos ->

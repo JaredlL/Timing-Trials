@@ -11,6 +11,7 @@ import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.databinding.ListItemCourseBinding
 import com.android.jared.linden.timingtrials.ui.SelectableCourseViewModel
 import com.android.jared.linden.timingtrials.ui.SelectableCourseData
+import com.android.jared.linden.timingtrials.util.LengthConverter
 
 class CourseListAdapter internal constructor(val context: Context): RecyclerView.Adapter<CourseListAdapter.CourseViewHolder>()  {
 
@@ -68,10 +69,10 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
 
 
 
-    fun setCourses(data: SelectableCourseData){
+    fun setCourses(data: SelectableCourseData, unitConverter: LengthConverter){
         if(data.selectedId != selectedId || data.courses != mCourses){
             selectedId = data.selectedId
-            mCourses = data.courses
+            mCourses = data.courses.map { SelectableCourseViewModel(it, unitConverter) }
             notifyDataSetChanged()
         }
 

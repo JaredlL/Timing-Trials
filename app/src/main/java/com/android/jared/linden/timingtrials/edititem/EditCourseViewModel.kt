@@ -3,6 +3,7 @@ package com.android.jared.linden.timingtrials.edititem
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.Course
 import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
+import com.android.jared.linden.timingtrials.util.LengthConverter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -18,6 +19,13 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
     val mutableLengthString: MutableLiveData<String> = MutableLiveData()
     val courseName = MutableLiveData<String>("")
     val cttName = MutableLiveData<String>("")
+
+    val liveLengthConverter: MutableLiveData<LengthConverter> = MutableLiveData()
+
+    fun setLengthConverter(value: LengthConverter){
+        liveLengthConverter.value = value
+        selectedItemPosition = lengthUnits.indexOf(value.getUnitName())
+    }
 
     private val currentId = MutableLiveData<Long>(0L)
 
@@ -71,16 +79,12 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
     }
 
 
-    private val distances = listOf(
-            DistanceViewModel("Miles", (1 / 1609.34)),
-            DistanceViewModel("KM", (1 / 1000.0))
-    )
 
-    val lengthUnits = distances.map { d -> d.name }
+    val lengthUnits = LengthConverter.unitMap.values.map { it.first }
 
     private fun updateLengthString(newLength: Double){
         if(newLength > 0){
-            mutableLengthString.value = BigDecimal((newLength * distances[selectedItemPosition].conversion)).setScale(3, RoundingMode.HALF_EVEN).toString()
+            mutableLengthString.value = "%2.4f".format(liveLengthConverter.value?.convert(newLength))
         }else{
             mutableLengthString.value = "0.000"
         }
@@ -90,6 +94,7 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
 
 
     var selectedItemPosition = 0
+    val converstions = LengthConverter.unitMap.values.map { it.second }
 
     fun changeCourse(courseId: Long){
         if(currentId.value != courseId){
@@ -112,13 +117,18 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
     fun addOrUpdate(){
         viewModelScope.launch(Dispatchers.IO) {
 
-            mutableCourse.value?.let {
+            mutableCourse.value?.let {course->
 
-                val len = mutableLengthString.value?.toDoubleOrNull()?.run {
-                    this / distances[selectedItemPosition].conversion
+                val len = mutableLengthString.value?.toDoubleOrNull()?.let {
+                    it * converstions[selectedItemPosition]
                 }?:0.0
 
-                repository.insertOrUpdate(it.copy(length = len))
+                val trimmed = course.copy(
+                        courseName = course.courseName.trim(),
+                        length = len,
+                        cttName = course.cttName.trim()
+                )
+                repository.insertOrUpdate(trimmed)
             }
         }
     }

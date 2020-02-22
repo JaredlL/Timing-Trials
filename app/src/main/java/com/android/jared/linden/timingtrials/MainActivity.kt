@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         setContentView(R.layout.activity_main)
 
 
+
         val collapsingToolbar = collapsing_toolbar_layout
         val navController = findNavController(R.id.nav_host_fragment)
         //appBarConfiguration = AppBarConfiguration(navController.graph)
@@ -104,12 +105,17 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
                 }
-                R.id.app_bar_test->{
+                R.id.app_bar_test-> {
 //                    val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToTitleFragment()
 //                    navController.navigate(action)
 
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
+                }
+                R.id.app_bar_settings -> {
+                    drawer_layout.closeDrawer(GravityCompat.START)
+                    true
+
                 }
                 else->{
                     true
@@ -135,6 +141,17 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                         val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToTitleFragment()
                         navController.navigate(action)
                         drawer_layout.closeDrawer(GravityCompat.START)
+
+                    }
+                    R.id.app_bar_settings -> {
+                        if(navController.currentDestination?.id == R.id.dataBaseViewPagerFragment){
+                            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSettingsFragment()
+                            navController.navigate(action)
+                        }else{
+                            navController.navigate(R.id.settingsFragment)
+                        }
+
+
 
                     }
                     else->{
@@ -217,6 +234,10 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     }
 
 
+}
+
+class TTPrefs(){
+    val blobs: String = "HI"
 }
 
 //class FAB_Hide_on_Scroll(context: Context?, attrs: AttributeSet?) : FloatingActionButton.Behavior() {

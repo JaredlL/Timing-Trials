@@ -69,6 +69,7 @@ class TitleFragment : Fragment()
 //
             testTimingButton.setOnClickListener {
 
+
                 testViewModel.testTiming()
             }
 

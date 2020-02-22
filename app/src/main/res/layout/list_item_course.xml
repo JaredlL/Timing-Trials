@@ -12,6 +12,9 @@
 
     </data>
 
+
+
+
     <RelativeLayout
         android:id="@+id/courseLayout"
         android:orientation="vertical"
@@ -28,7 +31,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@{courseVm.course.courseName ?? @string/course_name}"
+            android:text="@{courseVm.nameString ?? @string/course_name}"
             tools:text="Course Name" />
 
         <TextView
@@ -38,7 +41,7 @@
             android:layout_centerInParent="true"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@{courseVm.convertedLengthString ?? @string/distance}"
+            android:text="@{courseVm.distString ?? @string/distance}"
             tools:text="Length" />
 
         <TextView
@@ -46,11 +49,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
-            android:layout_toLeftOf="@id/checkBox"
+            android:layout_toStartOf="@id/checkBox"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:layout_marginRight="8dp"
-            android:text="@{courseVm.course.cttName ?? @string/cttname}"
+            android:layout_marginEnd="8dp"
+            android:text="@{courseVm.cttNameString ?? @string/cttname}"
             tools:text="CTT Name" />
 
         <CheckBox
@@ -58,11 +61,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
-            android:layout_alignParentRight="true" />
+            android:layout_alignParentEnd="true" />
 
 
 
 
     </RelativeLayout>
+
 
 </layout>

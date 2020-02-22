@@ -6,6 +6,8 @@ import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.Format
 import java.text.SimpleDateFormat
 import java.util.*
@@ -47,5 +49,35 @@ object ConverterUtils{
 
 
 
+
+}
+
+class LengthConverter(val unitString: String){
+
+    private val conversion: Double = unitMap[unitString]?.second?:1000.0
+    fun lengthToDisplay(length: Double): String{
+        return "%2.2f".format(length / conversion)
+    }
+
+    fun convert(length: Double): Double{
+        return  length / conversion
+    }
+
+    fun convertBack(lengthString: String): Double?{
+        val lenDouble = lengthString.toDoubleOrNull()
+        return lenDouble?.times(conversion)
+    }
+
+    fun getUnitName(): String{
+        return unitMap[unitString]?.first?:""
+    }
+
+    companion object Table{
+        val unitMap = mapOf(
+                "km" to Pair("Kilometers", 1000.0),
+                "miles" to Pair("Miles", 1609.34),
+                "meters" to Pair("Meters", 1.0))
+
+    }
 
 }

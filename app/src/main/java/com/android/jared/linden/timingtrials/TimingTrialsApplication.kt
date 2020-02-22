@@ -18,6 +18,7 @@ class TimingTrialsApplication: Application(), DaggerComponentProvider {
         super.onCreate()
         AndroidThreeTen.init(this)
 
+
         if(BuildConfig.DEBUG){
             Timber.plant(Timber.DebugTree())
         }

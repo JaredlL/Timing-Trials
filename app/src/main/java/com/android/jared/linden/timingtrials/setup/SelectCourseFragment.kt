@@ -53,8 +53,9 @@ class SelectCourseFragment : Fragment() {
         viewManager = LinearLayoutManager(context)
         adapter = CourseListAdapter(requireContext())
         adapter.editCourse = ::editCourse
+
         viewModel.getAllCourses().observe(viewLifecycleOwner, Observer { courses ->
-            courses?.let{adapter.setCourses(it)}
+            courses?.let{adapter.setCourses(it, getLengthConverter())}
         })
         adapter.courseSelected = { blobs ->
 
@@ -67,10 +68,9 @@ class SelectCourseFragment : Fragment() {
 
         adapter.setHasStableIds(true)
 
-        val heading: SelectableCourseViewModel = object: SelectableCourseViewModel(Course("Course Name", 0.0, "CTT Name")){
+        val unitString = getLengthConverter().unitString
 
-            override var convertedLengthString = "Distance"
-        }
+        val heading: SelectableCourseViewModel = SelectableCourseViewModel("Course Name", "Distance ($unitString)", "CTT Name")
 
         val binding = DataBindingUtil.inflate<FragmentCourseListBinding>(inflater, R.layout.fragment_course_list, container, false).apply{
             lifecycleOwner = (this@SelectCourseFragment)

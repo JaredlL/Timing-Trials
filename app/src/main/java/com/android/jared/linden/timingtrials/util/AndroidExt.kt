@@ -1,10 +1,12 @@
 package com.android.jared.linden.timingtrials.util
 
 import android.app.Activity
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
+import androidx.preference.PreferenceManager
 import com.android.jared.linden.timingtrials.TimingTrialsApplication
 
 @Suppress("UNCHECKED_CAST")
@@ -16,6 +18,11 @@ fun <T : Any> AppCompatActivity.argument(key: String) =
         lazy { intent?.extras?.get(key) as? T ?: error("Intent Argument $key is missing") }
 
 
+fun Fragment.getLengthConverter():LengthConverter{
+    //val unitString =  requireActivity().getPreferences(Context.MODE_PRIVATE).getString("unit", "km")?:"km"
+    val unitString = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getString("units", "km")?:"km"
+    return LengthConverter(unitString)
+}
 
 inline fun <reified T: ViewModel> Fragment.getViewModel(crossinline factory: () -> T): T = T::class.java.let { clazz ->
     ViewModelProvider(this, object: ViewModelProvider.Factory {

@@ -135,7 +135,14 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
 
     fun addOrUpdate(){
         viewModelScope.launch(Dispatchers.IO) {
-            mutableRider.value?.let { repository.insertOrUpdate(it) }
+            mutableRider.value?.let { rider->
+                val trimmed = rider.copy(
+                        firstName = rider.firstName.trim(),
+                        lastName = rider.lastName.trim(),
+                        club = rider.club.trim(),
+                        category = rider.category.trim())
+                repository.insertOrUpdate(trimmed)
+            }
             mutableRider.postValue(Rider.createBlank())
         }
 
@@ -148,7 +155,6 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun onCleared() {
         super.onCleared()
         viewModelScope.cancel()

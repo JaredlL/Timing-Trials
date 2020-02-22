@@ -21,6 +21,7 @@ import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.FragmentListGenericBinding
 import com.android.jared.linden.timingtrials.ui.SelectableCourseViewModel
 import com.android.jared.linden.timingtrials.util.argument
+import com.android.jared.linden.timingtrials.util.getLengthConverter
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.google.android.material.appbar.AppBarLayout
@@ -59,14 +60,19 @@ class GenericListFragment : Fragment() {
                 })
             }
             ITEM_COURSE -> {
-                viewFactory = CourseViewHolderFactory()
+                val converter = getLengthConverter()
+                viewFactory = CourseViewHolderFactory(converter.unitString)
                 adapter = GenericListAdapter(requireContext(), viewFactory)
                 listViewModel.filteredAllCourse.observe(viewLifecycleOwner, Observer{res->
-                    res?.let {(adapter as? GenericListAdapter<SelectableCourseViewModel>)?.setItems(it)}
+                    res?.let {(adapter as? GenericListAdapter<SelectableCourseViewModel>)?.setItems(it.map {
+                        SelectableCourseViewModel(it, converter)
+                    }.filter {cvm->
+                        cvm.distString.contains(listViewModel.liveFilter.value?.filterString?:"", ignoreCase = true)
+                    })}
                 })
             }
             ITEM_TIMETRIAL ->{
-                viewFactory = TimeTrialViewHolderFactory(listViewModel, viewLifecycleOwner)
+                viewFactory = TimeTrialViewHolderFactory()
                 adapter = GenericListAdapter(requireContext(), viewFactory)
                 listViewModel.filteredAllTimeTrials.observe(viewLifecycleOwner, Observer{res->
                     res?.let {(adapter as? GenericListAdapter<TimeTrialHeader>)?.setItems(it)}
