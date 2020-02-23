@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Resources
+import android.database.ContentObserver
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -16,6 +17,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
 import android.provider.MediaStore
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.util.TypedValue
@@ -43,10 +45,13 @@ import com.android.jared.linden.timingtrials.util.Utils
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_timetrial_result.*
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
+import kotlin.concurrent.thread
+import kotlin.math.roundToInt
 
 class ResultFragment : Fragment() {
 
@@ -83,7 +88,6 @@ class ResultFragment : Fragment() {
         resultViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
             res?.let {
                 binding.titleText.text = "${it.timeTrialHeader.ttName} ${resources.getString(R.string.results)}"
-                binding.courseText.text = "${it.course?.courseName} ${it.course?.length} KM"
             }
         })
 
@@ -262,12 +266,14 @@ class ResultFragment : Fragment() {
     }
 
 
-   fun convertDpToPixels(dp: Float): Int {
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().displayMetrics))
-    }
+//   fun convertDpToPixels(dp: Float): Int {
+//        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().displayMetrics).roundToInt()
+//    }
 
     fun takeScreenShot(view: View){
 
+        val oldWidth = view.width
+        val oldHeight =  view.height
         try {
 
 
@@ -281,8 +287,8 @@ class ResultFragment : Fragment() {
 
             val imgName = "${ttName?:nowChars}.jpeg"
 
-            //val scrollViewWidth = horizontalScrollView.getChildAt(0).width
-            val scrollViewWidth = 200
+            val scrollViewWidth = horizontalScrollView.getChildAt(0).width
+            //val scrollViewWidth = 200
 
             val sr = fragResultRecyclerView.computeVerticalScrollRange()
 
@@ -290,7 +296,7 @@ class ResultFragment : Fragment() {
 
             //https://dev.to/pranavpandey/android-create-bitmap-from-a-view-3lck
             view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(gridHeight+200, View.MeasureSpec.EXACTLY))
+                    View.MeasureSpec.makeMeasureSpec(gridHeight+300, View.MeasureSpec.EXACTLY))
 
             view.layout(0,0, view.measuredWidth, view.measuredHeight)
             val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
@@ -330,6 +336,10 @@ class ResultFragment : Fragment() {
         }
         finally {
 
+            view.measure(View.MeasureSpec.makeMeasureSpec(oldWidth, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(oldHeight, View.MeasureSpec.EXACTLY))
+
+            view.layout(0,0, view.measuredWidth, view.measuredHeight)
         }
     }
 
@@ -342,15 +352,22 @@ class ResultFragment : Fragment() {
 
         bitmap.compress(Bitmap.CompressFormat.PNG, 80, imageOut)
 
+        Timber.d("Inserted image Filepath API 29 -> $filePath")
+
         val dets = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
             put(MediaStore.Images.Media.TITLE, imageName)
             put(MediaStore.Images.Media.BUCKET_DISPLAY_NAME, "Timing Trials")
             put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
             put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+            put(MediaStore.MediaColumns.DATA, filePath.path)
         }
 
+
         val data = requireActivity().contentResolver.insert(MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL), dets)
+
+        Timber.d("Inserted image URI API 29 -> $data")
+
         imageOut.flush()
         imageOut.close()
         openScreenshot(data)
@@ -389,25 +406,34 @@ class ResultFragment : Fragment() {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, imageOut)
 
 
+            imageOut.flush()
+            imageOut.close()
 
-            val contentResolver = requireActivity().contentResolver
-            val insertedImageString = MediaStore.Images.Media.insertImage(contentResolver, filePath.path, fileName, "Timing Trials")
+            Timber.d("Inserted image Filepath API 26 -> $filePath")
+
+            //val contentResolver = requireActivity().contentResolver
+            //val insertedImageString = MediaStore.Images.Media.insertImage(contentResolver, filePath.path, fileName, "Timing Trials")
 
             val values = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
                 put(MediaStore.Images.Media.TITLE, fileName)
-                put(MediaStore.Images.Media.CONTENT_TYPE, "image/jpeg")
-                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
-                put(MediaStore.MediaColumns.DATA, filePath.path)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                //put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+                put(MediaStore.MediaColumns.DATA, filePath.absolutePath)
                 put(MediaStore.Images.Media.SIZE, filePath.length())
-                //put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+                put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
             }
-            requireActivity().contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
 
-            imageOut.flush()
-            imageOut.close()
+            val insertedImageString = requireActivity().contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
 
-            openScreenshot(Uri.parse(insertedImageString))
+           //requireActivity().contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+
+            Timber.d("Inserted image URI API 26 -> $insertedImageString")
+
+
+
+
+            openScreenshot(insertedImageString)
 
 //                val dets = ContentValues().apply {
 //                    put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
@@ -434,9 +460,14 @@ class ResultFragment : Fragment() {
         val intent = Intent()
         intent.setDataAndType(imageFile, "image/*")
         intent.action = Intent.ACTION_VIEW
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        //intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        Timber.d("Request open  ${imageFile?.path}")
         startActivity(intent)
     }
+
+}
+
+class mContnetObserver(handler: Handler) : ContentObserver(handler){
 
 }
 

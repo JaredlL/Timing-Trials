@@ -51,7 +51,7 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
     fun getHeading(tt: TimeTrial): ResultRowViewModel{
         val mutList: MutableList<String> = mutableListOf()
 
-        mutList.add("Rider")
+        mutList.add("Rider Name")
         mutList.add("Total Time")
         mutList.add("Club")
         mutList.add("Category")

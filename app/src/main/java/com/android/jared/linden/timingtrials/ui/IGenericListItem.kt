@@ -7,6 +7,11 @@ interface IGenericListItem {
 
 }
 
+interface IGenericListHeading {
+
+}
+
+data class GenericListHeadingField(val text: String)
 
 
 data class GenericListItemField(val text: String, val next: GenericListItemNext = GenericListItemNext())

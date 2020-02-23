@@ -21,14 +21,14 @@ class CsvResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowView
 
     private fun writeTimeTrialRow(writer: PrintWriter){
         val formatter = DateTimeFormatter.ofPattern("d/M/y")
-        writer.appendln("TimeTrial Name,Date,Laps")
+        writer.appendln("TimeTrial Name,TimeTrial Date,TimeTrial Laps")
         writer.appendln("${timeTrial.timeTrialHeader.ttName},${timeTrial.timeTrialHeader.startTime.format(formatter)},${timeTrial.timeTrialHeader.laps}")
     }
 
     private fun writeCourseRow(writer: PrintWriter){
         val course = timeTrial.course
         if(course != null){
-            writer.appendln("Course Name,Course Length,CTT Name")
+            writer.appendln("Course Name,Course Length, Course CTT Name")
             writer.appendln("${course.courseName}.${course.length/1000L},${course.cttName}")
         }else{
             writer.appendln(surroundQuotes("Unknown Course"))
