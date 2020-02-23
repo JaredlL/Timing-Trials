@@ -7,7 +7,7 @@
         <import type="com.android.jared.linden.timingtrials.util.ConverterUtils"/>
         <variable
             name="viewModel"
-            type="com.android.jared.linden.timingtrials.viewdata.TimeTrialListItem"/>
+            type="com.android.jared.linden.timingtrials.viewdata.listfragment.TimeTrialListItem"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

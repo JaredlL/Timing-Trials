@@ -5,11 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
-import android.widget.Toast
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -17,13 +13,14 @@ import com.android.jared.linden.timingtrials.IFabCallbacks
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.ITEM_COURSE
 import com.android.jared.linden.timingtrials.data.ITEM_RIDER
-import com.android.jared.linden.timingtrials.data.ITEM_TIMETRIAL
 import com.android.jared.linden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
 import com.android.jared.linden.timingtrials.domain.Filter
 import com.android.jared.linden.timingtrials.util.EventObserver
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import com.google.android.material.snackbar.Snackbar
+import com.android.jared.linden.timingtrials.viewdata.listfragment.CourseListFragment
+import com.android.jared.linden.timingtrials.viewdata.listfragment.RiderListFragment
+import com.android.jared.linden.timingtrials.viewdata.listfragment.TimeTrialListFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
 
@@ -151,9 +148,9 @@ class TimeTrialDBPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
      * Mapping of the ViewPager page indexes to their respective Fragments
      */
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-            RIDER_PAGE_INDEX to { GenericListFragment.newInstance(ITEM_RIDER) },
-            COURSE_PAGE_INDEX to { GenericListFragment.newInstance(ITEM_COURSE) },
-            TIMETRIAL_PAGE_INDEX to {GenericListFragment.newInstance(ITEM_TIMETRIAL)}
+            RIDER_PAGE_INDEX to { RiderListFragment() },
+            COURSE_PAGE_INDEX to { CourseListFragment() },
+            TIMETRIAL_PAGE_INDEX to { TimeTrialListFragment() }
     )
 
     override fun getItemCount() = tabFragmentsCreators.size

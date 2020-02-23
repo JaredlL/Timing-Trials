@@ -70,7 +70,9 @@
     <string name="delete_timetrial">Delete TimeTrial</string>
     <string name="confirm_delete_rider_message">Are you sure? ALL results associated with this rider will be lost!</string>
     <string name="confirm_delete_course_message">Are you sure? ALL results associated with this course will be lost!</string>
-    <string name="confirm_delete_timetrial_message">Are you sure? These results will be deleted, This cannot be undone!</string>
+    <string name="confirm_delete_timetrial_results_message">Are you sure? These results will be deleted, This cannot be undone!</string>
+    <string name="confirm_delete_timetrial_message">Are you sure? ALL results associated with this timetrial will be deleted, this cannot be undone!</string>
+    <string name="confirm_delete_setup_timetrial_message">Are you sure? This cannot be undone!</string>
     <string name="delete_course">Delete Course</string>
     <string name="title_activity_global_result">GlobalResultActivity</string>
     <string name="resume_setup">Resume setting up</string>

@@ -180,7 +180,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     main_app_bar_layout.setExpanded(true)
                 }
                 R.id.resultFragment->{
-                    //main_app_bar_layout.setExpanded(true)
+                    main_app_bar_layout.setExpanded(true)
                 }
             }
         }

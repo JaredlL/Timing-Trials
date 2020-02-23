@@ -24,6 +24,8 @@ interface ITimeTrialRepository{
 
     suspend fun delete(timeTrial: TimeTrial)
 
+    suspend fun deleteById(ttId: Long)
+
     suspend fun deleteHeader(timeTrialHeader: TimeTrialHeader)
     //val nonFinishedTimeTrial: LiveData<TimeTrialWithCourse?>
     fun getSetupTimeTrialById(timeTrialId: Long): LiveData<TimeTrial?>
@@ -126,6 +128,12 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @WorkerThread
     override suspend fun delete(timeTrial: TimeTrial) {
         timeTrialDao.delete(timeTrial)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    override suspend fun deleteById(id: Long) {
+        timeTrialDao.deleteTimeTrialById(id)
     }
 
     @Suppress("RedundantSuspendModifier")

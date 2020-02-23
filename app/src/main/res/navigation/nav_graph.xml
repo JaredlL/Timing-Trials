@@ -90,8 +90,8 @@
         <action
             android:id="@+id/action_dataBaseViewPagerFragment_to_selectCourseFragment2"
             app:destination="@id/selectCourseFragment"
-            app:enterAnim="@anim/fragment_close_enter"
-            app:exitAnim="@anim/fragment_close_exit"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
         <action
@@ -156,7 +156,7 @@
     <fragment
         android:id="@+id/selectCourseFragment"
         android:name="com.android.jared.linden.timingtrials.setup.SelectCourseFragment"
-        android:label="Select Course"
+        android:label="Setup Timetrial"
         tools:layout="@layout/fragment_course_list">
         <action
             android:id="@+id/action_selectCourseFragment_to_editCourseFragment"
@@ -167,7 +167,7 @@
             android:id="@+id/action_selectCourseFragment_to_setupViewPagerFragment"
             app:destination="@id/setupViewPagerFragment"
             app:popUpTo="@+id/nav_graph"
-            app:popUpToInclusive="true" />/>
+            app:popUpToInclusive="true" />
 
         <argument
             android:name="timeTrialId"

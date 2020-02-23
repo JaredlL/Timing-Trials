@@ -70,6 +70,13 @@ class ListViewModel @Inject constructor(private val courseRepository: ICourseRep
         }
     }
 
+    fun deleteTimeTrial(ttId: Long){
+            viewModelScope.launch(Dispatchers.IO) {
+                timeTrialRepository.deleteById(ttId)
+
+        }
+    }
+
     private val _mTimeTrialInsertedEvent: MutableLiveData<Event<Long>> = MutableLiveData()
 
     val timeTrialInsertedEvent: LiveData<Event<Long>> = _mTimeTrialInsertedEvent

@@ -1,11 +1,11 @@
 package com.android.jared.linden.timingtrials.data.source
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.liveData
 import androidx.room.*
-import com.android.jared.linden.timingtrials.data.*
-import kotlinx.coroutines.Dispatchers
+import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
+import com.android.jared.linden.timingtrials.data.TimeTrialRider
+import timber.log.Timber
 
 @Dao
 abstract class TimeTrialDao(db: RoomDatabase) {
@@ -39,7 +39,7 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     open suspend fun insertFull(timeTrial: TimeTrial): Long
     {
         val id = insert(timeTrial.timeTrialHeader)
-        System.out.println("JAREDMSG -> Insert New TT $id + ${timeTrial.timeTrialHeader.ttName} FROM TRANSACTON, ${timeTrial.riderList.count()} riders into DB")
+        Timber.d("JAREDMSG -> Insert New TT $id + ${timeTrial.timeTrialHeader.ttName} FROM TRANSACTON, ${timeTrial.riderList.count()} riders into DB")
 
         val newRiderList = timeTrial.riderList.map { it.timeTrialData.copy(timeTrialId = id) }
 
@@ -50,6 +50,14 @@ abstract class TimeTrialDao(db: RoomDatabase) {
 
 
 
+    @Delete
+    fun delete(timeTrial: TimeTrial){
+        timeTrial.timeTrialHeader.id?.let {ttId ->
+            _deleteTtRiders(ttId)
+            delete(timeTrial.timeTrialHeader)
+        }
+
+    }
 
     @Transaction
     @Suppress("RedundantSuspendModifier")
@@ -78,16 +86,9 @@ abstract class TimeTrialDao(db: RoomDatabase) {
 
     }
 
-    @Delete
-    fun delete(timeTrial: TimeTrial){
-        timeTrial.timeTrialHeader.id?.let {ttId ->
-            println("JAREDMSG -> TTDAO DeletingtT ${ttId}")
-            _deleteTtRiders(ttId)
-            delete(timeTrial.timeTrialHeader)
-        }
 
-    }
 
+    @Query("DELETE FROM timetrial_table WHERE id = :ttId") abstract fun deleteTimeTrialById(ttId: Long)
 
     @Query("DELETE FROM timetrial_table") abstract fun deleteAll()
     @Query("DELETE FROM timetrial_rider_table") abstract fun deleteAllR()
