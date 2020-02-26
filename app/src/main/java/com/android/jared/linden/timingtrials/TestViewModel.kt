@@ -35,6 +35,8 @@ class TestViewModel@Inject constructor(
         insertedTest.value = false
     }
 
+
+
 //    fun testSetup(timeTrial: TimeTrial){
 //
 //            if(!inserting.get() && timeTrial.timeTrialHeader.ttName != "Test Setup Timetrial"){

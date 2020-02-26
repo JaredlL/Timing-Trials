@@ -2,10 +2,7 @@ package com.android.jared.linden.timingtrials.data.roomrepo
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
-import com.android.jared.linden.timingtrials.data.TimeTrialHeader
-import com.android.jared.linden.timingtrials.data.TimeTrialRider
-import com.android.jared.linden.timingtrials.data.TimeTrialRiderResult
+import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.source.TimeTrialRiderDao
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,6 +33,10 @@ class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao
 
     suspend fun getByRiderCourseTimeTrialIds(riderId: Long, courseId:Long, timeTrialId: Long): List<TimeTrialRider>{
         return timeTrialRiderDao.getByRiderCourseTimeTrialIds(riderId, courseId, timeTrialId)
+    }
+
+    fun lastTimeTrialRiders(): LiveData<List<RiderIdStartTime>> {
+        return timeTrialRiderDao.getRiderIdTimeTrialStartTime()
     }
 
     fun getRidersForTimeTrial(ttHeader: TimeTrialHeader): LiveData<List<FilledTimeTrialRider>>{

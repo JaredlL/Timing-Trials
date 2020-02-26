@@ -97,4 +97,6 @@
     <string name="cati">CATI</string>
     <string name="senior">Senior</string>
     <string name="powered_by_timing_trials">Powered by Timing Trials</string>
+    <string name="sort">Sort</string>
+    <string name="choose_sort">Choose Sorting</string>
 </resources>

@@ -5,6 +5,7 @@ import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
 import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
 import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.TimeTrialRiderRepository
 import kotlinx.coroutines.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -23,7 +24,8 @@ interface ITimeTrialSetupViewModel {
 class SetupViewModel @Inject constructor(
         val timeTrialRepository: ITimeTrialRepository,
         val riderRepository: IRiderRepository,
-        val courseRepository: ICourseRepository
+        val courseRepository: ICourseRepository,
+        val timeTrialRiderRepository: TimeTrialRiderRepository
 ) : ViewModel(), ITimeTrialSetupViewModel {
 
 

@@ -31,7 +31,7 @@ data class TimeTrialRider(val riderId: Long,
 
 }
 
-
+data class RiderIdStartTime(val riderId: Long, val startTime: OffsetDateTime)
 
 data class TimeTrialRiderResult(
         @Embedded val timeTrialData: TimeTrialRider,

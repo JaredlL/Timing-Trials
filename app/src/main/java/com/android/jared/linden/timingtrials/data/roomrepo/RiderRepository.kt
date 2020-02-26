@@ -36,7 +36,7 @@ interface IRiderRepository {
     @WorkerThread
     suspend fun updateRiders(riders: List<Rider>)
 
-    fun getRider(riderId: Long) : LiveData<Rider>
+    fun getRider(riderId: Long) : LiveData<Rider?>
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
@@ -47,6 +47,8 @@ interface IRiderRepository {
     suspend fun insertOrUpdate(rider: Rider)
 
     suspend fun ridersFromIds(ids: List<Long>): List<Rider>
+
+
 
     suspend fun ridersFromFirstLastName(firstName:String, lastName:String): List<Rider>
 
@@ -61,6 +63,7 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
     override val allRidersLight: LiveData<List<Rider>> = riderDao.getAllRidersLight()
 
     override val allClubs: LiveData<List<String>> = riderDao.getAllClubs()
+
 
     override val allCategories: LiveData<List<String>> = Transformations.map(riderDao.getAllCategories()){res-> res.filterNotNull() }
 
@@ -100,12 +103,14 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
     }
 
 
-    override fun getRider(riderId: Long) : LiveData<Rider> {
+    override fun getRider(riderId: Long) : LiveData<Rider?> {
         return when(riderId){
             0L ->  MutableLiveData<Rider>(Rider.createBlank().copy(gender = Gender.MALE))
             else ->  riderDao.getRiderById(riderId)
         }
     }
+
+
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread

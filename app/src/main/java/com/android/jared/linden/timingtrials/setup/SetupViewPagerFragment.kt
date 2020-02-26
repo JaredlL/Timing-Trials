@@ -1,26 +1,28 @@
 package com.android.jared.linden.timingtrials.setup
 
 
-import android.app.Activity
 import android.app.SearchManager
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.SearchView
-import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.android.jared.linden.timingtrials.IFabCallbacks
-import com.android.jared.linden.timingtrials.MainActivity
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.android.synthetic.main.fragment_database_view_pager.*
 
 
 class SetupViewPagerFragment: Fragment() {
@@ -29,6 +31,14 @@ class SetupViewPagerFragment: Fragment() {
     //private lateinit var setupViewModel: SetupViewModel
 
     private val args: SetupViewPagerFragmentArgs by navArgs()
+
+    val SORT_RECENT_ACTIVITY = 0
+    val SORT_ALPHABETICAL = 1
+    val SORT_KEY = "sorting"
+
+    var setupMenu: Menu? = null
+
+    lateinit var prefListner : SharedPreferences.OnSharedPreferenceChangeListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -56,6 +66,15 @@ class SetupViewPagerFragment: Fragment() {
             //manageFabVisibility(position)
         }.attach()
 
+        prefListner =  object : SharedPreferences.OnSharedPreferenceChangeListener{
+            override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
+               val vm = requireActivity().getViewModel {  requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
+                vm.setSortMode(p0?.getInt(SORT_KEY, 0)?:0)
+            }
+        }
+        PreferenceManager.getDefaultSharedPreferences(requireContext()).registerOnSharedPreferenceChangeListener(prefListner)
+
+
 
 
 
@@ -74,24 +93,76 @@ class SetupViewPagerFragment: Fragment() {
                     findNavController().navigate(action)
                 }
                 setHasOptionsMenu(true)
+                setupMenu?.let {
+                    it.findItem(R.id.settings_app_bar_search)?.isVisible = true
+
+//                    val anim = AnimationUtils.loadAnimation(requireContext(),R.anim.translate_from_right_to_current_accelerate_fast)
+//                    anim.setAnimationListener(object : Animation.AnimationListener {
+//                        override fun onAnimationRepeat(p0: Animation?) {
+//                            
+//                        }
+//
+//                        override fun onAnimationEnd(p0: Animation?) {
+//                            it.findItem(R.id.settings_app_bar_search)?.actionView = null
+//                        }
+//
+//                        override fun onAnimationStart(p0: Animation?) {
+//                            it.findItem(R.id.settings_app_bar_search)?.actionView = null
+//                        }
+//
+//
+//                    })
+//                    it.findItem(R.id.settings_app_bar_search)?.actionView?.startAnimation(anim)
+
+
+                }
             }
             ORDER_RIDER_INDEX ->  {
                 act.setVisibility(View.GONE)
-                setHasOptionsMenu(false)
-                //optionsMenu?.clear()
+                setHasOptionsMenu(true)
+                setupMenu?.let {
+                    it.findItem(R.id.settings_app_bar_search)?.isVisible = false
+
+                }
+
             }
             TIMETRIAL_PAGE_INDEX-> {
                 act.setVisibility(View.GONE)
                 setHasOptionsMenu(false)
-                //optionsMenu?.clear()
+
             }
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_database, menu)
+        setupMenu = menu
+        when(view_pager2.currentItem){
+            RIDER_PAGE_INDEX->{
+                inflateRiderPageMenu(menu, inflater)
+            }
+            ORDER_RIDER_INDEX ->  {
+                inflateOrderPageMenu(menu, inflater)
+            }
+            TIMETRIAL_PAGE_INDEX-> {
+
+
+            }
+
+        }
+
+
+    }
+
+    private fun inflateOrderPageMenu(menu: Menu, inflater: MenuInflater){
+        inflater.inflate(R.menu.menu_setup, menu)
+        menu.findItem(R.id.settings_app_bar_search).isVisible = false
+    }
+
+    private fun inflateRiderPageMenu(menu: Menu, inflater: MenuInflater){
+        inflater.inflate(R.menu.menu_setup, menu)
+        menu.findItem(R.id.settings_app_bar_search).isVisible = true
         val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        (menu.findItem(R.id.app_bar_search).actionView as SearchView).apply {
+        (menu.findItem(R.id.settings_app_bar_search).actionView as SearchView).apply {
             // Assumes current activity is the searchable activity
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
             isIconified=false // Do not iconify the widget; expand it by default
@@ -113,51 +184,23 @@ class SetupViewPagerFragment: Fragment() {
 
             })
         }
+
+        menu.findItem(R.id.settings_menu_ordering).setOnMenuItemClickListener {
+            val current = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_RECENT_ACTIVITY)
+            AlertDialog.Builder(requireContext())
+                    .setTitle(resources.getString(R.string.choose_sort))
+                    //.setMessage("Choose Sorting")
+                    .setSingleChoiceItems(R.array.sortingArray, current) { _, j->
+                        PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putInt(SORT_KEY, j).apply()
+                    }
+                    .setPositiveButton(R.string.ok){_,_->
+
+                    }
+                    .create().show()
+            true
+        }
     }
 
-//    private fun setMenuSearch(){
-//        val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
-//        val b = optionsMenu?.findItem(R.id.app_bar_search)
-//        (optionsMenu?.findItem(R.id.app_bar_search)?.actionView as SearchView).apply {
-//            // Assumes current activity is the searchable activity
-//            setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
-//            isIconified=false // Do not iconify the widget; expand it by default
-//            isIconifiedByDefault = false
-//
-//
-//            setOnQueryTextListener(object : SearchView.OnQueryTextListener{
-//                override fun onQueryTextSubmit(searchText: String?): Boolean {
-//                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
-//                    //listViewModel.setFilterString(searchText?:"")
-//                    return true
-//                }
-//
-//                override fun onQueryTextChange(searchText: String?): Boolean {
-//                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
-//                    //listViewModel.setFilterString(searchText?:"")
-//                    return true
-//                }
-//
-//            })
-//        }
-//    }
-
-//    private fun setupNewFab() {
-//        val rootCoordinator: CoordinatorLayout = (activity as MainActivity).rootCoordinator
-//        val inflater = requireActivity().getSystemService(Activity.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-//        val fab = inflater.inflate(R.layout.my_fab_definition, rootCoordinator, false) as FloatingActionButton
-//        fab.setOnClickListener { v: View? -> myAction() }
-//        rootCoordinator.addView(fab)
-//    }
-
-//    private fun manageFabVisibility(position: Int){
-//        when (position) {
-//            RIDER_PAGE_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.VISIBLE
-//            ORDER_RIDER_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.GONE
-//            TIMETRIAL_PAGE_INDEX -> (requireActivity() as MainActivity).mMainFab.visibility = View.GONE
-//            else -> throw IndexOutOfBoundsException()
-//        }
-//    }
 
     private fun getTabIcon(position: Int): Int {
         return when (position) {

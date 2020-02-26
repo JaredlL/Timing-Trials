@@ -56,6 +56,13 @@ class TitleFragment : Fragment()
             }
         })
 
+        testViewModel.timingTrialsDatabase.timeTrialRiderDao().getRiderIdTimeTrialStartTime().observe(viewLifecycleOwner, Observer {res->
+            res?.let {
+                val b = it
+            }
+
+        })
+
         val binding =  DataBindingUtil.inflate<FragmentTitleBinding>(inflater, R.layout.fragment_title, container, false).apply{
 
             startTtSetupButton.setOnClickListener{

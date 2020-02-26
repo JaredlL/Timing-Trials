@@ -11,4 +11,9 @@
         <item>miles</item>
         <item>meters</item>
     </string-array>
+
+    <string-array name="sortingArray">
+        <item>Recent Activity</item>
+        <item>Alphabetical</item>
+    </string-array>
 </resources>

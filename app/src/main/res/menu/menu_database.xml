@@ -9,7 +9,5 @@
         app:showAsAction="always|collapseActionView"
         android:title="Search"
         app:actionViewClass="android.widget.SearchView" />
-<!--    <item-->
-<!--        android:title="Item"-->
-<!--        app:showAsAction="always" />-->
+
 </menu>

@@ -2,6 +2,7 @@ package com.android.jared.linden.timingtrials.timetrialresults
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
@@ -28,11 +29,19 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
                 }else{
                     resultTextView.typeface = Typeface.DEFAULT
                 }
+                //TODO Seems to be bugged
+//                if(position/rowLength != 0 && (position / rowLength).rem(2) == 0){
+//                    riderLayout.setBackgroundColor(Color.rgb(240, 240, 240))
+//                }else{
+//                    riderLayout.setBackgroundColor(Color.TRANSPARENT)
+//                }
                 executePendingBindings()
             }
 
         }
     }
+
+
 
     override fun onBindViewHolder(holder: ResultViewHolder, position: Int) {
         mResults[position].let {
