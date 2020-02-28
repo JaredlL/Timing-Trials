@@ -13,6 +13,7 @@
 
     <style name="CustomDialog" parent="@style/Theme.AppCompat.Light.Dialog">
         <item name="android:windowNoTitle">false</item>
+        <item name="android:windowIsFloating">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar">

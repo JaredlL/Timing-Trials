@@ -68,12 +68,14 @@ class SetupViewPagerFragment: Fragment() {
 
         prefListner =  object : SharedPreferences.OnSharedPreferenceChangeListener{
             override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
-               val vm = requireActivity().getViewModel {  requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
-                vm.setSortMode(p0?.getInt(SORT_KEY, 0)?:0)
+                setupViewModel.selectRidersViewModel.setSortMode(p0?.getInt(SORT_KEY, 0)?:0)
             }
         }
-        PreferenceManager.getDefaultSharedPreferences(requireContext()).registerOnSharedPreferenceChangeListener(prefListner)
-
+        val prefMan = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        prefMan.registerOnSharedPreferenceChangeListener(prefListner)
+        prefMan.getInt(SORT_KEY, 0).let {
+            setupViewModel.selectRidersViewModel.setSortMode(it)
+        }
 
 
 
@@ -95,26 +97,7 @@ class SetupViewPagerFragment: Fragment() {
                 setHasOptionsMenu(true)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = true
-
-//                    val anim = AnimationUtils.loadAnimation(requireContext(),R.anim.translate_from_right_to_current_accelerate_fast)
-//                    anim.setAnimationListener(object : Animation.AnimationListener {
-//                        override fun onAnimationRepeat(p0: Animation?) {
-//                            
-//                        }
-//
-//                        override fun onAnimationEnd(p0: Animation?) {
-//                            it.findItem(R.id.settings_app_bar_search)?.actionView = null
-//                        }
-//
-//                        override fun onAnimationStart(p0: Animation?) {
-//                            it.findItem(R.id.settings_app_bar_search)?.actionView = null
-//                        }
-//
-//
-//                    })
-//                    it.findItem(R.id.settings_app_bar_search)?.actionView?.startAnimation(anim)
-
-
+                    it.findItem(R.id.settings_menu_ordering)?.isVisible = true
                 }
             }
             ORDER_RIDER_INDEX ->  {
@@ -122,13 +105,17 @@ class SetupViewPagerFragment: Fragment() {
                 setHasOptionsMenu(true)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = false
-
+                    it.findItem(R.id.settings_menu_ordering)?.isVisible = true
                 }
 
             }
             TIMETRIAL_PAGE_INDEX-> {
                 act.setVisibility(View.GONE)
-                setHasOptionsMenu(false)
+                setupMenu?.let {
+                    it.findItem(R.id.settings_app_bar_search)?.isVisible = false
+                    it.findItem(R.id.settings_menu_ordering)?.isVisible = false
+                }
+                //setHasOptionsMenu(false)
 
             }
         }

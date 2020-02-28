@@ -99,4 +99,5 @@
     <string name="powered_by_timing_trials">Powered by Timing Trials</string>
     <string name="sort">Sort</string>
     <string name="choose_sort">Choose Sorting</string>
+    <string name="start_in_string">Start in: %1$d minutes</string>
 </resources>
