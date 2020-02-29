@@ -1,67 +1,70 @@
 package com.android.jared.linden.timingtrials.domain.csv
 
 import com.android.jared.linden.timingtrials.data.Gender
+import com.android.jared.linden.timingtrials.domain.ILineToObjectConverter
+import com.android.jared.linden.timingtrials.domain.RiderResultIO
+import com.android.jared.linden.timingtrials.domain.StringToObjectField
 
-class LineToRiderConverter: ILineToObjectConverter<ImportRider> {
+class LineToRiderConverter: ILineToObjectConverter<RiderResultIO> {
 
-    class ToRiderFirstName(private val heading: List<String>): StringToObjectField<ImportRider>(){
+    class ToRiderFirstName(private val heading: List<String>): StringToObjectField<RiderResultIO>(){
 
         override val fieldIndex: Int?
             get() = heading.indexOfFirst { it.contains("first", true) && it.contains("name", true) }
 
-        override fun applyFieldFromString(valString: String, target: ImportRider): ImportRider {
+        override fun applyFieldFromString(valString: String, target: RiderResultIO): RiderResultIO {
             return target.copy(firstName = valString)
         }
     }
 
-    class LastNameFieldSetter(private val heading: List<String>): StringToObjectField<ImportRider>(){
+    class LastNameFieldSetter(private val heading: List<String>): StringToObjectField<RiderResultIO>(){
 
         override val fieldIndex: Int?
             get() = heading.indexOfFirst { (it.contains("sur", true) || it.contains("last", true)) && it.contains("name", true) }
 
-        override fun applyFieldFromString(valString: String, target: ImportRider): ImportRider {
+        override fun applyFieldFromString(valString: String, target: RiderResultIO): RiderResultIO {
             return target.copy(lastName = valString)
         }
     }
 
-    class FullNameFieldSetter(private val heading: List<String>): StringToObjectField<ImportRider>(){
+    class FullNameFieldSetter(private val heading: List<String>): StringToObjectField<RiderResultIO>(){
 
         override val fieldIndex: Int?
             get() = heading.indexOfFirst { it.contains("name", true) }
 
-        override fun applyFieldFromString(valString: String, target: ImportRider): ImportRider {
+        override fun applyFieldFromString(valString: String, target: RiderResultIO): RiderResultIO {
             val split = valString.split(" ", ignoreCase = true)
             return target.copy(firstName = split.first(), lastName = split.drop(1).joinToString(" "))
         }
     }
 
-    class ClubFieldSetter(private val heading: List<String>): StringToObjectField<ImportRider>(){
+    class ClubFieldSetter(private val heading: List<String>): StringToObjectField<RiderResultIO>(){
 
         override val fieldIndex: Int?
             get() = heading.indexOfFirst { (it.contains("club", true) || it.contains("team", true)) }
 
-        override fun applyFieldFromString(valString: String, target: ImportRider): ImportRider {
+        override fun applyFieldFromString(valString: String, target: RiderResultIO): RiderResultIO {
             return target.copy(club = valString)
         }
     }
 
 
 
-    class CategoryFieldSetter(private val heading: List<String>): StringToObjectField<ImportRider>(){
+    class CategoryFieldSetter(private val heading: List<String>): StringToObjectField<RiderResultIO>(){
 
         override val fieldIndex: Int?
             get() = heading.indexOfFirst { (it.contains("category", true))}
 
-        override fun applyFieldFromString(valString: String, target: ImportRider): ImportRider {
+        override fun applyFieldFromString(valString: String, target: RiderResultIO): RiderResultIO {
             return target.copy(category = valString)}
     }
 
-    class GenderFieldSetter(private val heading: List<String>): StringToObjectField<ImportRider>() {
+    class GenderFieldSetter(private val heading: List<String>): StringToObjectField<RiderResultIO>() {
 
         override val fieldIndex: Int?
             get() = heading.indexOfFirst { (it.contains("gender", true)) }
 
-        override fun applyFieldFromString(valString: String, target: ImportRider): ImportRider {
+        override fun applyFieldFromString(valString: String, target: RiderResultIO): RiderResultIO {
             val gen = when {
                 valString.equals("male", true) -> { Gender.MALE }
                 valString.equals("female", true) -> { Gender.FEMALE }
@@ -75,12 +78,12 @@ class LineToRiderConverter: ILineToObjectConverter<ImportRider> {
         }
     }
 
-    class FinishTimeFieldSetter(private val heading: List<String>): StringToObjectField<ImportRider>() {
+    class FinishTimeFieldSetter(private val heading: List<String>): StringToObjectField<RiderResultIO>() {
 
         override val fieldIndex: Int?
             get() = heading.indexOfFirst { (it.contains("time", true)) }
 
-        override fun applyFieldFromString(valString: String, target: ImportRider): ImportRider {
+        override fun applyFieldFromString(valString: String, target: RiderResultIO): RiderResultIO {
 
             //val times = valString.split(":",".").reversed()
 
@@ -124,12 +127,12 @@ class LineToRiderConverter: ILineToObjectConverter<ImportRider> {
         }
     }
 
-    class SplitFieldSetter(private val heading: List<String>, val splitIndex: Int): StringToObjectField<ImportRider>() {
+    class SplitFieldSetter(private val heading: List<String>, val splitIndex: Int): StringToObjectField<RiderResultIO>() {
 
         override val fieldIndex: Int?
             get() = splitIndex
 
-        override fun applyFieldFromString(valString: String, target: ImportRider): ImportRider {
+        override fun applyFieldFromString(valString: String, target: RiderResultIO): RiderResultIO {
 
             //val times = valString.split(":",".").reversed()
 
@@ -169,12 +172,12 @@ class LineToRiderConverter: ILineToObjectConverter<ImportRider> {
             }
         }
     }
-    class NotesNameFieldSetter(private val heading: List<String>): StringToObjectField<ImportRider>(){
+    class NotesNameFieldSetter(private val heading: List<String>): StringToObjectField<RiderResultIO>(){
 
         override val fieldIndex: Int?
             get() = heading.indexOfFirst { it.contains("note", true) }
 
-        override fun applyFieldFromString(valString: String, target: ImportRider): ImportRider {
+        override fun applyFieldFromString(valString: String, target: RiderResultIO): RiderResultIO {
             return target.copy(notes = valString)
         }
     }
@@ -185,7 +188,7 @@ class LineToRiderConverter: ILineToObjectConverter<ImportRider> {
         return (line.contains("Rider", ignoreCase = true) || line.contains("athlete", ignoreCase = true)) && line.contains("name", ignoreCase = true)
     }
 
-    var stringToFieldList: List<StringToObjectField<ImportRider>> = listOf()
+    var stringToFieldList: List<StringToObjectField<RiderResultIO>> = listOf()
 
     override fun setHeading(headingLine: String) {
         val splitHeading = headingLine.split(",")
@@ -223,8 +226,8 @@ class LineToRiderConverter: ILineToObjectConverter<ImportRider> {
 
     }
 
-    override fun importLine(dataLine: String): ImportRider? {
-        var importRider = ImportRider("", "", "",null, Gender.UNKNOWN, 0L, listOf(), null)
+    override fun importLine(dataLine: String): RiderResultIO? {
+        var importRider = RiderResultIO()
 
         for(fieldFiller in stringToFieldList){
             importRider = fieldFiller.applyFieldToObject(dataLine.split(","), importRider)

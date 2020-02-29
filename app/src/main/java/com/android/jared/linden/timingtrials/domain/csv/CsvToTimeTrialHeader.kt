@@ -2,6 +2,7 @@ package com.android.jared.linden.timingtrials.domain.csv
 
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
+import com.android.jared.linden.timingtrials.domain.ILineToObjectConverter
 import org.threeten.bp.*
 import org.threeten.bp.format.DateTimeFormatter
 

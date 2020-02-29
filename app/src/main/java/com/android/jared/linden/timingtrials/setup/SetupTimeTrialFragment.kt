@@ -2,19 +2,14 @@ package com.android.jared.linden.timingtrials.setup
 
 
 import android.app.Dialog
-import android.app.TimePickerDialog
-import android.content.DialogInterface
-import android.graphics.Color
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.TimePicker
-import android.widget.TimePicker.OnTimeChangedListener
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
@@ -107,15 +102,6 @@ class SetupTimeTrialFragment : Fragment() {
         findNavController().navigate(action)
     }
 
-//    private fun showCourseFrag(){
-//        val courseFrag: SelectCourseFragment = requireActivity().supportFragmentManager
-//                .findFragmentByTag("dialog") as? SelectCourseFragment ?: SelectCourseFragment.newInstance()
-//
-//        if(courseFrag.dialog?.isShowing != true) {
-//
-//            courseFrag.show(requireActivity().supportFragmentManager, "dialog")
-//        }
-//    }
 
 
 
@@ -183,53 +169,4 @@ class  TimePickerFragment2 : DialogFragment(){
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 
-}
-
-class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener {
-
-    private lateinit var timeTrialViewModel: ITimeTrialPropertiesViewModel
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        // Use the current time as the default values for the picker
-
-        timeTrialViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.timeTrialPropertiesViewModel
-
-        var now = Instant.now()
-        if(timeTrialViewModel.startTime.value != null){
-            now = timeTrialViewModel.startTime.value?.toInstant()
-        }
-        else{
-            now.plusSeconds(10*60)
-        }
-        val ldt = LocalDateTime.ofInstant(now, ZoneId.systemDefault())
-        val hour = ldt.hour
-        val minute = ldt.minute
-
-
-
-        // Create a new instance of TimePickerDialog and return it
-
-        val tbd = TimePickerDialog(activity, R.style.CustomDialog,this, hour, minute, DateFormat.is24HourFormat(activity))
-        val tvTitle = TextView(requireActivity())
-        tvTitle.setText("TimePickerDialog Title")
-        tvTitle.setBackgroundColor(Color.parseColor("#EEE8AA"))
-        tvTitle.setPadding(5, 3, 5, 3);
-        tvTitle.setGravity(Gravity.CENTER_HORIZONTAL)
-
-        //tbd.
-
-        tbd.setTitle("dfada")
-
-        return tbd
-    }
-
-    override fun onTimeSet(view: TimePicker, hourOfDay: Int, minute: Int) {
-        // Do something with the time chosen by the user
-
-        Toast.makeText(requireContext(), "YI", Toast.LENGTH_SHORT).show()
-
-        val ldt = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault())
-        val ldt2 = LocalDateTime.of(ldt.year, ldt.month, ldt.dayOfMonth, hourOfDay, minute)
-        timeTrialViewModel.startTime.value = ZonedDateTime.of(ldt2, ZoneId.systemDefault()).toOffsetDateTime()
-    }
 }

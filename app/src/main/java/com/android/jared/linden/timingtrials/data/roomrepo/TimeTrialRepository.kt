@@ -23,7 +23,7 @@ interface ITimeTrialRepository{
     suspend fun getHeadersByName(name: String): List<TimeTrialHeader>
 
     suspend fun delete(timeTrial: TimeTrial)
-
+    suspend fun allTimeTrials(): List<TimeTrial>
     suspend fun deleteById(ttId: Long)
 
     suspend fun deleteHeader(timeTrialHeader: TimeTrialHeader)
@@ -86,6 +86,9 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     }
 
 
+    override suspend fun allTimeTrials(): List<TimeTrial> {
+        return timeTrialDao.getAllCompleteTimeTrials()
+    }
 
 
 

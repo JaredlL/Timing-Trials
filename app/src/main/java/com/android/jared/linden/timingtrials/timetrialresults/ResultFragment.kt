@@ -139,7 +139,7 @@ class ResultFragment : Fragment() {
             R.id.resultMenuJson->{
                 val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
-                    putExtra(Intent.EXTRA_TITLE, "${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.json")
+                    putExtra(Intent.EXTRA_TITLE, "${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.tt")
                     //MIME types
                     type = "text/*"
                     // Optionally, specify a URI for the directory that should be opened in
@@ -254,7 +254,7 @@ class ResultFragment : Fragment() {
             catch(e: IOException)
             {
                 e.printStackTrace()
-                Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }

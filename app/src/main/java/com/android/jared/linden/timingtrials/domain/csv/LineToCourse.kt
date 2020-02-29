@@ -1,6 +1,7 @@
 package com.android.jared.linden.timingtrials.domain.csv
 
 import com.android.jared.linden.timingtrials.data.Course
+import com.android.jared.linden.timingtrials.domain.ILineToObjectConverter
 
 class LineToCourseConverter: ILineToObjectConverter<Course> {
     override fun isHeading(line: String): Boolean {

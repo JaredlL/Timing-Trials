@@ -102,6 +102,8 @@ abstract class TimeTrialDao(db: RoomDatabase) {
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE status == 1") abstract fun getTimingTimeTrials(): LiveData<List<TimeTrial>>
 
+    @Transaction @Query("SELECT * FROM timetrial_table") abstract fun getAllCompleteTimeTrials(): List<TimeTrial>
+
     @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName LIMIT 1") abstract fun getTimeTrialByName(timeTrialName: String): TimeTrial?
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE ttName = :timeTrialName") abstract fun getHeadersByName(timeTrialName: String): List<TimeTrialHeader>

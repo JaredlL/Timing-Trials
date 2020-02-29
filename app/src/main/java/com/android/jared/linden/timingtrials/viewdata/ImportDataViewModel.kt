@@ -1,35 +1,65 @@
 package com.android.jared.linden.timingtrials.viewdata
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.*
-import com.android.jared.linden.timingtrials.domain.csv.ImportTimeTrial
+import com.android.jared.linden.timingtrials.domain.JsonResultsWriter
+import com.android.jared.linden.timingtrials.domain.TimeTrialIO
+import com.android.jared.linden.timingtrials.domain.TimingTrialsExport
 import com.android.jared.linden.timingtrials.domain.csv.LineToCourseConverter
 import com.android.jared.linden.timingtrials.domain.csv.LineToRiderConverter
 import com.android.jared.linden.timingtrials.domain.csv.LineToTimeTrialConverter
 import com.android.jared.linden.timingtrials.util.ConverterUtils
+import com.android.jared.linden.timingtrials.util.Event
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.threeten.bp.*
-import org.threeten.bp.format.DateTimeFormatter
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.io.OutputStream
 import javax.inject.Inject
 import kotlin.Exception
 
-class ImportViewModel @Inject constructor(private val riderRespository: IRiderRepository,
-                                          private val courseRepository: ICourseRepository,
-                                          private val timeTrialRepository: ITimeTrialRepository,
-                                          private val  timeTrialRiderRepository: TimeTrialRiderRepository): ViewModel() {
+class IOViewModel @Inject constructor(private val riderRespository: IRiderRepository,
+                                      private val courseRepository: ICourseRepository,
+                                      private val timeTrialRepository: ITimeTrialRepository,
+                                      private val  timeTrialRiderRepository: TimeTrialRiderRepository): ViewModel() {
 
 
+    val writeAllResult: MutableLiveData<Event<String>> = MutableLiveData()
 
+    fun writeAllTimeTrialsToPath(outputStream: OutputStream){
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val allTts = timeTrialRepository.allTimeTrials()
+                JsonResultsWriter().writeToPath(outputStream, allTts)
+                writeAllResult.postValue(Event("Success"))
+            }catch (e:Exception){
+                writeAllResult.postValue(Event(e.message?:"Error"))
+            }
+        }
+    }
 
     fun readInput(title: String?, inputStream: InputStream){
         viewModelScope.launch(Dispatchers.IO) {
-            readInputIntoDb(inputStream)
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            val fileString = reader.readText()
+            reader.close()
+            val firstNonWhitespaceChar = fileString.asSequence().first { !it.isWhitespace() }
+
+            val msg = if(firstNonWhitespaceChar == "{".first() || firstNonWhitespaceChar == "[".first()){
+                readJsonInputIntoDb(fileString)
+            }else{
+                readCsvInputIntoDb(fileString)
+            }
+
+            importMessage.postValue(Event(msg))
+
+            //readCsvInputIntoDb(inputStream)
         }
     }
 
@@ -37,73 +67,91 @@ class ImportViewModel @Inject constructor(private val riderRespository: IRiderRe
     val READING_COURSE = 1
     val READING_RIDER = 2
 
+    val importMessage: MutableLiveData<Event<String>> = MutableLiveData<Event<String>>()
 
-    suspend fun readInputIntoDb(inputStream: InputStream){
-        val reader = BufferedReader(InputStreamReader(inputStream))
+    private suspend fun readJsonInputIntoDb(fileString: String): String{
+       return try{
+            val result = Gson().fromJson(fileString, TimingTrialsExport::class.java)
+           for(tt in result.timingTrialsData){
+               addImportTtToDb(tt)
+           }
+           "Imported ${result.timingTrialsData.count()}"
 
-        val lineToTt = LineToTimeTrialConverter()
-        val lineToCourse = LineToCourseConverter()
-        val lineToRider = LineToRiderConverter()
+        }catch (e:Exception){
+            "Failed to parse JSON file: ${e.message}"
+        }
+    }
 
-        var currentLine:String? = reader.readLine().replace(""""""", "")
-        val timeTrialList: MutableList<ImportTimeTrial> = mutableListOf()
-        var state = READING_TT
+    private suspend fun readCsvInputIntoDb(fileString: String): String{
+        try{
+            val lineToTt = LineToTimeTrialConverter()
+            val lineToCourse = LineToCourseConverter()
+            val lineToRider = LineToRiderConverter()
 
-        while (currentLine != null){
+            val lineList = fileString.lineSequence()
 
-            if(lineToTt.isHeading(currentLine)){
-                lineToTt.setHeading(currentLine)
-                timeTrialList.add(ImportTimeTrial())
-                state = READING_TT
+            val timeTrialList: MutableList<TimeTrialIO> = mutableListOf()
+            var state = READING_TT
 
-            }else if (lineToCourse.isHeading(currentLine)){
-                lineToCourse.setHeading(currentLine)
-                state = READING_COURSE
+            for  (fileLine in fileString.lineSequence()){
+                val currentLine = fileLine.replace(""""""", "")
+                if(lineToTt.isHeading(currentLine)){
+                    lineToTt.setHeading(currentLine)
+                    timeTrialList.add(TimeTrialIO())
+                    state = READING_TT
 
-            }else if (lineToRider.isHeading(currentLine)){
-                lineToRider.setHeading(currentLine)
-                state = READING_RIDER
-            }
-            else{
-                when(state){
-                    READING_TT->{
-                        val tt = lineToTt.importLine(currentLine)
-                        tt?.let {
-                            timeTrialList.lastOrNull()?.header = it
-                            //state = READING_COURSE
+                }else if (lineToCourse.isHeading(currentLine)){
+                    lineToCourse.setHeading(currentLine)
+                    state = READING_COURSE
 
+                }else if (lineToRider.isHeading(currentLine)){
+                    lineToRider.setHeading(currentLine)
+                    state = READING_RIDER
+                }
+                else{
+                    when(state){
+                        READING_TT->{
+                            val tt = lineToTt.importLine(currentLine)
+                            tt?.let {
+                                timeTrialList.lastOrNull()?.timeTrialHeader = it
+                                //state = READING_COURSE
+
+                            }
                         }
-                    }
-                    READING_COURSE->{
-                        val course = lineToCourse.importLine(currentLine)
-                        course?.let {
-                            timeTrialList.lastOrNull()?.course = it
-                            //state = READING_RIDER
+                        READING_COURSE->{
+                            val course = lineToCourse.importLine(currentLine)
+                            course?.let {
+                                timeTrialList.lastOrNull()?.course = it
+                                //state = READING_RIDER
+                            }
                         }
-                    }
-                    READING_RIDER->{
-                        val rider = lineToRider.importLine(currentLine)
-                        rider?.let {
-                            timeTrialList.lastOrNull()?.importRiderList?.add(it)
+                        READING_RIDER->{
+                            lineToRider.importLine(currentLine)?.let {
+                                timeTrialList.lastOrNull()?.results?.add(it)
+                            }
                         }
                     }
                 }
+//                currentLine = reader.readLine()
+//                if(currentLine != null){
+//                    currentLine = currentLine.replace(""""""", "")
+//                    currentLine = currentLine.replace("""'""", "")
+//                }
             }
-            currentLine = reader.readLine()
-            if(currentLine != null){
-                currentLine = currentLine.replace(""""""", "")
-                currentLine = currentLine.replace("""'""", "")
+
+            timeTrialList.forEach {
+                addImportTtToDb(it)
             }
+            return "Imported ${timeTrialList.count()} timetrials"
+        }catch (e:Exception){
+            return "Failed to import data ${e.message}"
         }
 
-        timeTrialList.forEach {
-            addImportTtToDb(it)
-        }
 
     }
 
-    suspend fun addImportTtToDb(importTt: ImportTimeTrial){
-        val header = importTt.header
+    suspend fun addImportTtToDb(importTt: TimeTrialIO){
+        val header = importTt.timeTrialHeader
         val course = importTt.course
 
         var headerInDb: TimeTrialHeader? = null
@@ -165,7 +213,7 @@ class ImportViewModel @Inject constructor(private val riderRespository: IRiderRe
             }
 
         }
-        importTt.importRiderList.filter { it.firstName.isNotBlank() }.forEach {importRider->
+        importTt.results.filter { it.firstName.isNotBlank() }.forEach {importRider->
 
             val existingRiders = riderRespository.ridersFromFirstLastName(importRider.firstName, importRider.lastName?:"")
             //var timeTrialRider:TimeTrialRider? = null

@@ -1,11 +1,17 @@
 package com.android.jared.linden.timingtrials
 
+import android.content.ContentResolver
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
@@ -14,12 +20,19 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.android.jared.linden.timingtrials.domain.JsonResultsWriter
 import com.android.jared.linden.timingtrials.timing.TimingActivity
+import com.android.jared.linden.timingtrials.util.EventObserver
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.android.jared.linden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import java.io.File
+import java.io.IOException
 import kotlin.math.abs
 
 
@@ -33,6 +46,7 @@ interface IFabCallbacks{
     fun setAction(action: () -> Unit)
     fun setImage(resourceId: Int)
 }
+
 
 class MainActivity : AppCompatActivity(), IFabCallbacks {
 
@@ -101,7 +115,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     intent.type = "text/*"
                     startActivityForResult(intent, REQUEST_IMPORT_FILE)
 
-                    Toast.makeText(this, "Select CSV File", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Select CSV or .tt File", Toast.LENGTH_LONG).show()
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
                 }
@@ -116,6 +130,22 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
 
+                }
+                R.id.app_bar_export->{
+                    val date = LocalDateTime.now()
+                    val fString = date.format(DateTimeFormatter.ofPattern("dd-MM-yy"))
+
+                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        putExtra(Intent.EXTRA_TITLE, "Timing Trials Export $fString.tt")
+                        //MIME types
+                        type = "text/*"
+                        // Optionally, specify a URI for the directory that should be opened in
+                        // the system file picker before your app creates the document.
+                        //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
+                    }
+                    startActivityForResult(intent, REQUEST_CREATE_FILE_JSON)
+                    true
                 }
                 else->{
                     true
@@ -192,20 +222,60 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         when(requestCode){
             REQUEST_IMPORT_FILE ->{
                 data?.data?.let {uri->
-                    //  try {
+
                     val importVm = getViewModel { injector.importViewModel()}
                     val inputStream = contentResolver.openInputStream(uri)
+
+                    //Toast.makeText(this, b, Toast.LENGTH_SHORT).show()
                     if(inputStream != null){
                         importVm.readInput(uri.path, inputStream)
+                        importVm.importMessage.observe(this, EventObserver {
+                            Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
+                        })
                     }
-                    //         }
-//                    catch(e: IOException)
-//                    {
-//                        e.printStackTrace()
-//                        Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
-//                    }
+
                 }
             }
+            REQUEST_CREATE_FILE_JSON->{
+                data?.data?.let {uri->
+                    try {
+                        val outputStream = contentResolver.openOutputStream(uri)
+                        if(haveOrRequestFilePermission() && outputStream != null){
+                            val allTtsVm = getViewModel { injector.importViewModel()}
+
+                            allTtsVm.writeAllTimeTrialsToPath(outputStream)
+                            allTtsVm.importMessage.observe(this, EventObserver{
+                                Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
+                                val intent = Intent()
+                                intent.action = Intent.ACTION_VIEW
+                                intent.setDataAndType(uri, "text/*")
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                startActivity(intent)
+                            })
+
+                        }
+                    }
+                    catch(e: IOException)
+                    {
+                        e.printStackTrace()
+                        Toast.makeText(this, "Save failed - ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+
+            }
+        }
+    }
+
+    fun haveOrRequestFilePermission(): Boolean{
+        return if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+//            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+//                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
+//            }else{
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
+            false
+            // }
+        }else{
+            true
         }
     }
 
@@ -236,31 +306,4 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
 }
 
-class TTPrefs(){
-    val blobs: String = "HI"
-}
 
-//class FAB_Hide_on_Scroll(context: Context?, attrs: AttributeSet?) : FloatingActionButton.Behavior() {
-//    override fun onNestedScroll(coordinatorLayout: CoordinatorLayout, child: FloatingActionButton, target: View, dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int) {
-//        super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed)
-//        //child -> Floating Action Button
-//        if (dyConsumed > 0 && child.visibility == View.VISIBLE) {
-//            child.hide(object : OnVisibilityChangedListener() {
-//
-//                override fun onHidden(fab: FloatingActionButton) {
-//                    super.onShown(fab)
-//                    //fab.visibility = View.INVISIBLE
-//                }
-//            })
-//
-//        } else if (dyConsumed < 0 && child.visibility != View.VISIBLE) {
-//            //child.show()
-//        }
-//    }
-//
-//    override fun onStartNestedScroll(coordinatorLayout: CoordinatorLayout, child: FloatingActionButton, directTargetChild: View, target: View, nestedScrollAxes: Int): Boolean {
-//        return nestedScrollAxes == ViewCompat.SCROLL_AXIS_VERTICAL
-//    }
-//
-//
-//}
