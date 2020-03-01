@@ -215,6 +215,23 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             }
         }
 
+        val data = intent?.data?.let {
+            importData(it)
+        }
+
+    }
+
+    private fun importData(uri: Uri){
+        val importVm = getViewModel { injector.importViewModel()}
+        val inputStream = contentResolver.openInputStream(uri)
+
+        //Toast.makeText(this, b, Toast.LENGTH_SHORT).show()
+        if(inputStream != null){
+            importVm.readInput(uri.path, inputStream)
+            importVm.importMessage.observe(this, EventObserver {
+                Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
+            })
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -222,18 +239,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         when(requestCode){
             REQUEST_IMPORT_FILE ->{
                 data?.data?.let {uri->
-
-                    val importVm = getViewModel { injector.importViewModel()}
-                    val inputStream = contentResolver.openInputStream(uri)
-
-                    //Toast.makeText(this, b, Toast.LENGTH_SHORT).show()
-                    if(inputStream != null){
-                        importVm.readInput(uri.path, inputStream)
-                        importVm.importMessage.observe(this, EventObserver {
-                            Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
-                        })
-                    }
-
+                    importData(uri)
                 }
             }
             REQUEST_CREATE_FILE_JSON->{

@@ -21,6 +21,7 @@ import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
+import java.util.zip.ZipInputStream
 import javax.inject.Inject
 import kotlin.Exception
 
@@ -35,6 +36,8 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
     fun writeAllTimeTrialsToPath(outputStream: OutputStream){
         viewModelScope.launch(Dispatchers.IO) {
             try {
+
+
                 val allTts = timeTrialRepository.allTimeTrials()
                 JsonResultsWriter().writeToPath(outputStream, allTts)
                 writeAllResult.postValue(Event("Success"))
@@ -46,8 +49,15 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
     fun readInput(title: String?, inputStream: InputStream){
         viewModelScope.launch(Dispatchers.IO) {
-            val reader = BufferedReader(InputStreamReader(inputStream))
-            val fileString = reader.readText()
+            val nextZipped = ZipInputStream(inputStream).nextEntry
+           val fString = if(nextZipped!= null){
+                nextZipped.
+            }else{
+               val reader = BufferedReader(InputStreamReader(inputStream))
+               reader.readText()
+           }
+
+
             reader.close()
             val firstNonWhitespaceChar = fileString.asSequence().first { !it.isWhitespace() }
 
@@ -193,7 +203,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                     "Unknown TT"
                 }
             }
-            val headerToInsert = header.copy(ttName = headerName, courseId = courseInDb?.id, status = TimeTrialStatus.FINISHED)
+            val headerToInsert = header.copy(ttName = headerName, courseId = courseInDb?.id, status = header.status)
 
             val headerList = timeTrialRepository.getHeadersByName(headerName)
 
@@ -239,7 +249,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             }
 
             riderInDbId.id?.let {
-                val fTime = importRider.finishTime
+                val fTime =  importRider.finishTime
                 val gen = if(importRider.gender != Gender.UNKNOWN)
                 {
                     importRider.gender}
@@ -257,8 +267,8 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                             courseId = courseInDb?.id,
                             index = 0,
                             number = 0,
-                            finishTime = fTime,
-                            splits = transformSplits(importRider.splits, importRider.finishTime),
+                            finishTime = if (headerInDb?.status == TimeTrialStatus.FINISHED) fTime else 0L,
+                            splits = if (headerInDb?.status == TimeTrialStatus.FINISHED) transformSplits(importRider.splits, importRider.finishTime) else listOf(),
                             category = importRider.category?:"",
                             gender = importRider.gender,
                             club = importRider.club?:"",

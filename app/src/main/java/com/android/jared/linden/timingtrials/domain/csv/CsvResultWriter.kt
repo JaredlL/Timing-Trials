@@ -28,7 +28,7 @@ class CsvResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowView
     private fun writeCourseRow(writer: PrintWriter){
         val course = timeTrial.course
         if(course != null){
-            writer.appendln("Course Name,Course Length, Course CTT Name")
+            writer.appendln("Course Name,Course Length,Course CTT Name")
             writer.appendln("${course.courseName}.${course.length/1000L},${course.cttName}")
         }else{
             writer.appendln(surroundQuotes("Unknown Course"))

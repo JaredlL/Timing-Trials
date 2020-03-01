@@ -6,8 +6,9 @@ import com.android.jared.linden.timingtrials.domain.TimeTrialIO
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
-import java.io.OutputStream
-import java.io.PrintWriter
+import java.io.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 class JsonResultsWriter{
 
@@ -27,11 +28,18 @@ class JsonResultsWriter{
 
         }
 
-        val writer = PrintWriter(filePath)
         val output = TimingTrialsExport(timeTrialList.map { TimeTrialIO(it) })
+
+        val zip = ZipOutputStream(BufferedOutputStream(filePath))
+        val writer = OutputStreamWriter(zip)
+
+        zip.putNextEntry(ZipEntry("TimingTrials.json"))
+
         GsonBuilder().addSerializationExclusionStrategy(exclusionStrategy).create().toJson(output,writer)
-        writer.flush()
         writer.close()
+        zip.closeEntry()
+        zip.close()
+        //writer.close()
     }
 
 }
