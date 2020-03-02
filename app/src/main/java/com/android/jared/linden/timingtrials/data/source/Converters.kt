@@ -132,4 +132,12 @@ class Converters {
     @TypeConverter fun statusToInt(status: TimeTrialStatus): Int{
         return status.ordinal
     }
+
+    @TypeConverter fun stringToNumberRule(str: String): NumberRules?{
+        return NumberRules.fromString(str)
+    }
+
+    @TypeConverter fun numberRulesToString(rules: NumberRules): String{
+        return NumberRules.toString(rules)
+    }
 }

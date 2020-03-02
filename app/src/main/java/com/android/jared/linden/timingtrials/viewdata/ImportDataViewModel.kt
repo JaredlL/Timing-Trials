@@ -4,7 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.jared.linden.timingtrials.data.*
-import com.android.jared.linden.timingtrials.data.roomrepo.*
+import com.android.jared.linden.timingtrials.data.roomrepo.ICourseRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.IRiderRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.TimeTrialRiderRepository
 import com.android.jared.linden.timingtrials.domain.JsonResultsWriter
 import com.android.jared.linden.timingtrials.domain.TimeTrialIO
 import com.android.jared.linden.timingtrials.domain.TimingTrialsExport
@@ -16,14 +19,11 @@ import com.android.jared.linden.timingtrials.util.Event
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.threeten.bp.*
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.io.OutputStream
+import org.threeten.bp.OffsetDateTime
+import java.io.*
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
-import kotlin.Exception
+
 
 class IOViewModel @Inject constructor(private val riderRespository: IRiderRepository,
                                       private val courseRepository: ICourseRepository,
@@ -49,22 +49,39 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
     fun readInput(title: String?, inputStream: InputStream){
         viewModelScope.launch(Dispatchers.IO) {
-            val nextZipped = ZipInputStream(inputStream).nextEntry
-           val fString = if(nextZipped!= null){
-                nextZipped.
+
+            val buf = BufferedInputStream(inputStream)
+            buf.mark(100)
+            val zis = ZipInputStream(buf)
+            val nextZipped = zis.nextEntry
+            var fString = ""
+           if(nextZipped!= null){
+               //val reader2 = BufferedReader(BufferedInputStream(zis))
+               val sb = StringBuilder()
+               val buffer = ByteArray(1024)
+               var read = 0
+
+               while (zis.read(buffer, 0, 1024).also { read = it } >= 0) {
+                   //read = zis.read(buffer, 0, 1024)
+                   sb.append(String(buffer, 0, read))
+               }
+               fString = sb.toString()
+               zis.close()
             }else{
-               val reader = BufferedReader(InputStreamReader(inputStream))
-               reader.readText()
+               buf.reset()
+               val reader = BufferedReader(InputStreamReader(buf))
+               fString = reader.readText()
+               reader.close()
            }
 
 
-            reader.close()
-            val firstNonWhitespaceChar = fileString.asSequence().first { !it.isWhitespace() }
+            //reader.close()
+            val firstNonWhitespaceChar = fString.asSequence().first { !it.isWhitespace() }
 
             val msg = if(firstNonWhitespaceChar == "{".first() || firstNonWhitespaceChar == "[".first()){
-                readJsonInputIntoDb(fileString)
+                readJsonInputIntoDb(fString)
             }else{
-                readCsvInputIntoDb(fileString)
+                readCsvInputIntoDb(fString)
             }
 
             importMessage.postValue(Event(msg))
@@ -266,7 +283,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                             timeTrialId = headerInDb?.id,
                             courseId = courseInDb?.id,
                             index = 0,
-                            number = 0,
                             finishTime = if (headerInDb?.status == TimeTrialStatus.FINISHED) fTime else 0L,
                             splits = if (headerInDb?.status == TimeTrialStatus.FINISHED) transformSplits(importRider.splits, importRider.finishTime) else listOf(),
                             category = importRider.category?:"",

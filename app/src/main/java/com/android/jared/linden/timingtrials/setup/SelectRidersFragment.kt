@@ -20,6 +20,7 @@ import com.android.jared.linden.timingtrials.adapters.SelectableRiderListAdapter
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.android.jared.linden.timingtrials.util.*
+import kotlinx.android.synthetic.main.fragment_selectrider_list.*
 
 
 /**

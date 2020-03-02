@@ -17,7 +17,7 @@ enum class RiderStatus {
 class RiderStatusViewWrapper(val filledRider: FilledTimeTrialRider, val timeLine: TimeLine){
 
     val rider = filledRider.timeTrialData
-    val number: String = rider.number.toString()
+    val number: String = rider.index.toString()
 
     val startTimeMilis: Long = timeLine.timeTrial.timeTrialHeader.startTimeMilis + timeLine.timeTrial.helper.getRiderStartTime(rider)
     //val b = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimeMilis), ZoneId.systemDefault())

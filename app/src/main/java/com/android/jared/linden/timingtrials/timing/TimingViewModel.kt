@@ -261,7 +261,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                 val millisToNextRider = (nextStartMilli - millisSinceStart)
 
                     val riderString = if(tte.timeTrialHeader.interval == 0){
-                        "(${nextStartRider.timeTrialData.number}) ${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName}"
+                        "(${nextStartRider.timeTrialData.index}) ${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName}"
                     }else{
                         "All Riders"
                     }

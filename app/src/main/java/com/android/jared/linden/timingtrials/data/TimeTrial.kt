@@ -15,6 +15,7 @@ data class TimeTrialHeader(val ttName: String,
                            val startTime: OffsetDateTime,
                            val firstRiderStartOffset: Int = 60,
                            val status: TimeTrialStatus = TimeTrialStatus.SETTING_UP,
+                           val numberRules: NumberRules = NumberRules(),
                            val timeStamps: List<Long> = listOf(),
                            @PrimaryKey(autoGenerate = true) override val id: Long? = null) : ITimingTrialsEntity {
 
@@ -68,7 +69,7 @@ data class TimeTrial(
     }
 
     fun updateRiderList(newRiderList: List<FilledTimeTrialRider>): TimeTrial{
-        val ensureCorrect = newRiderList.mapIndexed {i,r-> r.updateTimeTrialData( r.timeTrialData.copy(timeTrialId = this.timeTrialHeader.id, courseId = this.course?.id, index = i, number = i+1)) }
+        val ensureCorrect = newRiderList.mapIndexed {i,r-> r.updateTimeTrialData( r.timeTrialData.copy(timeTrialId = this.timeTrialHeader.id, courseId = this.course?.id, index = i)) }
         return  this.copy(riderList = ensureCorrect)
     }
 

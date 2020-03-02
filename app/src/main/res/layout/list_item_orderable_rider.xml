@@ -13,6 +13,10 @@
             name="startTime"
             type="java.lang.Integer" />
 
+        <variable
+            name="number"
+            type="java.lang.Integer" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -78,7 +82,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:background="@drawable/number_back"
-            android:text="@{Integer.toString(rider.timeTrialData.number)}"
+            android:text="@{Integer.toString(number)}"
             android:textAlignment="center"
             android:textColor="@android:color/black"
             android:textSize="24sp"

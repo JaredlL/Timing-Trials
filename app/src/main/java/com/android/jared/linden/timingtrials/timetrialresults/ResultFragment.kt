@@ -31,16 +31,14 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.android.jared.linden.timingtrials.IFabCallbacks
-import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.REQUEST_CREATE_FILE_CSV
-import com.android.jared.linden.timingtrials.REQUEST_CREATE_FILE_JSON
+import com.android.jared.linden.timingtrials.*
 import com.android.jared.linden.timingtrials.databinding.FragmentTimetrialResultBinding
 import com.android.jared.linden.timingtrials.domain.JsonResultsWriter
 import com.android.jared.linden.timingtrials.domain.csv.CsvResultWriter
 import com.android.jared.linden.timingtrials.util.Utils
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_timetrial_result.*
 import timber.log.Timber
 import java.io.File
@@ -228,7 +226,7 @@ class ResultFragment : Fragment() {
             catch(e: IOException)
             {
                 e.printStackTrace()
-                Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_SHORT).show()
+                Snackbar.make((requireActivity() as MainActivity).rootCoordinator, "Save failed - ${e.message}", Snackbar.LENGTH_LONG).show()
             }
         }
     }
@@ -254,7 +252,7 @@ class ResultFragment : Fragment() {
             catch(e: IOException)
             {
                 e.printStackTrace()
-                Toast.makeText(requireActivity(), "Save failed - ${e.message}", Toast.LENGTH_LONG).show()
+                Snackbar.make((requireActivity() as MainActivity).rootCoordinator, "Save failed - ${e.message}", Snackbar.LENGTH_LONG).show()
             }
         }
     }

@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
                 R.id.app_bar_import -> {
                     val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                    intent.type = "text/*"
+                    intent.type = "*/*"
                     startActivityForResult(intent, REQUEST_IMPORT_FILE)
 
                     Toast.makeText(this, "Select CSV or .tt File", Toast.LENGTH_LONG).show()
