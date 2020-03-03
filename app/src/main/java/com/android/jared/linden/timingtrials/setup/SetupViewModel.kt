@@ -57,7 +57,6 @@ class SetupViewModel @Inject constructor(
                 val current = _mTimeTrial.value
                 val ordered = tt.copy(riderList = tt.riderList.sortedBy { it.timeTrialData.index })
                 if (!isCarolineAlive.get() && ordered != current) {
-                    System.out.println("JAREDMSG -> SETUPVIEWMODEL -> current data = ${_mTimeTrial.value?.timeTrialHeader?.id} new = ${tt.timeTrialHeader.id}")
                     _mTimeTrial.value = ordered
                 }
             }
@@ -118,6 +117,31 @@ class SetupViewModel @Inject constructor(
 
         }
 
+        val numberRulesMediator : MediatorLiveData<NumberRules> = MediatorLiveData()
+
+        init {
+            numberRulesMediator.addSource(_mTimeTrial){
+                it?.timeTrialHeader?.numberRules?.let { nr->
+                    if(startNumber.value != nr.terminus) startNumber.value = nr.terminus
+                    if(exclusions)
+                }
+            }
+        }
+
+        override val startNumber: MutableLiveData<Int>
+            get() = TODO("Not yet implemented")
+
+        override val exclusions: MutableLiveData<String>
+            get() = TODO("Not yet implemented")
+
+        override fun getNumberDirection(): LiveData<NumbersDirection> {
+            TODO("Not yet implemented")
+        }
+
+        override fun setNumberDirection(mode: NumbersDirection) {
+            TODO("Not yet implemented")
+        }
+
         override fun getOrderableRiderData(): LiveData<TimeTrial?> {
             return _mTimeTrial
         }
@@ -132,7 +156,6 @@ class SetupViewModel @Inject constructor(
     @ExperimentalCoroutinesApi
     override fun onCleared() {
         super.onCleared()
-        System.out.println("JAREDMSG -> SETUPVIEWMODEL CLEARING")
         isCarolineAlive.set(false)
         viewModelScope.cancel()
     }

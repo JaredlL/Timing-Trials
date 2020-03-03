@@ -1,6 +1,7 @@
 package com.android.jared.linden.timingtrials.setup
 
 
+import android.app.Dialog
 import android.app.SearchManager
 import android.content.Context
 import android.content.SharedPreferences
@@ -10,7 +11,10 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
@@ -18,11 +22,15 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.android.jared.linden.timingtrials.IFabCallbacks
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.NumbersDirection
 import com.android.jared.linden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
+import com.android.jared.linden.timingtrials.databinding.FragmentNumberOptionsBinding
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_database_view_pager.*
+import kotlinx.android.synthetic.main.fragment_number_options.*
+import kotlinx.android.synthetic.main.fragment_title.*
 
 
 class SetupViewPagerFragment: Fragment() {
@@ -186,6 +194,11 @@ class SetupViewPagerFragment: Fragment() {
                     .create().show()
             true
         }
+
+        menu.findItem(R.id.settings_menu_number_options).setOnMenuItemClickListener {
+            NumberOptionsDialog().show(childFragmentManager, "number_rules")
+            true
+        }
     }
 
 
@@ -238,4 +251,53 @@ class SetupPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun createFragment(position: Int): Fragment {
         return tabFragmentsCreators[position]?.invoke() ?: throw IndexOutOfBoundsException()
     }
+}
+
+class NumberOptionsDialog: DialogFragment(){
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+       return activity?.let {
+            val builder = AlertDialog.Builder(it)
+            val inflater = it.layoutInflater
+            val timeTrialViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.orderRidersViewModel
+
+            val binding = DataBindingUtil.inflate<FragmentNumberOptionsBinding>(inflater, R.layout.fragment_number_options, container, false).apply {
+                radioGroup.setOnCheckedChangeListener { group, checkedId ->
+                    when(checkedId){
+                        ascendingRadioButton.id -> timeTrialViewModel.setNumberDirection(NumbersDirection.ASCEND)
+                        else -> timeTrialViewModel.setNumberDirection(NumbersDirection.DESCEND)
+                    }
+                }
+            }
+            timeTrialViewModel.getNumberDirection().observe(viewLifecycleOwner, Observer {
+                it?.let {
+                    when(it){
+                        NumbersDirection.ASCEND -> {
+                            binding.ascendingRadioButton.isChecked = true
+                            binding.descendingRadioButton.isChecked = false
+                        }
+                        else ->{
+                            binding.ascendingRadioButton.isChecked = false
+                            binding.descendingRadioButton.isChecked = true
+                        }
+                    }
+
+                }
+            })
+            builder.setView(binding.root)
+                    // Add action buttons
+                    .setPositiveButton(R.string.ok) { dialog, id ->
+
+
+                    }
+                    .setNegativeButton(R.string.cancel) { dialog, id ->
+                        getDialog()?.cancel()
+                    }
+            builder.create()
+        }?:throw IllegalStateException("Activity cannot be null")
+
+
+
+    }
+
 }

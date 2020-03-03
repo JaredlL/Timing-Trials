@@ -32,6 +32,7 @@ class RiderListFragment : Fragment() {
 
         viewFactory = RiderViewHolderFactory()
         adapter = GenericListAdapter(requireContext(), viewFactory)
+        adapter.setHasStableIds(true)
         listViewModel.filteredAllRiders.observe(viewLifecycleOwner, Observer{res->
             res?.let {adapter.setItems(it)}
         })

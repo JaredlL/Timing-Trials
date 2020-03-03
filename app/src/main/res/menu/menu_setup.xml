@@ -6,12 +6,18 @@
         android:id="@+id/settings_app_bar_search"
         android:icon="@drawable/ic_search_white_24dp"
         app:showAsAction="always|collapseActionView"
-        android:title="Search"
+        android:title="@string/search"
         app:actionViewClass="android.widget.SearchView" />
     <item
         android:id="@+id/settings_menu_ordering"
         android:icon="@drawable/ic_find_replace_black_24dp"
         app:showAsAction="never"
         android:title="@string/sort" />
+
+    <item
+        android:id="@+id/settings_menu_number_options"
+        android:icon="@drawable/ic_find_replace_black_24dp"
+        app:showAsAction="never"
+        android:title="@string/edit_numbering" />
 
 </menu>

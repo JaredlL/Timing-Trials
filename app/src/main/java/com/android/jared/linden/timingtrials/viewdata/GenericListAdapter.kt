@@ -6,12 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import com.android.jared.linden.timingtrials.data.ITimingTrialsEntity
 
 
-
-
-
-class GenericListAdapter<T> internal constructor(val context: Context, val vhFact: GenericViewHolderFactory<T>): RecyclerView.Adapter<BaseHolder<T>>() {
+class GenericListAdapter<T: ITimingTrialsEntity> internal constructor(val context: Context, val vhFact: GenericViewHolderFactory<T>): RecyclerView.Adapter<BaseHolder<T>>() {
 
 
 
@@ -31,6 +29,10 @@ class GenericListAdapter<T> internal constructor(val context: Context, val vhFac
                 bind(data)
             }
         }
+    }
+
+    override fun getItemId(position: Int): Long {
+        return mData[position].id?:position.toLong()
     }
 
     fun setItems(newItems: List<T>){
