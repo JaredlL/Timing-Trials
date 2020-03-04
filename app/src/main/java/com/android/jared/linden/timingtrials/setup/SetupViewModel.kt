@@ -122,25 +122,55 @@ class SetupViewModel @Inject constructor(
         init {
             numberRulesMediator.addSource(_mTimeTrial){
                 it?.timeTrialHeader?.numberRules?.let { nr->
-                    if(startNumber.value != nr.terminus) startNumber.value = nr.terminus
-                    if(exclusions)
+                    val exString = nr.exlusionsString()
+                    if(startNumber.value != nr.terminus.toString()) startNumber.value = nr.terminus.toString()
+                    if(exString != exclusions.toString()) exclusions.value = exString
+                }
+
+                numberRulesMediator.addSource(startNumber) { newSs ->
+                    newSs.toIntOrNull()?.let {newSn->
+                        val currentTt = _mTimeTrial.value
+                        val currentSn = _mTimeTrial.value?.timeTrialHeader?.numberRules?.terminus
+                        if (currentSn != null && currentTt != null) {
+                            if (currentSn != newSn) {
+                                val newNumRules = currentTt.timeTrialHeader.numberRules.copy(terminus = newSn)
+                                updateTimeTrial(currentTt.copy(timeTrialHeader = currentTt.timeTrialHeader.copy(numberRules = newNumRules)))
+                            }
+                        }
+                    }
+                }
+
+                numberRulesMediator.addSource(numberDirection){newDir->
+                    val currentTt = _mTimeTrial.value
+                    val currentDir = _mTimeTrial.value?.timeTrialHeader?.numberRules?.direction
+                    if(newDir != null && currentDir!= null && currentTt != null){
+                        if(currentDir != newDir){
+                            val newNumRules = currentTt.timeTrialHeader.numberRules.copy(direction = newDir)
+                            updateTimeTrial(currentTt.copy(timeTrialHeader = currentTt.timeTrialHeader.copy(numberRules = newNumRules)))
+                        }
+                    }
+                }
+
+                numberRulesMediator.addSource(exclusions){newExc->
+                    val currentTt = _mTimeTrial.value
+                    val currentExc = _mTimeTrial.value?.timeTrialHeader?.numberRules?.exclusions
+                    if(newExc != null && currentExc!= null && currentTt != null){
+                       val newList = NumberRules.stringToExclusions(newExc)
+                        if(currentExc != newList){
+                            val newNumRules = currentTt.timeTrialHeader.numberRules.copy(exclusions = newList)
+                            updateTimeTrial(currentTt.copy(timeTrialHeader = currentTt.timeTrialHeader.copy(numberRules = newNumRules)))
+                        }
+                    }
                 }
             }
         }
 
-        override val startNumber: MutableLiveData<Int>
-            get() = TODO("Not yet implemented")
+        override val numberDirection: MutableLiveData<NumbersDirection> = MutableLiveData()
 
-        override val exclusions: MutableLiveData<String>
-            get() = TODO("Not yet implemented")
+        override val startNumber: MutableLiveData<String> = MutableLiveData()
 
-        override fun getNumberDirection(): LiveData<NumbersDirection> {
-            TODO("Not yet implemented")
-        }
+        override val exclusions: MutableLiveData<String> = MutableLiveData()
 
-        override fun setNumberDirection(mode: NumbersDirection) {
-            TODO("Not yet implemented")
-        }
 
         override fun getOrderableRiderData(): LiveData<TimeTrial?> {
             return _mTimeTrial

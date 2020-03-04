@@ -2,11 +2,22 @@ package com.android.jared.linden.timingtrials.data
 
 enum class NumbersDirection {ASCEND, DESCEND}
 
-class NumberRules(val terminus: Int = 1, val isStart: Boolean = true, val direction: NumbersDirection = NumbersDirection.ASCEND, val exclusions: List<Int> = listOf()) {
+data class NumberRules(val terminus: Int = 1, val isStart: Boolean = true, val direction: NumbersDirection = NumbersDirection.ASCEND, val exclusions: List<Int> = listOf()) {
 
     fun isDefault(): Boolean{
         return terminus == 1 && direction == NumbersDirection.ASCEND && exclusions.isEmpty() && isStart
     }
+
+    fun exlusionsString(): String{
+        val sb = StringBuilder()
+        for(e in exclusions){
+            sb.append(e)
+            sb.append(",")
+        }
+        return sb.toString()
+    }
+
+
 
     fun numberFromIndex(index: Int, totalCount: Int): Int{
 
@@ -41,6 +52,10 @@ class NumberRules(val terminus: Int = 1, val isStart: Boolean = true, val direct
                 }
                 return  NumberRules(term, isStart, direction, exc)
             }
+        }
+
+        fun stringToExclusions(excString : String): List<Int>{
+            return excString.splitToSequence(",").mapNotNull { it.toIntOrNull() }.toList()
         }
 
         fun toString(rules: NumberRules): String{

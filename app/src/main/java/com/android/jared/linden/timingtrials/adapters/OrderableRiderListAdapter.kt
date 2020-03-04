@@ -37,6 +37,7 @@ class OrderableRiderListAdapter(val context: Context) : RecyclerView.Adapter<Ord
         fun bind(rd:FilledTimeTrialRider){
             binding.apply {
                 rider = rd
+                number = mTimeTrialHeader.numberRules.numberFromIndex(rd.timeTrialData.index, mRiders.count())
                 startTime = mTimeTrialHeader.firstRiderStartOffset + mTimeTrialHeader.interval * rd.timeTrialData.index
             }
         }

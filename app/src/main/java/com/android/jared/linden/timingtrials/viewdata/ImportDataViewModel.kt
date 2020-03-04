@@ -246,7 +246,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             //var timeTrialRider:TimeTrialRider? = null
             val riderInDbId:Rider = when(existingRiders.size){
                 0->{
-                    val newRider = Rider(importRider.firstName, importRider.lastName?:"", importRider.club?:"", null, importRider.category?:"", importRider.gender)
+                    val newRider = Rider(importRider.firstName, importRider.lastName, importRider.club, null, importRider.category?:"", importRider.gender)
                     val id = riderRespository.insert(newRider)
                     newRider.copy(id = id)
                 }
@@ -256,7 +256,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                 else->{
                     val byGender = existingRiders.filter { importRider.gender!= Gender.UNKNOWN && it.gender == importRider.gender }
                     if(byGender.isEmpty()){
-                        val newRider = Rider(importRider.firstName, importRider.lastName?:"", importRider.club?:"", null, importRider.category?:"", importRider.gender)
+                        val newRider = Rider(importRider.firstName, importRider.lastName, importRider.club, null, importRider.category, importRider.gender)
                         val id = riderRespository.insert(newRider)
                         newRider.copy(id = id)
                     }else{
@@ -285,10 +285,10 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                             index = 0,
                             finishTime = if (headerInDb?.status == TimeTrialStatus.FINISHED) fTime else 0L,
                             splits = if (headerInDb?.status == TimeTrialStatus.FINISHED) transformSplits(importRider.splits, importRider.finishTime) else listOf(),
-                            category = importRider.category?:"",
-                            gender = importRider.gender,
-                            club = importRider.club?:"",
-                            resultNote = importRider.notes?:""
+                            category = importRider.category,
+                            gender = gen,
+                            club = importRider.club,
+                            resultNote = importRider.notes
                     )
                     insertTimeTrialRider(timeTrialRider)
                 }

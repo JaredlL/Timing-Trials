@@ -107,6 +107,7 @@ data class FilledTimeTrialRider(
     }
 
 
+
     companion object{
         fun createFromRiderAndTimeTrial(rider: Rider, timeTrial: TimeTrial): FilledTimeTrialRider{
             if(rider.id != null){

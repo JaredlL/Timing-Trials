@@ -7,10 +7,9 @@ import com.android.jared.linden.timingtrials.data.*
 interface IOrderRidersViewModel{
     fun getOrderableRiderData(): LiveData<TimeTrial?>
     fun moveItem(fromPosition: Int, toPosition:Int)
-    val startNumber: MutableLiveData<Int>
+    val startNumber: MutableLiveData<String>
     val exclusions: MutableLiveData<String>
-    fun getNumberDirection(): LiveData<NumbersDirection>
-    fun setNumberDirection(mode: NumbersDirection)
+    val numberDirection: MutableLiveData<NumbersDirection>
 
 
 }

@@ -255,35 +255,26 @@ class SetupPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
 class NumberOptionsDialog: DialogFragment(){
 
+    private lateinit var mBinding: FragmentNumberOptionsBinding
+    private lateinit var  mViewModel: IOrderRidersViewModel
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
        return activity?.let {
             val builder = AlertDialog.Builder(it)
             val inflater = it.layoutInflater
-            val timeTrialViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.orderRidersViewModel
+           mViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.orderRidersViewModel
 
             val binding = DataBindingUtil.inflate<FragmentNumberOptionsBinding>(inflater, R.layout.fragment_number_options, container, false).apply {
+                viewModel = mViewModel
                 radioGroup.setOnCheckedChangeListener { group, checkedId ->
                     when(checkedId){
-                        ascendingRadioButton.id -> timeTrialViewModel.setNumberDirection(NumbersDirection.ASCEND)
-                        else -> timeTrialViewModel.setNumberDirection(NumbersDirection.DESCEND)
+                        ascendingRadioButton.id -> mViewModel.numberDirection.value = NumbersDirection.ASCEND
+                        else -> mViewModel.numberDirection.value = NumbersDirection.DESCEND
                     }
                 }
             }
-            timeTrialViewModel.getNumberDirection().observe(viewLifecycleOwner, Observer {
-                it?.let {
-                    when(it){
-                        NumbersDirection.ASCEND -> {
-                            binding.ascendingRadioButton.isChecked = true
-                            binding.descendingRadioButton.isChecked = false
-                        }
-                        else ->{
-                            binding.ascendingRadioButton.isChecked = false
-                            binding.descendingRadioButton.isChecked = true
-                        }
-                    }
+           mBinding = binding
 
-                }
-            })
             builder.setView(binding.root)
                     // Add action buttons
                     .setPositiveButton(R.string.ok) { dialog, id ->
@@ -296,8 +287,26 @@ class NumberOptionsDialog: DialogFragment(){
             builder.create()
         }?:throw IllegalStateException("Activity cannot be null")
 
-
-
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        mViewModel.numberDirection.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                when(it){
+                    NumbersDirection.ASCEND -> {
+                        mBinding.ascendingRadioButton.isChecked = true
+                        mBinding.descendingRadioButton.isChecked = false
+                    }
+                    else ->{
+                        mBinding.ascendingRadioButton.isChecked = false
+                        mBinding.descendingRadioButton.isChecked = true
+                    }
+                }
+
+            }
+        })
+        super.onViewCreated(view, savedInstanceState)
+    }
+
 
 }
