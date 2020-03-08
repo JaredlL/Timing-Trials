@@ -36,10 +36,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="16dp"
             android:layout_toStartOf="@id/checkBox"
-            android:text="@{rider.club}"
             android:maxLength="20"
+            android:text="@{rider.club}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/checkBox"
             app:layout_constraintTop_toTopOf="parent"
@@ -47,25 +47,18 @@
 
         <CheckBox
             android:id="@+id/checkBox"
+            style="@android:style/Widget.Material.CompoundButton.CheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!--<TextView-->
-            <!--android:id="@+id/textView20"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginEnd="8dp"-->
-            <!--android:text="@{selectableRider.catString}"-->
-            <!--app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--app:layout_constraintEnd_toStartOf="@+id/textView4"-->
-            <!--app:layout_constraintTop_toTopOf="parent"-->
-            <!--tools:text="Category" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

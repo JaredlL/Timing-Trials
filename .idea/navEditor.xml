@@ -212,6 +212,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="numberOptionsDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="555" />
+                            <option name="y" value="-865" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="resultFragment">
                     <value>
                       <LayoutPositions>

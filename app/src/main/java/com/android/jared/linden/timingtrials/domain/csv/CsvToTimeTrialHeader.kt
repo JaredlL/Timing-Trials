@@ -1,11 +1,27 @@
 package com.android.jared.linden.timingtrials.domain.csv
 
-import android.text.format.Time
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.domain.ILineToObjectConverter
 import org.threeten.bp.*
 import org.threeten.bp.format.DateTimeFormatter
+
+object CSVUtils{
+    fun lineToList(input: String): List<String>{
+        val result: MutableList<String> = ArrayList()
+        var start = 0
+        var inQuotes = false
+        for (current in 0 until input.length) {
+            if (input[current] == '\"') inQuotes = !inQuotes // toggle state
+            val atLastChar = current == input.length - 1
+            if (atLastChar) result.add(input.substring(start)) else if (input[current] == ',' && !inQuotes) {
+                result.add(input.substring(start, current).replace(""""""", ""))
+                start = current + 1
+            }
+        }
+        return result
+    }
+}
 
 class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
 
@@ -20,7 +36,7 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
 
 
     override fun setHeading(headingLine: String){
-        val splitLine = headingLine.splitToSequence(",", ignoreCase = true)
+        val splitLine = CSVUtils.lineToList(headingLine)
 
         nameIndex = splitLine.withIndex().firstOrNull { it.value.contains("name", true) }?.index
         dateindex= splitLine.withIndex().firstOrNull { it.value.contains("date", true) }?.index
@@ -34,7 +50,7 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
     override fun importLine(dataLine: String): TimeTrialHeader? {
 
         try{
-            val dataList = dataLine.split(",", ignoreCase =  true)
+            val dataList = CSVUtils.lineToList(dataLine)
             val ttName = nameIndex?.let { dataList.getOrNull(it)}?:""
             val dateString = dateindex?.let { dataList.getOrNull(it) }
             val status = statusIndex?.let { if((dataList.getOrNull(it)?:"").contains("setting up", ignoreCase = true)) TimeTrialStatus.SETTING_UP else TimeTrialStatus.FINISHED }
@@ -57,6 +73,25 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
             throw Exception("Error reading timetrial data", e)
         }
 
+    }
+
+    fun fromCttTitle(cttTitle: String): TimeTrialHeader{
+        val titleString = cttTitle.replace(".csv", "", ignoreCase = true).replace("startsheet-", "", ignoreCase = true).replace("results-", "", ignoreCase = true)
+        val dateList = titleString.split("-").reversed().mapNotNull { it.toIntOrNull() }
+        val date = if(dateList.size > 2){
+
+            OffsetDateTime.of(LocalDate.of(2000+dateList[0], dateList[1],dateList[2]), LocalTime.of(1,0,0),ZoneId.systemDefault().rules.getOffset(Instant.now()))
+        }else{
+            OffsetDateTime.MIN
+        }
+        val datePortion = Regex("""[-]\d{1,2}[-]\d{1,2}[-]\d{1,2}""").find(titleString)?.value
+
+        val cleanedTitle = datePortion?.let {
+            titleString.replace(datePortion, "").replace("-", " ") + " ${datePortion.drop(1)}"
+        }?:titleString
+
+        val status = if(cttTitle.contains("startsheet")) TimeTrialStatus.SETTING_UP else TimeTrialStatus.FINISHED
+        return TimeTrialHeader(ttName = cleanedTitle, startTime = date, status = status)
     }
 
 }

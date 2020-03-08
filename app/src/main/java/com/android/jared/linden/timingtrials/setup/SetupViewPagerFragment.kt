@@ -65,6 +65,11 @@ class SetupViewPagerFragment: Fragment() {
             }
         })
 
+//        setupViewModel.orderRidersViewModel.numberRulesMediator.observe(requireActivity(), Observer {
+//
+//        })
+
+        setHasOptionsMenu(true)
 
         viewPager.offscreenPageLimit = 2
         // Set the icon and text for each tab
@@ -131,29 +136,6 @@ class SetupViewPagerFragment: Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         setupMenu = menu
-        when(view_pager2.currentItem){
-            RIDER_PAGE_INDEX->{
-                inflateRiderPageMenu(menu, inflater)
-            }
-            ORDER_RIDER_INDEX ->  {
-                inflateOrderPageMenu(menu, inflater)
-            }
-            TIMETRIAL_PAGE_INDEX-> {
-
-
-            }
-
-        }
-
-
-    }
-
-    private fun inflateOrderPageMenu(menu: Menu, inflater: MenuInflater){
-        inflater.inflate(R.menu.menu_setup, menu)
-        menu.findItem(R.id.settings_app_bar_search).isVisible = false
-    }
-
-    private fun inflateRiderPageMenu(menu: Menu, inflater: MenuInflater){
         inflater.inflate(R.menu.menu_setup, menu)
         menu.findItem(R.id.settings_app_bar_search).isVisible = true
         val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
@@ -196,9 +178,12 @@ class SetupViewPagerFragment: Fragment() {
         }
 
         menu.findItem(R.id.settings_menu_number_options).setOnMenuItemClickListener {
-            NumberOptionsDialog().show(childFragmentManager, "number_rules")
+            val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragmentToNumberOptionsDialog()
+            findNavController().navigate(action)
             true
         }
+
+
     }
 
 
@@ -255,58 +240,50 @@ class SetupPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
 class NumberOptionsDialog: DialogFragment(){
 
-    private lateinit var mBinding: FragmentNumberOptionsBinding
-    private lateinit var  mViewModel: IOrderRidersViewModel
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-       return activity?.let {
-            val builder = AlertDialog.Builder(it)
-            val inflater = it.layoutInflater
-           mViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.orderRidersViewModel
 
-            val binding = DataBindingUtil.inflate<FragmentNumberOptionsBinding>(inflater, R.layout.fragment_number_options, container, false).apply {
-                viewModel = mViewModel
-                radioGroup.setOnCheckedChangeListener { group, checkedId ->
-                    when(checkedId){
-                        ascendingRadioButton.id -> mViewModel.numberDirection.value = NumbersDirection.ASCEND
-                        else -> mViewModel.numberDirection.value = NumbersDirection.DESCEND
-                    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val mViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.orderRidersViewModel
+
+        setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Theme_AppCompat_Dialog_Alert);
+
+        val binding = DataBindingUtil.inflate<FragmentNumberOptionsBinding>(inflater, R.layout.fragment_number_options, container, false).apply {
+            viewModel = mViewModel
+            radioGroup.setOnCheckedChangeListener { group, checkedId ->
+                when(checkedId){
+                    ascendingRadioButton.id -> mViewModel.numberDirection.value = NumbersDirection.ASCEND
+                    else -> mViewModel.numberDirection.value = NumbersDirection.DESCEND
                 }
             }
-           mBinding = binding
+            button.setOnClickListener {
+                this@NumberOptionsDialog.dismiss()
+            }
+        }
 
-            builder.setView(binding.root)
-                    // Add action buttons
-                    .setPositiveButton(R.string.ok) { dialog, id ->
-
-
-                    }
-                    .setNegativeButton(R.string.cancel) { dialog, id ->
-                        getDialog()?.cancel()
-                    }
-            builder.create()
-        }?:throw IllegalStateException("Activity cannot be null")
-
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        mViewModel.numberRulesMediator.observe(viewLifecycleOwner, Observer {
+            val n = it
+        })
         mViewModel.numberDirection.observe(viewLifecycleOwner, Observer {
             it?.let {
                 when(it){
                     NumbersDirection.ASCEND -> {
-                        mBinding.ascendingRadioButton.isChecked = true
-                        mBinding.descendingRadioButton.isChecked = false
+                        binding.radioGroup.check(ascendingRadioButton.id)
                     }
                     else ->{
-                        mBinding.ascendingRadioButton.isChecked = false
-                        mBinding.descendingRadioButton.isChecked = true
+                        binding.radioGroup.check(descendingRadioButton.id)
+
                     }
+
                 }
+
 
             }
         })
-        super.onViewCreated(view, savedInstanceState)
+
+        return binding.root
     }
+
+
 
 
 }

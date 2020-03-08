@@ -29,7 +29,7 @@ class LineToCourseConverter: ILineToObjectConverter<Course> {
 
     override fun importLine(dataLine: String): Course? {
         try{
-            val dataList = dataLine.split(",", ignoreCase =  true)
+            val dataList = CSVUtils.lineToList(dataLine)
             val courseName = nameIndex?.let { dataList.getOrNull(it)}
             if(courseName == "Lee"){
                 throw Exception("Ug?")

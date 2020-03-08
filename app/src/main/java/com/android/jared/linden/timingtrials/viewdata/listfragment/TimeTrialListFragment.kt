@@ -36,7 +36,7 @@ class TimeTrialListFragment : Fragment() {
         viewFactory = TimeTrialViewHolderFactory(::longPress)
         adapter = GenericListAdapter(requireContext(), viewFactory)
         listViewModel.filteredAllTimeTrials.observe(viewLifecycleOwner, Observer{res->
-            res?.let {(adapter as? GenericListAdapter<TimeTrialHeader>)?.setItems(it)}
+            res?.let {adapter.setItems(it.sortedBy { it.status })}
         })
 
         viewManager = LinearLayoutManager(context)

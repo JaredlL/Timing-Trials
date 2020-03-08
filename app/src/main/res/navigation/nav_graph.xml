@@ -152,6 +152,9 @@
             android:name="timeTrialId"
             app:argType="long"
             android:defaultValue="-1L" />
+        <action
+            android:id="@+id/action_setupViewPagerFragment_to_numberOptionsDialog"
+            app:destination="@id/numberOptionsDialog" />
     </fragment>
     <fragment
         android:id="@+id/selectCourseFragment"
@@ -218,4 +221,9 @@
         android:name="com.android.jared.linden.timingtrials.settings.SettingsFragment"
         tools:layout="@layout/nav_view_header"
         android:label="Settings" />
+    <dialog
+        android:id="@+id/numberOptionsDialog"
+        tools:layout="@layout/fragment_number_options"
+        android:name="com.android.jared.linden.timingtrials.setup.NumberOptionsDialog"
+        android:label="NumberOptionsDialog" />
 </navigation>

@@ -138,7 +138,7 @@ interface IResult{
     val category: String
     val gender: Gender
     val laps: Int
-    val resultTime: Long
+    val resultTime: Long?
     val splits: List<Long>
     val dateSet: OffsetDateTime?
     val timeTrial: TimeTrialHeader?

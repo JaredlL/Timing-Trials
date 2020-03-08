@@ -12,7 +12,7 @@ class LineToRiderConverterTest {
         var heading = "firstname,lastname,club,time"
         var line = "jared,linden,RDFCC,23:40"
 
-        val riderImporter = LineToRiderConverter()
+        val riderImporter = LineToResultRiderConverter()
         riderImporter.setHeading(heading)
         var import = riderImporter.importLine(line)
 

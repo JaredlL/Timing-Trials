@@ -1,12 +1,12 @@
 package com.android.jared.linden.timingtrials
 
-import android.content.ContentResolver
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.view.View
-import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -20,7 +20,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.android.jared.linden.timingtrials.domain.JsonResultsWriter
 import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.EventObserver
 import com.android.jared.linden.timingtrials.util.getViewModel
@@ -31,7 +30,6 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
-import java.io.File
 import java.io.IOException
 import kotlin.math.abs
 
@@ -224,14 +222,37 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     private fun importData(uri: Uri){
         val importVm = getViewModel { injector.importViewModel()}
         val inputStream = contentResolver.openInputStream(uri)
+        val fName = getFileName(uri)
 
         //Toast.makeText(this, b, Toast.LENGTH_SHORT).show()
         if(inputStream != null){
-            importVm.readInput(uri.path, inputStream)
+            importVm.readInput(fName, inputStream)
             importVm.importMessage.observe(this, EventObserver {
                 Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
             })
         }
+    }
+
+    fun getFileName(uri: Uri): String? {
+        var result: String? = null
+        if (uri.scheme == "content") {
+            val cursor: Cursor? = contentResolver.query(uri, null, null, null, null)
+            cursor.use { cursor ->
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.path
+            result?.let{
+                val cut = it.lastIndexOf('/')
+                if (cut != -1) {
+                    result = it.substring(cut + 1)
+                }
+            }
+        }
+        return result
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

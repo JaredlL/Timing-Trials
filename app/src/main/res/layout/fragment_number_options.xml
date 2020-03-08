@@ -12,16 +12,16 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
 
         <RadioGroup
             android:id="@+id/radioGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/editText2"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -43,21 +43,23 @@
             android:id="@+id/textView21"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:text="Start at:"
             app:layout_constraintBottom_toBottomOf="@+id/editText2"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintEnd_toStartOf="@+id/editText2" />
 
         <EditText
             android:id="@+id/editText2"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="number"
+            android:layout_marginEnd="48dp"
             android:ems="5"
+            android:inputType="number"
             android:text="@={viewModel.startNumber}"
             app:layout_constraintBottom_toBottomOf="@+id/radioGroup"
-            app:layout_constraintStart_toStartOf="@+id/editText4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/radioGroup"
             tools:text="1" />
 
@@ -77,24 +79,33 @@
             android:id="@+id/textView27"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:text="Exclusions"
             app:layout_constraintBottom_toBottomOf="@+id/editText4"
-            app:layout_constraintStart_toStartOf="@+id/divider7"
+            app:layout_constraintEnd_toEndOf="@+id/textView21"
             app:layout_constraintTop_toBottomOf="@+id/divider7" />
 
         <EditText
             android:id="@+id/editText4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
-            android:ems="10"
-            android:text="@={viewModel.exclusions}"
-            android:inputType="number"
             android:digits="0123456789.,"
-            app:layout_constraintStart_toEndOf="@+id/textView27"
+            android:ems="6"
+            android:inputType="number"
+            android:text="@={viewModel.exclusions}"
+            app:layout_constraintEnd_toEndOf="@+id/radioGroup"
+            app:layout_constraintStart_toEndOf="@+id/textView21"
             app:layout_constraintTop_toBottomOf="@+id/divider7" />
+
+        <Button
+            android:id="@+id/button"
+            style="@android:style/Widget.Material.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/ok"
+            app:layout_constraintEnd_toEndOf="@+id/radioGroup"
+            app:layout_constraintTop_toBottomOf="@+id/editText4" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,11 +1,8 @@
 package com.android.jared.linden.timingtrials.domain
 
 import com.android.jared.linden.timingtrials.data.TimeTrial
-import com.android.jared.linden.timingtrials.domain.RiderResultIO
-import com.android.jared.linden.timingtrials.domain.TimeTrialIO
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.io.*
 import java.util.zip.ZipEntry

@@ -12,15 +12,18 @@ import com.android.jared.linden.timingtrials.domain.JsonResultsWriter
 import com.android.jared.linden.timingtrials.domain.TimeTrialIO
 import com.android.jared.linden.timingtrials.domain.TimingTrialsExport
 import com.android.jared.linden.timingtrials.domain.csv.LineToCourseConverter
-import com.android.jared.linden.timingtrials.domain.csv.LineToRiderConverter
+import com.android.jared.linden.timingtrials.domain.csv.LineToResultRiderConverter
 import com.android.jared.linden.timingtrials.domain.csv.LineToTimeTrialConverter
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import com.android.jared.linden.timingtrials.util.Event
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
 import java.io.*
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
@@ -33,58 +36,71 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
     val writeAllResult: MutableLiveData<Event<String>> = MutableLiveData()
 
+    val isIoInProgress = AtomicBoolean()
+
     fun writeAllTimeTrialsToPath(outputStream: OutputStream){
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-
-
-                val allTts = timeTrialRepository.allTimeTrials()
-                JsonResultsWriter().writeToPath(outputStream, allTts)
-                writeAllResult.postValue(Event("Success"))
-            }catch (e:Exception){
-                writeAllResult.postValue(Event(e.message?:"Error"))
+            if(isIoInProgress.compareAndSet(false, true)){
+                try {
+                    val allTts = timeTrialRepository.allTimeTrials()
+                    JsonResultsWriter().writeToPath(outputStream, allTts)
+                    writeAllResult.postValue(Event("Success"))
+                }catch (e:Exception){
+                    writeAllResult.postValue(Event(e.message?:"Error"))
+                }finally {
+                    isIoInProgress.set(false)
+                }
             }
+
         }
     }
 
     fun readInput(title: String?, inputStream: InputStream){
         viewModelScope.launch(Dispatchers.IO) {
+            if(isIoInProgress.compareAndSet(false, true)){
+                try {
+                    val buf = BufferedInputStream(inputStream)
+                    buf.mark(100)
+                    val zis = ZipInputStream(buf)
+                    val nextZipped = zis.nextEntry
+                    var fString = ""
+                    if(nextZipped!= null){
+                        //val reader2 = BufferedReader(BufferedInputStream(zis))
+                        val sb = StringBuilder()
+                        val buffer = ByteArray(1024)
+                        var read = 0
 
-            val buf = BufferedInputStream(inputStream)
-            buf.mark(100)
-            val zis = ZipInputStream(buf)
-            val nextZipped = zis.nextEntry
-            var fString = ""
-           if(nextZipped!= null){
-               //val reader2 = BufferedReader(BufferedInputStream(zis))
-               val sb = StringBuilder()
-               val buffer = ByteArray(1024)
-               var read = 0
-
-               while (zis.read(buffer, 0, 1024).also { read = it } >= 0) {
-                   //read = zis.read(buffer, 0, 1024)
-                   sb.append(String(buffer, 0, read))
-               }
-               fString = sb.toString()
-               zis.close()
-            }else{
-               buf.reset()
-               val reader = BufferedReader(InputStreamReader(buf))
-               fString = reader.readText()
-               reader.close()
-           }
+                        while (zis.read(buffer, 0, 1024).also { read = it } >= 0) {
+                            //read = zis.read(buffer, 0, 1024)
+                            sb.append(String(buffer, 0, read))
+                        }
+                        fString = sb.toString()
+                        zis.close()
+                    }else{
+                        buf.reset()
+                        val reader = BufferedReader(InputStreamReader(buf))
+                        fString = reader.readText()
+                        reader.close()
+                    }
 
 
-            //reader.close()
-            val firstNonWhitespaceChar = fString.asSequence().first { !it.isWhitespace() }
+                    //reader.close()
+                    val firstNonWhitespaceChar = fString.asSequence().first { !it.isWhitespace() }
 
-            val msg = if(firstNonWhitespaceChar == "{".first() || firstNonWhitespaceChar == "[".first()){
-                readJsonInputIntoDb(fString)
-            }else{
-                readCsvInputIntoDb(fString)
+                    val msg = if(firstNonWhitespaceChar == "{".first() || firstNonWhitespaceChar == "[".first()){
+                        readJsonInputIntoDb(fString)
+                    }else{
+                        readCsvInputIntoDb(title?:"TimeTrial", fString)
+                    }
+
+                    importMessage.postValue(Event(msg))
+                }catch (e: Exception){
+                    importMessage.postValue(Event(e.message?:"Error reading file: ${e.message}"))
+                }finally {
+                    isIoInProgress.set(false)
+                }
             }
 
-            importMessage.postValue(Event(msg))
 
             //readCsvInputIntoDb(inputStream)
         }
@@ -93,6 +109,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
     val READING_TT = 0
     val READING_COURSE = 1
     val READING_RIDER = 2
+    val READING_CTT_RIDER = 3
 
     val importMessage: MutableLiveData<Event<String>> = MutableLiveData<Event<String>>()
 
@@ -109,19 +126,18 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
         }
     }
 
-    private suspend fun readCsvInputIntoDb(fileString: String): String{
+
+    private suspend fun readCsvInputIntoDb(fileName: String, fileContents: String): String{
         try{
             val lineToTt = LineToTimeTrialConverter()
             val lineToCourse = LineToCourseConverter()
-            val lineToRider = LineToRiderConverter()
-
-            val lineList = fileString.lineSequence()
+            val lineToRider = LineToResultRiderConverter()
 
             val timeTrialList: MutableList<TimeTrialIO> = mutableListOf()
             var state = READING_TT
 
-            for  (fileLine in fileString.lineSequence()){
-                val currentLine = fileLine.replace(""""""", "")
+            for  (fileLine in fileContents.lineSequence()){
+                val currentLine = fileLine
                 if(lineToTt.isHeading(currentLine)){
                     lineToTt.setHeading(currentLine)
                     timeTrialList.add(TimeTrialIO())
@@ -133,6 +149,9 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
                 }else if (lineToRider.isHeading(currentLine)){
                     lineToRider.setHeading(currentLine)
+                    if(timeTrialList.isEmpty()){
+                        timeTrialList.add(TimeTrialIO(timeTrialHeader = lineToTt.fromCttTitle(fileName)))
+                    }
                     state = READING_RIDER
                 }
                 else{
@@ -154,7 +173,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                         }
                         READING_RIDER->{
                             lineToRider.importLine(currentLine)?.let {
-                                timeTrialList.lastOrNull()?.results?.add(it)
+                                timeTrialList.lastOrNull()?.timeTrialRiders?.add(it)
                             }
                         }
                     }
@@ -171,13 +190,13 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             }
             return "Imported ${timeTrialList.count()} timetrials"
         }catch (e:Exception){
-            return "Failed to import data ${e.message}"
+            return "Failed to import csv data ${e.message}"
         }
 
 
     }
 
-    suspend fun addImportTtToDb(importTt: TimeTrialIO){
+    suspend fun  addImportTtToDb(importTt: TimeTrialIO){
         val header = importTt.timeTrialHeader
         val course = importTt.course
 
@@ -220,7 +239,57 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                     "Unknown TT"
                 }
             }
-            val headerToInsert = header.copy(ttName = headerName, courseId = courseInDb?.id, status = header.status)
+           val status = when {
+               importTt.timeTrialRiders.all { it.finishTime == null } -> {
+                   TimeTrialStatus.SETTING_UP
+               }
+               importTt.timeTrialRiders.all { it.startTime == null } -> {
+                   TimeTrialStatus.FINISHED
+               }
+               else -> {
+                   header.status
+               }
+           }
+            val firstRider = importTt.timeTrialRiders.firstOrNull()
+            var firstRiderStartOffset = header.firstRiderStartOffset
+            var startTime = header.startTime
+            if(status == TimeTrialStatus.SETTING_UP && firstRider != null) {
+                firstRider.startTime?.let {
+                    startTime = OffsetDateTime.of(header.startTime.year, header.startTime.monthValue, header.startTime.dayOfMonth, it.hour, it.minute - 1, it.second, 0, ZoneId.systemDefault().rules.getOffset(Instant.now()))
+                    firstRiderStartOffset = 60
+                }
+            }
+
+            var numberRules = header.numberRules
+            var interval = header.interval
+            val secondRider = importTt.timeTrialRiders.getOrNull(1)
+            if(firstRider != null && secondRider != null){
+                val fst = firstRider.startTime
+                val sst = secondRider.startTime
+                if(fst != null && sst != null){
+                    interval = sst.toSecondOfDay() - fst.toSecondOfDay()
+                }
+                var firstBib = 1
+                var direction = NumbersDirection.ASCEND
+                if(firstRider.bib != null && secondRider.bib != null){
+                    firstBib = firstRider.bib
+                    direction = if(secondRider.bib < firstRider.bib){
+                        NumbersDirection.DESCEND
+                    }else{
+                        NumbersDirection.ASCEND
+                    }
+                }
+                numberRules = NumberRules(firstBib, true, direction, listOf())
+            }
+
+            val headerToInsert = header.copy(
+                    ttName = headerName,
+                    courseId = courseInDb?.id,
+                    status = status,
+                    interval = interval,
+                    firstRiderStartOffset = firstRiderStartOffset,
+                    numberRules = numberRules,
+            startTime = startTime)
 
             val headerList = timeTrialRepository.getHeadersByName(headerName)
 
@@ -240,9 +309,9 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             }
 
         }
-        importTt.results.filter { it.firstName.isNotBlank() }.forEach {importRider->
+        importTt.timeTrialRiders.asSequence().filter { it.firstName.isNotBlank() }.sortedBy { it.bib?:it.startTime?.toSecondOfDay()?:0 }.forEachIndexed { index, importRider ->
 
-            val existingRiders = riderRespository.ridersFromFirstLastName(importRider.firstName, importRider.lastName?:"")
+            val existingRiders = riderRespository.ridersFromFirstLastName(importRider.firstName, importRider.lastName)
             //var timeTrialRider:TimeTrialRider? = null
             val riderInDbId:Rider = when(existingRiders.size){
                 0->{
@@ -266,7 +335,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             }
 
             riderInDbId.id?.let {
-                val fTime =  importRider.finishTime
                 val gen = if(importRider.gender != Gender.UNKNOWN)
                 {
                     importRider.gender}
@@ -274,24 +342,21 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                     riderInDbId.gender
                 }
 
-                if(fTime > 0){
-
-
 
                     val timeTrialRider = TimeTrialRider(
                             riderId = it,
                             timeTrialId = headerInDb?.id,
                             courseId = courseInDb?.id,
-                            index = 0,
-                            finishTime = if (headerInDb?.status == TimeTrialStatus.FINISHED) fTime else 0L,
-                            splits = if (headerInDb?.status == TimeTrialStatus.FINISHED) transformSplits(importRider.splits, importRider.finishTime) else listOf(),
+                            index = index,
+                            finishTime = if (headerInDb?.status == TimeTrialStatus.FINISHED) importRider.finishTime else null,
+                            splits = if (headerInDb?.status == TimeTrialStatus.FINISHED) transformSplits(importRider.splits) else listOf(),
                             category = importRider.category,
                             gender = gen,
                             club = importRider.club,
                             resultNote = importRider.notes
                     )
                     insertTimeTrialRider(timeTrialRider)
-                }
+
 
             }
 
@@ -301,7 +366,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
     }
 
-    fun transformSplits(splits: List<Long>, targetTime: Long): List<Long>{
+    fun transformSplits(splits: List<Long>): List<Long>{
 
         if(splits.size <= 1) return splits
 
@@ -320,11 +385,10 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
     suspend fun insertTimeTrialRider(timeTrialRider: TimeTrialRider){
 
         val riderId = timeTrialRider.riderId
-        val courseId = timeTrialRider.courseId
         val timeTrialId = timeTrialRider.timeTrialId
 
-        if(courseId != null && timeTrialId != null){
-            val existing = timeTrialRiderRepository.getByRiderCourseTimeTrialIds(riderId, courseId, timeTrialId)
+        if(timeTrialId != null){
+            val existing = timeTrialRiderRepository.getByRiderTimeTrialIds(riderId, timeTrialId)
 
             when(existing.size){
                 0->{

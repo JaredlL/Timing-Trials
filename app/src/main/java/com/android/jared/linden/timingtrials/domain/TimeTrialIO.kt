@@ -1,29 +1,34 @@
 package com.android.jared.linden.timingtrials.domain
 
 import com.android.jared.linden.timingtrials.data.*
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.LocalTime
 
 
 data class ImportAttempt<T>(val sucess: Boolean, val data: T, val message: String?)
 
 data class TimingTrialsExport(val timingTrialsData: List<TimeTrialIO>)
 
-data class TimeTrialIO(var timeTrialHeader: TimeTrialHeader? = null, var course: Course? = null, val results: MutableList<RiderResultIO> = mutableListOf()){
+data class TimeTrialIO(var timeTrialHeader: TimeTrialHeader? = null, var course: Course? = null, val timeTrialRiders: MutableList<TimeTrialRiderIO> = mutableListOf()){
     constructor(timeTrial: TimeTrial) : this(
             timeTrial.timeTrialHeader,
             timeTrial.course,
-            timeTrial.helper.results.map { RiderResultIO(it) }.toMutableList()
+            timeTrial.helper.results.map { TimeTrialRiderIO(it) }.toMutableList()
     )
 }
 
-data class RiderResultIO(
+
+data class TimeTrialRiderIO(
         val firstName:String = "",
         val lastName:String = "",
         val club: String = "",
         val category:String = "",
         val gender: Gender = Gender.UNKNOWN,
-        val finishTime: Long = 0L,
+        val finishTime: Long? = null,
         val splits: List<Long> = listOf(),
-        val notes:String = "") {
+        val notes:String = "",
+        val bib: Int? = null,
+        val startTime: LocalTime? = null) {
 
     constructor(result:IResult) : this(
             result.rider.firstName,

@@ -34,17 +34,22 @@ object ConverterUtils{
     }
 
 
-    fun toSecondsDisplayString(milliseconds: Long): String{
-        val millis = abs(milliseconds)
-        val secs =  (millis/1000)
-        return String.format("%d:%02d:%02d", secs / 3600, (secs % 3600) / 60, (secs % 60))
+    fun toSecondsDisplayString(milliseconds: Long?): String{
+        return milliseconds?.let {
+            val millis = abs(milliseconds)
+            val secs =  (millis/1000)
+            String.format("%d:%02d:%02d", secs / 3600, (secs % 3600) / 60, (secs % 60))
+        }?:""
+
     }
 
-    fun toTenthsDisplayString(milliseconds: Long): String{
-        if(milliseconds == Long.MAX_VALUE) return ""
-        val milis = abs(milliseconds)
-        val secs =  (milis/1000)
-        return String.format("%d:%02d:%02d.%1d", secs / 3600, (secs % 3600) / 60, (secs % 60),  (milis % 1000) / 100)
+    fun toTenthsDisplayString(milliseconds: Long?): String{
+        return milliseconds?.let {
+            val milis = abs(milliseconds)
+            val secs =  (milis/1000)
+            return String.format("%d:%02d:%02d.%1d", secs / 3600, (secs % 3600) / 60, (secs % 60),  (milis % 1000) / 100)
+        }?:""
+
     }
 
 

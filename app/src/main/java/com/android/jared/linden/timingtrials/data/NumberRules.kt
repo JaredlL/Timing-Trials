@@ -23,11 +23,15 @@ data class NumberRules(val terminus: Int = 1, val isStart: Boolean = true, val d
 
         val dxToUse = if(isStart) index else totalCount - index
 
-            val dir = if(direction == NumbersDirection.ASCEND) 1 else -1
-            val num = (dxToUse + 1) * dxToUse * dir
-            val range = terminus..num
-            val count = exclusions.count { range.contains(it) }
-            return num + count
+        val dir = if(direction == NumbersDirection.ASCEND) 1 else -1
+        val num = (terminus) + dxToUse * dir
+        val range = terminus..num
+        val count = exclusions.count { range.contains(it) }
+        var retnumnum = num + count
+        while (exclusions.contains(retnumnum)){
+            retnumnum+=1
+        }
+        return retnumnum
 
     }
 
@@ -42,13 +46,15 @@ data class NumberRules(val terminus: Int = 1, val isStart: Boolean = true, val d
                 var direction = NumbersDirection.ASCEND
                 val exc = mutableListOf<Int>()
                 for(s in str.splitToSequence(",").withIndex()){
-                    val intVal = s.value.toInt()
-                    when(s.index){
-                        1 -> term = intVal
-                        2-> isStart = intVal == 1
-                        3 -> if(intVal == 1) direction = NumbersDirection.DESCEND
-                        else-> exc.add((intVal))
+                   s.value.toIntOrNull()?.let {
+                        when(s.index){
+                            0 -> term = it
+                            1-> isStart = it == 1
+                            2 -> direction = if(it == 1) NumbersDirection.DESCEND else NumbersDirection.ASCEND
+                            else-> exc.add((it))
+                        }
                     }
+
                 }
                 return  NumberRules(term, isStart, direction, exc)
             }
@@ -68,10 +74,10 @@ data class NumberRules(val terminus: Int = 1, val isStart: Boolean = true, val d
                 sb.append(if(rules.isStart) 1 else 0)
                 sb.append(",")
                 sb.append(rules.direction.ordinal)
-                sb.append(",")
                 for(x in rules.exclusions){
-                    sb.append(x)
                     sb.append(",")
+                    sb.append(x)
+
                 }
                 sb.toString()
             }
