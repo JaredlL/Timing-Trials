@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDate
 import org.threeten.bp.OffsetDateTime
 
-@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, TimeTrialRider::class], version = 38, exportSchema = false)
+@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, TimeTrialRider::class], version = 39, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 

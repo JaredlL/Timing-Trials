@@ -272,8 +272,10 @@ class LineToResultRiderConverter: ILineToObjectConverter<TimeTrialRiderIO> {
     override fun importLine(dataLine: String): TimeTrialRiderIO? {
         var importRider = TimeTrialRiderIO()
 
+        val lineList = CSVUtils.lineToList(dataLine)
+
         for(fieldFiller in stringToFieldList){
-            importRider = fieldFiller.applyFieldToObject(CSVUtils.lineToList(dataLine), importRider)
+            importRider = fieldFiller.applyFieldToObject(lineList, importRider)
         }
         val ir = importRider
         return if(ir.firstName.isNotBlank()){

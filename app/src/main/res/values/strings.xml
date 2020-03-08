@@ -88,6 +88,7 @@
     <string name="export_json">Export .tt</string>
     <string name="screenshot">Screenshot</string>
     <string name="delete_results">Delete Results</string>
+    <string name="clear_notes">Clear Notes</string>
     <string name="missed_start_move_to_back">Missed start, move to back</string>
     <string name="rider_dns_did_not_start">Rider DNS (did not start)</string>
     <string name="rider_dnf_did_not_finish">Rider DNF (Did not finish)</string>

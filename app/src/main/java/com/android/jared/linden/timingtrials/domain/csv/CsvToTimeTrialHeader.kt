@@ -11,11 +11,17 @@ object CSVUtils{
         val result: MutableList<String> = ArrayList()
         var start = 0
         var inQuotes = false
-        for (current in 0 until input.length) {
+        for (current in input.indices) {
             if (input[current] == '\"') inQuotes = !inQuotes // toggle state
             val atLastChar = current == input.length - 1
             if (atLastChar) {
-                result.add(input.substring(start).replace(""""""", ""))
+                val lastString = input.substring(start).replace(""""""", "")
+                val sToAdd = if(lastString.endsWith(",")){
+                    lastString.dropLast(1)
+                }else{
+                    lastString
+                }
+                result.add(sToAdd)
             }
             else if (input[current] == ',' && !inQuotes) {
                 result.add(input.substring(start, current).replace(""""""", ""))
@@ -28,6 +34,13 @@ object CSVUtils{
 
 class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
 
+    val NAME = "name"
+    val DATE = "date"
+    val LAPS = "laps"
+    val STATUS = "status"
+    val DESCRIPTION = "description"
+    val NOTES = "notes"
+
     override fun isHeading(line:String): Boolean{
         return line.splitToSequence(",", ignoreCase = true).any{it.contains("TimeTrial Name", true)}
     }
@@ -36,16 +49,17 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
     var dateindex:Int? = null
     var lapsIndex:Int? = null
     var statusIndex:Int? = null
+    var notesIndex:Int? = null
 
 
     override fun setHeading(headingLine: String){
         val splitLine = CSVUtils.lineToList(headingLine)
 
-        nameIndex = splitLine.withIndex().firstOrNull { it.value.contains("name", true) }?.index
-        dateindex= splitLine.withIndex().firstOrNull { it.value.contains("date", true) }?.index
-        lapsIndex= splitLine.withIndex().firstOrNull { it.value.contains("laps", true) }?.index
-        statusIndex = splitLine.withIndex().firstOrNull { it.value.contains("status", true) }?.index
-
+        nameIndex = splitLine.withIndex().firstOrNull { it.value.contains(NAME, true) }?.index
+        dateindex= splitLine.withIndex().firstOrNull { it.value.contains(DATE, true) }?.index
+        lapsIndex= splitLine.withIndex().firstOrNull { it.value.contains(LAPS, true) }?.index
+        statusIndex = splitLine.withIndex().firstOrNull { it.value.contains(STATUS, true) }?.index
+        notesIndex = splitLine.withIndex().firstOrNull { it.value.contains(DESCRIPTION, true) || it.value.contains(NOTES, true) }?.index
     }
 
     val formatList = listOf("d/m/y", "d-M-y","d/M/y")
@@ -67,10 +81,11 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
                     val b = e
                 }
             }
+            val notes = notesIndex?.let { (dataList.getOrNull(it)) }?:""
             val offsetDateTime = date?.let { OffsetDateTime.of(it, LocalTime.of(19,0,0), ZoneId.systemDefault().rules.getOffset(Instant.now()))}
             val laps = lapsIndex?.let { dataList.getOrNull(it)?.toIntOrNull() }?:1
 
-            return TimeTrialHeader(ttName, null, laps,60, offsetDateTime?: OffsetDateTime.MIN, status = status?:TimeTrialStatus.FINISHED)
+            return TimeTrialHeader(ttName, null, laps,60, offsetDateTime?: OffsetDateTime.MIN, status = status?:TimeTrialStatus.FINISHED, notes = notes)
 
         }catch (e:Exception){
             throw Exception("Error reading timetrial data", e)

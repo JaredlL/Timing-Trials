@@ -6,6 +6,9 @@ import com.android.jared.linden.timingtrials.data.roomrepo.*
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val riderRepository: IRiderRepository, val courseRepository: ICourseRepository, val resultRepository: TimeTrialRiderRepository) : ViewModel() {
@@ -34,8 +37,6 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
         }
 
     }
-
-
 
 
     fun delete(){
@@ -95,4 +96,4 @@ class ResultRowViewModel{
 
     }
 }
-class ResultCell(val content:LiveData<String>)
+class ResultCell(val content:MutableLiveData<String>)
