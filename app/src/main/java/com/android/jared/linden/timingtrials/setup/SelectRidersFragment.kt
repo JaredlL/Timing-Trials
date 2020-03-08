@@ -13,12 +13,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
+import com.android.jared.linden.timingtrials.IFabCallbacks
 import com.android.jared.linden.timingtrials.R
 
 import com.android.jared.linden.timingtrials.adapters.SelectableRiderListAdapter
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.android.jared.linden.timingtrials.util.*
+import kotlinx.android.synthetic.main.fragment_selectrider_list.*
 
 
 /**
@@ -44,6 +46,14 @@ class SelectRidersFragment : Fragment() {
         adapter.setHasStableIds(true)
         adapter.editRider = ::editRider
 
+        (requireActivity() as IFabCallbacks).apply {
+            setVisibility(View.VISIBLE)
+            setImage(R.drawable.ic_add_white_24dp)
+            setAction {
+                editRider(0)
+            }
+        }
+
         val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
             lifecycleOwner = (this@SelectRidersFragment)
             riderHeading.rider =  Rider.createBlank().copy( firstName = "Name", club = "Club")
@@ -51,13 +61,16 @@ class SelectRidersFragment : Fragment() {
             riderRecyclerView.adapter = adapter
             riderRecyclerView.layoutManager = viewManager
 
-            riderListFab.setOnClickListener {
-                editRider(0)
-            }
+//            riderListFab.setOnClickListener {
+//                editRider(0)
+//            }
         }
 
-        adapter.riderSelectionChanged ={selectedRiders->
-            viewModel.updateSelectedRiders(selectedRiders)
+        adapter.addRiderToSelection = {
+            viewModel.addRiderToTt(it)
+        }
+        adapter.removeRiderFromSelection = {
+            viewModel.removeRiderFromTt(it)
         }
 
         viewModel.selectedRidersInformation.observe(viewLifecycleOwner, Observer {result->

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.databinding.ListItemGenericBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemSelectableRiderBinding
+import com.android.jared.linden.timingtrials.ui.GenericListItemNext
 import com.android.jared.linden.timingtrials.ui.IGenericListItem
 
 class GenericListItemAdapter internal constructor(val context: Context): RecyclerView.Adapter<GenericListItemAdapter.GenericListItemViewHolder>() {
@@ -22,6 +23,12 @@ class GenericListItemAdapter internal constructor(val context: Context): Recycle
             binding.apply{
                 item = genericItem
 
+                genericTextView1.setOnClickListener {
+                    onClick(genericItem.item1.next)
+                }
+                genericTextView2.setOnClickListener {
+                    onClick(genericItem.item2.next)
+                }
                 executePendingBindings()
             }
         }
@@ -30,6 +37,8 @@ class GenericListItemAdapter internal constructor(val context: Context): Recycle
     private var mItems: List<IGenericListItem> = listOf()
     //var mSelected: ArrayList<Long> = arrayListOf()
     val layoutInflater = LayoutInflater.from(context)
+
+    var onClick = {item: GenericListItemNext -> Unit}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GenericListItemViewHolder {
 

@@ -5,19 +5,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.android.jared.linden.timingtrials.BR
+import androidx.databinding.library.baseAdapters.BR
+
 
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
+import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.databinding.FragmentTimerBinding
+import com.android.jared.linden.timingtrials.domain.ITimelineEvent
 import com.android.jared.linden.timingtrials.ui.EventViewWrapper
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_timer.*
-import org.threeten.bp.Instant
 
 /**
  * A simple [Fragment] subclass.
@@ -66,8 +70,17 @@ class TimerFragment : Fragment() {
             }
         })
 
+        adapter.setHasStableIds(true)
+
+        adapter.longClick = {
+
+                showEventDialog(it)
+
+
+        }
+
         timingViewModel.timeString.observe(viewLifecycleOwner, Observer {
-            val b = "g"
+
         })
 
 
@@ -82,6 +95,19 @@ class TimerFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    fun showEventDialog(event: ITimelineEvent){
+        AlertDialog.Builder(requireActivity())
+                .setTitle("Unassign Event")
+                .setMessage("Unassign ${event.rider?.riderData?.fullName()} from event?")
+                .setPositiveButton("Yes, unassign"){_,_->
+                    timingViewModel.unassignRiderFromEvent(event)
+                }
+                .setNegativeButton("Dismiss"){_,_->
+
+                }
+                .create().show()
     }
 
     companion object {

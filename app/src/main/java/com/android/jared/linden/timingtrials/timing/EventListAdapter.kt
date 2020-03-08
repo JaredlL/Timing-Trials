@@ -8,8 +8,11 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
+import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.databinding.ListItemEventButtonBinding
 import com.android.jared.linden.timingtrials.databinding.ListItemEventTextBinding
+import com.android.jared.linden.timingtrials.domain.ITimelineEvent
 import com.android.jared.linden.timingtrials.domain.TimelineEventType
 import com.android.jared.linden.timingtrials.ui.EventViewWrapper
 
@@ -33,23 +36,37 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
             _binding.apply {
                 event = eventWrapper
 
-                if(eventWrapper.event.eventType == TimelineEventType.RIDER_PASSED){
-                    text1.setTextColor(Color.BLUE)
+                when (eventWrapper.event.eventType) {
+                    TimelineEventType.RIDER_PASSED -> {
+                        text1.setTextColor(context.resources.getColor(R.color.colorPrimary))
+                    }
+                    TimelineEventType.RIDER_FINISHED -> {
+                        text1.setTextColor(context.resources.getColor(R.color.colorAccent))
+                    }
+                    else -> {
+                        text1.setTextColor(context.resources.getColor(R.color.mainBackground))
+                    }
                 }
-                else if(eventWrapper.event.eventType == TimelineEventType.RIDER_FINISHED){
-                    text1.setTextColor(Color.MAGENTA)
+                val event = eventWrapper.event
+                if(event.rider != null && event.eventType != TimelineEventType.RIDER_STARTED){
+                    listItemEventTextContraint.setOnLongClickListener {
+                        longClick(event)
+                        true
+                    }
                 }else{
-                    text1.setTextColor(Color.BLACK)
+                    listItemEventTextContraint.setOnLongClickListener { false }
                 }
+
                 executePendingBindings()
             }
 
         }
     }
 
+    var longClick = {_: ITimelineEvent -> Unit}
 
-    var mEvents: List<EventViewWrapper> = listOf()
-    val layoutInflater = LayoutInflater.from(context)
+    private var mEvents: List<EventViewWrapper> = listOf()
+    private val layoutInflater = LayoutInflater.from(context)
 
     fun setEvents(newEvents: List<EventViewWrapper>){
         mEvents = newEvents
@@ -78,6 +95,10 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
         }
     }
 
+    override fun getItemId(position: Int): Long {
+        return mEvents[position].event.timeStamp
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when(viewType){
             R.layout.list_item_event_button ->{
@@ -93,7 +114,7 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
 
     override fun getItemViewType(position: Int): Int {
         val ev = mEvents[position].event
-        return if (ev.eventType == TimelineEventType.RIDER_PASSED && ev.riderId == null) R.layout.list_item_event_button else R.layout.list_item_event_text
+        return if (ev.eventType == TimelineEventType.RIDER_PASSED && ev.rider == null) R.layout.list_item_event_button else R.layout.list_item_event_text
         //return mEvents[position].event.eventType.ordinal
     }
 

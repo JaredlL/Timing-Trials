@@ -1,11 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
+<ripple android:color="@color/mainBackground"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <corners android:radius="9dp" />
-    <solid android:color="@color/eventButtonColor" />
-    <stroke
-        android:width="1dip"
-        android:color="@color/mainBackground" />
-</shape>
+    <item>
+        <selector>
+            <!-- When selected, use grey -->
+            <item
+                android:state_checked="true">
+
+                <shape android:shape="rectangle">
+                    <corners android:radius="8dp" />
+                    <solid android:color="@color/numberColor" />
+                    <stroke
+                        android:width="1dip"
+                        android:color="@color/mainBackground" />
+                </shape>
+
+            </item>
+
+            <!-- When not selected, use white-->
+            <item
+                android:state_checked="false">
+                <shape android:shape="rectangle">
+
+                    <corners android:radius="8dp" />
+                    <solid android:color="@color/buttonInactive" />
+                    <stroke
+                        android:width="1dip"
+                        android:color="@color/mainBackground" />
+
+                </shape>
+            </item>
+
+        </selector>
+
+    </item>
+
+
+</ripple>

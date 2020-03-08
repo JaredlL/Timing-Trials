@@ -52,14 +52,15 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/courseListFab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
-            android:src="@drawable/ic_add_black_24dp"
-            app:layout_anchorGravity="bottom|end" />
+<!--        <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--            android:id="@+id/courseListFab"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="bottom|end"-->
+<!--            android:layout_marginBottom="80dp"-->
+<!--            android:layout_marginEnd="@dimen/fab_margin"-->
+<!--            android:src="@drawable/ic_add_white_24dp"-->
+<!--            app:layout_anchorGravity="bottom|end" />-->
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

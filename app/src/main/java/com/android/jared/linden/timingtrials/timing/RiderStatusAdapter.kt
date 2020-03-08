@@ -6,7 +6,9 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.databinding.ListItemRiderStatusBinding
+import com.android.jared.linden.timingtrials.ui.RiderStatus
 import com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper
 
 class RiderStatusAdapter internal constructor(val context: Context): RecyclerView.Adapter<RiderStatusAdapter.RiderStatusViewHolder>(){
@@ -17,6 +19,21 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
         fun bind(status: RiderStatusViewWrapper){
             _binding.apply {
                 viewModel = status
+
+                riderStatusTextView.background = when(status.status){
+                    RiderStatus.NOT_STARTED -> context.getDrawable(R.drawable.background_rider_status_inactive)
+                    RiderStatus.RIDING -> context.getDrawable(R.drawable.background_rider_status_active)
+                    RiderStatus.DNS -> context.getDrawable(R.drawable.background_rider_status_dnf)
+                    RiderStatus.DNF -> context.getDrawable(R.drawable.background_rider_status_dnf)
+                    else-> context.getDrawable(R.drawable.background_rider_status_inactive)
+                }
+
+                riderStatusTextView.setOnLongClickListener {
+                    onLongClick(status)
+                    true
+                }
+
+
                 executePendingBindings()
             }
 
@@ -25,6 +42,8 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
 
     var mStatus: List<RiderStatusViewWrapper> = listOf()
     val layoutInflater = LayoutInflater.from(context)
+
+    var onLongClick = {rider: RiderStatusViewWrapper -> Unit}
 
     fun setRiderStatus(newStatus: List<RiderStatusViewWrapper>){
         mStatus = newStatus
@@ -39,6 +58,11 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
             }
         }
     }
+
+    override fun getItemId(position: Int): Long {
+        return mStatus[position].rider.riderId
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RiderStatusViewHolder {
         val binding: ListItemRiderStatusBinding = DataBindingUtil.inflate(layoutInflater, R.layout.list_item_rider_status, parent, false)

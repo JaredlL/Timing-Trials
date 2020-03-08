@@ -6,70 +6,45 @@ import com.android.jared.linden.timingtrials.data.roomrepo.*
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import kotlin.Exception
 
-class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val riderRepository: IRiderRepository, val courseRepository: ICourseRepository, val resultRepository: IGlobalResultRepository) : ViewModel() {
-
+class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val riderRepository: IRiderRepository, val courseRepository: ICourseRepository, val resultRepository: TimeTrialRiderRepository) : ViewModel() {
 
 
-    val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
+    private val idLiveData: MutableLiveData<Long?> = MutableLiveData()
+
+    fun changeTimeTrial(newId: Long){
+        if(idLiveData.value != newId){
+            idLiveData.postValue(newId)
+        }
+    }
+
+    val timeTrial = Transformations.switchMap(idLiveData){
+        it?.let { id->
+            timeTrialRepository.getResultTimeTrialById(id)
+        }
+    }
 
 
     val results = Transformations.map(timeTrial){tt->
         if(tt != null && tt.timeTrialHeader.status == TimeTrialStatus.FINISHED) {
-
-//            val checker = RecordChecker(tt, riderRepository, courseRepository)
-//            viewModelScope.launch(Dispatchers.IO) {
-//                checker.checkRecords()
-//               checker.courseToUpdate?.let {  courseRepository.update(it)}
-//                riderRepository.updateRiders(checker.ridersToUpdate)
-//            }
-            (sequenceOf(getHeading(tt)) + tt.helper.results3.asSequence().sortedBy { it.resultTime }.map { res-> ResultRowViewModel(res) }).toList()
+            (sequenceOf(getHeading(tt)) + tt.helper.results.asSequence().map { res-> ResultRowViewModel(res, tt.timeTrialHeader.laps) }).toList()
         }else{
             null
         }
 
     }
 
-    val resultSettings: MutableLiveData<ResultDisplaySettings> = MutableLiveData()
 
-    fun initialise(timeTrialId: Long){
-        if(timeTrial.value?.timeTrialHeader?.id != timeTrialId){
-            timeTrial.addSource(timeTrialRepository.getTimeTrialById(timeTrialId)){
-                timeTrial.value = it
-            }
-        }
-
-    }
-
-    var isCorotineAlive = AtomicBoolean()
-    fun insertResults(){
-        if(!isCorotineAlive.get()){
+    fun delete(){
+        timeTrial.value?.let {
             viewModelScope.launch(Dispatchers.IO) {
-                timeTrial.value?.let {tt->
-                    tt.timeTrialHeader.id?.let { ttid->
-
-                        try {
-                            isCorotineAlive.set(true)
-
-                            val ttRes = resultRepository.getResultsForTimeTrial(ttid)
-
-                            if(ttRes.isEmpty()){
-                                resultRepository.insertNewResults(tt.helper.results3)
-                            }
-                        }catch(e:Exception){
-                            throw e
-                        }
-                        finally {
-                            isCorotineAlive.set(false)
-                        }
-                    }
-
-                }
-
+                timeTrialRepository.delete(it)
             }
+
         }
 
     }
@@ -77,14 +52,18 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
     fun getHeading(tt: TimeTrial): ResultRowViewModel{
         val mutList: MutableList<String> = mutableListOf()
 
-        mutList.add("Rider")
-        mutList.add("Category")
-        mutList.add("Club")
+        mutList.add("Rider Name")
         mutList.add("Total Time")
-        tt.helper.results3.firstOrNull()?.let {
-            if(it.splits.size > 1) it.splits.forEachIndexed{ index, _ -> if(index - 1 <it.splits.size) mutList.add("Split ${index + 1}") }
-        }
+        mutList.add("Club")
+        mutList.add("Gender")
+        mutList.add("Category")
         mutList.add("Notes")
+        if(tt.timeTrialHeader.laps > 1){
+            for(i in 1..tt.timeTrialHeader.laps){
+                mutList.add("Split $i")
+            }
+        }
+
         return ResultRowViewModel(mutList)
     }
 
@@ -97,19 +76,24 @@ class ResultRowViewModel{
         strings.forEach { row.add(ResultCell(MutableLiveData(it))) }
     }
 
-    constructor(result: IResult)
+    constructor(result: IResult, laps:Int)
      {
         row.add(ResultCell(MutableLiveData("${result.rider.firstName} ${result.rider.lastName}")))
-        row.add(ResultCell(MutableLiveData(result.categoryString)))
-        row.add(ResultCell(MutableLiveData(result.riderClub)))
-        row.add(ResultCell(MutableLiveData(ConverterUtils.toTenthsDisplayString(result.resultTime))))
+         row.add(ResultCell(MutableLiveData(ConverterUtils.toTenthsDisplayString(result.resultTime))))
+         row.add(ResultCell(MutableLiveData(result.riderClub)))
+         row.add(ResultCell(MutableLiveData(result.gender.fullString())))
+         row.add(ResultCell(MutableLiveData(result.category)))
+         row.add(ResultCell(MutableLiveData(result.notes)))
+         if(laps > 1){
+             for (i in 0 until laps){
+                 val splitVal = result.splits.getOrNull(i)
+                 val splitString = if(splitVal != null) ConverterUtils.toTenthsDisplayString(splitVal) else ""
+                 row.add(ResultCell(MutableLiveData(splitString)))
+             }
+         }
 
-        if(result.splits.size > 1){
-            row.addAll(result.splits.map { ResultCell(MutableLiveData(ConverterUtils.toTenthsDisplayString(it))) })
-        }
-         row.add(ResultCell(MutableLiveData("")))
 
 
     }
 }
-class ResultCell(val content:LiveData<String>)
+class ResultCell(val content:MutableLiveData<String>)

@@ -8,7 +8,7 @@ import com.android.jared.linden.timingtrials.data.Rider
 interface RiderDao {
 
     @Insert
-    fun insert(rider: Rider)
+    fun insert(rider: Rider):Long
 
     @Update
     fun update(rider: Rider)
@@ -27,9 +27,18 @@ interface RiderDao {
 
     @Query  ("SELECT *  from rider_table ORDER BY firstName COLLATE NOCASE ASC") fun getAllRidersLightSuspend(): List<Rider>
 
-    @Query("SELECT DISTINCT club from rider_table") fun getAllClubs(): LiveData<List<String>>
+    @Query("SELECT * FROM rider_table WHERE firstName == :firstName COLLATE NOCASE AND lastName == :lastName COLLATE NOCASE") fun ridersFromFirstLastName(firstName: String, lastName: String): List<Rider>
 
-    @Query("SELECT * FROM rider_table WHERE Id = :riderId LIMIT 1") fun getRiderById(riderId: Long): LiveData<Rider>
+    @Query("SELECT club from rider_table UNION SELECT club from timetrial_rider_table") fun getAllClubs(): LiveData<List<String>>
+
+    @Query("SELECT category from rider_table UNION SELECT category from timetrial_rider_table") fun getAllCategories(): LiveData<List<String?>>
+
+    @Query("SELECT * FROM rider_table WHERE Id = :riderId LIMIT 1") fun getRiderById(riderId: Long): LiveData<Rider?>
 
     @Query("SELECT * FROM rider_table WHERE Id IN (:ids)") fun getRidersByIds(ids: List<Long>): List<Rider>
+
+    //@Query("SELECT rider_table.id, timetrial_rider_table.id AS ttRiderId FROM rider_table INNER JOIN timetrial_rider_table ON timetrial_rider_table.riderId = id") fun getRiderWithRides(ids: List<Long>): List<Rider>
+
+    //Left Join
+    //@Query("SELECT r1.* from rider_table AS r1 LEFT JOIN timetrial_rider_table AS tr1 ON r1.id = tr1.riderId INNER JOIN timetrial_table AS tt1 ON timeTrialId = tr1.timeTrialId ORDER BY tt1.ttName") fun getRidersByFinishTime(): LiveData<List<Rider>>
 }

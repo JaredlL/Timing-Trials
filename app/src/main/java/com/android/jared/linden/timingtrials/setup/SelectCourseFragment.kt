@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.android.jared.linden.timingtrials.IFabCallbacks
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.adapters.CourseListAdapter
 import com.android.jared.linden.timingtrials.data.*
@@ -22,33 +24,53 @@ import com.android.jared.linden.timingtrials.util.*
 
 class SelectCourseFragment : Fragment() {
 
-
+    private lateinit var setupViewModel: SetupViewModel
     private lateinit var viewModel: ISelectCourseViewModel
     private lateinit var adapter: CourseListAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
 
+    private val args: SelectCourseFragmentArgs by navArgs()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        viewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectCourseViewModel
+        setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
+
+        if(args.timeTrialId != -1L){
+            setupViewModel.changeTimeTrial(args.timeTrialId)
+        }
+
+        (requireActivity() as IFabCallbacks).apply {
+            setVisibility(View.VISIBLE)
+            setImage(R.drawable.ic_add_white_24dp)
+            setAction {
+                val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")
+                findNavController().navigate(action)
+            }
+        }
+
+        viewModel = setupViewModel.selectCourseViewModel
         viewManager = LinearLayoutManager(context)
         adapter = CourseListAdapter(requireContext())
         adapter.editCourse = ::editCourse
+
         viewModel.getAllCourses().observe(viewLifecycleOwner, Observer { courses ->
-            courses?.let{adapter.setCourses(it)}
+            courses?.let{adapter.setCourses(it, getLengthConverter())}
         })
         adapter.courseSelected = { blobs ->
-            findNavController().popBackStack()
+
             viewModel.setSelectedCourse(blobs)
+            val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToSetupViewPagerFragment()
+            findNavController().navigate(action)
+
 
         }
 
         adapter.setHasStableIds(true)
 
-        val heading: SelectableCourseViewModel = object: SelectableCourseViewModel(Course("Course Name", 0.0, "CTT Name")){
+        val unitString = getLengthConverter().unitString
 
-            override var convertedLengthString = "Distance"
-        }
+        val heading: SelectableCourseViewModel = SelectableCourseViewModel("Course Name", "Distance ($unitString)", "CTT Name")
 
         val binding = DataBindingUtil.inflate<FragmentCourseListBinding>(inflater, R.layout.fragment_course_list, container, false).apply{
             lifecycleOwner = (this@SelectCourseFragment)
@@ -56,13 +78,13 @@ class SelectCourseFragment : Fragment() {
             courseHeading.checkBox.visibility = View.INVISIBLE
             courseRecyclerView.adapter = adapter
             courseRecyclerView.layoutManager = viewManager
-            courseListFab.setOnClickListener {
-                val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")
-                findNavController().navigate(action)
-
-                //editCourse(0)
-               // dismiss()
-            }
+//            courseListFab.setOnClickListener {
+//                val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")
+//                findNavController().navigate(action)
+//
+//                //editCourse(0)
+//               // dismiss()
+//            }
         }
 
 

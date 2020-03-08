@@ -43,11 +43,13 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
                         if(checkBox.isChecked){
                             val nSelected = mSelected + listOf(riderVm)
                             mSelected = nSelected
-                            riderSelectionChanged(mSelected)
+                            //riderSelectionChanged(mSelected)
+                            addRiderToSelection(riderVm)
                         }else{
                             val nSelected = mSelected.filterNot { it.id == riderVm.id }
                             mSelected = nSelected
-                            riderSelectionChanged(mSelected)
+                            //riderSelectionChanged(mSelected)
+                            removeRiderFromSelection(riderVm)
                         }
 
                     }
@@ -84,8 +86,12 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
     var editRider = {_: Long -> Unit}
     var riderSelectionChanged = {_:List<Rider> -> Unit}
 
+    var removeRiderFromSelection = {_:Rider -> Unit}
+
+    var addRiderToSelection = {_:Rider -> Unit}
+
     fun setRiders(newInfo: SelectedRidersInformation){
-        val newSelected = newInfo.timeTrial.riderList.map { it.rider }
+        val newSelected = newInfo.timeTrial.riderList.map { it.riderData }
 
         if(mRiders != newInfo.allRiderList || mSelected != newSelected){
             mRiders = newInfo.allRiderList

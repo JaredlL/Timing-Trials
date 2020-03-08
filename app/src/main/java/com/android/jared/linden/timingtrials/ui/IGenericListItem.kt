@@ -1,9 +1,18 @@
 package com.android.jared.linden.timingtrials.ui
 
 interface IGenericListItem {
-    val itemText1: String
-    val itemText2: String
-    val itemText3: String
-
+    val item1: GenericListItemField
+    val item2: GenericListItemField
+    val item3: GenericListItemField
 
 }
+
+interface IGenericListHeading {
+
+}
+
+data class GenericListHeadingField(val text: String)
+
+
+data class GenericListItemField(val text: String, val next: GenericListItemNext = GenericListItemNext())
+data class GenericListItemNext(val itemType: String = "", val nextId: Long? =null)

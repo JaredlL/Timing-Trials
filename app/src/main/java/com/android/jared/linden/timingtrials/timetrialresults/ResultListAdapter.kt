@@ -2,8 +2,10 @@ package com.android.jared.linden.timingtrials.timetrialresults
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Typeface
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -27,11 +29,19 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
                 }else{
                     resultTextView.typeface = Typeface.DEFAULT
                 }
+                //TODO Seems to be bugged
+//                if(position/rowLength != 0 && (position / rowLength).rem(2) == 0){
+//                    riderLayout.setBackgroundColor(Color.rgb(240, 240, 240))
+//                }else{
+//                    riderLayout.setBackgroundColor(Color.TRANSPARENT)
+//                }
                 executePendingBindings()
             }
 
         }
     }
+
+
 
     override fun onBindViewHolder(holder: ResultViewHolder, position: Int) {
         mResults[position].let {
@@ -40,6 +50,7 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
                 bind(it, position)
             }
         }
+
     }
 
     override fun getItemId(position: Int): Long {
@@ -52,7 +63,7 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
     }
 
     override fun getItemViewType(position: Int): Int {
-        return super.getItemViewType(position)
+        return 1
     }
 
     override fun getItemCount(): Int {
@@ -61,12 +72,16 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
 
     private var mResults: List<ResultCell> = listOf()
     private var rowLength = 0
+
     val layoutInflater = LayoutInflater.from(context)
+    var rowCount = 0
+    //var itemHeight = 0
 
     fun setResults(newResults: List<ResultRowViewModel>){
 
         rowLength = newResults.first().row.size
         mResults = newResults.flatMap { it.row }
+        rowCount = newResults.size
         notifyDataSetChanged()
     }
 

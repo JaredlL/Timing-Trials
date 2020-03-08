@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
+import org.threeten.bp.LocalDate
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
@@ -47,6 +48,19 @@ class Converters {
         return date?.format(formatter)
     }
 
+    private val localDateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+    @TypeConverter
+    fun toLocalDate(value: String?): LocalDate? {
+        return value?.let {
+            return localDateFormatter.parse(value, LocalDate::from)
+        }
+    }
+
+    @TypeConverter
+    fun fromLocalDate(date: LocalDate?): String? {
+        return date?.format(localDateFormatter)
+    }
+
 
     @TypeConverter
     fun courseRecordsToString(cr:List<CourseRecord>?): String?{
@@ -84,14 +98,16 @@ class Converters {
 
     @TypeConverter
     fun longListToString(splits: List<Long>?): String?{
-        return splits?.let { Gson().toJson(splits)}
+        return splits?.joinToString(separator = ",")
     }
 
     @TypeConverter
     fun longListFromString(splitsString:String?): List<Long>? {
-        return splitsString?.let{
-            val listType = object : TypeToken<List<Long>>() {}.type
-            Gson().fromJson<List<Long>>(splitsString, listType)}
+        return if(splitsString.isNullOrBlank()){
+             listOf()
+        }else{
+             splitsString.split(",").map { it.toLong() }
+        }
 
     }
 
@@ -115,5 +131,13 @@ class Converters {
 
     @TypeConverter fun statusToInt(status: TimeTrialStatus): Int{
         return status.ordinal
+    }
+
+    @TypeConverter fun stringToNumberRule(str: String): NumberRules?{
+        return NumberRules.fromString(str)
+    }
+
+    @TypeConverter fun numberRulesToString(rules: NumberRules): String{
+        return NumberRules.toString(rules)
     }
 }

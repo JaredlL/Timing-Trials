@@ -8,7 +8,7 @@ import com.android.jared.linden.timingtrials.data.Course
 interface CourseDao {
 
     @Insert
-    fun insert(course: Course)
+    fun insert(course: Course):Long
 
     @Update
     fun update(course: Course)
@@ -29,4 +29,6 @@ interface CourseDao {
     @Query("SELECT * FROM course_table WHERE Id = :courseId LIMIT 1") fun getLiveCourseById(courseId: Long): LiveData<Course>
 
     @Query("SELECT * FROM course_table LIMIT 1") fun getFirst(): LiveData<Course>
+
+    @Query("SELECT * FROM course_table WHERE courseName == :name COLLATE NOCASE") fun getCoursesByName(name: String): List<Course>
 }

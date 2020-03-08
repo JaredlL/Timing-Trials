@@ -3,6 +3,7 @@ package com.android.jared.linden.timingtrials.data
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import org.threeten.bp.LocalDate
 import org.threeten.bp.OffsetDateTime
 
 
@@ -11,8 +12,9 @@ data class Rider(
         val firstName: String,
         val lastName: String,
         val club: String = "",
-        val dateOfBirth: OffsetDateTime,
-        val gender: Gender,
+        val dateOfBirth: LocalDate? = null,
+        val category: String = "",
+        val gender: Gender = Gender.UNKNOWN,
         @PrimaryKey(autoGenerate = true) override val id: Long? = null
 ) : ITimingTrialsEntity  {
 
@@ -22,13 +24,9 @@ data class Rider(
         return "$firstName $lastName"
     }
 
-    fun getCategoryStandard(): RiderCategoryStandard{
-        return RiderCategoryStandard(gender, OffsetDateTime.now().year - dateOfBirth.year )
-    }
-
     companion object {
 
-        fun createBlank() = Rider("", "", "", OffsetDateTime.now().minusYears(20), Gender.UNKNOWN)
+        fun createBlank() = Rider("", "")
 
     }
 }

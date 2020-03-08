@@ -10,12 +10,14 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import androidx.navigation.NavDeepLinkBuilder
 import com.android.jared.linden.timingtrials.MainActivity
 import com.android.jared.linden.timingtrials.R
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
+import com.android.jared.linden.timingtrials.timetrialresults.ResultFragmentArgs
 import com.android.jared.linden.timingtrials.util.EventObserver
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
@@ -23,6 +25,7 @@ import com.google.android.material.snackbar.Snackbar
 
 import kotlinx.android.synthetic.main.activity_timing.*
 import org.threeten.bp.Instant
+import timber.log.Timber
 import java.lang.Exception
 
 class TimingActivity : AppCompatActivity() {
@@ -64,7 +67,10 @@ class TimingActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
+
         viewModel = getViewModel { injector.timingViewModel() }
+
+        supportActionBar?.title = "Timetrial in progress"
 
 
         mBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)
@@ -116,7 +122,7 @@ class TimingActivity : AppCompatActivity() {
                 value = it
             }
         }.observe(this, Observer {
-            viewModel.updateLoop(it)
+            viewModel.updateLoop()
         })
     }
 
@@ -124,7 +130,7 @@ class TimingActivity : AppCompatActivity() {
         when(timeTrialHeader.status){
             TimeTrialStatus.SETTING_UP -> {
                 if(mBound){
-                    System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
+                    Timber.d("Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
                     applicationContext.unbindService(connection)
                     service.stop()
                     mBound = false
@@ -132,15 +138,22 @@ class TimingActivity : AppCompatActivity() {
                 finish()
             }
             TimeTrialStatus.IN_PROGRESS -> {
-                System.out.println("JAREDMSG -> Timing Activity -> Got in progress TT and Service is up, lets roll")
                 service.startTiming(timeTrialHeader)
             }
             TimeTrialStatus.FINISHED -> {
                 if(mBound){
-                    System.out.println("JAREDMSG -> Timing Activity -> Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
+                    Timber.d("Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
                     applicationContext.unbindService(connection)
                     service.stop()
                     mBound = false
+                    val args = ResultFragmentArgs(timeTrialHeader.id?:0)
+                    val pendingIntent = NavDeepLinkBuilder(this)
+                            .setGraph(R.navigation.nav_graph)
+                            .setDestination(R.id.resultFragment)
+                            .setArguments(args.toBundle())
+                            .setComponentName(MainActivity::class.java)
+                            .createPendingIntent()
+                    pendingIntent.send()
                 }
                 finish()
             }
@@ -149,10 +162,21 @@ class TimingActivity : AppCompatActivity() {
 
     var prevBackPress = 0L
     override fun onBackPressed() {
+        val tt = viewModel.timeTrial.value
+
+        if(tt==null)
+        {
+            applicationContext.unbindService(connection)
+            mService.value?.stop()
+            mBound = false
+            finish()
+        }
+
         if(System.currentTimeMillis() > prevBackPress + 2000){
             Toast.makeText(this, "Tap again to end", Toast.LENGTH_SHORT).show()
             prevBackPress = System.currentTimeMillis()
         }else{
+
 
             viewModel.timeTrial.value?.let{
                 if(it.timeTrialHeader.startTime.toInstant() > Instant.now()){

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="unitsArray">
+        <item>Kilometers</item>
+        <item>Miles</item>
+        <item>Meters</item>
+    </string-array>
+
+    <string-array name="unitsValues">
+        <item>km</item>
+        <item>miles</item>
+        <item>meters</item>
+    </string-array>
+
+    <string-array name="sortingArray">
+        <item>Recent Activity</item>
+        <item>Alphabetical</item>
+    </string-array>
+</resources>

@@ -1,30 +1,49 @@
 package com.android.jared.linden.timingtrials.timetrialresults
 
+import android.annotation.TargetApi
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.view.*
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.android.jared.linden.timingtrials.R
+import com.android.jared.linden.timingtrials.*
 import com.android.jared.linden.timingtrials.databinding.FragmentTimetrialResultBinding
-import com.android.jared.linden.timingtrials.edititem.EditRiderFragmentArgs
-import com.android.jared.linden.timingtrials.util.argument
+import com.android.jared.linden.timingtrials.domain.JsonResultsWriter
+import com.android.jared.linden.timingtrials.domain.csv.CsvResultWriter
+import com.android.jared.linden.timingtrials.util.Utils
 import com.android.jared.linden.timingtrials.util.getViewModel
 import com.android.jared.linden.timingtrials.util.injector
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_timetrial_result.*
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.util.*
 
 class ResultFragment : Fragment() {
@@ -32,38 +51,49 @@ class ResultFragment : Fragment() {
     private val args: ResultFragmentArgs by navArgs()
 
     lateinit var resultViewModel: ResultViewModel
+    lateinit var viewManager: GridLayoutManager
+    lateinit var resultGridAdapter: ResultListAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
 
-        val viewManager = GridLayoutManager(requireActivity(), 2)
-        val adapter = ResultListAdapter(requireActivity())
-        adapter.setHasStableIds(true)
+        viewManager = GridLayoutManager(requireActivity(), 2)
+        resultGridAdapter = ResultListAdapter(requireActivity())
+        resultGridAdapter.setHasStableIds(true)
 
-        requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
 
-        resultViewModel = requireActivity().getViewModel {  requireActivity().injector.resultViewModel() }.apply { initialise(args.timeTrialId) }
+        (requireActivity() as? IFabCallbacks)?.setVisibility(View.GONE)
+
+        resultViewModel = requireActivity().getViewModel {  requireActivity().injector.resultViewModel() }.apply { changeTimeTrial(args.timeTrialId) }
 
         val binding = DataBindingUtil.inflate<FragmentTimetrialResultBinding>(inflater, R.layout.fragment_timetrial_result, container, false).apply {
 
             fragResultRecyclerView.isNestedScrollingEnabled = false
             fragResultRecyclerView.layoutManager = viewManager
-            fragResultRecyclerView.adapter = adapter
+            fragResultRecyclerView.adapter = resultGridAdapter
             fragResultRecyclerView.addItemDecoration(DividerItemDecoration(requireActivity(), LinearLayoutManager.VERTICAL))
+
         }
 
 
-
-
-
+        resultViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
+            res?.let {
+                binding.titleText.text = "${it.timeTrialHeader.ttName} ${resources.getString(R.string.results)}"
+                if(res.timeTrialHeader.notes.isBlank()){
+                    binding.resultNotesTextView.visibility = View.GONE
+                }else{
+                    binding.resultNotesTextView.visibility = View.VISIBLE
+                    binding.resultNotesTextView.text = res.timeTrialHeader.notes
+                }
+            }
+        })
 
 
         resultViewModel.results.observe(viewLifecycleOwner, Observer {res->
             res?.let {newRes->
                 if(newRes.isNotEmpty()){
                     val rowLength = newRes.first().row.size
-
                     viewManager.spanCount = rowLength + 2
                     viewManager.spanSizeLookup = (object : GridLayoutManager.SpanSizeLookup(){
                         override fun getSpanSize(position: Int): Int {
@@ -74,7 +104,7 @@ class ResultFragment : Fragment() {
                             }
                         }
                     })
-                    adapter.setResults(newRes)
+                    resultGridAdapter.setResults(newRes)
                 }
 
             }
@@ -91,53 +121,354 @@ class ResultFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.doneButton -> {
-                resultViewModel.insertResults()
+            R.id.resultScreenshot -> {
+                view?.let {
+                    takeScreenShot(it)
+                }
+                true
+            }
+            R.id.resultMenuCsv ->{
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    putExtra(Intent.EXTRA_TITLE, "${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.csv")
+                    //MIME types
+                    type = "text/csv"
+                    // Optionally, specify a URI for the directory that should be opened in
+                    // the system file picker before your app creates the document.
+                    //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
+                }
+                startActivityForResult(intent, REQUEST_CREATE_FILE_CSV)
+                true
+            }
+            R.id.resultMenuJson->{
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    putExtra(Intent.EXTRA_TITLE, "${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.tt")
+                    //MIME types
+                    type = "text/*"
+                    // Optionally, specify a URI for the directory that should be opened in
+                    // the system file picker before your app creates the document.
+                    //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
+                }
+                startActivityForResult(intent, REQUEST_CREATE_FILE_JSON)
+                true
+            }
+            R.id.resultMenuDelete->{
+                showDeleteDialog()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    fun takeScreenShot(view: View){
-        try {
-            val now = Date()
-            android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
-            // image naming and path  to include sd card  appending name you choose for file
-            val mPath = requireActivity().applicationInfo.dataDir + "/" + now + ".jpg"
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            REQUEST_CREATE_FILE_CSV->{
+                    data?.data?.let {
+                        writeCsv(it)
+                    }
+            }
+            REQUEST_CREATE_FILE_JSON->{
+                data?.data?.let {
+                    writeJson(it)
+                }
+            }
+        }
+    }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Toast.makeText(requireActivity(), "Permission Request", Toast.LENGTH_SHORT).show()
+    }
 
-            // create bitmap screen capture
-            //val v1 = getWindow().getDecorView().getRootView()
+    fun showDeleteDialog(){
+        AlertDialog.Builder(requireContext())
+                .setTitle(resources.getString(R.string.delete_timetrial))
+                .setMessage(resources.getString(R.string.confirm_delete_timetrial_results_message))
+                .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
+                    resultViewModel.delete()
+                    findNavController().popBackStack()
+                }
+                .setNegativeButton("Dismiss"){_,_->
 
-            val bitmap = Bitmap.createBitmap(view.width,
-                    view.height, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-            view.draw(canvas)
+                }
+                .create().show()
+    }
 
-            val imageFile = File(mPath)
+    private fun writeCsv(uri: Uri){
 
-            val outputStream = FileOutputStream(imageFile)
-            val quality = 100
-            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            outputStream.flush()
-            outputStream.close()
+        val tt = resultViewModel.timeTrial.value
+        val results = resultViewModel.results.value
 
-            openScreenshot(imageFile)
-        } catch (e:Throwable) {
-            // Several error may come out with file handling or DOM
-            e.printStackTrace()
+        if(tt != null && results != null){
+            try {
+                val outputStream = requireActivity().contentResolver.openOutputStream(uri)
+                if(haveOrRequestFilePermission() && outputStream != null){
+                    val trans = CsvResultWriter(tt, results)
+                    trans.writeToPath(outputStream)
+
+
+                    var intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    intent.setDataAndType(uri, "text/csv")
+                    //intent.data = uri
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                    val activities: List<ResolveInfo> = requireActivity().packageManager.queryIntentActivities(
+                            intent,
+                            PackageManager.MATCH_DEFAULT_ONLY
+                    )
+                    if(activities.isEmpty()){
+                        intent = Intent()
+                        intent.action = Intent.ACTION_VIEW
+                        intent.setDataAndType(uri, "text/*")
+                        //intent.data = uri
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+
+                    startActivity(intent)
+                }
+            }
+            catch(e: IOException)
+            {
+                e.printStackTrace()
+                Snackbar.make((requireActivity() as MainActivity).rootCoordinator, "Save failed - ${e.message}", Snackbar.LENGTH_LONG).show()
+            }
         }
     }
 
-    private fun openScreenshot(imageFile: File) {
+    private fun writeJson(uri: Uri){
+        val tt = resultViewModel.timeTrial.value
+        val results = resultViewModel.results.value
+
+        if(tt != null && results != null){
+            try {
+                val outputStream = requireActivity().contentResolver.openOutputStream(uri)
+                if(haveOrRequestFilePermission() && outputStream != null){
+
+                    JsonResultsWriter().writeToPath(outputStream, tt)
+
+                    val intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    intent.setDataAndType(uri, "text/*")
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    startActivity(intent)
+                }
+            }
+            catch(e: IOException)
+            {
+                e.printStackTrace()
+                Snackbar.make((requireActivity() as MainActivity).rootCoordinator, "Save failed - ${e.message}", Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
+
+
+//   fun convertDpToPixels(dp: Float): Int {
+//        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().displayMetrics).roundToInt()
+//    }
+
+    fun takeScreenShot(view: View){
+
+        val oldWidth = view.width
+        val oldHeight =  view.height
+        try {
+
+
+           // val sv = horizontalScrollView
+           // val view = sv.getChildAt(0)
+            val now = Date()
+            val nowChars = android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
+
+            val ttName = resultViewModel.timeTrial.value?.timeTrialHeader?.ttName
+            
+            val imgName = "${ttName?:nowChars}.jpeg"
+
+            val scrollViewWidth = horizontalScrollView.getChildAt(0).width
+            //val scrollViewWidth = 200
+
+            val sr = fragResultRecyclerView.computeVerticalScrollRange()
+
+            val gridHeight = if(sr == 0) fragResultRecyclerView.height else sr
+
+            //https://dev.to/pranavpandey/android-create-bitmap-from-a-view-3lck
+            view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(gridHeight+300, View.MeasureSpec.EXACTLY))
+
+            view.layout(0,0, view.measuredWidth, view.measuredHeight)
+            val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
+
+            val canvas = Canvas(bitmap)
+
+           if( view.background!=null) {
+               view.background.draw(canvas)
+            }else{
+               canvas.drawColor(Color.WHITE)
+           }
+            view.draw(canvas)
+
+
+            val fileName = Utils.createFileName(imgName)
+
+            when(Build.VERSION.SDK_INT){
+
+                //29
+                Build.VERSION_CODES.Q -> saveScreenshotQ(bitmap, fileName)
+                //26-28
+                in(Build.VERSION_CODES.O..Build.VERSION_CODES.P) -> saveScreenshotO(bitmap, fileName)
+                //21-25
+                in(Build.VERSION_CODES.LOLLIPOP..Build.VERSION_CODES.N) -> saveScreenshotN(bitmap, fileName)
+
+                else -> throw Exception("Version Unsupported")
+
+            }
+
+
+
+        } catch (e:Throwable) {
+            // Several error may come out with file handling or DOM
+            throw Exception(e)
+
+        }
+        finally {
+
+            view.measure(View.MeasureSpec.makeMeasureSpec(oldWidth, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(oldHeight, View.MeasureSpec.EXACTLY))
+
+            view.layout(0,0, view.measuredWidth, view.measuredHeight)
+        }
+    }
+
+    //API 29
+    @TargetApi(Build.VERSION_CODES.Q)
+    fun saveScreenshotQ(bitmap: Bitmap, imageName:String){
+
+        val filePath = File(MediaStore.VOLUME_EXTERNAL_PRIMARY + imageName)
+        val imageOut = FileOutputStream(filePath)
+
+        bitmap.compress(Bitmap.CompressFormat.PNG, 80, imageOut)
+
+        Timber.d("Created image Filepath API 29 -> $filePath")
+
+        val contentVals = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
+            put(MediaStore.Images.Media.TITLE, imageName)
+            put(MediaStore.Images.Media.BUCKET_DISPLAY_NAME, "Timing Trials")
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+            put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+            put(MediaStore.MediaColumns.DATA, filePath.path)
+        }
+
+
+        val data = requireActivity().contentResolver.insert(MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL), contentVals)
+
+        Timber.d("Inserted image URI API 29 -> $data")
+
+        imageOut.flush()
+        imageOut.close()
+        openScreenshot(data)
+    }
+
+    fun haveOrRequestFilePermission(): Boolean{
+       return if(ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+//            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+//                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
+//            }else{
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
+             false
+            // }
+        }else{
+             true
+        }
+    }
+
+    //API 21-25
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    fun saveScreenshotN(bitmap: Bitmap, imageName:String){
+
+
+        val filePath = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), imageName)
+        val imageOut = FileOutputStream(filePath)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 80, imageOut)
+
+        Timber.d("Created image Filepath API 21-25 -> $filePath")
+
+        val contentVals = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
+            put(MediaStore.Images.Media.TITLE, imageName)
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+            put(MediaStore.MediaColumns.DATA, filePath.path)
+        }
+
+        val screenshotUri = requireActivity().contentResolver.insert(EXTERNAL_CONTENT_URI, contentVals)
+
+        Timber.d("Inserted image URI API 21-25 -> $screenshotUri")
+
+        imageOut.flush()
+        imageOut.close()
+        openScreenshot(screenshotUri)
+    }
+
+    //API 26-28
+    @TargetApi(Build.VERSION_CODES.O)
+    fun saveScreenshotO(bitmap: Bitmap, imageName:String){
+
+        if(haveOrRequestFilePermission()) {
+            //val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+
+            val path = requireActivity().getExternalFilesDir(null)
+            val filePath = File(path, imageName)
+            val imageOut = FileOutputStream(filePath)
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, imageOut)
+
+
+            imageOut.flush()
+            imageOut.close()
+
+            Timber.d("Created image Filepath API 26-28 -> $filePath")
+
+
+            val contentVals = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
+                put(MediaStore.Images.Media.TITLE, imageName)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+                put(MediaStore.MediaColumns.DATA, filePath.absolutePath)
+                put(MediaStore.Images.Media.SIZE, filePath.length())
+                //put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+            }
+
+            val insertedImageString = requireActivity().contentResolver.insert(EXTERNAL_CONTENT_URI, contentVals)
+
+           //requireActivity().contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+
+            Timber.d("Inserted image URI API 26 -> $insertedImageString")
+
+
+
+
+            openScreenshot(insertedImageString)
+
+
+
+        }
+
+    }
+
+
+
+    private fun openScreenshot(imageFile: Uri?) {
         val intent = Intent()
+        intent.setDataAndType(imageFile, "image/*")
         intent.action = Intent.ACTION_VIEW
-        val uri = Uri.fromFile(imageFile)
-        intent.setDataAndType(uri, "image/*")
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        Timber.d("Request open  ${imageFile?.path}")
         startActivity(intent)
     }
 
 }
+
 
 class DividerItemDecoration(context: Context, orientation: Int) : RecyclerView.ItemDecoration() {
 

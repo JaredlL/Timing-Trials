@@ -111,8 +111,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-441" />
-                            <option name="y" value="436" />
+                            <option name="x" value="-1411" />
+                            <option name="y" value="1295" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -132,12 +132,27 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_dataBaseViewPagerFragment_to_importFragment">
+                            <entry key="action_dataBaseViewPagerFragment_to_resultFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_dataBaseViewPagerFragment_to_resultFragment">
+                            <entry key="action_dataBaseViewPagerFragment_to_selectCourseFragment2">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_dataBaseViewPagerFragment_to_settingsFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_dataBaseViewPagerFragment_to_setupViewPagerFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_dataBaseViewPagerFragment_to_titleFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -152,8 +167,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="970" />
-                            <option name="y" value="-356" />
+                            <option name="x" value="1033" />
+                            <option name="y" value="-201" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -164,8 +179,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="891" />
-                            <option name="y" value="443" />
+                            <option name="x" value="896" />
+                            <option name="y" value="596" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -176,20 +191,34 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="610" />
-                            <option name="y" value="922" />
+                            <option name="x" value="525" />
+                            <option name="y" value="1989" />
                           </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_globalResultFragment_to_globalResultFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_globalResultFragment_to_resultFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
                         </option>
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="importFragment">
+                  <entry key="numberOptionsDialog">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="384" />
-                            <option name="y" value="1436" />
+                            <option name="x" value="555" />
+                            <option name="y" value="-865" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -200,9 +229,18 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-349" />
-                            <option name="y" value="1371" />
+                            <option name="x" value="817" />
+                            <option name="y" value="1355" />
                           </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="deepLink">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -212,8 +250,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-287" />
-                            <option name="y" value="-644" />
+                            <option name="x" value="-237" />
+                            <option name="y" value="-926" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -233,13 +271,25 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="settingsFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-438" />
+                            <option name="y" value="2330" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="setupViewPagerFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-431" />
-                            <option name="y" value="20" />
+                            <option name="x" value="-194" />
+                            <option name="y" value="-16" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -269,8 +319,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-1432" />
-                            <option name="y" value="279" />
+                            <option name="x" value="-1616" />
+                            <option name="y" value="151" />
                           </Point>
                         </option>
                         <option name="myPositions">

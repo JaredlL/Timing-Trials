@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.jared.linden.timingtrials.IFabCallbacks
 
 
 import com.android.jared.linden.timingtrials.R
@@ -34,9 +35,12 @@ class OrderRidersFragment : Fragment() {
         
         mAdapter = OrderableRiderListAdapter(requireContext()).apply { onMove = {x,y -> viewModel.moveItem(x, y)} }
 
-        viewModel.getOrderableRiders().observe(viewLifecycleOwner, Observer { riders ->
-            riders?.let {mAdapter.setRiders(riders)}
+        viewModel.getOrderableRiderData().observe(viewLifecycleOwner, Observer { ttData ->
+            ttData?.let {mAdapter.setData(ttData )}
         })
+        (requireActivity() as IFabCallbacks).setVisibility(View.GONE)
+
+
 
         return inflater.inflate(R.layout.fragment_order_riders, container, false)
     }
@@ -47,6 +51,7 @@ class OrderRidersFragment : Fragment() {
         val dragDropManager = RecyclerViewDragDropManager().apply {
             setInitiateOnMove(false)
             setInitiateOnLongPress(true)
+            setLongPressTimeout(300)
         }
 
         val wrappedAdapter = dragDropManager.createWrappedAdapter(mAdapter)

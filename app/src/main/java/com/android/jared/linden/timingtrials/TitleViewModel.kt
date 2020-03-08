@@ -2,11 +2,7 @@ package com.android.jared.linden.timingtrials
 
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
-import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
-import com.android.jared.linden.timingtrials.data.TimeTrialStatus
-import com.android.jared.linden.timingtrials.data.source.TimingTrialsDatabase
-import com.android.jared.linden.timingtrials.setup.ResumeOldConfirmationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,22 +11,23 @@ import javax.inject.Inject
 
 class TitleViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel() {
 
-    val nonFinishedTimeTrial = Transformations.map(timeTrialRepository.nonFinishedTimeTrial){tt->
-        tt
+    val nonFinishedTimeTrial = Transformations.map(timeTrialRepository.allTimeTrialsHeader){tt->
+        tt.firstOrNull()
     }
 
-    fun clearTimeTrial(timeTrial: TimeTrial){
+    val timingTimeTrial = timeTrialRepository.getTimingTimeTrial()
+
+    fun clearTimeTrial(timeTrial: TimeTrialHeader){
         viewModelScope.launch(Dispatchers.IO) {
-            val cleared = TimeTrial.createBlank().copy(timeTrialHeader = TimeTrialHeader.createBlank().copy(id = timeTrial.timeTrialHeader.id))
-            timeTrialRepository.update(cleared)
+            timeTrialRepository.deleteHeader(timeTrial)
         }
     }
 
-    val resumeOldViewModel: ResumeOldConfirmationViewModel = ResumeOldConfirmationViewModel(this)
+    //val resumeOldViewModel: ResumeOldConfirmationViewModel = ResumeOldConfirmationViewModel(this)
 
-    fun deleteTimeTrial(tt: TimeTrial){
+    fun deleteTimeTrial(tt: TimeTrialHeader){
         viewModelScope.launch(Dispatchers.IO) {
-            timeTrialRepository.delete(tt)
+            timeTrialRepository.deleteHeader(tt)
         }
     }
 

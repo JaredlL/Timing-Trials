@@ -31,9 +31,10 @@ class RoomDatabaseModule{
     }
 
     @Provides @Singleton
-    fun globalResultDao(db: TimingTrialsDatabase): GlobalResultDao{
-        return db.globalResultDao()
+    fun timeTrialRiderDao(db: TimingTrialsDatabase): TimeTrialRiderDao{
+        return db.timeTrialRiderDao()
     }
+
 
 }
 
@@ -59,8 +60,8 @@ class RepositoryModule {
 
     @Provides
     @Singleton
-    fun globalResultRepository(globalResultDao: GlobalResultDao): IGlobalResultRepository {
-        return GlobalResultRepository(globalResultDao)
+    fun timeTrialRiderRepository(timeTrialRiderDao: TimeTrialRiderDao): TimeTrialRiderRepository{
+        return TimeTrialRiderRepository(timeTrialRiderDao)
     }
 
 }

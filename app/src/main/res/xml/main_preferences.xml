@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ListPreference
+        app:icon="@drawable/ic_find_replace_black_24dp"
+        app:key="units"
+        app:title="@string/distance_units"
+        app:summary="@string/units_setting_description"
+        android:entries="@array/unitsArray"
+        android:entryValues="@array/unitsValues"/>
+
+    <SwitchPreferenceCompat
+        app:key="darkMode"
+        app:title="Enable Dark Mode"/>
+
+</PreferenceScreen>

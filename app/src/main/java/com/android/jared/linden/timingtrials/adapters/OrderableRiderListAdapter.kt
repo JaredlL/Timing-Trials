@@ -1,19 +1,26 @@
 package com.android.jared.linden.timingtrials.adapters
 
 import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.android.jared.linden.timingtrials.R
-import com.android.jared.linden.timingtrials.data.Rider
+import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
+import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.databinding.ListItemOrderableRiderBinding
+import com.android.jared.linden.timingtrials.util.ConverterUtils
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder
 
 
-class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<OrderableRiderListAdapter.OrderableRiderViewHolder>(),
+class OrderableRiderListAdapter(val context: Context) : RecyclerView.Adapter<OrderableRiderListAdapter.OrderableRiderViewHolder>(),
         DraggableItemAdapter<OrderableRiderListAdapter.OrderableRiderViewHolder> {
 
     init {
@@ -23,25 +30,28 @@ class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<Orderab
     override fun getItemId(position: Int): Long {
         // requires static value, it means need to keep the same value
         // even if the item position has been changed.
-        return mRiders[position].id ?: 0L
+        return mRiders[position].riderData.id ?: 0L
     }
 
     inner class OrderableRiderViewHolder(val binding: ListItemOrderableRiderBinding): AbstractDraggableItemViewHolder(binding.root){
 
-        fun bind(rd:Rider, position: Int){
+        fun bind(rd:FilledTimeTrialRider){
             binding.apply {
                 rider = rd
-                pos = position + 1
+                number = mTimeTrialHeader.numberRules.numberFromIndex(rd.timeTrialData.index, mRiders.count())
+                startTime = ConverterUtils.offsetToHmsDisplayString(mTimeTrialHeader.startTime.plusSeconds((mTimeTrialHeader.firstRiderStartOffset + mTimeTrialHeader.interval * rd.timeTrialData.index).toLong()))
             }
         }
     }
 
     private val layoutInflater = LayoutInflater.from(context)
-    private var mRiders: List<Rider> = listOf()
+    private var mRiders: List<FilledTimeTrialRider> = listOf()
+    private var mTimeTrialHeader: TimeTrialHeader = TimeTrialHeader.createBlank()
     var onMove: (from:Int, to:Int) -> Unit = {_,_ -> Unit}
 
-    fun setRiders(newRiders: List<Rider>){
-        mRiders = newRiders
+    fun setData(newData: TimeTrial){
+        mRiders = newData.riderList
+        mTimeTrialHeader = newData.timeTrialHeader
         notifyDataSetChanged()
     }
 
@@ -54,7 +64,7 @@ class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<Orderab
         mRiders.get(position).let { rider ->
             with(holder){
                 itemView.tag = rider
-                bind(rider, position)
+                bind(rider)
             }
         }
     }
@@ -68,7 +78,16 @@ class OrderableRiderListAdapter(context: Context) : RecyclerView.Adapter<Orderab
     }
 
     override fun onItemDragStarted(position: Int) {
+        val v = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            v!!.vibrate(VibrationEffect.createOneShot(25, VibrationEffect.EFFECT_TICK))
+        }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            v!!.vibrate(VibrationEffect.createOneShot(25, 25))
+        }
+        else { //deprecated in API 26
+            v!!.vibrate(25)
+        }
     }
 
     override fun onMoveItem(fromPosition: Int, toPosition: Int) {

@@ -1,25 +1,33 @@
 package com.android.jared.linden.timingtrials
 
+import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.android.jared.linden.timingtrials.timing.TimingActivity
-import com.android.jared.linden.timingtrials.util.getViewModel
-import com.android.jared.linden.timingtrials.util.injector
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
-import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.databinding.FragmentTitleBinding
+import com.android.jared.linden.timingtrials.timing.TimingActivity
 import com.android.jared.linden.timingtrials.util.EventObserver
-import kotlinx.android.synthetic.main.fragment_title.*
+import com.android.jared.linden.timingtrials.util.Utils
+import com.android.jared.linden.timingtrials.util.getViewModel
+import com.android.jared.linden.timingtrials.util.injector
+import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
+
 
 class TitleFragment : Fragment()
 {
@@ -33,28 +41,32 @@ class TitleFragment : Fragment()
         titleViewModel = requireActivity().getViewModel {  requireActivity().injector.mainViewModel() }
         testViewModel =  requireActivity().getViewModel {  requireActivity().injector.testViewModel() }
 
+//        (requireActivity() as MainActivity).mMainFab.setOnClickListener {
+//            Toast.makeText(it.context, "i", Toast.LENGTH_SHORT).show()
+//        }
+        //(requireActivity() as MainActivity).mMainFab.setImageResource(R.drawable.ic_timer_black_24dp)
+
+
         titleViewModel.nonFinishedTimeTrial.observe(viewLifecycleOwner, Observer {tt->
             tt?.let { timeTrial->
-                if(timeTrial.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS){
+                if(timeTrial.status == TimeTrialStatus.IN_PROGRESS){
                     val tIntent = Intent(requireActivity(), TimingActivity::class.java)
                     startActivity(tIntent)
                 }
             }
         })
 
+        testViewModel.timingTrialsDatabase.timeTrialRiderDao().getRiderIdTimeTrialStartTime().observe(viewLifecycleOwner, Observer {res->
+            res?.let {
+                val b = it
+            }
+
+        })
+
         val binding =  DataBindingUtil.inflate<FragmentTitleBinding>(inflater, R.layout.fragment_title, container, false).apply{
 
             startTtSetupButton.setOnClickListener{
-                titleViewModel.nonFinishedTimeTrial.observe(viewLifecycleOwner, Observer {result->
-                    result?.let {timeTrial->
-                        if(timeTrial.timeTrialHeader.copy(id = null) != TimeTrialHeader.createBlank()){
-                            showSetupDialog(timeTrial)
-                        }else{
-                            val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
-                            findNavController().navigate(action)
-                        }
-                    }
-                })
+
 
             }
 
@@ -64,16 +76,18 @@ class TitleFragment : Fragment()
             }
 
             testSetupButton.setOnClickListener {
-                titleViewModel.nonFinishedTimeTrial.value?.let {
-                    testViewModel.testSetup(it)
-                }
+                testViewModel.delete()
+                findNavController().popBackStack()
             }
 
 
+
+
             testTimingButton.setOnClickListener {
-                titleViewModel.nonFinishedTimeTrial.value?.let {
-                    testViewModel.testTiming(it)
-                }
+
+                //view?.let {  testScreenShot(it)}
+
+                testViewModel.testTiming()
             }
 
             testResults1.setOnClickListener {
@@ -85,9 +99,18 @@ class TitleFragment : Fragment()
                     }
                 })
             }
-
             testResult2.setOnClickListener {
                 testViewModel.insertFinishedTt()
+                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
+                    it?.let {id->
+                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
+                        findNavController().navigate(action)
+                    }
+                })
+            }
+//
+            button2.setOnClickListener {
+                testViewModel.insertFinishedTt3()
                 testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
                     it?.let {id->
                         val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
@@ -101,10 +124,58 @@ class TitleFragment : Fragment()
         return binding.root
     }
 
-   private fun showSetupDialog(timeTrial: TimeTrial){
+    fun testScreenShot(view: View){
+
+
+        val imgName = "Test.jpeg"
+        val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
+
+        val canvas = Canvas(bitmap)
+
+        val path = requireActivity().getExternalFilesDir(null)
+
+        val fileName = Utils.createFileName(imgName)
+
+        view.draw(canvas)
+
+        val filePath = File(path, fileName)
+
+        val imageOut = FileOutputStream(filePath)
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, imageOut)
+
+        val contentResolver = requireActivity().contentResolver
+
+        val values = ContentValues(3)
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+        values.put(MediaStore.Images.Media.DATA, filePath.getAbsolutePath())
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+
+        val insertedImageString = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+
+        insertedImageString?.let{refreshGallery(insertedImageString)}
+
+        val intent = Intent()
+        intent.setDataAndType(insertedImageString, "image/*")
+        intent.action = Intent.ACTION_VIEW
+        //intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        Timber.d("Request open  $insertedImageString")
+        startActivity(intent)
+
+    }
+    fun refreshGallery(filePath: Uri) {
+        val scanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+        //val newPhotoPath = "file:" + image.getAbsolutePath() // image is the created file image
+        //val contentUri = Uri.fromFile(filePath)
+        scanIntent.data = filePath
+        requireActivity().sendBroadcast(scanIntent)
+    }
+
+
+   private fun showSetupDialog(timeTrial: TimeTrialHeader){
         AlertDialog.Builder(requireActivity())
                 .setTitle(resources.getString(R.string.resume_setup))
-                .setMessage("${resources.getString(R.string.resume_setup)} ${timeTrial.timeTrialHeader.ttName}?")
+                .setMessage("${resources.getString(R.string.resume_setup)} ${timeTrial.ttName}?")
                 .setPositiveButton(resources.getString(R.string.ok)) { _, _ ->
 
                     val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()

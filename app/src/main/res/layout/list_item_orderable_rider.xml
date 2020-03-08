@@ -7,11 +7,15 @@
     <data>
         <variable
             name="rider"
-            type="com.android.jared.linden.timingtrials.data.Rider"/>
+            type="com.android.jared.linden.timingtrials.data.FilledTimeTrialRider"/>
+        
+        <variable
+            name="startTime"
+            type="java.lang.String" />
 
         <variable
-            name="pos"
-            type="Integer"/>
+            name="number"
+            type="java.lang.Integer" />
 
     </data>
 
@@ -19,37 +23,43 @@
         android:id="@+id/riderLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:orientation="vertical">
 
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/genericTextView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@{rider.firstName +' ' + rider.lastName}"
+            android:text="@{rider.riderData.firstName +' ' + rider.riderData.lastName}"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/textView13"
+            app:layout_constraintStart_toEndOf="@+id/riderStatusTextView"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Rider Name" />
 
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/genericTextView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
-            android:layout_toLeftOf="@id/view"
-            android:text="@{rider.club}"
+            android:layout_toStartOf="@id/view"
+            android:text="@{startTime}"
+            android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@+id/divider4"
             app:layout_constraintEnd_toStartOf="@+id/view"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Club" />
+            tools:text="+60" />
 
         <View
             android:id="@+id/divider4"
@@ -62,20 +72,22 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView13" />
+            app:layout_constraintTop_toBottomOf="@+id/riderStatusTextView" />
 
         <TextView
-            android:id="@+id/textView13"
-            android:layout_width="32dp"
+            android:id="@+id/riderStatusTextView"
+            android:maxWidth="64dp"
+            android:minWidth="36dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:background="@drawable/number_back"
-            android:text="@{pos.toString()}"
+            android:text="@{Integer.toString(number)}"
             android:textAlignment="center"
             android:textColor="@android:color/black"
-            android:textSize="18sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
