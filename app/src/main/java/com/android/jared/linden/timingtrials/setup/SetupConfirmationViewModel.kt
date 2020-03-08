@@ -25,7 +25,7 @@ class SetupConfirmationViewModel (private val ttSetup: SetupViewModel) : ISetupC
     val timeTrialDefinition = Transformations.map(timeTrial){it?.timeTrialHeader}
 
     override val title = Transformations.map(timeTrialDefinition){ tt ->
-        "Starting ${tt?.ttName}"
+        "Start Timing?"
     }
 
     override val lapsCourse = Transformations.map(timeTrial){ tt->

@@ -14,6 +14,7 @@ import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.databinding.ListItemOrderableRiderBinding
+import com.android.jared.linden.timingtrials.util.ConverterUtils
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder
@@ -38,7 +39,7 @@ class OrderableRiderListAdapter(val context: Context) : RecyclerView.Adapter<Ord
             binding.apply {
                 rider = rd
                 number = mTimeTrialHeader.numberRules.numberFromIndex(rd.timeTrialData.index, mRiders.count())
-                startTime = mTimeTrialHeader.firstRiderStartOffset + mTimeTrialHeader.interval * rd.timeTrialData.index
+                startTime = ConverterUtils.offsetToHmsDisplayString(mTimeTrialHeader.startTime.plusSeconds((mTimeTrialHeader.firstRiderStartOffset + mTimeTrialHeader.interval * rd.timeTrialData.index).toLong()))
             }
         }
     }

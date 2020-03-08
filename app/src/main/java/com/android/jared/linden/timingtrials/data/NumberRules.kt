@@ -1,5 +1,7 @@
 package com.android.jared.linden.timingtrials.data
 
+import java.lang.Exception
+
 enum class NumbersDirection {ASCEND, DESCEND}
 
 data class NumberRules(val terminus: Int = 1, val isStart: Boolean = true, val direction: NumbersDirection = NumbersDirection.ASCEND, val exclusions: List<Int> = listOf()) {
@@ -20,6 +22,10 @@ data class NumberRules(val terminus: Int = 1, val isStart: Boolean = true, val d
 
 
     fun numberFromIndex(index: Int, totalCount: Int): Int{
+
+        if(index >= totalCount){
+            throw Exception("Error getting rider number - index is equal or greater than count")
+        }
 
         val dxToUse = if(isStart) index else totalCount - index
 

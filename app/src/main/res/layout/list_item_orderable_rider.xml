@@ -11,7 +11,7 @@
         
         <variable
             name="startTime"
-            type="java.lang.Integer" />
+            type="java.lang.String" />
 
         <variable
             name="number"
@@ -54,7 +54,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
             android:layout_toStartOf="@id/view"
-            android:text="@{'+' + Integer.toString(startTime)}"
+            android:text="@{startTime}"
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@+id/divider4"
             app:layout_constraintEnd_toStartOf="@+id/view"

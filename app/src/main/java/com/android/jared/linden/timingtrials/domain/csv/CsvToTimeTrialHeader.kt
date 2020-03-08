@@ -14,7 +14,10 @@ object CSVUtils{
         for (current in 0 until input.length) {
             if (input[current] == '\"') inQuotes = !inQuotes // toggle state
             val atLastChar = current == input.length - 1
-            if (atLastChar) result.add(input.substring(start)) else if (input[current] == ',' && !inQuotes) {
+            if (atLastChar) {
+                result.add(input.substring(start).replace(""""""", ""))
+            }
+            else if (input[current] == ',' && !inQuotes) {
                 result.add(input.substring(start, current).replace(""""""", ""))
                 start = current + 1
             }
@@ -87,7 +90,7 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
         val datePortion = Regex("""[-]\d{1,2}[-]\d{1,2}[-]\d{1,2}""").find(titleString)?.value
 
         val cleanedTitle = datePortion?.let {
-            titleString.replace(datePortion, "").replace("-", " ") + " ${datePortion.drop(1)}"
+            titleString.replace(datePortion, "").replace("-", " ").replace("  ", " ") + " ${datePortion.drop(1)}"
         }?:titleString
 
         val status = if(cttTitle.contains("startsheet")) TimeTrialStatus.SETTING_UP else TimeTrialStatus.FINISHED

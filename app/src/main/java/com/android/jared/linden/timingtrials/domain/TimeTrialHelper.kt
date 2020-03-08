@@ -169,7 +169,13 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
         timeTrial.riderList.sortedBy { it.timeTrialData.index }.toList()
     }
 
-    val results : List<IResult> by lazy {
+    val filledRiderResults : List<FilledTimeTrialRider> by lazy {
+        timeTrial.riderList.asSequence()
+                .sortedBy { it.timeTrialData.finishTime?:Long.MAX_VALUE }
+                .toList()
+    }
+
+    val results : List<TimeTrialRiderResult> by lazy {
         timeTrial.riderList.asSequence()
                 .map { TimeTrialRiderResult(it.timeTrialData, it.riderData, this.timeTrial.timeTrialHeader, this.timeTrial.course) }
                 .sortedBy { it.resultTime?:Long.MAX_VALUE }

@@ -39,7 +39,6 @@ class TimingService : Service(){
 
     var timerTick: MutableLiveData<Long> = MutableLiveData()
 
-    var prevString = ""
     var prevSecs = 0L
     inner class TimeTrialTask(val timeTrial: TimeTrialHeader) : TimerTask(){
         override fun run() {

@@ -26,6 +26,10 @@ object ConverterUtils{
         return (f.format(instant))
     }
 
+    fun offsetToHmsDisplayString(ofs: OffsetDateTime): String{
+        return ofs.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+    }
+
     @BindingConversion
     @JvmStatic
     fun dateToDisplay(dateTime: OffsetDateTime): String{

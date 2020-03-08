@@ -85,7 +85,7 @@
     <string name="insert_results">Insert to DB</string>
     <string name="number_of_rides">Rides</string>
     <string name="export_csv">Export CSV</string>
-    <string name="export_json">Export JSON</string>
+    <string name="export_json">Export .tt</string>
     <string name="screenshot">Screenshot</string>
     <string name="delete_results">Delete Results</string>
     <string name="missed_start_move_to_back">Missed start, move to back</string>

@@ -54,6 +54,7 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
         mutList.add("Rider Name")
         mutList.add("Total Time")
         mutList.add("Club")
+        mutList.add("Gender")
         mutList.add("Category")
         mutList.add("Notes")
         if(tt.timeTrialHeader.laps > 1){
@@ -79,6 +80,7 @@ class ResultRowViewModel{
         row.add(ResultCell(MutableLiveData("${result.rider.firstName} ${result.rider.lastName}")))
          row.add(ResultCell(MutableLiveData(ConverterUtils.toTenthsDisplayString(result.resultTime))))
          row.add(ResultCell(MutableLiveData(result.riderClub)))
+         row.add(ResultCell(MutableLiveData(result.gender.fullString())))
          row.add(ResultCell(MutableLiveData(result.category)))
          row.add(ResultCell(MutableLiveData(result.notes)))
          if(laps > 1){

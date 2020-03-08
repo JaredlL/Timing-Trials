@@ -86,6 +86,10 @@ data class TimeTrial(
         return this.updateRiderList(this.riderList.filterNot { it.riderData.id == riderToRemove.id })
     }
 
+    fun getRiderNumber(index: Int): Int{
+        return timeTrialHeader.numberRules.numberFromIndex(index, riderList.size)
+    }
+
 
 
     @Ignore @Transient

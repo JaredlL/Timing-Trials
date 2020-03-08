@@ -3,6 +3,7 @@ package com.android.jared.linden.timingtrials.timing
 import androidx.lifecycle.*
 import com.android.jared.linden.timingtrials.data.*
 import com.android.jared.linden.timingtrials.data.roomrepo.ITimeTrialRepository
+import com.android.jared.linden.timingtrials.data.roomrepo.TimeTrialRiderRepository
 import com.android.jared.linden.timingtrials.domain.ITimelineEvent
 import com.android.jared.linden.timingtrials.domain.TimeLine
 import com.android.jared.linden.timingtrials.domain.TimeTrialHelper
@@ -19,7 +20,7 @@ interface IEventSelectionData{
     var eventAwaitingSelection: Long?
 }
 
-class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel(), IEventSelectionData {
+class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val resultRepository: TimeTrialRiderRepository) : ViewModel(), IEventSelectionData {
 
     val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
     private val liveMilisSinceStart: MutableLiveData<Long> = MutableLiveData()
@@ -116,15 +117,14 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     var looptime = 0L
 
     var queue = ConcurrentLinkedQueue<TimeTrial>()
-    var isCorotineAlive = AtomicBoolean()
+    private val isCorotineAlive = AtomicBoolean()
 
     private fun updateTimeTrial(newtt: TimeTrial){
         timeTrial.value = newtt
         Timber.d("Update TT, ${newtt.riderList.size} riders")
-            if(!isCorotineAlive.get()){
+            if(isCorotineAlive.compareAndSet(false, true)){
                 queue.add(newtt)
                 viewModelScope.launch(Dispatchers.IO) {
-                    isCorotineAlive.set(true)
                     while (queue.peek() != null){
                         var ttToInsert = queue.peek()
                         while (queue.peek() != null){
@@ -139,6 +139,28 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             }else{
                 queue.add(newtt)
             }
+    }
+
+    private fun backgroundUpdateTt(newtt: TimeTrial){
+        timeTrial.postValue(newtt)
+        Timber.d("Update TT, ${newtt.riderList.size} riders")
+        if(isCorotineAlive.compareAndSet(false, true)){
+            queue.add(newtt)
+            viewModelScope.launch(Dispatchers.IO) {
+                while (queue.peek() != null){
+                    var ttToInsert = queue.peek()
+                    while (queue.peek() != null){
+                        ttToInsert = queue.poll()
+                    }
+                    ttToInsert?.let {
+                        timeTrialRepository.updateFull(it)
+                    }
+                }
+                isCorotineAlive.set(false)
+            }
+        }else{
+            queue.add(newtt)
+        }
     }
 
     fun updateLoop(){
@@ -201,18 +223,88 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     fun finishTt(){
         timeTrial.value?.let {
-            val headerCopy = it.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED)
-            updateTimeTrial(it.copy(timeTrialHeader = headerCopy))
+            calculatePbs()
         }
     }
+
+    val calcPbsCorotineAlive = AtomicBoolean()
+    fun calculatePbs(){
+        timeTrial.value?.let {tt->
+            tt.course?.id?.let {courseId->
+                if (calcPbsCorotineAlive.compareAndSet(false, true)) {
+                    viewModelScope.launch(Dispatchers.IO) {
+                        try {
+                            //Must be ordered
+                            val allRes = resultRepository.getCourseResultsSuspend(courseId).filter { it.timeTrialId != tt.timeTrialHeader.id }
+                            val updatedTt = writeRecordsToNotes(tt, allRes)
+                            val updt = updatedTt.copy(timeTrialHeader = updatedTt.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED))
+                            backgroundUpdateTt(updt)
+
+                        }finally {
+                            calcPbsCorotineAlive.set(false)
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    val PRString = "PR"
+    val CRString = "CR"
+
+    fun writeRecordsToNotes(timeTrial: TimeTrial, courseResults: List<TimeTrialRider>): TimeTrial{
+
+        val maleCr = courseResults.firstOrNull{it.gender == Gender.MALE}?.finishTime
+        val femaleCr = courseResults.firstOrNull{it.gender == Gender.FEMALE}?.finishTime
+
+        val copList = timeTrial.riderList.asSequence().map { ttr->
+            courseResults.firstOrNull{it.finishTime != null && it.riderId == ttr.riderData.id}?.let { existingResult->
+                val rTime = ttr.timeTrialData.finishTime
+                val eTime = existingResult.finishTime
+                if(rTime != null && eTime != null && eTime > rTime){
+                    ttr.copy(timeTrialData = ttr.timeTrialData.copy(notes = PRString))
+                }else{
+                    ttr
+                }
+
+            }?:ttr
+        }.toList()
+
+        val maleWithCr = timeTrial.helper.results.filter { it.riderData.gender == Gender.MALE && (it.timeTrialData.finishTime?:Long.MAX_VALUE) < (maleCr ?: 0) }.minBy {
+            it.resultTime ?: Long.MAX_VALUE
+        }
+        val femaleWithCr = timeTrial.helper.results.filter { it.riderData.gender == Gender.FEMALE && (it.timeTrialData.finishTime?: Long.MAX_VALUE) < (femaleCr ?: 0) }.minBy {
+            it.resultTime ?: Long.MAX_VALUE
+        }
+
+        val nCList = copList.map {
+           when (it.riderData.id) {
+               maleWithCr?.riderData?.id -> it.copy(timeTrialData = it.timeTrialData.copy(notes = CRString))
+               femaleWithCr?.riderData?.id -> it.copy(timeTrialData = it.timeTrialData.copy(notes = CRString))
+               else -> it
+           }
+       }.toList()
+
+//        timeTrial.riderList.forEach { res->
+//            courseResults.firstOrNull{it.finishTime != null && it.riderId == res.riderData.id}?.let { existingResult->
+//                val rTime = res.timeTrialData.finishTime
+//                val eTime = existingResult.finishTime
+//                if(rTime != null && eTime != null && eTime > rTime){
+//                    newRiderList.add(res.copy(timeTrialData = res.timeTrialData.copy(notes = "PR")))
+//                }
+//            }
+//        }
+        return timeTrial.updateRiderList(nCList)
+    }
+
 
     fun discardTt(){
         Timber.d("JAREDMSG -> TIMINGVM -> Deleting TT")
         viewModelScope.launch(Dispatchers.IO) {
             var deleted = false
             while (!deleted){
-                if(!isCorotineAlive.get()){
-                    isCorotineAlive.set(true)
+                if(isCorotineAlive.compareAndSet(false, true)){
                     timeTrial.value?.let {
                         timeTrialRepository.delete(it)
                     }
@@ -260,8 +352,9 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                 val nextStartRider = sparse.valueAt(nextIndex)
                 val millisToNextRider = (nextStartMilli - millisSinceStart)
 
-                    val riderString = if(tte.timeTrialHeader.interval == 0){
-                        "(${nextStartRider.timeTrialData.index}) ${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName}"
+
+                    val riderString = if(tte.timeTrialHeader.interval != 0){
+                        "(${tte.getRiderNumber(nextStartRider.timeTrialData.index)}) ${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName}"
                     }else{
                         "All Riders"
                     }

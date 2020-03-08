@@ -20,8 +20,7 @@ class RiderStatusViewWrapper(val filledRider: FilledTimeTrialRider, val timeLine
     val number: String = timeLine.timeTrial.timeTrialHeader.numberRules.numberFromIndex(rider.index, timeLine.timeTrial.riderList.size).toString()
 
     val startTimeMilis: Long = timeLine.timeTrial.timeTrialHeader.startTimeMilis + timeLine.timeTrial.helper.getRiderStartTime(rider)
-    //val b = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTimeMilis), ZoneId.systemDefault())
-    val startTimeDisplay: String = ConverterUtils.toSecondsDisplayString(timeLine.timeTrial.helper.getRiderStartTime(rider))
+    val startTimeDisplay: String = ConverterUtils.offsetToHmsDisplayString(timeLine.timeTrial.timeTrialHeader.startTime.plusSeconds((timeLine.timeTrial.timeTrialHeader.firstRiderStartOffset + timeLine.timeTrial.timeTrialHeader.interval * filledRider.timeTrialData.index).toLong()))
 
     var onPressedCallback: (TimeTrialRider) -> Unit ={}
 

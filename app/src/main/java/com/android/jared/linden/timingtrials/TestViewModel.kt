@@ -85,7 +85,7 @@ class TestViewModel@Inject constructor(
                                         firstRiderStartOffset = 0,
                                         interval = 5,
                                         courseId = courses[2].id,
-                                        laps = 2,
+                                        laps = 1,
                                         status = TimeTrialStatus.IN_PROGRESS),
                         course = courses[2])
 

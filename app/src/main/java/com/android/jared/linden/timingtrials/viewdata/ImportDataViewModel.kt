@@ -160,7 +160,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                             val tt = lineToTt.importLine(currentLine)
                             tt?.let {
                                 timeTrialList.lastOrNull()?.timeTrialHeader = it
-                                //state = READING_COURSE
 
                             }
                         }
@@ -168,7 +167,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                             val course = lineToCourse.importLine(currentLine)
                             course?.let {
                                 timeTrialList.lastOrNull()?.course = it
-                                //state = READING_RIDER
                             }
                         }
                         READING_RIDER->{
@@ -178,11 +176,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                         }
                     }
                 }
-//                currentLine = reader.readLine()
-//                if(currentLine != null){
-//                    currentLine = currentLine.replace(""""""", "")
-//                    currentLine = currentLine.replace("""'""", "")
-//                }
             }
 
             timeTrialList.forEach {
