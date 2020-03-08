@@ -3,6 +3,7 @@ package com.android.jared.linden.timingtrials.data.source
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialBasicInfo
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import timber.log.Timber
@@ -93,6 +94,7 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     @Query("DELETE FROM timetrial_table") abstract fun deleteAll()
     @Query("DELETE FROM timetrial_rider_table") abstract fun deleteAllR()
 
+    @Query("SELECT courseId, laps, interval, id FROM timetrial_table") abstract fun getAllHeaderBasicInfo(): List<TimeTrialBasicInfo>
 
     @Query("SELECT * from timetrial_table ORDER BY status ASC, startTime ASC") abstract fun getAllTimeTrials(): LiveData<List<TimeTrialHeader>>
 
@@ -113,6 +115,7 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE id = :timeTrialId LIMIT 1") abstract fun getFullTimeTrial(timeTrialId: Long): LiveData<TimeTrial>
+
 
 
 

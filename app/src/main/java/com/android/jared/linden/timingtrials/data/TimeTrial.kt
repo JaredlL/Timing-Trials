@@ -36,6 +36,13 @@ data class TimeTrialHeader(val ttName: String,
 
 }
 
+data class TimeTrialBasicInfo(
+        val courseId: Long? = null,
+        val laps: Int = 1,
+        val interval:Int = 60,
+        val id: Long? = null
+)
+
 data class TimeTrialWithCourse(
     @Embedded val timeTrialHeader: TimeTrialHeader,
 

@@ -235,7 +235,8 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                     viewModelScope.launch(Dispatchers.IO) {
                         try {
                             //Must be ordered
-                            val allRes = resultRepository.getCourseResultsSuspend(courseId).filter { it.timeTrialId != tt.timeTrialHeader.id }
+                            val ttsOnTheCourse = timeTrialRepository.getAllHeaderBasicInfo().asSequence().filter { it.courseId == courseId && it.laps == tt.timeTrialHeader.laps && it.id != tt.timeTrialHeader.id }.map { it.id }.toList()
+                            val allRes = resultRepository.getCourseResultsSuspend(courseId).filter { it.timeTrialId?.let { ttsOnTheCourse.contains(it)}?:false}
                             val updatedTt = writeRecordsToNotes(tt, allRes)
                             val updt = updatedTt.copy(timeTrialHeader = updatedTt.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED))
                             backgroundUpdateTt(updt)

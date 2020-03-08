@@ -4,6 +4,7 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.android.jared.linden.timingtrials.data.TimeTrial
+import com.android.jared.linden.timingtrials.data.TimeTrialBasicInfo
 import com.android.jared.linden.timingtrials.data.TimeTrialHeader
 import com.android.jared.linden.timingtrials.data.TimeTrialStatus
 import com.android.jared.linden.timingtrials.data.source.TimeTrialDao
@@ -25,6 +26,8 @@ interface ITimeTrialRepository{
     suspend fun delete(timeTrial: TimeTrial)
     suspend fun allTimeTrials(): List<TimeTrial>
     suspend fun deleteById(ttId: Long)
+
+    fun getAllHeaderBasicInfo(): List<TimeTrialBasicInfo>
 
     suspend fun deleteHeader(timeTrialHeader: TimeTrialHeader)
     //val nonFinishedTimeTrial: LiveData<TimeTrialWithCourse?>
@@ -60,6 +63,10 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
             throw Exception("TT ID cannot be null")
         }
         timeTrialDao.update(timeTrial)
+    }
+
+    override fun getAllHeaderBasicInfo(): List<TimeTrialBasicInfo> {
+        return timeTrialDao.getAllHeaderBasicInfo()
     }
 
     override val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>> = timeTrialDao.getAllTimeTrials()
