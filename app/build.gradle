@@ -105,6 +105,9 @@ dependencies {
     //GSON
     implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
 
+    //CSV
+    implementation "com.opencsv:opencsv:4.5"
+
     //Threeten Time
     implementation 'com.jakewharton.threetenabp:threetenabp:1.2.2'
     testImplementation('org.threeten:threetenbp:1.4.1') {

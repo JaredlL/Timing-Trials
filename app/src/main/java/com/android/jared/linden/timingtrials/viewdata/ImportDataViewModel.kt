@@ -17,6 +17,9 @@ import com.android.jared.linden.timingtrials.domain.csv.LineToTimeTrialConverter
 import com.android.jared.linden.timingtrials.util.ConverterUtils
 import com.android.jared.linden.timingtrials.util.Event
 import com.google.gson.Gson
+import com.opencsv.CSVReader
+import com.opencsv.CSVReaderBuilder
+import com.opencsv.ICSVParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
@@ -136,8 +139,11 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             val timeTrialList: MutableList<TimeTrialIO> = mutableListOf()
             var state = READING_TT
 
-            for  (fileLine in fileContents.lineSequence()){
-                val currentLine = fileLine
+            val allLines = CSVReader(StringReader(fileContents)).readAll()
+            for  (fileLine in allLines){
+
+                val currentLine = fileLine.joinToString()
+                val cLineList = fileLine.toList()
                 if(lineToTt.isHeading(currentLine)){
                     lineToTt.setHeading(currentLine)
                     timeTrialList.add(TimeTrialIO())
@@ -157,20 +163,20 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                 else{
                     when(state){
                         READING_TT->{
-                            val tt = lineToTt.importLine(currentLine)
+                            val tt = lineToTt.importLine(cLineList)
                             tt?.let {
                                 timeTrialList.lastOrNull()?.timeTrialHeader = it
 
                             }
                         }
                         READING_COURSE->{
-                            val course = lineToCourse.importLine(currentLine)
+                            val course = lineToCourse.importLine(cLineList)
                             course?.let {
                                 timeTrialList.lastOrNull()?.course = it
                             }
                         }
                         READING_RIDER->{
-                            lineToRider.importLine(currentLine)?.let {
+                            lineToRider.importLine(cLineList)?.let {
                                 timeTrialList.lastOrNull()?.timeTrialRiders?.add(it)
                             }
                         }

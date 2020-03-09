@@ -64,10 +64,10 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
 
     val formatList = listOf("d/m/y", "d-M-y","d/M/y")
 
-    override fun importLine(dataLine: String): TimeTrialHeader? {
+    override fun importLine(dataLine: List<String>): TimeTrialHeader? {
 
         try{
-            val dataList = CSVUtils.lineToList(dataLine)
+            val dataList =dataLine// CSVUtils.lineToList(dataLine)
             val ttName = nameIndex?.let { dataList.getOrNull(it)}?:""
             val dateString = dateindex?.let { dataList.getOrNull(it) }
             val status = statusIndex?.let { if((dataList.getOrNull(it)?:"").contains("setting up", ignoreCase = true)) TimeTrialStatus.SETTING_UP else TimeTrialStatus.FINISHED }

@@ -46,7 +46,7 @@ data class TimeTrialRiderIO(
 interface ILineToObjectConverter<T>{
     fun isHeading(line:String): Boolean
     fun setHeading(headingLine: String)
-    fun importLine(dataLine: String): T?
+    fun importLine(dataLine: List<String>): T?
 }
 
 

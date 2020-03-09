@@ -27,9 +27,9 @@ class LineToCourseConverter: ILineToObjectConverter<Course> {
         cttNameIndex= splitLine.withIndex().firstOrNull { it.value.contains("ctt", true) }?.index
     }
 
-    override fun importLine(dataLine: String): Course? {
+    override fun importLine(dataLine: List<String>): Course? {
         try{
-            val dataList = CSVUtils.lineToList(dataLine)
+            val dataList = dataLine //CSVUtils.lineToList(dataLine)
             val courseName = nameIndex?.let { dataList.getOrNull(it)}
             if(courseName == "Lee"){
                 throw Exception("Ug?")

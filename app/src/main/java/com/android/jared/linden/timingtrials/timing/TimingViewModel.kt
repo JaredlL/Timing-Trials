@@ -230,24 +230,29 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     val calcPbsCorotineAlive = AtomicBoolean()
     fun calculatePbs(){
         timeTrial.value?.let {tt->
-            tt.course?.id?.let {courseId->
                 if (calcPbsCorotineAlive.compareAndSet(false, true)) {
                     viewModelScope.launch(Dispatchers.IO) {
+                        val ttToInsert = try {
+                            tt.course?.id?.let { courseId ->
+                                //Must be ordered
+                                val ttsOnTheCourse = timeTrialRepository.getAllHeaderBasicInfo().asSequence().filter { it.courseId == courseId && it.laps == tt.timeTrialHeader.laps && it.id != tt.timeTrialHeader.id }.map { it.id }.filterNotNull().toList()
+                                val allRes = resultRepository.getCourseResultsSuspend(courseId).filter { courseResult ->
+                                    courseResult.timeTrialId?.let { ttsOnTheCourse.contains(it) } ?: false
+                                }
+                                writeRecordsToNotes(tt, allRes).copy(timeTrialHeader = tt.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED))
+                            }?:tt
+                        }
+                        catch (e: Exception){
+                            showMessage("Error setting CRs and PRs - ${e.message}")
+                            tt
+                        }
                         try {
-                            //Must be ordered
-                            val ttsOnTheCourse = timeTrialRepository.getAllHeaderBasicInfo().asSequence().filter { it.courseId == courseId && it.laps == tt.timeTrialHeader.laps && it.id != tt.timeTrialHeader.id }.map { it.id }.toList()
-                            val allRes = resultRepository.getCourseResultsSuspend(courseId).filter { it.timeTrialId?.let { ttsOnTheCourse.contains(it)}?:false}
-                            val updatedTt = writeRecordsToNotes(tt, allRes)
-                            val updt = updatedTt.copy(timeTrialHeader = updatedTt.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED))
-                            backgroundUpdateTt(updt)
-
+                            backgroundUpdateTt(ttToInsert)
                         }finally {
                             calcPbsCorotineAlive.set(false)
                         }
                     }
                 }
-            }
-
         }
     }
 
@@ -259,44 +264,50 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         val maleCr = courseResults.firstOrNull{it.gender == Gender.MALE}?.finishTime
         val femaleCr = courseResults.firstOrNull{it.gender == Gender.FEMALE}?.finishTime
 
-        val copList = timeTrial.riderList.asSequence().map { ttr->
-            courseResults.firstOrNull{it.finishTime != null && it.riderId == ttr.riderData.id}?.let { existingResult->
-                val rTime = ttr.timeTrialData.finishTime
-                val eTime = existingResult.finishTime
-                if(rTime != null && eTime != null && eTime > rTime){
-                    ttr.copy(timeTrialData = ttr.timeTrialData.copy(notes = PRString))
-                }else{
-                    ttr
-                }
+        val maleWithCr = maleCr?.let {
+            timeTrial.helper.results.filter { it.timeTrialData.finishTime != null && it.riderData.gender == Gender.MALE && it.timeTrialData.finishTime < maleCr }.minBy { it.timeTrialData.finishTime ?: Long.MAX_VALUE }
+        }?.rider
+        val femaleWithCr = femaleCr?.let {
+            timeTrial.helper.results.filter { it.timeTrialData.finishTime != null && it.riderData.gender == Gender.FEMALE && it.timeTrialData.finishTime < femaleCr }.minBy { it.timeTrialData.finishTime ?: Long.MAX_VALUE }
+        }?.rider
 
-            }?:ttr
+        val listWithPrsCalculated = timeTrial.riderList.asSequence().map { timeTrialRider->
+            timeTrialRider.riderData.id?.let {riderId->
+                when (riderId) {
+                    maleWithCr?.id -> {
+                        timeTrialRider.copy(timeTrialData = timeTrialRider.timeTrialData.copy(notes = CRString))
+                    }
+                    femaleWithCr?.id -> {
+                        timeTrialRider.copy(timeTrialData = timeTrialRider.timeTrialData.copy(notes = CRString))
+                    }
+                    else -> {
+                        courseResults.firstOrNull{it.finishTime != null && it.riderId == riderId}?.let { existingResult->
+
+                            val thisResultTime = timeTrialRider.timeTrialData.finishTime
+                            val existingResultTime = existingResult.finishTime
+
+                            if(thisResultTime != null && existingResultTime != null && existingResultTime > thisResultTime){
+                                timeTrialRider.copy(timeTrialData = timeTrialRider.timeTrialData.copy(notes = PRString))
+                            }else{
+                                timeTrialRider
+                            }
+                        }
+                    }
+                }
+            } ?:timeTrialRider
         }.toList()
 
-        val maleWithCr = timeTrial.helper.results.filter { it.riderData.gender == Gender.MALE && (it.timeTrialData.finishTime?:Long.MAX_VALUE) < (maleCr ?: 0) }.minBy {
-            it.resultTime ?: Long.MAX_VALUE
-        }
-        val femaleWithCr = timeTrial.helper.results.filter { it.riderData.gender == Gender.FEMALE && (it.timeTrialData.finishTime?: Long.MAX_VALUE) < (femaleCr ?: 0) }.minBy {
-            it.resultTime ?: Long.MAX_VALUE
-        }
 
-        val nCList = copList.map {
-           when (it.riderData.id) {
-               maleWithCr?.riderData?.id -> it.copy(timeTrialData = it.timeTrialData.copy(notes = CRString))
-               femaleWithCr?.riderData?.id -> it.copy(timeTrialData = it.timeTrialData.copy(notes = CRString))
-               else -> it
-           }
-       }.toList()
 
-//        timeTrial.riderList.forEach { res->
-//            courseResults.firstOrNull{it.finishTime != null && it.riderId == res.riderData.id}?.let { existingResult->
-//                val rTime = res.timeTrialData.finishTime
-//                val eTime = existingResult.finishTime
-//                if(rTime != null && eTime != null && eTime > rTime){
-//                    newRiderList.add(res.copy(timeTrialData = res.timeTrialData.copy(notes = "PR")))
-//                }
-//            }
-//        }
-        return timeTrial.updateRiderList(nCList)
+//        val listWithCRsCalculated = listWithPrsCalculated.map {
+//           when (it.riderData.id) {
+//               maleWithCr?.riderData?.id -> it.copy(timeTrialData = it.timeTrialData.copy(notes = CRString))
+//               femaleWithCr?.riderData?.id -> it.copy(timeTrialData = it.timeTrialData.copy(notes = CRString))
+//               else -> it
+//           }
+//       }.toList()
+
+        return timeTrial.updateRiderList(listWithPrsCalculated)
     }
 
 
