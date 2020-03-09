@@ -1,10 +1,7 @@
 package com.android.jared.linden.timingtrials.domain
 
 import android.util.LongSparseArray
-import androidx.core.util.size
 import com.android.jared.linden.timingtrials.data.*
-import com.android.jared.linden.timingtrials.ui.RiderStatus
-import org.threeten.bp.Instant
 import java.util.*
 
 
@@ -13,7 +10,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
 
     fun assignRiderToEvent(ttRider: TimeTrialRider, eventTimestamp: Long): RiderAssignmentResult {
 
-        if(ttRider.finishTime != null && ttRider.finishTime < 0){
+        if(ttRider.finishCode != null && ttRider.finishCode < 0){
             return RiderAssignmentResult(false, "Rider did not start or finish", timeTrial)
         }
 
@@ -25,7 +22,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
                 val newSplits = (ttr.timeTrialData.splits + (eventTimestamp - riderStartTime)).sorted()
 
                 if (ttr.timeTrialData.splits.size +1 == timeTrial.timeTrialHeader.laps){
-                    ttr.updateTimeTrialData(ttr.timeTrialData.copy(splits = newSplits, finishTime = newSplits.last()))
+                    ttr.updateTimeTrialData(ttr.timeTrialData.copy(splits = newSplits, finishCode = newSplits.last()))
 
                 }else{
                     ttr.updateTimeTrialData( ttr.timeTrialData.copy(splits = newSplits))
@@ -60,7 +57,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
         return timeTrial.copy(riderList = timeTrial.riderList.map {
             if(it.timeTrialData.id == rider.id)
             {
-                it.copy(timeTrialData = it.timeTrialData.copy(finishTime = -2, notes = "DNF"))
+                it.copy(timeTrialData = it.timeTrialData.copy(finishCode = FinishCode.DNF.type, notes = FinishCode.DNF.toString()))
             }
             else{
                 it
@@ -86,7 +83,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
         return timeTrial.copy(riderList = timeTrial.riderList.map {
             if(it.timeTrialData.id == rider.id)
             {
-                it.copy(timeTrialData = it.timeTrialData.copy(finishTime = -1, notes = "DNS"))
+                it.copy(timeTrialData = it.timeTrialData.copy(finishCode = FinishCode.DNS.type, notes = FinishCode.DNS.toString()))
             }
             else{
                 it
@@ -98,7 +95,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
         return timeTrial.copy(riderList = timeTrial.riderList.map {
             if(it.timeTrialData.id == rider.id)
             {
-                it.copy(timeTrialData = it.timeTrialData.copy(finishTime = null, notes = ""))
+                it.copy(timeTrialData = it.timeTrialData.copy(finishCode = null, notes = ""))
             }
             else{
                 it
@@ -171,7 +168,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
 
     val filledRiderResults : List<FilledTimeTrialRider> by lazy {
         timeTrial.riderList.asSequence()
-                .sortedBy { it.timeTrialData.finishTime?:Long.MAX_VALUE }
+                .sortedBy { it.timeTrialData.finishTime() }
                 .toList()
     }
 

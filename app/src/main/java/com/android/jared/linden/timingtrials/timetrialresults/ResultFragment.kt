@@ -79,7 +79,7 @@ class ResultFragment : Fragment() {
 
         resultViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
             res?.let {
-                binding.titleText.text = "${it.timeTrialHeader.ttName} ${resources.getString(R.string.results)}"
+                binding.titleText.text = it.timeTrialHeader.ttName
                 if(res.timeTrialHeader.notes.isBlank()){
                     binding.resultNotesTextView.visibility = View.GONE
                 }else{

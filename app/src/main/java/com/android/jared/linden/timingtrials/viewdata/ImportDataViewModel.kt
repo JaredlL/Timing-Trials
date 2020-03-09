@@ -348,12 +348,12 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                             timeTrialId = headerInDb?.id,
                             courseId = courseInDb?.id,
                             index = index,
-                            finishTime = if (headerInDb?.status == TimeTrialStatus.FINISHED) importRider.finishTime else null,
+                            finishCode = if (headerInDb?.status == TimeTrialStatus.FINISHED) importRider.finishTime else null,
                             splits = if (headerInDb?.status == TimeTrialStatus.FINISHED) transformSplits(importRider.splits) else listOf(),
                             category = importRider.category,
                             gender = gen,
                             club = importRider.club,
-                            resultNote = importRider.notes
+                            notes = importRider.notes
                     )
                     insertTimeTrialRider(timeTrialRider)
 

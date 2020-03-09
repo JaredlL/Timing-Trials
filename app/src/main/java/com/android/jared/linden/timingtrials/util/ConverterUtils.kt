@@ -1,17 +1,11 @@
 package com.android.jared.linden.timingtrials.util
 
 import androidx.databinding.BindingConversion
-import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.text.Format
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.math.abs
+import kotlin.math.*
 
 object ConverterUtils{
 
@@ -56,7 +50,19 @@ object ConverterUtils{
 
     }
 
+    fun toSecondMinuteHour(milliseconds: Long): String{
+        return when {
+            milliseconds < 999 -> "${sigDigRounder((milliseconds.toDouble()/1000))} sec"
+            milliseconds in (1000..59999) -> "${milliseconds/1000}.${(milliseconds % 1000) / 100} sec".replace(".0", "")
+            else -> String.format("%d min %d sec", milliseconds / 60000, (milliseconds/1000) % 60)
+        }
+    }
 
+    fun sigDigRounder(value: Double, nSigDig: Int = 1, dir: Int = -1): Double {
+        var intermediate = value / 10.0.pow(floor(log10(abs(value))) - (nSigDig - 1))
+        intermediate = if (dir > 0) ceil(intermediate) else if (dir < 0) floor(intermediate) else intermediate.roundToInt().toDouble()
+        return intermediate * 10.0.pow(floor(log10(abs(value))) - (nSigDig - 1))
+    }
 
 
 }

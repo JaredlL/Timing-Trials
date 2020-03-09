@@ -14,7 +14,7 @@ class LineToRiderConverterTest {
 
         val riderImporter = LineToResultRiderConverter()
         riderImporter.setHeading(heading)
-        var import = riderImporter.importLine(line)
+        var import = riderImporter.importLine(line.split(","))
 
         assertEquals( "jared",import?.firstName)
         assertEquals("linden", import?.lastName)
@@ -23,7 +23,7 @@ class LineToRiderConverterTest {
          line = "jared linden,RDFCC,23:40"
 
         riderImporter.setHeading(heading)
-        import = riderImporter.importLine(line)
+        import = riderImporter.importLine(line.split(""))
 
         assertEquals( "jared",import?.firstName)
         assertEquals("linden", import?.lastName)

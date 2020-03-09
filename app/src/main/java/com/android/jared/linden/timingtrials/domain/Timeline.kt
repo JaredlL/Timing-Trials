@@ -1,6 +1,7 @@
 package com.android.jared.linden.timingtrials.domain
 
 import com.android.jared.linden.timingtrials.data.FilledTimeTrialRider
+import com.android.jared.linden.timingtrials.data.FinishCode
 import com.android.jared.linden.timingtrials.data.TimeTrial
 import com.android.jared.linden.timingtrials.data.TimeTrialRider
 import com.android.jared.linden.timingtrials.ui.RiderStatus
@@ -30,8 +31,8 @@ class TimeLine(val timeTrial: TimeTrial, val timeStamp: Long) {
 
     fun getRiderStatus(rider: TimeTrialRider): RiderStatus {
         return when {
-            rider.finishTime?.toInt() == -2 -> RiderStatus.DNF
-            rider.finishTime?.toInt() == -1 -> RiderStatus.DNS
+            rider.finishCode == FinishCode.DNF.type -> RiderStatus.DNF
+            rider.finishCode == FinishCode.DNS.type -> RiderStatus.DNS
             timeStamp < timeTrial.helper.getRiderStartTime(rider) -> RiderStatus.NOT_STARTED
             rider.splits.size < timeTrial.timeTrialHeader.laps -> RiderStatus.RIDING
             else -> RiderStatus.FINISHED
@@ -43,7 +44,7 @@ class TimeLine(val timeTrial: TimeTrial, val timeStamp: Long) {
     private fun gtl(): List<ITimelineEvent> {
         val startedEvents = timeTrial.riderList.asSequence()
                 .filter {
-                    (it.timeTrialData.finishTime != null && it.timeTrialData.finishTime == -1L).not()
+                    (it.timeTrialData.finishCode != null && it.timeTrialData.finishCode == FinishCode.DNS.type).not()
                 }
                 .map { ttr -> TimeLineEvent(timeTrial.helper.getRiderStartTime(ttr.timeTrialData), TimelineEventType.RIDER_STARTED, ttr) }
                 .filter { it.timeStamp <= timeStamp }

@@ -33,3 +33,9 @@ enum class TimeTrialStatus(val type: Int){
         fun fromInt(type: Int) = map[type]
     }
 }
+
+enum class FinishCode(val type: Long){
+    INVALID(0),
+    DNF(-1),
+    DNS(-2)
+}

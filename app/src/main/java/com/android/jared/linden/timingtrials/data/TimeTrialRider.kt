@@ -1,7 +1,6 @@
 package com.android.jared.linden.timingtrials.data
 
 import androidx.room.*
-import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 
 
@@ -14,18 +13,30 @@ data class TimeTrialRider(val riderId: Long,
                           val courseId: Long?,
                           val index: Int,
                           val startTimeOffset: Int = 0,
-                          val finishTime: Long? = null,
+                          val finishCode: Long? = null,
                           val splits: List<Long> = listOf(),
                           val partOfTeam: Boolean = false,
                           val category: String = "",
                           val gender: Gender = Gender.UNKNOWN,
                           val club: String = "",
                           val notes: String = "",
-                          val resultNote: String? = null,
                           @PrimaryKey(autoGenerate = true) val id: Long? = null){
 
     fun hasNotDnfed():Boolean{
-        return finishTime == null || finishTime >0
+        return finishCode == null || finishCode >0
+    }
+
+
+    fun hasFinished():Boolean{
+        return finishCode?.let { it>0 }?:false
+    }
+
+    fun finishTime():Long?{
+        return if (finishCode != null && finishCode > 0){
+            finishCode
+        }else{
+            null
+        }
     }
 
 }
@@ -48,7 +59,7 @@ data class TimeTrialRiderResult(
         get() = riderData
 
     override val category: String
-        get() = timeTrialData.category?:""
+        get() = timeTrialData.category
 
     override val course: Course
         get() = resCourse?:Course.createBlank()
@@ -66,7 +77,7 @@ data class TimeTrialRiderResult(
         get() = timeTrialData.notes
 
     override val resultTime: Long?
-        get() = timeTrialData.finishTime
+        get() = timeTrialData.finishTime()
 
 
     override val splits: List<Long>

@@ -256,38 +256,43 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         }
     }
 
-    val PRString = "PR"
-    val CRString = "CR"
+    val PRString = "PR!"
+    val CRString = "CR!"
 
     fun writeRecordsToNotes(timeTrial: TimeTrial, courseResults: List<TimeTrialRider>): TimeTrial{
 
-        val maleCr = courseResults.firstOrNull{it.gender == Gender.MALE}?.finishTime
-        val femaleCr = courseResults.firstOrNull{it.gender == Gender.FEMALE}?.finishTime
+        val maleCr = courseResults.firstOrNull{it.gender == Gender.MALE}?.finishTime()
+        val femaleCr = courseResults.firstOrNull{it.gender == Gender.FEMALE}?.finishTime()
 
         val maleWithCr = maleCr?.let {
-            timeTrial.helper.results.filter { it.timeTrialData.finishTime != null && it.riderData.gender == Gender.MALE && it.timeTrialData.finishTime < maleCr }.minBy { it.timeTrialData.finishTime ?: Long.MAX_VALUE }
+            timeTrial.helper.results.filter { it.riderData.gender == Gender.MALE && it.timeTrialData.finishTime()?: Long.MAX_VALUE < maleCr }.minBy { it.timeTrialData.finishTime() ?: Long.MAX_VALUE }
         }?.rider
         val femaleWithCr = femaleCr?.let {
-            timeTrial.helper.results.filter { it.timeTrialData.finishTime != null && it.riderData.gender == Gender.FEMALE && it.timeTrialData.finishTime < femaleCr }.minBy { it.timeTrialData.finishTime ?: Long.MAX_VALUE }
+            timeTrial.helper.results.filter { it.riderData.gender == Gender.FEMALE && it.timeTrialData.finishTime()?: Long.MAX_VALUE < femaleCr }.minBy { it.timeTrialData.finishTime()  ?: Long.MAX_VALUE }
         }?.rider
 
         val listWithPrsCalculated = timeTrial.riderList.asSequence().map { timeTrialRider->
             timeTrialRider.riderData.id?.let {riderId->
                 when (riderId) {
                     maleWithCr?.id -> {
-                        timeTrialRider.copy(timeTrialData = timeTrialRider.timeTrialData.copy(notes = CRString))
+                        val newTime = timeTrialRider.timeTrialData.finishTime()
+                        val crString = newTime?.let { "$CRString (by ${ConverterUtils.toSecondMinuteHour(maleCr - newTime)})"}?:""
+                        timeTrialRider.copy(timeTrialData = timeTrialRider.timeTrialData.copy(notes = crString))
                     }
                     femaleWithCr?.id -> {
-                        timeTrialRider.copy(timeTrialData = timeTrialRider.timeTrialData.copy(notes = CRString))
+                        val newTime = timeTrialRider.timeTrialData.finishTime()
+                        val crString = newTime?.let { "$CRString (by ${ConverterUtils.toSecondMinuteHour(femaleCr - newTime)})"}?:""
+                        timeTrialRider.copy(timeTrialData = timeTrialRider.timeTrialData.copy(notes = crString))
                     }
                     else -> {
-                        courseResults.firstOrNull{it.finishTime != null && it.riderId == riderId}?.let { existingResult->
+                        courseResults.firstOrNull{it.finishTime() != null && it.riderId == riderId}?.let { existingResult->
 
-                            val thisResultTime = timeTrialRider.timeTrialData.finishTime
-                            val existingResultTime = existingResult.finishTime
+                            val thisResultTime = timeTrialRider.timeTrialData.finishTime()
+                            val existingResultTime = existingResult.finishTime()
 
                             if(thisResultTime != null && existingResultTime != null && existingResultTime > thisResultTime){
-                                timeTrialRider.copy(timeTrialData = timeTrialRider.timeTrialData.copy(notes = PRString))
+                                val prString = "$PRString (by ${ConverterUtils.toSecondMinuteHour(existingResultTime - thisResultTime)})"
+                                timeTrialRider.copy(timeTrialData = timeTrialRider.timeTrialData.copy(notes = prString))
                             }else{
                                 timeTrialRider
                             }
