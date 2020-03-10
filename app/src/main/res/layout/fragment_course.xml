@@ -7,7 +7,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.android.jared.linden.timingtrials.edititem.EditCourseViewModel"/>
+            type="com.jaredlinden.timingtrials.edititem.EditCourseViewModel"/>
     </data>
 
     <androidx.core.widget.NestedScrollView

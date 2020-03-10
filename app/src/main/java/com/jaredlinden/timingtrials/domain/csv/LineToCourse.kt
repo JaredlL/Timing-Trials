@@ -1,0 +1,53 @@
+package com.jaredlinden.timingtrials.domain.csv
+
+import com.jaredlinden.timingtrials.data.Course
+import com.jaredlinden.timingtrials.domain.ILineToObjectConverter
+
+class LineToCourseConverter: ILineToObjectConverter<Course> {
+    override fun isHeading(line: String): Boolean {
+        return line.splitToSequence(",", ignoreCase = true).any{it.contains("Course Name", true)}
+    }
+
+    val defaultConversion = 1000.0
+    var nameIndex:Int? = 0
+    var distanceIndex:Int? = 2
+    var cttNameIndex:Int? = 1
+    var conversion: Double = defaultConversion
+
+    val conversions = mapOf("km" to 1000.0, "miles" to 1609.34, "mi" to 1609.34, "meters" to 1.0)
+
+
+    override fun setHeading(headingLine: String) {
+        val splitLine = headingLine.splitToSequence(",", ignoreCase = true)
+
+        nameIndex = splitLine.withIndex().firstOrNull { it.value.contains("name", true) }?.index
+        distanceIndex= splitLine.withIndex().firstOrNull { it.value.contains("distance", true) || it.value.contains("length", true) }?.index
+        val distanceString = distanceIndex?.let { splitLine.elementAtOrNull(it)}
+        conversion = distanceString?.let {ds -> conversions.filter{ds.contains(it.key, ignoreCase =  true)}.values.firstOrNull() } ?:defaultConversion
+        cttNameIndex= splitLine.withIndex().firstOrNull { it.value.contains("ctt", true) }?.index
+    }
+
+    override fun importLine(dataLine: List<String>): Course? {
+        try{
+            val dataList = dataLine //CSVUtils.lineToList(dataLine)
+            val courseName = nameIndex?.let { dataList.getOrNull(it)}
+            if(courseName == "Lee"){
+                throw Exception("Ug?")
+            }
+            val distance = distanceIndex?.let { dataList.getOrNull(it)?.toDoubleOrNull()?.times(conversion)}
+            val cctName = cttNameIndex?.let { dataList.getOrNull(it) }
+
+            return if(courseName.isNullOrBlank()){
+                null
+            }else{
+                Course(courseName, distance?:0.0, cctName?:"")
+            }
+
+
+        }catch (e:Exception){
+            throw Exception("Error reading course data", e)
+        }
+    }
+
+
+}

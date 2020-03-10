@@ -1,0 +1,73 @@
+package com.jaredlinden.timingtrials.setup
+
+
+import android.os.Build
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.jaredlinden.timingtrials.IFabCallbacks
+
+
+import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.adapters.OrderableRiderListAdapter
+import com.jaredlinden.timingtrials.util.getViewModel
+import com.jaredlinden.timingtrials.util.injector
+import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager
+import kotlinx.android.synthetic.main.fragment_order_riders.*
+
+
+class OrderRidersFragment : Fragment() {
+
+    private lateinit var viewModel: IOrderRidersViewModel
+    private lateinit var mAdapter: OrderableRiderListAdapter
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+
+
+        viewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.orderRidersViewModel
+        
+        mAdapter = OrderableRiderListAdapter(requireContext()).apply { onMove = {x,y -> viewModel.moveItem(x, y)} }
+
+        viewModel.getOrderableRiderData().observe(viewLifecycleOwner, Observer { ttData ->
+            ttData?.let {mAdapter.setData(ttData )}
+        })
+        (requireActivity() as IFabCallbacks).setVisibility(View.GONE)
+
+
+
+        return inflater.inflate(R.layout.fragment_order_riders, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val dragDropManager = RecyclerViewDragDropManager().apply {
+            setInitiateOnMove(false)
+            setInitiateOnLongPress(true)
+            setLongPressTimeout(300)
+        }
+
+        val wrappedAdapter = dragDropManager.createWrappedAdapter(mAdapter)
+        val mSortableRecyclerView = sortableRecyclerView
+        mSortableRecyclerView.adapter = wrappedAdapter
+        mSortableRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        //mSortableRecyclerView.itemAnimator = DraggableItemAnimator()
+        dragDropManager.attachRecyclerView(sortableRecyclerView)
+    }
+
+    fun supportsViewElevation(): Boolean{
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance() =
+                OrderRidersFragment()
+    }
+
+}

@@ -8,7 +8,7 @@
     <data>
         <variable
             name="courseVm"
-            type="com.android.jared.linden.timingtrials.ui.SelectableCourseViewModel"/>
+            type="com.jaredlinden.timingtrials.ui.SelectableCourseViewModel"/>
 
     </data>
 
