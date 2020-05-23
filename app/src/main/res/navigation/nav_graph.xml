@@ -108,6 +108,9 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_open_exit" />
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_sheetFragment"
+            app:destination="@id/sheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/editCourseFragment"
@@ -226,4 +229,8 @@
         tools:layout="@layout/fragment_number_options"
         android:name="com.jaredlinden.timingtrials.setup.NumberOptionsDialog"
         android:label="NumberOptionsDialog" />
+    <fragment
+        android:id="@+id/sheetFragment"
+        android:name="com.jaredlinden.timingtrials.spreadsheet.test.TestSheetFragment"
+        android:label="SheetFragment" />
 </navigation>

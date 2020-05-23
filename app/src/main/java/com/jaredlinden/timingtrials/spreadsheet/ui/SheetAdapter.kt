@@ -1,5 +1,6 @@
-package com.unwrappedapps.android.spreadsheet.ui.sheet
+package com.jaredlinden.timingtrials.spreadsheet.ui
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.View
@@ -8,16 +9,20 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.widget.TextView
 import android.view.Gravity
+import androidx.databinding.DataBindingUtil
 import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.databinding.ListItemResultBinding
+import com.jaredlinden.timingtrials.spreadsheet.GridData
 import com.jaredlinden.timingtrials.spreadsheet.Spreadsheet
 
 
-class SheetAdapter(val density: Int, var select: TextView?) :
+
+class SheetAdapter(val density: Int, val gridData: GridData, var select: TextView?) :
         RecyclerView.Adapter<SheetAdapter.ViewHolder>() {
 
 
     companion object {
-        private var spreadsheet: Spreadsheet? = null
+        //private var gridData: GridData = GridData(listOf())
 
         private const val CELL = 3
         private const val COLUMN_MARKER = 2
@@ -35,8 +40,8 @@ class SheetAdapter(val density: Int, var select: TextView?) :
         select?.text = ""
     }
 
-    fun assignSpreadsheet(ss : Spreadsheet?) {
-        spreadsheet = ss
+    fun assignSpreadsheet(data : GridData) {
+        //gridData = data
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -90,10 +95,10 @@ class SheetAdapter(val density: Int, var select: TextView?) :
 
     private fun makeCell(viewHolder: ViewHolder, position: Int) {
 
-        val workbook = spreadsheet?.workbook
-        val sheet = workbook?.sheetList?.get(workbook.currentSheet)
+        //val workbook = gridData?.workbook
+        //val sheet = workbook?.sheetList?.get(workbook.currentSheet)
 
-        val numColumns = sheet?.getNumberOfColumns()
+        val numColumns = gridData.numberOfColumns
 
         val coordinate = posToMarkers(position)
         var r = coordinate.r
@@ -107,24 +112,24 @@ class SheetAdapter(val density: Int, var select: TextView?) :
         if (numColumns == null) return
 
         if (numColumns < 1) {
-            cellsValue = "Jared Linden"
+            cellsValue = "Error"
         } else {
-            cellsValue = "Chunk"
+
+            cellsValue = gridData.data.getOrNull(r)?.getOrNull(c)?:"Null"
             //cellsValue = sheet.getRow(r).getCell(c).cellValue
         }
 
         viewHolder.textView.text = cellsValue
 
-        if (sheet.columnWidths.size > c) {
-            val baseWidth = sheet.columnWidths[c]
+        if (gridData.columWidth > c) {
+            val baseWidth = gridData.columWidth
             val denseWidth = baseWidth * density
             viewHolder.textView.width = denseWidth
         } else {
             viewHolder.textView.width = ROW_MARKER_WIDTH*density*2
         }
 
-        val denseHeight = density * sheet.getRow(r).height
-
+        val denseHeight = density * gridData.rowHeight
         viewHolder.textView.height = denseHeight
 
         //val alpha = 0;
@@ -150,10 +155,8 @@ class SheetAdapter(val density: Int, var select: TextView?) :
         var (row,_) = posToMarkers(position)
 
         row--
-        val workbook = spreadsheet?.workbook
-        val sheet = workbook?.sheetList?.get(workbook.currentSheet)
-        val height = sheet?.getRow(row)?.height ?: ROW_HEIGHT
-        val denseHeight = density * height
+
+        val denseHeight = density * gridData.rowHeight
 
         viewHolder.textView.height = denseHeight
         setBackground(viewHolder)
@@ -162,7 +165,7 @@ class SheetAdapter(val density: Int, var select: TextView?) :
 
         val width = ROW_MARKER_WIDTH * density
 
-        viewHolder.textView.height = density * height
+        viewHolder.textView.height = density * gridData.rowHeight
         viewHolder.textView.setWidth(width)
         viewHolder.textView.setText(rm)
         viewHolder.textView.setGravity(Gravity.CENTER)
@@ -174,27 +177,27 @@ class SheetAdapter(val density: Int, var select: TextView?) :
 
         val (_, c) = posToMarkers(position)
 
-        val workbook = spreadsheet?.workbook
-        val sheet = workbook?.sheetList?.get(workbook.currentSheet)
+        //val workbook = gridData?.workbook
+        //val sheet = workbook?.sheetList?.get(workbook.currentSheet)
 
-        val size = sheet?.columnWidths?.size
-
-        if (position == 0) {
-            viewHolder.textView.width = ROW_MARKER_WIDTH * density
-
-        } else {
-            if (size != null) {
-                if (size >= c) {
-                    val baseWidth = sheet.columnWidths[c-1]
-                    val denseWidth = baseWidth * density
-                    viewHolder.textView.width = denseWidth
-                } else {
-                    viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
-                }
-            } else {
-                viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
-            }
-        }
+        val size = gridData.columWidth
+        viewHolder.textView.width = gridData.rowMarkerWidth
+//        if (position == 0) {
+//            viewHolder.textView.width = ROW_MARKER_WIDTH * density
+//
+//        } else {
+//            if (size != null) {
+//                if (size >= c) {
+//                    val baseWidth = sheet.columnWidths[c-1]
+//                    val denseWidth = baseWidth * density
+//                    viewHolder.textView.width = denseWidth
+//                } else {
+//                    viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
+//                }
+//            } else {
+//                viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
+//            }
+//        }
 
         setBackground(viewHolder)
 
@@ -323,7 +326,7 @@ class SheetAdapter(val density: Int, var select: TextView?) :
         val textView: TextView
 
         init {
-            textView = view.findViewById(R.id.textView)
+            textView = view.findViewById(R.id.resultTextView)
         }
     }
 

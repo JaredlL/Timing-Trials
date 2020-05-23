@@ -5,6 +5,7 @@ import android.util.Log
 import java.io.InputStream
 
 
+
 class Spreadsheet {
 
     var workbook : Workbook = Workbook()
@@ -15,16 +16,10 @@ class Spreadsheet {
     }
 
     // spreadsheetFormat from string to other
-    constructor(inputStream: InputStream, spreadsheetFormat: String?) {
-
-        if (spreadsheetFormat.equals("csv")) {
-            workbook = CsvWorkbook(inputStream)
-        }
-
-    }
 
 
 }
+
 
 open class Workbook {
 

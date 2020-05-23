@@ -129,6 +129,11 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     true
 
                 }
+                R.id.app_bar_spreadsheet -> {
+                    drawer_layout.closeDrawer(GravityCompat.START)
+                    true
+
+                }
                 R.id.app_bar_export->{
                     val date = LocalDateTime.now()
                     val fString = date.format(DateTimeFormatter.ofPattern("dd-MM-yy"))
@@ -180,6 +185,12 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                         }
 
 
+
+                    }
+                    R.id.app_bar_spreadsheet->{
+                        val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment()
+                        navController.navigate(action)
+                        drawer_layout.closeDrawer(GravityCompat.START)
 
                     }
                     else->{

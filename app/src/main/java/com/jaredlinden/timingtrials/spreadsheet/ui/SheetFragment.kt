@@ -1,5 +1,6 @@
 package com.jaredlinden.timingtrials.spreadsheet.ui
 
+
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -8,7 +9,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.adapters.GenericListItemAdapter
+import com.jaredlinden.timingtrials.spreadsheet.GridData
+import com.jaredlinden.timingtrials.spreadsheet.test.TestAdapter
+import com.jaredlinden.timingtrials.spreadsheet.test.TestLayoutManager
+import com.jaredlinden.timingtrials.spreadsheet.test.TestLayoutManagerOptions
+
+import kotlinx.android.synthetic.main.fragment_spreadsheet.view.*
 
 
 /*
@@ -31,47 +42,32 @@ class SheetFragment : Fragment() {
 
     fun startSearch() {
         val sheetLayoutManager = fragmentRecyclerView.layoutManager as SheetLayoutManager
-        sheetLayoutManager.startSearch()
+        //sheetLayoutManager.startSearch()
     }
 
-    override fun onResume() {
-        super.onResume()
-        val sheetLayoutManager = fragmentRecyclerView.layoutManager as SheetLayoutManager
-        sheetLayoutManager.removeAllViews()
-        fragmentRecyclerView.adapter?.notifyDataSetChanged()
-        sheetLayoutManager.resetLayoutManagerSearch()
-    }
+//    override fun onResume() {
+//        super.onResume()
+//        val sheetLayoutManager = fragmentRecyclerView.layoutManager as SheetLayoutManager
+//        sheetLayoutManager.removeAllViews()
+//        fragmentRecyclerView.adapter?.notifyDataSetChanged()
+//        //sheetLayoutManager.resetLayoutManagerSearch()
+//    }
 
     fun processSearchJump() {
-        jumpToNewCoordinates().resetLayoutManagerSearch()
+        //jumpToNewCoordinates().resetLayoutManagerSearch()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view =  inflater.inflate(R.layout.sheet_fragment, container, false)
-        val recyclerView = view.recyclerview
+        val view =  inflater.inflate(R.layout.fragment_spreadsheet, container, false)
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        recyclerView.setHasFixedSize(true)
 
-        val displayMetrics = DisplayMetrics()
-        activity?.windowManager?.defaultDisplay?.getMetrics(displayMetrics)
 
-        val density = displayMetrics.density.toInt()
 
-        val sheetAdapter = SheetAdapter(density, activity?.findViewById(R.id.select))
 
-        sheetAdapter.assignSpreadsheet(Spreadsheet())
 
-        recyclerView.adapter = sheetAdapter
-
-        val sheetLayoutManager = SheetLayoutManager()
-        recyclerView.layoutManager = sheetLayoutManager
-
-        fragmentRecyclerView = recyclerView
 
         return view
     }
@@ -94,35 +90,26 @@ class SheetFragment : Fragment() {
             SheetLayoutManager.leftColumn = leftColumn
         }
 
-        viewModel?.sheetLoadState?.observe(this , Observer {
-            val sheetAdapter = fragmentRecyclerView.adapter as SheetAdapter
-            sheetAdapter.assignSpreadsheet(viewModel?.spreadsheet?.value)
-            sheetAdapter.notifyDataSetChanged()
-        })
-
-        viewModel?.jumpCell?.observe(this, Observer<String> { item ->
-            jumpToNewCoordinates()
-        })
     }
 
 
-    fun jumpToNewCoordinates() : SheetLayoutManager {
-        val tr = viewModel?.topRow
-        val lc = viewModel?.leftColumn
-
-        if (tr != null && lc != null) {
-            SheetLayoutManager.topRow = tr
-            SheetLayoutManager.leftColumn = lc
-        }
-
-        val sheetAdapter = fragmentRecyclerView.adapter as SheetAdapter
-        sheetAdapter.notifyDataSetChanged()
-
-        val sheetLayoutManager = fragmentRecyclerView.layoutManager as SheetLayoutManager
-        sheetLayoutManager.removeAllViews()
-        return sheetLayoutManager
-
-    }
+//    fun jumpToNewCoordinates() : SheetLayoutManager {
+//        val tr = viewModel?.topRow
+//        val lc = viewModel?.leftColumn
+//
+//        if (tr != null && lc != null) {
+//            SheetLayoutManager.topRow = tr
+//            SheetLayoutManager.leftColumn = lc
+//        }
+//
+//        val sheetAdapter = fragmentRecyclerView.adapter as SheetAdapter
+//        sheetAdapter.notifyDataSetChanged()
+//
+//        val sheetLayoutManager = fragmentRecyclerView.layoutManager as SheetLayoutManager
+//        sheetLayoutManager.removeAllViews()
+//        return sheetLayoutManager
+//
+//    }
 
     fun processUri() {
         val sheetLayoutManager = fragmentRecyclerView.layoutManager as SheetLayoutManager

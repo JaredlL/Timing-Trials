@@ -1,4 +1,4 @@
-package com.jaredlinden.timingtrials.spreadsheet.ui
+package com.jaredlinden.timingtrials.spreadsheet
 
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +27,41 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
 
     override fun onLayoutChildren(recycler: RecyclerView.Recycler?,
                                   state: RecyclerView.State?) {
-        doInitialLayout(recycler)
+        if (skipLayoutForSearch) {
+            return
+        }
+
+        val jumpColumn = leftColumn
+        val jumpRow = topRow
+
+        var currentColumn = HEADER_COLUMN
+        var currentRow = HEADER_ROW
+        var cellView : View?
+        var filledWidth = 0
+        var filledHeight = 0
+        var cellHeight = 0
+        var columnInc = 0
+        var rowInc = 0
+
+        if (recycler != null) {
+            removeAndRecycleAllViews(recycler)
+            detachAndScrapAttachedViews(recycler)
+        }
+
+        while (height - filledHeight >= 0) {
+            while (width - filledWidth >= 0) {
+                cellView = layoutChildView(recycler, currentColumn, currentRow, filledWidth, filledHeight, Direction.UNLIMITED, Tilt.VERTICAL)
+                filledWidth = filledWidth + getDecoratedSide(cellView, Tilt.VERTICAL)
+                currentColumn = jumpColumn + columnInc++
+                cellHeight = getDecoratedSide(cellView, Tilt.HORIZONTAL) // we don't need to measure this each time
+            }
+
+            currentColumn = HEADER_COLUMN
+            columnInc = 0
+            filledWidth = 0
+            filledHeight = filledHeight + cellHeight
+            currentRow = jumpRow + rowInc++
+        }
     }
 
     override fun scrollHorizontallyBy(dx: Int, recycler: RecyclerView.Recycler?, state: RecyclerView.State?): Int {
@@ -46,8 +80,8 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
 
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
         return LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT)
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
 
@@ -68,63 +102,27 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
 
     private fun doInitialLayout(recycler: RecyclerView.Recycler?) {
 
-        if (skipLayoutForSearch) {
-            return
-        }
 
-        val jumpColumn = leftColumn
-        val jumpRow = topRow
-
-        var currentColumn = HEADER_COLUMN
-        var currentRow = HEADER_ROW
-        var cellView : View?
-        var filledWidth = 0
-        var filledHeight = 0
-        var cellHeight = 0
-        var columnInc = 0
-        var rowInc = 0
-
-
-        if (recycler != null) {
-            removeAndRecycleAllViews(recycler)
-            detachAndScrapAttachedViews(recycler)
-        }
-
-        while (height - filledHeight >= 0) {
-            while (width - filledWidth >= 0) {
-                cellView = layoutChildView(recycler, currentColumn, currentRow, filledWidth, filledHeight, Direction.UNLIMITED, Tilt.VERTICAL)
-                filledWidth = filledWidth + 100//getDecoratedSide(cellView, Tilt.VERTICAL)
-                currentColumn = jumpColumn + columnInc++
-                cellHeight = 100//getDecoratedSide(cellView, Tilt.HORIZONTAL) // we don't need to measure this each time
-            }
-
-            currentColumn = HEADER_COLUMN
-            columnInc = 0
-            filledWidth = 0
-            filledHeight = filledHeight + cellHeight
-            currentRow = jumpRow + rowInc++
-        }
     }
 
 
     // TODO: think of more elegant solution
     private fun getDecoratedMeasuredNullableWidth (cellView : View?) : Int =
-        if (cellView == null) 0
-        else getDecoratedMeasuredWidth(cellView)
+            if (cellView == null) 0
+            else getDecoratedMeasuredWidth(cellView)
 
     // TODO: think of more elegant solution
     private fun getDecoratedMeasuredNullableHeight (cellView : View?) : Int =
-        if (cellView == null) 0
-        else getDecoratedMeasuredHeight(cellView)
+            if (cellView == null) 0
+            else getDecoratedMeasuredHeight(cellView)
 
 
     private fun layoutChildView(recycler: RecyclerView.Recycler?,
-                          column: Int, row: Int,
-                          fWidth: Int, fHeight: Int,
-                          direction: Direction, tilt: Tilt): View? {
+                                column: Int, row: Int,
+                                fWidth: Int, fHeight: Int,
+                                direction: Direction, tilt: Tilt): View? {
 
         val position = markerToPos(row, column)
-        if(position >= itemCount) return null
         val cellView = recycler?.getViewForPosition(position) ?: return null
 
         // TODO: This call is needed for a newly loaded file, not for a rotation etc.
@@ -294,9 +292,9 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
 
 
     private fun fillNewSide(screenBreadth : Int, initialFilled : Int, tilt: Tilt,
-            initialColumn : Int, initialRow : Int,
-            recycler : RecyclerView.Recycler?,
-            screenLimit : Int, direction: Direction) {
+                            initialColumn : Int, initialRow : Int,
+                            recycler : RecyclerView.Recycler?,
+                            screenLimit : Int, direction: Direction) {
 
         var cellView : View?
         var filled = initialFilled
@@ -319,8 +317,8 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
 
 
     private fun getDecoratedSide(child : View?, tilt: Tilt) =
-        if (tilt == Tilt.HORIZONTAL) getDecoratedMeasuredNullableHeight(child)
-        else getDecoratedMeasuredNullableWidth(child)
+            if (tilt == Tilt.HORIZONTAL) getDecoratedMeasuredNullableHeight(child)
+            else getDecoratedMeasuredNullableWidth(child)
 
 
     private fun getLimited(tilt : Tilt) : Int {
@@ -409,7 +407,7 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
 
             if (direction == Direction.LIMITED) {
                 if ((c.top > height && tilt == Tilt.VERTICAL) ||
-                    (c.left > width && tilt == Tilt.HORIZONTAL)) {
+                        (c.left > width && tilt == Tilt.HORIZONTAL)) {
                     dealWithView(recycler, c, tilt, direction)
                 }
             }
@@ -435,7 +433,7 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
     }
 
     private fun sideAdjust(direction: Direction, initialRows: Int, initialColumns: Int,
-                   bottomCellsGone: Int, rightCellsGone: Int) {
+                           bottomCellsGone: Int, rightCellsGone: Int) {
 
         val rowDiff : Int
         val columnDiff : Int
@@ -477,6 +475,6 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
     }
 
     private class LayoutParams(width: Int, height: Int) :
-        RecyclerView.LayoutParams(width, height)
+            RecyclerView.LayoutParams(width, height)
 
 }
