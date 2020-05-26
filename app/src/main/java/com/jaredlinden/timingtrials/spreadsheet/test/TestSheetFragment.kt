@@ -39,7 +39,7 @@ class TestSheetFragment : Fragment()  {
         val density = displayMetrics.density.toInt()
         val adapter = TestAdapter(requireContext(), density)
 
-        val opts = TestLayoutManagerOptions(data)
+        val opts = TestLayoutManagerOptions(data, ('a'..'t').map { it.toString() }.toList())
 
         adapter.setNewItems(opts)
 

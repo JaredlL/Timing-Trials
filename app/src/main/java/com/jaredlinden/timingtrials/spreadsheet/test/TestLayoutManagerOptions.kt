@@ -1,6 +1,6 @@
 package com.jaredlinden.timingtrials.spreadsheet.test
 
-class TestLayoutManagerOptions(val data: List<List<String>>){
+class TestLayoutManagerOptions(val data: List<List<String>>, val headings: List<String>){
 
     val numberOfColumns: Int = data.first().size
     val numberOfRows: Int = data.size

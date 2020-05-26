@@ -136,9 +136,11 @@ class TestLayoutManager(val options: TestLayoutManagerOptions) : RecyclerView.La
                                 direction: Direction, tilt: Tilt): View? {
 
 
-        if(row >= options.numberOfRows || column >= options.numberOfColumns) return null
+        if(row >= options.numberOfRows || column >= options.numberOfColumns)
+            return null
         val position = markerToPos(row, column)
-        if(position >= options.totalItems) return null
+        if(position >= options.totalItems)
+            return null
 
         val cellView = recycler?.getViewForPosition(position) ?: return null
 
@@ -169,8 +171,9 @@ class TestLayoutManager(val options: TestLayoutManagerOptions) : RecyclerView.La
 
 
     private fun markerToPos(r: Int, c: Int): Int {
-        val t = c + r + 1
-        return t * (t + 1) / 2 - c - 1
+        return r * options.numberOfColumns + c
+//        val t = c + r + 1
+//        return t * (t + 1) / 2 - c - 1
     }
 
     // row and column headers get scrolled under, top left header scrolled under by all
@@ -234,7 +237,8 @@ class TestLayoutManager(val options: TestLayoutManagerOptions) : RecyclerView.La
         if (amountBeyondScreen > scrollSize) {
             offsetCells(scrollSize, orientation)
         }else if(currentRow >= options.numberOfRows && tilt == Tilt.VERTICAL || currentCol >= options.numberOfColumns && tilt == Tilt.HORIZONTAL){
-            //offsetCells(ltd, orientation)
+            val ltd = getUnlimited(tilt)
+            offsetCells(-ltd, orientation)
         } else {
             offsetCells(amountBeyondScreen, orientation)
             newMarker(recycler, Direction.UNLIMITED, tilt)
@@ -367,6 +371,28 @@ class TestLayoutManager(val options: TestLayoutManagerOptions) : RecyclerView.La
         return sm
     }
 
+    private fun getUnlimited(tilt : Tilt) : Int {
+        var smallestSoFar = 2140000000
+
+        for (i in 0 until childCount) {
+            val child = getChildAt(i) ?: continue
+            if (cellIsMarker(child)) continue
+
+            val current = if (tilt == Tilt.VERTICAL) child.bottom
+            else child.right
+
+            if (current < smallestSoFar) {
+                smallestSoFar = current
+            }
+        }
+
+        val topLeft = if (tilt == Tilt.VERTICAL) getChildAt(0)?.top ?: 0
+        else getChildAt(0)?.left ?: 0
+
+        val sm = topLeft + (smallestSoFar * -1)
+        return sm
+    }
+
 
     private fun getSmallest(tilt : Tilt) : Int {
         var smallestSoFar = 2140000000
@@ -416,6 +442,7 @@ class TestLayoutManager(val options: TestLayoutManagerOptions) : RecyclerView.La
             }
         }
     }
+
 
 
     // XXX: maybe scrap within scroll

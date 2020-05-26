@@ -41,7 +41,7 @@ class TestAdapter internal constructor(val context: Context, val density: Int): 
     val layoutInflater = LayoutInflater.from(context)
 
     val dummy = listOf(listOf("",""))
-    var mOptions: TestLayoutManagerOptions = TestLayoutManagerOptions(dummy)
+    var mOptions: TestLayoutManagerOptions = TestLayoutManagerOptions(dummy,  listOf(""))
 
     fun setNewItems(options: TestLayoutManagerOptions){
         //mItems = newItems
@@ -183,47 +183,14 @@ class TestAdapter internal constructor(val context: Context, val density: Int): 
             } else {
                 viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
             }
+
+            var text = mOptions.headings[position-1]
+            viewHolder.textView.setText(text)
         }
 
         setBackground(viewHolder)
 
-
-        var many = mOptions.data.flatten()[position]
-        var text = many
-
-//        if (c > 26) {
-//            var before = (c - 1) / 26
-//            before--
-//
-//            if (before >= 26) {
-//                before = before % 26
-//            }
-//
-//            val beforeLast = getLetter(before)
-//            text = beforeLast + text
-//
-//        } else if (position == 0) {
-//            text = " "
-//        }
-
-
-//        if (c > 26 * (26 + 1)) {
-//            var ch = c
-//            ch = ch - 26
-//            ch = ch - 1
-//            ch = ch / 26
-//            ch = ch / 26
-//            ch = ch - 1
-//
-//            val beforebeforeLast = getLetter(ch)
-//            text = beforebeforeLast + text
-//
-//        } else if (position == 0) {
-//            text = " "
-//        }
-
         viewHolder.textView.setGravity(Gravity.CENTER)
-        viewHolder.textView.setText(text)
     }
 
     private fun setBackground(viewHolder: ViewHolder) {
@@ -244,29 +211,9 @@ class TestAdapter internal constructor(val context: Context, val density: Int): 
 
     // translate position to column and row
     private fun posToMarkers(pos: Int): Coordinate {
-        val diff: Int
-        val column: Int
-
-        var p = pos
-        p++
-        p = p * 2
-        val r = Math.floor(Math.sqrt(p.toDouble()))
-        val w = r.toInt()
-
-        val tryit = (w + 1) * w / 2
-
-        if (tryit > pos) {
-            val low = (w - 1) * w / 2
-            diff = low - pos
-            column = w - 1 + diff
-        } else {
-            diff = tryit - pos
-            column = w + diff
-        }
-
-        val row = diff * -1
-
-        return Coordinate(row, column)
+        val col =  pos.rem(mOptions.numberOfColumns)
+        val row = pos / mOptions.numberOfColumns
+        return Coordinate(row, col)
     }
 
     private data class Coordinate(val r : Int, val c : Int)
