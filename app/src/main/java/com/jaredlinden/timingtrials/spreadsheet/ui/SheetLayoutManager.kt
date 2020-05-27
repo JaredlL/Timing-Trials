@@ -2,14 +2,23 @@ package com.jaredlinden.timingtrials.spreadsheet.ui
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.jaredlinden.timingtrials.R
+import java.lang.Exception
 
-class SheetLayoutManager : RecyclerView.LayoutManager() {
+private const val HEADER_COLUMN: Int = 0
+private const val HEADER_ROW: Int = 0
+
+class SheetLayoutManager(private val options: ITestLayoutManagerOptions) : RecyclerView.LayoutManager() {
 
     companion object {
         // need to know if we should stop scrolling up and left, to begin with
         var leftColumn = 1
         var topRow = 1
+
+        //var bottomRow = 1
+        //var rightColumn = 1
 
         private const val HEADER_COLUMN: Int = 0
         private const val HEADER_ROW: Int = 0
@@ -24,6 +33,10 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
         enum class Side{ ROWS, COLUMNS }
         enum class Direction{ LIMITED, UNLIMITED }
     }
+
+    private val totalColumns = options.numberOfColumns + 1
+    private val totalRows = options.numberOfRows + 1
+    private val totalItems = totalColumns * totalRows
 
     override fun onLayoutChildren(recycler: RecyclerView.Recycler?,
                                   state: RecyclerView.State?) {
@@ -46,8 +59,8 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
 
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
         return LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT)
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
 
@@ -84,24 +97,23 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
         var columnInc = 0
         var rowInc = 0
 
-
         if (recycler != null) {
             removeAndRecycleAllViews(recycler)
             detachAndScrapAttachedViews(recycler)
         }
 
-        while (height - filledHeight >= 0) {
-            while (width - filledWidth >= 0) {
+        while (height - filledHeight >= 0 && rowInc < totalRows) {
+            while (width - filledWidth >= 0 && columnInc < totalColumns) {
                 cellView = layoutChildView(recycler, currentColumn, currentRow, filledWidth, filledHeight, Direction.UNLIMITED, Tilt.VERTICAL)
-                filledWidth = filledWidth + 100//getDecoratedSide(cellView, Tilt.VERTICAL)
+                filledWidth += getDecoratedSide(cellView, Tilt.VERTICAL)
                 currentColumn = jumpColumn + columnInc++
-                cellHeight = 100//getDecoratedSide(cellView, Tilt.HORIZONTAL) // we don't need to measure this each time
+                cellHeight = getDecoratedSide(cellView, Tilt.HORIZONTAL) // we don't need to measure this each time
             }
 
             currentColumn = HEADER_COLUMN
             columnInc = 0
             filledWidth = 0
-            filledHeight = filledHeight + cellHeight
+            filledHeight += cellHeight
             currentRow = jumpRow + rowInc++
         }
     }
@@ -109,23 +121,30 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
 
     // TODO: think of more elegant solution
     private fun getDecoratedMeasuredNullableWidth (cellView : View?) : Int =
-        if (cellView == null) 0
-        else getDecoratedMeasuredWidth(cellView)
+            if (cellView == null) 0
+            else getDecoratedMeasuredWidth(cellView)
 
     // TODO: think of more elegant solution
     private fun getDecoratedMeasuredNullableHeight (cellView : View?) : Int =
-        if (cellView == null) 0
-        else getDecoratedMeasuredHeight(cellView)
+            if (cellView == null) 0
+            else getDecoratedMeasuredHeight(cellView)
 
 
     private fun layoutChildView(recycler: RecyclerView.Recycler?,
-                          column: Int, row: Int,
-                          fWidth: Int, fHeight: Int,
-                          direction: Direction, tilt: Tilt): View? {
+                                column: Int, row: Int,
+                                fWidth: Int, fHeight: Int,
+                                direction: Direction, tilt: Tilt): View? {
 
+
+        if(row >= totalRows || column >= totalColumns)
+            return null
         val position = markerToPos(row, column)
-        if(position >= itemCount) return null
+        if(position >= totalItems)
+            return null
+
         val cellView = recycler?.getViewForPosition(position) ?: return null
+
+
 
         // TODO: This call is needed for a newly loaded file, not for a rotation etc.
         // so it can be called less
@@ -137,7 +156,7 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
         val cellHeight = getDecoratedMeasuredHeight(cellView)
 
         when {
-            direction == Direction.UNLIMITED ->
+            direction == Direction.UNLIMITED -> //LEFT To RIGHT
                 layoutDecorated(cellView, fWidth, fHeight, cellWidth + fWidth, cellHeight + fHeight)
             tilt == Tilt.VERTICAL ->
                 layoutDecorated(cellView, fWidth, fHeight - cellHeight, cellWidth + fWidth, fHeight)
@@ -152,8 +171,9 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
 
 
     private fun markerToPos(r: Int, c: Int): Int {
-        val t = c + r + 1
-        return t * (t + 1) / 2 - c - 1
+        return r * totalColumns + c
+//        val t = c + r + 1
+//        return t * (t + 1) / 2 - c - 1
     }
 
     // row and column headers get scrolled under, top left header scrolled under by all
@@ -177,8 +197,9 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
     }
 
 
-    private fun handleScroll(d: Int, recycler: RecyclerView.Recycler?, tilt : Tilt) {
+    private fun handleScroll(d: Int, recycler: RecyclerView.Recycler?, tilt : Tilt): Int {
 
+        if(options.isEmpty) return 0
         val direction : Direction
         var dd : Int
 
@@ -195,8 +216,9 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
             do {
                 dd = processUnlimitedScroll(dd, recycler, tilt)
                 scrapOffscreenViews(recycler, direction, tilt)
-            } while (dd > 0)
+            } while (dd > 0 && ((topRow <= options.numberOfRows && tilt == Tilt.VERTICAL) || (leftColumn <= options.numberOfColumns && tilt == Tilt.HORIZONTAL)))
         }
+        return 0
     }
 
 
@@ -210,12 +232,20 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
         val breadth = if (tilt == Tilt.VERTICAL) height else width
         val amountBeyondScreen = farthestOut - breadth
 
-        if (amountBeyondScreen > scrollSize) {
+        var currentRow = getSideCount(Side.ROWS) + topRow
+        var currentCol = getSideCount(Side.COLUMNS) + leftColumn
+
+        if(amountBeyondScreen < 0){
+            return 0
+        }
+       else if (amountBeyondScreen > scrollSize) {
             offsetCells(scrollSize, orientation)
+        }else if(currentRow > totalRows && tilt == Tilt.VERTICAL || currentCol > totalColumns && tilt == Tilt.HORIZONTAL){
+            offsetCells(amountBeyondScreen, orientation)
         } else {
             offsetCells(amountBeyondScreen, orientation)
             newMarker(recycler, Direction.UNLIMITED, tilt)
-            var remainingMove = scrollSize - amountBeyondScreen
+            var remainingMove = amountBeyondScreen - scrollSize
             return remainingMove
         }
         return 0
@@ -294,9 +324,9 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
 
 
     private fun fillNewSide(screenBreadth : Int, initialFilled : Int, tilt: Tilt,
-            initialColumn : Int, initialRow : Int,
-            recycler : RecyclerView.Recycler?,
-            screenLimit : Int, direction: Direction) {
+                            initialColumn : Int, initialRow : Int,
+                            recycler : RecyclerView.Recycler?,
+                            screenLimit : Int, direction: Direction) {
 
         var cellView : View?
         var filled = initialFilled
@@ -304,23 +334,34 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
         var currentRow = initialRow
 
         // do subsequent
-        while (screenBreadth - filled >= 0) {
+        while (screenBreadth - filled >= 0 && currentColumn <= totalColumns && currentRow <= totalRows + 1) {
 
             cellView = if (tilt == Tilt.VERTICAL)
-                layoutChildView(recycler, currentColumn, currentRow, filled, screenLimit, direction, tilt)
-            else layoutChildView(recycler, currentColumn, currentRow, screenLimit, filled, direction, tilt)
+                    {
+                        layoutChildView(recycler, currentColumn, currentRow, filled, screenLimit, direction, tilt)
+                    }
+                    else
+                    {
+                        layoutChildView(recycler, currentColumn, currentRow, screenLimit, filled, direction, tilt)
+                    }
 
-            filled = filled + getDecoratedSide(cellView, tilt)
-            if (tilt == Tilt.VERTICAL) currentColumn++
-            else currentRow++
+            filled += getDecoratedSide(cellView, tilt)
+            if (tilt == Tilt.VERTICAL)
+            {
+                currentColumn++
+            }
+            else
+            {
+                currentRow++
+            }
         }
 
     }
 
 
     private fun getDecoratedSide(child : View?, tilt: Tilt) =
-        if (tilt == Tilt.HORIZONTAL) getDecoratedMeasuredNullableHeight(child)
-        else getDecoratedMeasuredNullableWidth(child)
+            if (tilt == Tilt.HORIZONTAL) getDecoratedMeasuredNullableHeight(child)
+            else getDecoratedMeasuredNullableWidth(child)
 
 
     private fun getLimited(tilt : Tilt) : Int {
@@ -332,6 +373,7 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
         val sm = topLeft + (smallestSoFar * -1)
         return sm
     }
+
 
 
     private fun getSmallest(tilt : Tilt) : Int {
@@ -384,6 +426,7 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
     }
 
 
+
     // XXX: maybe scrap within scroll
     // maybe increase height/depth
     // maybe relayout screen when shifting directions
@@ -403,13 +446,11 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
         // detaching in the other direction causes problems
         for (i in childCount-1 downTo 0) {
 
-            val c = getChildAt(i)
-
-            if (c == null) continue
+            val c = getChildAt(i) ?: continue
 
             if (direction == Direction.LIMITED) {
                 if ((c.top > height && tilt == Tilt.VERTICAL) ||
-                    (c.left > width && tilt == Tilt.HORIZONTAL)) {
+                        (c.left > width && tilt == Tilt.HORIZONTAL)) {
                     dealWithView(recycler, c, tilt, direction)
                 }
             }
@@ -425,7 +466,6 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
                 }
             }
         }
-
         sideAdjust(direction, initialRows, initialColumns, bottomCellsGone, rightCellsGone)
     }
 
@@ -435,7 +475,7 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
     }
 
     private fun sideAdjust(direction: Direction, initialRows: Int, initialColumns: Int,
-                   bottomCellsGone: Int, rightCellsGone: Int) {
+                           bottomCellsGone: Int, rightCellsGone: Int) {
 
         val rowDiff : Int
         val columnDiff : Int
@@ -451,8 +491,8 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
             rowDiff = 0
             columnDiff = 0
         }
-        topRow = topRow + rowDiff
-        leftColumn = leftColumn + columnDiff
+        topRow += rowDiff
+        leftColumn += columnDiff
 
     }
 
@@ -477,6 +517,6 @@ class SheetLayoutManager : RecyclerView.LayoutManager() {
     }
 
     private class LayoutParams(width: Int, height: Int) :
-        RecyclerView.LayoutParams(width, height)
+            RecyclerView.LayoutParams(width, height)
 
 }

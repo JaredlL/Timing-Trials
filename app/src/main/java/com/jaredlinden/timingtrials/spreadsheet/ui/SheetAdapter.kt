@@ -3,45 +3,70 @@ package com.jaredlinden.timingtrials.spreadsheet.ui
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import android.view.LayoutInflater
 import android.widget.TextView
-import android.view.Gravity
-import androidx.databinding.DataBindingUtil
+import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
 import com.jaredlinden.timingtrials.R
-import com.jaredlinden.timingtrials.databinding.ListItemResultBinding
-import com.jaredlinden.timingtrials.spreadsheet.GridData
-import com.jaredlinden.timingtrials.spreadsheet.Spreadsheet
 
 
+class SheetAdapter internal constructor(val context: Context, val density: Int): RecyclerView.Adapter<SheetAdapter.ViewHolder>(){
 
-class SheetAdapter(val density: Int, val gridData: GridData, var select: TextView?) :
-        RecyclerView.Adapter<SheetAdapter.ViewHolder>() {
-
-
-    companion object {
-        //private var gridData: GridData = GridData(listOf())
-
+    companion object{
         private const val CELL = 3
         private const val COLUMN_MARKER = 2
         private const val ROW_MARKER = 1
 
-        //30 can do 3 digits
-        //36 can do 4 digits
-        //private val ROW_MARKER_WIDTH = 45
-        private const val ROW_MARKER_WIDTH = 50
-
+        private const val ROW_MARKER_WIDTH = 30
         private const val ROW_HEIGHT = 60
     }
 
-    init {
-        select?.text = ""
+
+    inner  class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+
+        var text = ""
+        val textView: TextView = view.findViewById(R.id.spreadSheetTextView)
+        fun bind(resultText: String){
+            textView.text = resultText
+        }
     }
 
-    fun assignSpreadsheet(data : GridData) {
-        //gridData = data
+    val layoutInflater = LayoutInflater.from(context)
+
+    val dummy = listOf(listOf("",""))
+    var mOptions: ITestLayoutManagerOptions = SheetLayoutManagerOptions(dummy,  listOf(""))
+
+    fun setNewItems(options: ITestLayoutManagerOptions){
+        //mItems = newItems
+        mOptions = options
+        notifyDataSetChanged()
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
+        if (getItemViewType(position) == CELL) {
+            makeCell(holder, position)
+        } else if (getItemViewType(position) == COLUMN_MARKER) {
+            makeColumnMarker(holder, position)
+        } else {
+            makeRowMarker(holder, position)
+        }
+
+    }
+
+    fun totalColumns(): Int = mOptions.numberOfColumns + 1
+    fun totalRows(): Int = mOptions.numberOfRows + 1
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_spreadsheet, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun getItemCount(): Int {
+        return totalColumns() * totalRows()
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -58,47 +83,10 @@ class SheetAdapter(val density: Int, val gridData: GridData, var select: TextVie
 
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-
-        // Create a new view.
-        // could change markers by viewType here if necessary
-        val view: View
-
-        view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_result, parent, false)
-
-        return ViewHolder(view)
-    }
-
-    override fun getItemCount(): Int {
-        var items: Int
-
-        items = 2147483647 // biggest int I can make
-        items--
-        items--
-        return items
-    }
-
-    // what to do when position is bound to viewholder
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
-        if (getItemViewType(position) == CELL) {
-            makeCell(holder, position)
-        } else if (getItemViewType(position) == COLUMN_MARKER) {
-            makeColumnMarker(holder, position)
-        } else {
-            makeRowMarker(holder, position)
-        }
-
-    }
-
-
     private fun makeCell(viewHolder: ViewHolder, position: Int) {
 
-        //val workbook = gridData?.workbook
-        //val sheet = workbook?.sheetList?.get(workbook.currentSheet)
 
-        val numColumns = gridData.numberOfColumns
+        val numColumns = totalColumns()
 
         val coordinate = posToMarkers(position)
         var r = coordinate.r
@@ -109,27 +97,25 @@ class SheetAdapter(val density: Int, val gridData: GridData, var select: TextVie
 
         val cellsValue: String?
 
-        if (numColumns == null) return
+        if (numColumns == 0) return
 
         if (numColumns < 1) {
-            cellsValue = "Error"
+            cellsValue = " "
         } else {
-
-            cellsValue = gridData.data.getOrNull(r)?.getOrNull(c)?:"Null"
             //cellsValue = sheet.getRow(r).getCell(c).cellValue
+            cellsValue = mOptions.data[r][c]
         }
 
         viewHolder.textView.text = cellsValue
 
-        if (gridData.columWidth > c) {
-            val baseWidth = gridData.columWidth
+
+            val baseWidth = mOptions.getColumnWidth(c)
             val denseWidth = baseWidth * density
             viewHolder.textView.width = denseWidth
-        } else {
-            viewHolder.textView.width = ROW_MARKER_WIDTH*density*2
-        }
 
-        val denseHeight = density * gridData.rowHeight
+
+        val denseHeight = density * mOptions.getRowHeight(r)
+
         viewHolder.textView.height = denseHeight
 
         //val alpha = 0;
@@ -143,20 +129,20 @@ class SheetAdapter(val density: Int, val gridData: GridData, var select: TextVie
             viewHolder.textView.setBackground(ColorDrawable(Color.argb(alpha, 255, 255, 255)))
         }
 
-        viewHolder.textView.setOnClickListener(
-                {
-                    select?.text = cellsValue
-                })
+        viewHolder.textView.setOnClickListener {
+            Toast.makeText(context, cellsValue, Toast.LENGTH_SHORT).show()
+        }
     }
-
 
     private fun makeRowMarker(viewHolder: ViewHolder, position: Int) {
 
         var (row,_) = posToMarkers(position)
 
         row--
-
-        val denseHeight = density * gridData.rowHeight
+        //al workbook = spreadsheet?.workbook
+        //val sheet = workbook?.sheetList?.get(workbook.currentSheet)
+        val height = mOptions.getRowHeight(row)
+        val denseHeight = density * height
 
         viewHolder.textView.height = denseHeight
         setBackground(viewHolder)
@@ -165,81 +151,44 @@ class SheetAdapter(val density: Int, val gridData: GridData, var select: TextVie
 
         val width = ROW_MARKER_WIDTH * density
 
-        viewHolder.textView.height = density * gridData.rowHeight
+        viewHolder.textView.height = density * height
         viewHolder.textView.setWidth(width)
         viewHolder.textView.setText(rm)
         viewHolder.textView.setGravity(Gravity.CENTER)
     }
-
 
     // must be wide enough for 2-3 letter column markers
     private fun makeColumnMarker(viewHolder: ViewHolder, position: Int) {
 
         val (_, c) = posToMarkers(position)
 
-        //val workbook = gridData?.workbook
-        //val sheet = workbook?.sheetList?.get(workbook.currentSheet)
 
-        val size = gridData.columWidth
-        viewHolder.textView.width = gridData.rowMarkerWidth
-//        if (position == 0) {
-//            viewHolder.textView.width = ROW_MARKER_WIDTH * density
-//
-//        } else {
-//            if (size != null) {
-//                if (size >= c) {
-//                    val baseWidth = sheet.columnWidths[c-1]
-//                    val denseWidth = baseWidth * density
-//                    viewHolder.textView.width = denseWidth
-//                } else {
-//                    viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
-//                }
-//            } else {
-//                viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
-//            }
-//        }
+        val size =  mOptions.numberOfColumns
+
+        if (position == 0) {
+            viewHolder.textView.width = ROW_MARKER_WIDTH * density
+
+        } else {
+            if (size != null) {
+                if (size >= c) {
+                    val baseWidth = mOptions.getColumnWidth(c-1)
+                    val denseWidth = baseWidth * density
+                    viewHolder.textView.width = denseWidth
+                } else {
+                    viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
+                }
+            } else {
+                viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
+            }
+
+            var text = mOptions.headings[position-1]
+            viewHolder.textView.setText(text)
+        }
 
         setBackground(viewHolder)
 
-        val lastPosition = (c - 1) % 26
-
-        var text = getLetter(lastPosition)
-
-        if (c > 26) {
-            var before = (c - 1) / 26
-            before--
-
-            if (before >= 26) {
-                before = before % 26
-            }
-
-            val beforeLast = getLetter(before)
-            text = beforeLast + text
-
-        } else if (position == 0) {
-            text = " "
-        }
-
-
-        if (c > 26 * (26 + 1)) {
-            var ch = c
-            ch = ch - 26
-            ch = ch - 1
-            ch = ch / 26
-            ch = ch / 26
-            ch = ch - 1
-
-            val beforebeforeLast = getLetter(ch)
-            text = beforebeforeLast + text
-
-        } else if (position == 0) {
-            text = " "
-        }
-
         viewHolder.textView.setGravity(Gravity.CENTER)
-        viewHolder.textView.setText(text)
     }
-
 
     private fun setBackground(viewHolder: ViewHolder) {
 
@@ -257,79 +206,12 @@ class SheetAdapter(val density: Int, val gridData: GridData, var select: TextVie
         }
     }
 
-    private fun getLetter(lastPosition: Int): String {
-
-        val text: String
-
-        when (lastPosition) {
-            0 -> text = "Rider Name"
-            1 -> text = "Finish Time"
-            2 -> text = "Club"
-            3 -> text = "D"
-            4 -> text = "E"
-            5 -> text = "F"
-            6 -> text = "G"
-            7 -> text = "H"
-            8 -> text = "I"
-            9 -> text = "J"
-            10 -> text = "K"
-            11 -> text = "L"
-            12 -> text = "M"
-            13 -> text = "N"
-            14 -> text = "O"
-            15 -> text = "P"
-            16 -> text = "Q"
-            17 -> text = "R"
-            18 -> text = "S"
-            19 -> text = "T"
-            20 -> text = "U"
-            21 -> text = "V"
-            22 -> text = "W"
-            23 -> text = "X"
-            24 -> text = "Y"
-            25 -> text = "Z"
-            else -> text = " "
-        }
-        return text
-    }
-
-
     // translate position to column and row
     private fun posToMarkers(pos: Int): Coordinate {
-        val diff: Int
-        val column: Int
-
-        var p = pos
-        p++
-        p = p * 2
-        val r = Math.floor(Math.sqrt(p.toDouble()))
-        val w = r.toInt()
-
-        val tryit = (w + 1) * w / 2
-
-        if (tryit > pos) {
-            val low = (w - 1) * w / 2
-            diff = low - pos
-            column = w - 1 + diff
-        } else {
-            diff = tryit - pos
-            column = w + diff
-        }
-
-        val row = diff * -1
-
-        return Coordinate(row, column)
-    }
-
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val textView: TextView
-
-        init {
-            textView = view.findViewById(R.id.resultTextView)
-        }
+        val col =  pos.rem(totalColumns())
+        val row = pos / (totalColumns())
+        return Coordinate(row, col)
     }
 
     private data class Coordinate(val r : Int, val c : Int)
-
 }

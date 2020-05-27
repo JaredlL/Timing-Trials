@@ -231,6 +231,6 @@
         android:label="NumberOptionsDialog" />
     <fragment
         android:id="@+id/sheetFragment"
-        android:name="com.jaredlinden.timingtrials.spreadsheet.test.TestSheetFragment"
+        android:name="com.jaredlinden.timingtrials.spreadsheet.ui.SheetFragment"
         android:label="SheetFragment" />
 </navigation>
