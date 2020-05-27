@@ -24,7 +24,7 @@ class TestAdapter internal constructor(val context: Context, val density: Int): 
         private const val COLUMN_MARKER = 2
         private const val ROW_MARKER = 1
 
-        private const val ROW_MARKER_WIDTH = 50
+        private const val ROW_MARKER_WIDTH = 30
         private const val ROW_HEIGHT = 60
     }
 
@@ -61,7 +61,8 @@ class TestAdapter internal constructor(val context: Context, val density: Int): 
 
     }
 
-
+    fun totalColumns(): Int = mOptions.numberOfColumns + 1
+    fun totalRows(): Int = mOptions.numberOfRows + 1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_spreadsheet, parent, false)
@@ -69,7 +70,7 @@ class TestAdapter internal constructor(val context: Context, val density: Int): 
     }
 
     override fun getItemCount(): Int {
-        return mOptions.data.first().count() * mOptions.data.count()
+        return totalColumns() * totalRows()
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -89,7 +90,7 @@ class TestAdapter internal constructor(val context: Context, val density: Int): 
     private fun makeCell(viewHolder: ViewHolder, position: Int) {
 
 
-        val numColumns = mOptions.numberOfColumns
+        val numColumns = totalColumns()
 
         val coordinate = posToMarkers(position)
         var r = coordinate.r
@@ -112,7 +113,7 @@ class TestAdapter internal constructor(val context: Context, val density: Int): 
         viewHolder.textView.text = cellsValue
 
 
-            val baseWidth = mOptions.getColumnWidth(0)
+            val baseWidth = mOptions.getColumnWidth(c)
             val denseWidth = baseWidth * density
             viewHolder.textView.width = denseWidth
 
@@ -174,7 +175,7 @@ class TestAdapter internal constructor(val context: Context, val density: Int): 
         } else {
             if (size != null) {
                 if (size >= c) {
-                    val baseWidth = mOptions.getColumnWidth(0)
+                    val baseWidth = mOptions.getColumnWidth(c-1)
                     val denseWidth = baseWidth * density
                     viewHolder.textView.width = denseWidth
                 } else {
@@ -211,8 +212,8 @@ class TestAdapter internal constructor(val context: Context, val density: Int): 
 
     // translate position to column and row
     private fun posToMarkers(pos: Int): Coordinate {
-        val col =  pos.rem(mOptions.numberOfColumns)
-        val row = pos / mOptions.numberOfColumns
+        val col =  pos.rem(totalColumns())
+        val row = pos / (totalColumns())
         return Coordinate(row, col)
     }
 

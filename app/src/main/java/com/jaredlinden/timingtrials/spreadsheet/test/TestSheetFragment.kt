@@ -17,7 +17,6 @@ import com.jaredlinden.timingtrials.timetrialresults.ResultListAdapter
 import com.jaredlinden.timingtrials.timetrialresults.ResultViewModel
 import kotlinx.android.synthetic.main.fragment_spreadsheet.*
 import kotlinx.android.synthetic.main.fragment_spreadsheet.view.*
-import kotlinx.android.synthetic.main.fragment_spreadsheet.view.button4
 
 class TestSheetFragment : Fragment()  {
 
@@ -28,10 +27,9 @@ class TestSheetFragment : Fragment()  {
         val view =  inflater.inflate(R.layout.fragment_spreadsheet, container, false)
 
 
-        val data = (1..20).map { x-> ('a'..'t').map {y-> x.toString() + y  } }
+        val data = (1..25).map { x-> ('a'..'z').map {y-> x.toString() + y  } }
 
         //val gridData = GridData(data)
-
 
         val displayMetrics = DisplayMetrics()
         activity?.windowManager?.defaultDisplay?.getMetrics(displayMetrics)
@@ -39,7 +37,7 @@ class TestSheetFragment : Fragment()  {
         val density = displayMetrics.density.toInt()
         val adapter = TestAdapter(requireContext(), density)
 
-        val opts = TestLayoutManagerOptions(data, ('a'..'t').map { it.toString() }.toList())
+        val opts = TestLayoutManagerOptions(data, ('a'..'z').map {y-> y.toString()})
 
         adapter.setNewItems(opts)
 
@@ -63,9 +61,6 @@ class TestSheetFragment : Fragment()  {
 
         recyclerView.layoutManager = TestLayoutManager(opts)
 
-        view?.button4?.setOnClickListener {
-            adapter.notifyDataSetChanged()
-        }
 
         return view
     }

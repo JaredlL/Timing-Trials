@@ -34,6 +34,10 @@ class TestLayoutManager(val options: TestLayoutManagerOptions) : RecyclerView.La
         enum class Direction{ LIMITED, UNLIMITED }
     }
 
+    val totalColumns = options.numberOfColumns + 1
+    val totalRows = options.numberOfRows + 1
+    val totalItems = totalColumns * totalRows
+
     override fun onLayoutChildren(recycler: RecyclerView.Recycler?,
                                   state: RecyclerView.State?) {
         doInitialLayout(recycler)
@@ -136,10 +140,10 @@ class TestLayoutManager(val options: TestLayoutManagerOptions) : RecyclerView.La
                                 direction: Direction, tilt: Tilt): View? {
 
 
-        if(row >= options.numberOfRows || column >= options.numberOfColumns)
+        if(row >= totalRows || column >= totalColumns)
             return null
         val position = markerToPos(row, column)
-        if(position >= options.totalItems)
+        if(position >= totalItems)
             return null
 
         val cellView = recycler?.getViewForPosition(position) ?: return null
@@ -171,7 +175,7 @@ class TestLayoutManager(val options: TestLayoutManagerOptions) : RecyclerView.La
 
 
     private fun markerToPos(r: Int, c: Int): Int {
-        return r * options.numberOfColumns + c
+        return r * totalColumns + c
 //        val t = c + r + 1
 //        return t * (t + 1) / 2 - c - 1
     }
@@ -215,7 +219,7 @@ class TestLayoutManager(val options: TestLayoutManagerOptions) : RecyclerView.La
             do {
                 dd = processUnlimitedScroll(dd, recycler, tilt)
                 scrapOffscreenViews(recycler, direction, tilt)
-            } while (dd > 0 && ((topRow < options.numberOfRows + 10 && tilt == Tilt.VERTICAL) || (leftColumn < options.numberOfColumns + 10 && tilt == Tilt.HORIZONTAL)))
+            } while (dd > 0 && ((topRow <= options.numberOfRows && tilt == Tilt.VERTICAL) || (leftColumn <= options.numberOfColumns && tilt == Tilt.HORIZONTAL)))
         }
         return 0
     }
@@ -236,13 +240,12 @@ class TestLayoutManager(val options: TestLayoutManagerOptions) : RecyclerView.La
 
         if (amountBeyondScreen > scrollSize) {
             offsetCells(scrollSize, orientation)
-        }else if(currentRow >= options.numberOfRows && tilt == Tilt.VERTICAL || currentCol >= options.numberOfColumns && tilt == Tilt.HORIZONTAL){
-            val ltd = getUnlimited(tilt)
-            offsetCells(-ltd, orientation)
+        }else if(currentRow > totalRows && tilt == Tilt.VERTICAL || currentCol > totalColumns && tilt == Tilt.HORIZONTAL){
+            offsetCells(amountBeyondScreen, orientation)
         } else {
             offsetCells(amountBeyondScreen, orientation)
             newMarker(recycler, Direction.UNLIMITED, tilt)
-            var remainingMove = scrollSize - amountBeyondScreen
+            var remainingMove = amountBeyondScreen - scrollSize
             return remainingMove
         }
         return 0
@@ -331,7 +334,7 @@ class TestLayoutManager(val options: TestLayoutManagerOptions) : RecyclerView.La
         var currentRow = initialRow
 
         // do subsequent
-        while (screenBreadth - filled >= 0 && currentColumn <= options.numberOfColumns && currentRow <= options.numberOfRows) {
+        while (screenBreadth - filled >= 0 && currentColumn <= totalColumns && currentRow <= totalRows + 1) {
 
             cellView = if (tilt == Tilt.VERTICAL)
                     {
@@ -371,27 +374,6 @@ class TestLayoutManager(val options: TestLayoutManagerOptions) : RecyclerView.La
         return sm
     }
 
-    private fun getUnlimited(tilt : Tilt) : Int {
-        var smallestSoFar = 2140000000
-
-        for (i in 0 until childCount) {
-            val child = getChildAt(i) ?: continue
-            if (cellIsMarker(child)) continue
-
-            val current = if (tilt == Tilt.VERTICAL) child.bottom
-            else child.right
-
-            if (current < smallestSoFar) {
-                smallestSoFar = current
-            }
-        }
-
-        val topLeft = if (tilt == Tilt.VERTICAL) getChildAt(0)?.top ?: 0
-        else getChildAt(0)?.left ?: 0
-
-        val sm = topLeft + (smallestSoFar * -1)
-        return sm
-    }
 
 
     private fun getSmallest(tilt : Tilt) : Int {

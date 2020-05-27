@@ -4,15 +4,19 @@ class TestLayoutManagerOptions(val data: List<List<String>>, val headings: List<
 
     val numberOfColumns: Int = data.first().size
     val numberOfRows: Int = data.size
-
-    val totalItems = numberOfColumns * numberOfRows
+    
 
     fun getRowHeight(row:Int):Int{
-        return 100
+        return 60
     }
 
     fun getColumnWidth(column:Int):Int{
-        return 100
+       return when(column){
+           4-> 40
+           6-> 80
+           else -> 60
+        }
+
     }
 
 
