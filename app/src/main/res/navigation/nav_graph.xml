@@ -231,6 +231,14 @@
         android:label="NumberOptionsDialog" />
     <fragment
         android:id="@+id/sheetFragment"
-        android:name="com.jaredlinden.timingtrials.spreadsheet.ui.SheetFragment"
-        android:label="SheetFragment" />
+        android:name="com.jaredlinden.timingtrials.spreadsheet.SheetFragment"
+        android:label="SheetFragment" >
+        <argument
+            android:name="itemId"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="itemTypeId"
+            app:argType="string" />
+    </fragment>
 </navigation>

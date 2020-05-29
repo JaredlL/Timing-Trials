@@ -3,18 +3,23 @@ package com.jaredlinden.timingtrials.data
 enum class Gender{
     UNKNOWN{
         override fun fullString(): String { return ""}
+        override fun smallString(): String {return ""}
     },
     MALE{
         override fun fullString(): String { return "Male"}
+        override fun smallString(): String {return "M"}
     },
     FEMALE{
         override fun fullString(): String { return "Female"}
+        override fun smallString(): String {return "F"}
     },
     OTHER{
         override fun fullString(): String { return "Other"}
+        override fun smallString(): String {return "O"}
     };
 
     abstract fun fullString():String
+    abstract fun smallString():String
 
     companion object {
         private val map = values().associateBy(Gender::ordinal)

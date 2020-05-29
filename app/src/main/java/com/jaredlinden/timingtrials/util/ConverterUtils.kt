@@ -70,6 +70,7 @@ object ConverterUtils{
 class LengthConverter(val unitString: String){
 
     private val conversion: Double = unitMap[unitString]?.second?:1000.0
+
     fun lengthToDisplay(length: Double): String{
         return "%2.2f".format(length / conversion)
     }

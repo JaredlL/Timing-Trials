@@ -1,6 +1,6 @@
-package com.jaredlinden.timingtrials.spreadsheet.ui
+package com.jaredlinden.timingtrials.spreadsheet
 
-interface ITestLayoutManagerOptions {
+interface ISheetLayoutManagerOptions {
     val data: List<List<String>>
     val headings: List<String>
     val numberOfColumns: Int
@@ -10,7 +10,7 @@ interface ITestLayoutManagerOptions {
     fun getRowHeight(row: Int): Int
 }
 
-class SheetLayoutManagerOptions(override val data: List<List<String>>, override val headings: List<String>) : ITestLayoutManagerOptions {
+class SheetLayoutManagerOptions(override val data: List<List<String>>, override val headings: List<String>) : ISheetLayoutManagerOptions {
 
     override val numberOfColumns: Int = headings.size
     override val numberOfRows: Int = data.size
@@ -34,9 +34,5 @@ class SheetLayoutManagerOptions(override val data: List<List<String>>, override 
         }
 
     }
-
-
-
-
 }
 

@@ -76,7 +76,8 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Se
             }
 
             courseLayout.setOnClickListener {
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.id?:0, Course::class.java.simpleName)
+                //val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.id?:0, Course::class.java.simpleName)
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.id?:0, Course::class.java.simpleName)
                 Navigation.findNavController(_binding.root).navigate(action)
             }
 

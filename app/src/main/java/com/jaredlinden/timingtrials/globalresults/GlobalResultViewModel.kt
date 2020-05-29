@@ -1,10 +1,14 @@
 package com.jaredlinden.timingtrials.globalresults
 
 import androidx.lifecycle.*
+import com.jaredlinden.timingtrials.data.IResult
+import com.jaredlinden.timingtrials.data.Rider
+import com.jaredlinden.timingtrials.data.TimeTrialRiderResult
 import com.jaredlinden.timingtrials.data.roomrepo.*
 import com.jaredlinden.timingtrials.domain.GlobalResultData
 import com.jaredlinden.timingtrials.domain.ResultDataSource
 import com.jaredlinden.timingtrials.ui.GenericListItemNext
+import com.jaredlinden.timingtrials.ui.IGenericListItem
 import javax.inject.Inject
 
 class GlobalResultViewModel @Inject constructor(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository,private val courseRepository: ICourseRepository, private val timeTrialRiderRepository: TimeTrialRiderRepository) : ViewModel() {
@@ -15,6 +19,14 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
     private val dataSource = ResultDataSource(timeTrialRepository, riderRepository, courseRepository, timeTrialRiderRepository)
 
 
+    fun getRiderResultList(itemId: Long, itemTypeId: String): LiveData<List<TimeTrialRiderResult>> {
+       return if(itemTypeId == Rider::class.java.simpleName){
+            timeTrialRiderRepository.getRiderResults(itemId)
+        }else{
+            timeTrialRiderRepository.getCourseResults(itemId)
+        }
+
+    }
 
 
 
@@ -35,5 +47,7 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
             resMed.value = resMed.value?.copy(title =  it)
         }
     }
+
+
 
 }

@@ -1,16 +1,13 @@
-package com.jaredlinden.timingtrials.spreadsheet.ui
+package com.jaredlinden.timingtrials.spreadsheet
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.jaredlinden.timingtrials.R
-import java.lang.Exception
 
 private const val HEADER_COLUMN: Int = 0
 private const val HEADER_ROW: Int = 0
 
-class SheetLayoutManager(private val options: ITestLayoutManagerOptions) : RecyclerView.LayoutManager() {
+class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : RecyclerView.LayoutManager() {
 
     companion object {
         // need to know if we should stop scrolling up and left, to begin with

@@ -1,4 +1,4 @@
-package com.jaredlinden.timingtrials.spreadsheet.ui
+package com.jaredlinden.timingtrials.spreadsheet
 
 import android.content.Context
 import android.graphics.Color
@@ -37,9 +37,9 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
     val layoutInflater = LayoutInflater.from(context)
 
     val dummy = listOf(listOf("",""))
-    var mOptions: ITestLayoutManagerOptions = SheetLayoutManagerOptions(dummy,  listOf(""))
+    var mOptions: ISheetLayoutManagerOptions = SheetLayoutManagerOptions(dummy,  listOf(""))
 
-    fun setNewItems(options: ITestLayoutManagerOptions){
+    fun setNewItems(options: ISheetLayoutManagerOptions){
         //mItems = newItems
         mOptions = options
         notifyDataSetChanged()
@@ -117,7 +117,7 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
         val denseHeight = density * mOptions.getRowHeight(r)
 
         viewHolder.textView.height = denseHeight
-
+        viewHolder.textView.setGravity(Gravity.CENTER)
         //val alpha = 0;
         val alpha = 255
 
@@ -137,10 +137,8 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
     private fun makeRowMarker(viewHolder: ViewHolder, position: Int) {
 
         var (row,_) = posToMarkers(position)
-
         row--
-        //al workbook = spreadsheet?.workbook
-        //val sheet = workbook?.sheetList?.get(workbook.currentSheet)
+
         val height = mOptions.getRowHeight(row)
         val denseHeight = density * height
 

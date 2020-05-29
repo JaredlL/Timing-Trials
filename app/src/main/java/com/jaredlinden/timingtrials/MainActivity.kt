@@ -188,7 +188,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
                     }
                     R.id.app_bar_spreadsheet->{
-                        val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment()
+                        val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(0,"")
                         navController.navigate(action)
                         drawer_layout.closeDrawer(GravityCompat.START)
 
