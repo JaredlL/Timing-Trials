@@ -32,7 +32,7 @@ class CourseListFragment : Fragment() {
         listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
         val converter = getLengthConverter()
-        viewFactory = CourseViewHolderFactory(converter.unitString)
+        viewFactory = CourseViewHolderFactory(converter.unitDef.key)
         adapter = GenericListAdapter(requireContext(), viewFactory)
         listViewModel.filteredAllCourse.observe(viewLifecycleOwner, Observer{res->
             res?.let {adapter.setItems(it.map {

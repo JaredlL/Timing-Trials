@@ -78,7 +78,7 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
 
 
 
-    val lengthUnits = LengthConverter.unitMap.values.map { it.first }
+    val lengthUnits = LengthConverter.unitList.map { it.name }
 
     private fun updateLengthString(newLength: Double){
         if(newLength > 0){
@@ -92,7 +92,7 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
 
 
     var selectedItemPosition = 0
-    val converstions = LengthConverter.unitMap.values.map { it.second }
+    val converstions = LengthConverter.unitList.map { it.conversion }
 
     fun changeCourse(courseId: Long){
         if(currentId.value != courseId){

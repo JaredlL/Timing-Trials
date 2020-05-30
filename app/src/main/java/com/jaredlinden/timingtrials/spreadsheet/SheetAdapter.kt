@@ -161,13 +161,13 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
         val (_, c) = posToMarkers(position)
 
 
-        val size =  mOptions.numberOfColumns
+        val size =  40
 
         if (position == 0) {
             viewHolder.textView.width = ROW_MARKER_WIDTH * density
 
         } else {
-            if (size != null) {
+
                 if (size >= c) {
                     val baseWidth = mOptions.getColumnWidth(c-1)
                     val denseWidth = baseWidth * density
@@ -175,9 +175,9 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
                 } else {
                     viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
                 }
-            } else {
-                viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
-            }
+//             else {
+//                viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
+//            }
 
             var text = mOptions.headings[position-1]
             viewHolder.textView.setText(text)

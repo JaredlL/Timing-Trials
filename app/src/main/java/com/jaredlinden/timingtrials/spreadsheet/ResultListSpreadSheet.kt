@@ -27,7 +27,7 @@ class RiderResultListSpreadSheet(val results: List<IResult>, val distConverter: 
         }
     }
 
-    override val headings: List<String> = listOf("Course", "Date", "Time","Distance ${distConverter.unitString}", "Laps", "Average Speed ${distConverter.getUnitName()}/h")
+    override val headings: List<String> = listOf("Course", "Time", "Date", "Distance (${distConverter.unitDef.miniString})", "Laps", "Avg Speed (${distConverter.unitDef.miniString}/h)")
 
 
     override val numberOfColumns: Int = headings.count()
@@ -38,14 +38,15 @@ class RiderResultListSpreadSheet(val results: List<IResult>, val distConverter: 
     override val isEmpty: Boolean = results.isEmpty()
 
 
+    val headingWidths = headings.map { it.length }
     val colWidths: List<Int> = data.fold(headings.map { it.length }, {currentLengths,strings -> currentLengths.zip(strings).map { if(it.first >= it.second.length ) it.first else it.second.length } })
 
     override fun getColumnWidth(column: Int): Int {
-        return colWidths[column] * 10 + 20
+        return if(headingWidths[column] != colWidths[column]) colWidths[column] * 10 + 10 else colWidths[column] * 10
     }
 
     override fun getRowHeight(row: Int): Int {
-        return 40
+        return 30
     }
 
 }
@@ -59,7 +60,7 @@ class CourseResultListSpreadSheet(val results: List<IResult>, val distConverter:
         val timeString = res.resultTime?.let { ConverterUtils.toSecondsDisplayString(it) }?:""
         //val distDisplayString = res.course.length.let { distConverter.lengthToDisplay(it * res.laps) }
         val averageSpeedMetersPerMilisecond = averageSpeed(res)
-        return listOf(res.rider.fullName(), dateString, timeString, res.riderClub, res.category, res.gender.smallString(), res.laps.toString(), averageSpeedMetersPerMilisecond)
+        return listOf(res.rider.fullName(), timeString, dateString,  res.riderClub,  res.gender.smallString(),res.category,  averageSpeedMetersPerMilisecond, res.laps.toString())
     }
 
     fun averageSpeed(res:IResult) : String{
@@ -72,7 +73,7 @@ class CourseResultListSpreadSheet(val results: List<IResult>, val distConverter:
         }
     }
 
-    override val headings: List<String> = listOf("Rider", "Date", "Time", "Club", "Category", "Gender", "Laps", "Average Speed ${distConverter.getUnitName()}/h")
+    override val headings: List<String> = listOf("Rider", "Time", "Date", "Club", "Gender", "Category","Avg Speed ${distConverter.unitDef.miniString}/h", "Laps" )
 
 
     override val numberOfColumns: Int = headings.count()
@@ -83,14 +84,15 @@ class CourseResultListSpreadSheet(val results: List<IResult>, val distConverter:
     override val isEmpty: Boolean = results.isEmpty()
 
 
+    val headingWidths = headings.map { it.length }
     val colWidths: List<Int> = data.fold(headings.map { it.length }, {currentLengths,strings -> currentLengths.zip(strings).map { if(it.first >= it.second.length ) it.first else it.second.length } })
 
     override fun getColumnWidth(column: Int): Int {
-        return colWidths[column] * 10 + 20
+        return if(headingWidths[column] != colWidths[column]) colWidths[column] * 10 + 10 else colWidths[column] * 10
     }
 
     override fun getRowHeight(row: Int): Int {
-        return 40
+        return 30
     }
 
 }

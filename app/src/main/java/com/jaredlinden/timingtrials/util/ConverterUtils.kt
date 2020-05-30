@@ -67,33 +67,40 @@ object ConverterUtils{
 
 }
 
-class LengthConverter(val unitString: String){
+class LengthConverter(val unitKey: String){
 
-    private val conversion: Double = unitMap[unitString]?.second?:1000.0
+    val unitDef: LengthDef = unitList.firstOrNull { it.key == unitKey }?: unitList.first()
 
     fun lengthToDisplay(length: Double): String{
-        return "%2.2f".format(length / conversion)
+        return "%2.2f".format(length / unitDef.conversion)
     }
 
     fun convert(length: Double): Double{
-        return  length / conversion
+        return  length / unitDef.conversion
     }
 
     fun convertBack(lengthString: String): Double?{
         val lenDouble = lengthString.toDoubleOrNull()
-        return lenDouble?.times(conversion)
+        return lenDouble?.times(unitDef.conversion)
     }
 
     fun getUnitName(): String{
-        return unitMap[unitString]?.first?:""
+        return unitDef.name
+    }
+
+    fun getUnitMiniNam(): String{
+        return unitDef.miniString
     }
 
     companion object Table{
-        val unitMap = mapOf(
-                "km" to Pair("Kilometers", 1000.0),
-                "miles" to Pair("Miles", 1609.34),
-                "meters" to Pair("Meters", 1.0))
 
+        val unitList = listOf(
+                LengthDef("km", "Kilometers", "km", 1000.0),
+                LengthDef("miles", "Miles", "mi", 1609.34),
+                LengthDef("meters", "Meters", "m", 1.0)
+
+        )
     }
 
 }
+data class LengthDef(val key:String, val name:String, val miniString: String, val conversion: Double)

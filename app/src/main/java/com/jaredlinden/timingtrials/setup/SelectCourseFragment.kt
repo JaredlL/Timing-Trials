@@ -63,7 +63,7 @@ class SelectCourseFragment : Fragment() {
 
         adapter.setHasStableIds(true)
 
-        val unitString = getLengthConverter().unitString
+        val unitString = getLengthConverter().unitDef.name
 
         val heading: SelectableCourseViewModel = SelectableCourseViewModel("Course Name", "Distance ($unitString)", "CTT Name")
 
