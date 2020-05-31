@@ -7,8 +7,8 @@ apply plugin: 'androidx.navigation.safeargs.kotlin'
 repositories { mavenCentral() }
 
 android {
-    dataBinding {
-        enabled true
+    buildFeatures {
+        dataBinding true
     }
 
 

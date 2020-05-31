@@ -103,4 +103,6 @@
     <string name="start_in_string">Start in: %1$d minutes</string>
     <string name="search">Search</string>
     <string name="edit_numbering">Edit Numbering</string>
+    <string name="column_filter">Filters</string>
+    <string name="show_column">Show Column</string>
 </resources>

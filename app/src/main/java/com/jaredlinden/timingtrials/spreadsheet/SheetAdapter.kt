@@ -21,6 +21,7 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
         private const val ROW_MARKER = 1
 
         private const val ROW_MARKER_WIDTH = 30
+        private const val COLUMN_MARKER_HEIGHT = 30
         private const val ROW_HEIGHT = 60
     }
 
@@ -130,7 +131,7 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
         }
 
         viewHolder.textView.setOnClickListener {
-            Toast.makeText(context, cellsValue, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "$r,$c", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -145,7 +146,7 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
         viewHolder.textView.height = denseHeight
         setBackground(viewHolder)
 
-        val rm = Integer.toString(row+1)
+        val rm = (row + 1).toString()
 
         val width = ROW_MARKER_WIDTH * density
 
@@ -161,28 +162,22 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
         val (_, c) = posToMarkers(position)
 
 
-        val size =  40
 
         if (position == 0) {
             viewHolder.textView.width = ROW_MARKER_WIDTH * density
 
         } else {
 
-                if (size >= c) {
-                    val baseWidth = mOptions.getColumnWidth(c-1)
-                    val denseWidth = baseWidth * density
-                    viewHolder.textView.width = denseWidth
-                } else {
-                    viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
-                }
-//             else {
-//                viewHolder.textView.width = ROW_MARKER_WIDTH * density * 2
-//            }
+            val baseWidth = mOptions.getColumnWidth(c-1)
+            val denseWidth = baseWidth * density
+            viewHolder.textView.width = denseWidth
+
+
 
             var text = mOptions.headings[position-1]
             viewHolder.textView.setText(text)
         }
-
+        viewHolder.textView.height = COLUMN_MARKER_HEIGHT * density
         setBackground(viewHolder)
 
         viewHolder.textView.setGravity(Gravity.CENTER)

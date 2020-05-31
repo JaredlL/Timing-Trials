@@ -5,6 +5,18 @@ import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.LengthConverter
 import com.jaredlinden.timingtrials.util.Utils
 
+
+
+
+//class  ResultListSpreadSheet(val results: List<IResult>, val distConverter: LengthConverter):ISheetLayoutManagerOptions {
+//
+//
+//
+//
+//
+//}
+
+
 class RiderResultListSpreadSheet(val results: List<IResult>, val distConverter: LengthConverter):ISheetLayoutManagerOptions{
 
     override val data: List<List<String>> = results.map { listFromResult(it) }
@@ -14,7 +26,7 @@ class RiderResultListSpreadSheet(val results: List<IResult>, val distConverter: 
         val timeString = res.resultTime?.let { ConverterUtils.toSecondsDisplayString(it) }?:""
         val distDisplayString = res.course.length.let { distConverter.lengthToDisplay(it * res.laps) }
         val averageSpeedMetersPerMilisecond = averageSpeed(res)
-        return listOf(res.course.courseName, dateString, timeString, distDisplayString, res.laps.toString(), averageSpeedMetersPerMilisecond)
+        return listOf(res.course.courseName, timeString, dateString,  distDisplayString, res.laps.toString(), averageSpeedMetersPerMilisecond)
     }
 
     fun averageSpeed(res:IResult) : String{
@@ -42,7 +54,7 @@ class RiderResultListSpreadSheet(val results: List<IResult>, val distConverter: 
     val colWidths: List<Int> = data.fold(headings.map { it.length }, {currentLengths,strings -> currentLengths.zip(strings).map { if(it.first >= it.second.length ) it.first else it.second.length } })
 
     override fun getColumnWidth(column: Int): Int {
-        return if(headingWidths[column] != colWidths[column]) colWidths[column] * 10 + 10 else colWidths[column] * 10
+        return if(headingWidths[column] != colWidths[column]) colWidths[column] * 8 + 10 else colWidths[column] * 8
     }
 
     override fun getRowHeight(row: Int): Int {
@@ -88,7 +100,7 @@ class CourseResultListSpreadSheet(val results: List<IResult>, val distConverter:
     val colWidths: List<Int> = data.fold(headings.map { it.length }, {currentLengths,strings -> currentLengths.zip(strings).map { if(it.first >= it.second.length ) it.first else it.second.length } })
 
     override fun getColumnWidth(column: Int): Int {
-        return if(headingWidths[column] != colWidths[column]) colWidths[column] * 10 + 10 else colWidths[column] * 10
+        return if(headingWidths[column] != colWidths[column]) colWidths[column] * 8 + 10 else colWidths[column] * 8
     }
 
     override fun getRowHeight(row: Int): Int {

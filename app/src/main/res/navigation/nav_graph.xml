@@ -110,7 +110,11 @@
             app:popExitAnim="@anim/fragment_open_exit" />
         <action
             android:id="@+id/action_dataBaseViewPagerFragment_to_sheetFragment"
-            app:destination="@id/sheetFragment" />
+            app:destination="@id/sheetFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"/> />
     </fragment>
     <fragment
         android:id="@+id/editCourseFragment"
@@ -195,7 +199,7 @@
     </fragment>
     <fragment
         android:id="@+id/globalResultFragment"
-        android:name="com.jaredlinden.timingtrials.globalresults.GlobalResultFragment"
+        android:name="com.jaredlinden.timingtrials.resultexplorer.GlobalResultFragment"
         android:label="Results"
         tools:layout="@layout/fragment_timetrial_result">
         <argument

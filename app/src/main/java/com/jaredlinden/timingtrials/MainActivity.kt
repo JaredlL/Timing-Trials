@@ -221,6 +221,9 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 R.id.resultFragment->{
                     main_app_bar_layout.setExpanded(true)
                 }
+                R.id.sheetFragment->{
+                    main_app_bar_layout.setExpanded(true)
+                }
             }
         }
 

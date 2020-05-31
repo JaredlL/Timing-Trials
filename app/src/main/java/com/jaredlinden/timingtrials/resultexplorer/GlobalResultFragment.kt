@@ -1,4 +1,4 @@
-package com.jaredlinden.timingtrials.globalresults
+package com.jaredlinden.timingtrials.resultexplorer
 
 import android.os.Bundle
 import android.view.LayoutInflater
