@@ -34,7 +34,9 @@
     <string name="title_activity_timing">TimingActivity</string>
     <string name="start_tt">Start TT</string>
     <string name="riders">Riders</string>
+    <string name="rider">Rider</string>
     <string name="courses">Courses</string>
+    <string name="course">Course</string>
     <string name="time_trials">TimeTrials</string>
     <string name="manage_riders">View Database</string>
     <string name="rider_passed">Rider Passed!</string>
@@ -59,6 +61,9 @@
     <string name="gender">Gender</string>
     <string name="dob">DoB</string>
     <string name="yob">Year of birth</string>
+    <string name="time">Time</string>
+    <string name="laps">Laps</string>
+    <string name="average_speed">Average Speed</string>
     <string name="timingtrials_database">Timing Trials Database</string>
     <string name="rider_start_offset">First rider start offset</string>
     <string name="delete">Delete</string>
