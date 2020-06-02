@@ -1,6 +1,7 @@
 package com.jaredlinden.timingtrials.spreadsheet
 
 import com.jaredlinden.timingtrials.data.IResult
+import com.jaredlinden.timingtrials.domain.IResultColumn
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.LengthConverter
 import com.jaredlinden.timingtrials.util.Utils
@@ -8,13 +9,33 @@ import com.jaredlinden.timingtrials.util.Utils
 
 
 
-//class  ResultListSpreadSheet(val results: List<IResult>, val distConverter: LengthConverter):ISheetLayoutManagerOptions {
-//
-//
-//
-//
-//
-//}
+class  ResultListSpreadSheet(val results: List<IResult>, val columns: List<IResultColumn>):ISheetLayoutManagerOptions {
+
+    private val visibleCols = columns.filter { it.isVisible }
+
+    override val data: List<List<String>> = results.map { res -> visibleCols.map { it.getValue(res) } }
+    override val headings: List<String> = visibleCols.map { it.description }
+
+    override val numberOfColumns: Int = visibleCols.size
+
+    override val numberOfRows: Int = data.size
+
+    override val isEmpty: Boolean = data.isEmpty()
+
+    private val headingWidths = headings.map { it.length }
+
+    private val colWidths: List<Int> = data.fold(headings.map { it.length }, {currentLengths,strings -> currentLengths.zip(strings).map { if(it.first >= it.second.length ) it.first else it.second.length } })
+
+    override fun getColumnWidth(column: Int): Int {
+        return if(headingWidths[column] != colWidths[column]) colWidths[column] * 8 + 10 else colWidths[column] * 8
+    }
+
+    override fun getRowHeight(row: Int): Int {
+        return 30
+    }
+
+
+}
 
 
 class RiderResultListSpreadSheet(val results: List<IResult>, val distConverter: LengthConverter):ISheetLayoutManagerOptions{

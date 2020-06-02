@@ -47,5 +47,13 @@ inline fun <reified T: ViewModel> FragmentActivity.getViewModel(crossinline fact
     }).get(clazz)
 }
 
+fun <T> MutableLiveData<T>.setIfNotEqual(newVal:T){
+    if(value != newVal){
+        value = newVal
+    }
+}
+
+//fun <T> MediatorLiveData<T>.
+
 val Activity.injector get() = (application as TimingTrialsApplication).component
 val Fragment.injector get() = (requireActivity().application as TimingTrialsApplication).component
