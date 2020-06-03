@@ -23,6 +23,8 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
         private const val ROW_MARKER_WIDTH = 30
         private const val COLUMN_MARKER_HEIGHT = 30
         private const val ROW_HEIGHT = 60
+
+        private const val WIDTH_MULTIPLIER = 12
     }
 
 
@@ -111,7 +113,7 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
 
 
             val baseWidth = mOptions.getColumnWidth(c)
-            val denseWidth = baseWidth * density
+            val denseWidth = baseWidth * density * WIDTH_MULTIPLIER
             viewHolder.textView.width = denseWidth
 
 
@@ -131,7 +133,8 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
         }
 
         viewHolder.textView.setOnClickListener {
-            Toast.makeText(context, "$r,$c", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(context, "$r,$c", Toast.LENGTH_SHORT).show()
+            mOptions.onCellClick(r,c)
         }
     }
 
@@ -165,11 +168,12 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
 
         if (position == 0) {
             viewHolder.textView.width = ROW_MARKER_WIDTH * density
+            viewHolder.textView.text = ""
 
         } else {
 
             val baseWidth = mOptions.getColumnWidth(c-1)
-            val denseWidth = baseWidth * density
+            val denseWidth = baseWidth * density * WIDTH_MULTIPLIER
             viewHolder.textView.width = denseWidth
 
 
@@ -178,6 +182,9 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
             viewHolder.textView.setText(text)
         }
         viewHolder.textView.height = COLUMN_MARKER_HEIGHT * density
+        viewHolder.view.setOnClickListener {
+            mOptions.onColumnClick(c - 1)
+        }
         setBackground(viewHolder)
 
         viewHolder.textView.setGravity(Gravity.CENTER)

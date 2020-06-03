@@ -8,6 +8,8 @@ interface ISheetLayoutManagerOptions {
     val isEmpty: Boolean
     fun getColumnWidth(column: Int): Int
     fun getRowHeight(row: Int): Int
+    fun onColumnClick(columnPosition: Int)
+    fun onCellClick(row: Int, col: Int)
 }
 
 class SheetLayoutManagerOptions(override val data: List<List<String>>, override val headings: List<String>) : ISheetLayoutManagerOptions {
@@ -32,6 +34,14 @@ class SheetLayoutManagerOptions(override val data: List<List<String>>, override 
             6-> 80
             else -> 60
         }
+
+    }
+
+    override fun onColumnClick(columnPosition: Int) {
+
+    }
+
+    override fun onCellClick(row: Int, col: Int) {
 
     }
 }

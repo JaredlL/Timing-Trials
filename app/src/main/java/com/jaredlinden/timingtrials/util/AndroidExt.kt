@@ -53,7 +53,18 @@ fun <T> MutableLiveData<T>.setIfNotEqual(newVal:T){
     }
 }
 
-//fun <T> MediatorLiveData<T>.
+fun <T,U> MediatorLiveData<T>.changeValIfNotEqual(obs: LiveData<U>, getVal: (T) -> U, setVal: (U,T) -> T){
+    this.addSource(obs){res->
+        res?.let {u->
+            this.value?.let { t->
+                if(getVal(t) != u){
+                    val newVal = setVal(u,t)
+                    this.value = newVal
+                }
+            }
+        }
+    }
+}
 
 val Activity.injector get() = (application as TimingTrialsApplication).component
 val Fragment.injector get() = (requireActivity().application as TimingTrialsApplication).component

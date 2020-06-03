@@ -14,6 +14,9 @@ class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao
         timeTrialRiderDao.update(timeTrialRider)
     }
 
+    fun getAllResults(): LiveData<List<TimeTrialRiderResult>>{
+        return timeTrialRiderDao.getAllResults()
+    }
 
     fun insert (timeTrialRider: TimeTrialRider): Long{
         return timeTrialRiderDao.insert(timeTrialRider)

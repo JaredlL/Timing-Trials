@@ -5,18 +5,18 @@ import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.LengthConverter
 import org.threeten.bp.OffsetDateTime
 
-interface  IResultColumn{
-
-    val key: String
-    val description : String
-    val descriptionResourceId : Int
-    fun getValue(result: IResult): String
-    val isVisible : Boolean
-    val index: Int
-    val sortOrder: Int
-    val filterText: String
-    fun compare(result1 : IResult, result2: IResult): Int
-}
+//interface  IResultColumn{
+//
+//    val key: String
+//    val description : String
+//    val descriptionResourceId : Int
+//    fun getValue(result: IResult): String
+//    val isVisible : Boolean
+//    val index: Int
+//    val sortOrder: Int
+//    val filterText: String
+//    fun compare(result1 : IResult, result2: IResult): Int
+//}
 
 interface IColumnDefinition{
     val key: String
@@ -24,38 +24,21 @@ interface IColumnDefinition{
     val descriptionResourceId : Int
     fun getValue(result: IResult): String
     fun compare(result1 : IResult, result2: IResult): Int
+    fun passesFilter(filterText: String, result:IResult):Boolean
 }
 
 
-data class ColumnData(val sortOrder: Int = 0, val filterText: String = "", val isVisible: Boolean = true, private val definition: IColumnDefinition){
+data class ColumnData(private val definition: IColumnDefinition, val sortOrder: Int = 0, val filterText: String = "", val isVisible: Boolean = true, val compareAscending:Boolean = true){
     val key = definition.key
     val description = definition.description
     fun getValue(result: IResult): String = definition.getValue(result)
     fun compare(result1: IResult, result2: IResult): Int = definition.compare(result1, result2)
-
-}
-
-const val BLOBS_KEY = "rider"
-class BlobsColumn(){
-
-    override val key: String = RIDER_KEY
-    override val description: String = "Rider"
-    override val descriptionResourceId: Int = com.jaredlinden.timingtrials.R.string.rider
-
-    override fun getValue(result: IResult): String {
-        return result.rider.fullName()
-    }
-
-    override fun compare(result1: IResult, result2: IResult): Int {
-        return result1.rider.fullName().compareTo(result2.rider.fullName())
-    }
-
-
+    fun passesFilter(result: IResult):Boolean = definition.passesFilter(filterText, result)
 }
 
 
 const val RIDER_KEY = "rider"
-class RiderNameColumn(override val index: Int, override val sortOrder: Int = 0, override val filterText: String = "", override val isVisible: Boolean = true):IResultColumn{
+class RiderNameColumn:IColumnDefinition{
 
     override val key: String = RIDER_KEY
     override val description: String = "Rider"
@@ -67,13 +50,17 @@ class RiderNameColumn(override val index: Int, override val sortOrder: Int = 0, 
 
     override fun compare(result1: IResult, result2: IResult): Int {
         return result1.rider.fullName().compareTo(result2.rider.fullName())
+    }
+
+    override fun passesFilter(filterText: String, result: IResult): Boolean {
+        return result.rider.fullName().contains(filterText, true)
     }
 
 
 }
 
 const val COURSE_KEY = "course"
-class CourseNameColumn(override val index:Int, override val sortOrder: Int = 0, override val filterText: String = "", override val isVisible: Boolean = true) : IResultColumn{
+class CourseNameColumn : IColumnDefinition{
 
     override val key: String = COURSE_KEY
     override val description: String = "Course"
@@ -86,10 +73,14 @@ class CourseNameColumn(override val index:Int, override val sortOrder: Int = 0, 
     override fun compare(result1: IResult, result2: IResult): Int {
         return result1.course.courseName.compareTo(result2.course.courseName)
     }
+
+    override fun passesFilter(filterText: String, result: IResult): Boolean {
+        return result.course.courseName.contains(filterText, true)
+    }
 }
 
 const val CLUB_KEY = "club"
-class ClubColumn(override val index: Int, override val sortOrder: Int = 0, override val filterText: String = "", override val isVisible: Boolean = true) : IResultColumn{
+class ClubColumn : IColumnDefinition{
 
     override val key: String = CLUB_KEY
     override val description: String = "Club"
@@ -102,10 +93,14 @@ class ClubColumn(override val index: Int, override val sortOrder: Int = 0, overr
     override fun compare(result1: IResult, result2: IResult): Int {
         return result1.riderClub.compareTo(result2.riderClub)
     }
+
+    override fun passesFilter(filterText: String, result: IResult): Boolean {
+        return result.riderClub.contains(filterText, true)
+    }
 }
 
 const val CATEGORY_KEY = "cat"
-class CategoryColumn(override val index: Int, override val sortOrder: Int = 0, override val filterText: String = "", override val isVisible: Boolean = true) : IResultColumn{
+class CategoryColumn : IColumnDefinition{
 
     override val key: String = CATEGORY_KEY
     override val description: String = "Category"
@@ -118,10 +113,14 @@ class CategoryColumn(override val index: Int, override val sortOrder: Int = 0, o
     override fun compare(result1: IResult, result2: IResult): Int {
         return result1.category.compareTo(result2.category)
     }
+
+    override fun passesFilter(filterText: String, result: IResult): Boolean {
+        return result.category.contains(filterText, true)
+    }
 }
 
 const val GENDER_KEY = "gen"
-class GenderColumn(override val index: Int, override val sortOrder: Int = 0, override val filterText: String = "", override val isVisible: Boolean = true) : IResultColumn{
+class GenderColumn : IColumnDefinition{
 
     override val key: String = GENDER_KEY
     override val description: String = "Gender"
@@ -129,16 +128,19 @@ class GenderColumn(override val index: Int, override val sortOrder: Int = 0, ove
 
 
     override fun getValue(result: IResult): String {
-        return result.gender.fullString()
+        return result.gender.smallString()
     }
 
     override fun compare(result1: IResult, result2: IResult): Int {
         return result1.gender.compareTo(result2.gender)
     }
+    override fun passesFilter(filterText: String, result: IResult): Boolean {
+        return result.gender.smallString().contains(filterText, true)
+    }
 }
 
 const val TIME_KEY = "time"
-class TimeColumn(override val index: Int, override val sortOrder: Int = 0, override val filterText: String = "", override val isVisible: Boolean = true) : IResultColumn{
+class TimeColumn : IColumnDefinition{
 
     override val key: String = TIME_KEY
     override val description: String = "Time"
@@ -151,10 +153,13 @@ class TimeColumn(override val index: Int, override val sortOrder: Int = 0, overr
     override fun compare(result1: IResult, result2: IResult): Int {
         return (result1.resultTime?:Long.MAX_VALUE).compareTo(result2.resultTime?:Long.MAX_VALUE)
     }
+    override fun passesFilter(filterText: String, result: IResult): Boolean {
+        return getValue(result).contains(filterText, true)
+    }
 }
 
 const val DATE_KEY = "date"
-class DateColumn(override val index: Int, override val sortOrder: Int = 0, override val filterText: String = "", override val isVisible: Boolean = true) : IResultColumn{
+class DateColumn : IColumnDefinition{
 
     override val key: String = DATE_KEY
     override val description: String = "Date"
@@ -166,10 +171,13 @@ class DateColumn(override val index: Int, override val sortOrder: Int = 0, overr
     override fun compare(result1: IResult, result2: IResult): Int {
         return (result1.dateSet?: OffsetDateTime.MIN).compareTo(result2.dateSet?: OffsetDateTime.MIN)
     }
+    override fun passesFilter(filterText: String, result: IResult): Boolean {
+        return getValue(result).contains(filterText, true)
+    }
 }
 
 const val DISTANCE_KEY = "dist"
-class DistanceColumn(val distConverter: LengthConverter, override val index: Int, override val sortOrder: Int = 0, override val filterText: String = "", override val isVisible: Boolean = true) : IResultColumn{
+class DistanceColumn(private val distConverter: LengthConverter) : IColumnDefinition{
 
     override val key: String = DISTANCE_KEY
     override val description: String = "Distance"
@@ -181,10 +189,13 @@ class DistanceColumn(val distConverter: LengthConverter, override val index: Int
     override fun compare(result1: IResult, result2: IResult): Int {
         return (result1.course.length * result1.laps).compareTo(result2.course.length * result2.laps)
     }
+    override fun passesFilter(filterText: String, result: IResult): Boolean {
+        return getValue(result).contains(filterText, true)
+    }
 }
 
 const val LAPS_KEY = "dist"
-class LapsColumn(val distConverter: LengthConverter, override val index: Int, override val sortOrder: Int = 0, override val filterText: String = "", override val isVisible: Boolean = true) : IResultColumn{
+class LapsColumn : IColumnDefinition{
 
     override val key: String = LAPS_KEY
     override val description: String = "Laps"
@@ -196,10 +207,13 @@ class LapsColumn(val distConverter: LengthConverter, override val index: Int, ov
     override fun compare(result1: IResult, result2: IResult): Int {
         return (result1.laps).compareTo(result2.laps)
     }
+    override fun passesFilter(filterText: String, result: IResult): Boolean {
+        return getValue(result).contains(filterText, true)
+    }
 }
 
 const val SPEED_KEY = "speed"
-class SpeedColumn(val distConverter: LengthConverter, override val index: Int, override val sortOrder: Int = 0, override val filterText: String = "", override val isVisible: Boolean = true) : IResultColumn{
+class SpeedColumn(private val distConverter: LengthConverter) : IColumnDefinition{
 
     override val key: String = SPEED_KEY
     override val description: String = "Average Speed"
@@ -217,6 +231,9 @@ class SpeedColumn(val distConverter: LengthConverter, override val index: Int, o
 
 
     override fun compare(result1: IResult, result2: IResult): Int {
-        return (result1.course.length * result1.laps).compareTo(result2.laps)
+        return (result1.course.length * result1.laps).compareTo(result2.course.length * result2.laps)
+    }
+    override fun passesFilter(filterText: String, result: IResult): Boolean {
+        return getValue(result).contains(filterText, true)
     }
 }

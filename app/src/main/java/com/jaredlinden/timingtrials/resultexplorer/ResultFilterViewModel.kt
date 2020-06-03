@@ -2,17 +2,26 @@ package com.jaredlinden.timingtrials.resultexplorer
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.jaredlinden.timingtrials.domain.IResultColumn
+import com.jaredlinden.timingtrials.domain.*
+import com.jaredlinden.timingtrials.util.LengthConverter
+import com.jaredlinden.timingtrials.util.changeValIfNotEqual
 import com.jaredlinden.timingtrials.util.setIfNotEqual
 
-class ResultFilterViewModel(val column: IResultColumn) : ViewModel() {
 
-    val mutableColumn = MediatorLiveData<IResultColumn>().apply { value = column }
+
+class ResultFilterViewModel(column: ColumnData) {
+
+    val mutableColumn = MediatorLiveData<ColumnData>().apply { value = column }
 
     val isVisible = MutableLiveData(column.isVisible)
     val filterText = MutableLiveData(column.filterText)
     val sortIndex= MutableLiveData(column.sortOrder)
+    val description = column.description
+
+    fun clearText(){
+        filterText.value  =""
+       // mutableColumn.value = mutableColumn.value?.copy(filterText = "")
+    }
 
     init {
         mutableColumn.addSource(mutableColumn){
@@ -23,15 +32,34 @@ class ResultFilterViewModel(val column: IResultColumn) : ViewModel() {
             }
         }
 
-        mutableColumn.addSource(isVisible){res->
-            res?.let {str->
-                mutableColumn.value?.let { col->
-                    if(col.isVisible != str){
-                        mutableColumn.value = col.copy(isVisible = str)
-                    }
-                }
-            }
+        mutableColumn.changeValIfNotEqual(isVisible, {x -> x.isVisible}, {x,y -> y.copy(isVisible = x)})
+        mutableColumn.changeValIfNotEqual(filterText, {x -> x.filterText}, {x,y -> y.copy(filterText = x)})
+        mutableColumn.changeValIfNotEqual(sortIndex, {x -> x.sortOrder}, {x,y -> y.copy(sortOrder = x)})
+
+    }
+
+    companion object{
+        fun getAllColumns(distConverter: LengthConverter):List<ColumnData>{
+            return listOf(
+                    ColumnData(RiderNameColumn()),
+                    ColumnData(CourseNameColumn()),
+                    ColumnData(TimeColumn()),
+                    ColumnData(ClubColumn()),
+                    ColumnData(GenderColumn()),
+                    ColumnData(CategoryColumn()),
+                    ColumnData(LapsColumn()),
+                    ColumnData(DateColumn()),
+                    ColumnData(DistanceColumn(distConverter)),
+                    ColumnData(SpeedColumn(distConverter)))
+
         }
+
+        fun getAllColumnViewModels(distConverter: LengthConverter):List<ResultFilterViewModel>{
+            return getAllColumns(distConverter).map { ResultFilterViewModel(it) }
+        }
+
+
+
     }
 
 }
