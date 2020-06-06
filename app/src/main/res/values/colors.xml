@@ -9,4 +9,5 @@
     <color name="numberColor">#CDDC39</color>
     <color name="eventButtonColor">#8BF780</color>
     <color name="eventButtonShadow">#BF73B86B</color>
+    <color name="imageColor">#FF000000</color>
 </resources>

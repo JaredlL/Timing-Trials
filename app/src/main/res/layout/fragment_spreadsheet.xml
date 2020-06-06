@@ -27,7 +27,7 @@
                 android:id="@+id/filter_sheet"
                 android:name="com.jaredlinden.timingtrials.resultexplorer.ResultsFilterFragment"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="4dp"
                 android:elevation="50dp"

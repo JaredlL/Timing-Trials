@@ -22,27 +22,34 @@ interface IColumnDefinition{
     val key: String
     val description : String
     val descriptionResourceId : Int
+    val imageResourceId : Int
     fun getValue(result: IResult): String
     fun compare(result1 : IResult, result2: IResult): Int
     fun passesFilter(filterText: String, result:IResult):Boolean
 }
 
 
-data class ColumnData(private val definition: IColumnDefinition, val sortOrder: Int = 0, val filterText: String = "", val isVisible: Boolean = true, val compareAscending:Boolean = true){
+data class ColumnData(val definition: IColumnDefinition, val sortOrder: Int = 0, val filterText: String = "", val isVisible: Boolean = true, val compareAscending:Boolean = true){
     val key = definition.key
     val description = definition.description
+    val imageRes = definition.imageResourceId
     fun getValue(result: IResult): String = definition.getValue(result)
     fun compare(result1: IResult, result2: IResult): Int = definition.compare(result1, result2)
     fun passesFilter(result: IResult):Boolean = definition.passesFilter(filterText, result)
 }
 
 
-const val RIDER_KEY = "rider"
+
 class RiderNameColumn:IColumnDefinition{
 
-    override val key: String = RIDER_KEY
+    companion object{
+        const val columnKey = "rider"
+    }
+
+    override val key: String = columnKey
     override val description: String = "Rider"
     override val descriptionResourceId: Int = com.jaredlinden.timingtrials.R.string.rider
+    override val imageResourceId: Int = com.jaredlinden.timingtrials.R.drawable.ic_directions_bike_black_24dp
 
     override fun getValue(result: IResult): String {
         return result.rider.fullName()
@@ -59,12 +66,17 @@ class RiderNameColumn:IColumnDefinition{
 
 }
 
-const val COURSE_KEY = "course"
+
 class CourseNameColumn : IColumnDefinition{
 
-    override val key: String = COURSE_KEY
+    companion object{
+        const val columnKey = "co"
+    }
+
+    override val key: String = columnKey
     override val description: String = "Course"
     override val descriptionResourceId: Int = com.jaredlinden.timingtrials.R.string.course
+    override val imageResourceId: Int = com.jaredlinden.timingtrials.R.drawable.ic_directions_black_24dp
 
     override fun getValue(result: IResult): String {
         return result.course.courseName
@@ -79,12 +91,17 @@ class CourseNameColumn : IColumnDefinition{
     }
 }
 
-const val CLUB_KEY = "club"
 class ClubColumn : IColumnDefinition{
 
-    override val key: String = CLUB_KEY
+
+    companion object{
+        const val columnKey = "clu"
+    }
+
+    override val key: String = columnKey
     override val description: String = "Club"
     override val descriptionResourceId: Int = com.jaredlinden.timingtrials.R.string.club
+    override val imageResourceId: Int = com.jaredlinden.timingtrials.R.drawable.ic_baseline_group_24
 
     override fun getValue(result: IResult): String {
         return result.riderClub
@@ -99,12 +116,16 @@ class ClubColumn : IColumnDefinition{
     }
 }
 
-const val CATEGORY_KEY = "cat"
 class CategoryColumn : IColumnDefinition{
 
-    override val key: String = CATEGORY_KEY
+    companion object{
+        const val columnKey = "cat"
+    }
+
+    override val key: String = columnKey
     override val description: String = "Category"
     override val descriptionResourceId: Int = com.jaredlinden.timingtrials.R.string.category
+    override val imageResourceId: Int = com.jaredlinden.timingtrials.R.drawable.ic_baseline_category_24
 
     override fun getValue(result: IResult): String {
         return result.category
@@ -119,12 +140,17 @@ class CategoryColumn : IColumnDefinition{
     }
 }
 
-const val GENDER_KEY = "gen"
+
 class GenderColumn : IColumnDefinition{
 
-    override val key: String = GENDER_KEY
+    companion object{
+        const val columnKey = "gen"
+    }
+
+    override val key: String = columnKey
     override val description: String = "Gender"
     override val descriptionResourceId: Int = com.jaredlinden.timingtrials.R.string.gender
+    override val imageResourceId: Int = com.jaredlinden.timingtrials.R.drawable.ic_baseline_wc_24
 
 
     override fun getValue(result: IResult): String {
@@ -139,12 +165,16 @@ class GenderColumn : IColumnDefinition{
     }
 }
 
-const val TIME_KEY = "time"
 class TimeColumn : IColumnDefinition{
 
-    override val key: String = TIME_KEY
+    companion object{
+        const val columnKey = "tim"
+    }
+
+    override val key: String = columnKey
     override val description: String = "Time"
     override val descriptionResourceId: Int = com.jaredlinden.timingtrials.R.string.time
+    override val imageResourceId: Int = com.jaredlinden.timingtrials.R.drawable.ic_timer_black_24dp
 
     override fun getValue(result: IResult): String {
         return result.resultTime?.let { ConverterUtils.toSecondsDisplayString(it) }?:""
@@ -158,12 +188,17 @@ class TimeColumn : IColumnDefinition{
     }
 }
 
-const val DATE_KEY = "date"
 class DateColumn : IColumnDefinition{
 
-    override val key: String = DATE_KEY
+    companion object{
+        const val columnKey = "dat"
+    }
+
+    override val key: String = columnKey
     override val description: String = "Date"
     override val descriptionResourceId: Int = com.jaredlinden.timingtrials.R.string.date
+    override val imageResourceId: Int = com.jaredlinden.timingtrials.R.drawable.ic_baseline_date_range_24
+
     override fun getValue(result: IResult): String {
         return result.dateSet?.let { ConverterUtils.dateToDisplay(it) }?:""
     }
@@ -176,12 +211,17 @@ class DateColumn : IColumnDefinition{
     }
 }
 
-const val DISTANCE_KEY = "dist"
 class DistanceColumn(private val distConverter: LengthConverter) : IColumnDefinition{
 
-    override val key: String = DISTANCE_KEY
+    companion object{
+        const val columnKey = "dis"
+    }
+
+    override val key: String = columnKey
     override val description: String = "Distance"
     override val descriptionResourceId: Int = com.jaredlinden.timingtrials.R.string.distance
+    override val imageResourceId: Int = com.jaredlinden.timingtrials.R.drawable.ic_baseline_timeline_24
+
     override fun getValue(result: IResult): String {
         return result.course.length.let { distConverter.lengthToDisplay(it * result.laps) }
     }
@@ -194,12 +234,18 @@ class DistanceColumn(private val distConverter: LengthConverter) : IColumnDefini
     }
 }
 
-const val LAPS_KEY = "dist"
+
 class LapsColumn : IColumnDefinition{
 
-    override val key: String = LAPS_KEY
+    companion object{
+        const val columnKey = "lap"
+    }
+
+    override val key: String = columnKey
     override val description: String = "Laps"
     override val descriptionResourceId: Int = com.jaredlinden.timingtrials.R.string.laps
+    override val imageResourceId: Int = com.jaredlinden.timingtrials.R.drawable.ic_baseline_repeat_24
+
     override fun getValue(result: IResult): String {
         return result.laps.toString()
     }
@@ -212,12 +258,17 @@ class LapsColumn : IColumnDefinition{
     }
 }
 
-const val SPEED_KEY = "speed"
 class SpeedColumn(private val distConverter: LengthConverter) : IColumnDefinition{
 
-    override val key: String = SPEED_KEY
+    companion object{
+        const val columnKey = "spe"
+    }
+
+    override val key: String = columnKey
     override val description: String = "Average Speed"
     override val descriptionResourceId: Int = com.jaredlinden.timingtrials.R.string.average_speed
+    override val imageResourceId: Int = com.jaredlinden.timingtrials.R.drawable.ic_baseline_speed_24
+
     override fun getValue(result: IResult): String {
 
         val rt = result.resultTime
@@ -229,9 +280,19 @@ class SpeedColumn(private val distConverter: LengthConverter) : IColumnDefinitio
         }
     }
 
+    fun  averageSpeed(result: IResult): Double{
+        val rt = result.resultTime
+        return if(rt!= null && rt > 0){
+            (result.course.length * result.laps) / rt.toDouble()
+        }
+        else{
+            Double.MAX_VALUE
+        }
+    }
+
 
     override fun compare(result1: IResult, result2: IResult): Int {
-        return (result1.course.length * result1.laps).compareTo(result2.course.length * result2.laps)
+        return averageSpeed(result1).compareTo(averageSpeed(result2))
     }
     override fun passesFilter(filterText: String, result: IResult): Boolean {
         return getValue(result).contains(filterText, true)

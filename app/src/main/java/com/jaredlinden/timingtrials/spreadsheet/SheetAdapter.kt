@@ -10,10 +10,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.R
 
 
-class SheetAdapter internal constructor(val context: Context, val density: Int): RecyclerView.Adapter<SheetAdapter.ViewHolder>(){
+class SheetAdapter internal constructor(val context: Context, val density: Int, val snackBarCallback: () -> Unit): RecyclerView.Adapter<SheetAdapter.ViewHolder>(){
 
     companion object{
         private const val CELL = 3
@@ -124,17 +125,19 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
         //val alpha = 0;
         val alpha = 255
 
-        val sdk = android.os.Build.VERSION.SDK_INT
-        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            viewHolder.textView.setBackgroundDrawable(ColorDrawable(Color.argb(alpha, 255, 255, 255)))
-
-        } else {
-            viewHolder.textView.setBackground(ColorDrawable(Color.argb(alpha, 255, 255, 255)))
-        }
+//        val sdk = android.os.Build.VERSION.SDK_INT
+//        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+//            viewHolder.textView.setBackgroundDrawable(ColorDrawable(Color.argb(alpha, 255, 255, 255)))
+//
+//        } else {
+//            viewHolder.textView.setBackground(ColorDrawable(Color.argb(alpha, 255, 255, 255)))
+//        }
 
         viewHolder.textView.setOnClickListener {
             //Toast.makeText(context, "$r,$c", Toast.LENGTH_SHORT).show()
             mOptions.onCellClick(r,c)
+            snackBarCallback()
+
         }
     }
 
@@ -182,7 +185,7 @@ class SheetAdapter internal constructor(val context: Context, val density: Int):
             viewHolder.textView.setText(text)
         }
         viewHolder.textView.height = COLUMN_MARKER_HEIGHT * density
-        viewHolder.view.setOnClickListener {
+        viewHolder.textView.setOnClickListener {
             mOptions.onColumnClick(c - 1)
         }
         setBackground(viewHolder)

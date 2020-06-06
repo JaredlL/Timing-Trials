@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.ImageView
+import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -21,7 +23,13 @@ import com.jaredlinden.timingtrials.util.getLengthConverter
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_result_filter.*
+import kotlinx.android.synthetic.main.list_item_result_filter.*
 
+
+@BindingAdapter("android:src")
+fun setImageViewResource(imageView: ImageView, resource: Int) {
+    imageView.setImageResource(resource)
+}
 
 class ResultsFilterFragment : BottomSheetDialogFragment(){
 
@@ -43,14 +51,17 @@ class ResultsFilterFragment : BottomSheetDialogFragment(){
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
 
-
+        adapter.setHasStableIds(true)
 
         val binding = DataBindingUtil.inflate<FragmentResultFilterBinding>(inflater, R.layout.fragment_result_filter, container, false).apply {
 
             filterRecycler.adapter  =adapter
 
             filterRecycler.layoutManager = layoutManger
-            filterRecycler.invalidate()
+            clearAllFiltersButton.setOnClickListener {
+                vm.clearAllColumnFilters()
+            }
+            //filterRecycler.invalidate()
         }
 
         return binding.root

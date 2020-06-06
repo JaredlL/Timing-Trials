@@ -5,11 +5,15 @@ import com.jaredlinden.timingtrials.domain.ColumnData
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.LengthConverter
 import com.jaredlinden.timingtrials.util.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
-
-
-class  ResultListSpreadSheet(val results: List<IResult>, val columns: List<ColumnData>, val onTransform: (x:ResultListSpreadSheet) -> Unit):ISheetLayoutManagerOptions {
+class  ResultListSpreadSheet(val results: List<IResult>,
+                             val columns: List<ColumnData>,
+                             val onTransform: (x:List<IResult>, y: List<ColumnData>) -> Unit
+)
+    :ISheetLayoutManagerOptions {
 
     private val visibleCols = columns.filter { it.isVisible }
 
@@ -35,14 +39,38 @@ class  ResultListSpreadSheet(val results: List<IResult>, val columns: List<Colum
     }
 
     override fun onColumnClick(columnPosition: Int) {
-        val mult = if (columns[columnPosition].compareAscending) 1 else -1
-        val newData = results.sortedWith (Comparator{ r1,r2 -> mult * columns[columnPosition].compare(r1,r2) })
-        onTransform(ResultListSpreadSheet(newData,columns.mapIndexed { index, columnData -> if(index == columnPosition) columnData.copy(compareAscending = !columnData.compareAscending) else columnData  },onTransform))
+        val clickedCol = columns.filter { it.isVisible }[columnPosition]
+        val multiplier = if (clickedCol.compareAscending) 1 else -1
+        val newData = results.sortedWith (Comparator{ r1,r2 -> multiplier * clickedCol.compare(r1,r2) })
+        onTransform(newData, columns.map { columnData -> if(clickedCol.key == columnData.key) columnData.copy(compareAscending = !columnData.compareAscending) else columnData  })
+        //onTransform(ResultListSpreadSheet(newData,columns.map { columnData -> if(clickedCol.key == columnData.key) columnData.copy(compareAscending = !columnData.compareAscending) else columnData  },onTransform))
     }
+
+//    fun updateColumn(newColumnData: ColumnData): ResultListSpreadSheet{
+//        return ResultListSpreadSheet(results,columns.map { columnData -> if(newColumnData.key == columnData.key) newColumnData else columnData  },onTransform);
+//    }
 
     override fun onCellClick(row: Int, col: Int) {
+        val cellString =data[row][col]
+        val currentColFilter = visibleCols[col].filterText
+        val newFilter = if(cellString != currentColFilter) cellString else ""
+        if(visibleCols[col].filterText != newFilter){
+            val newCol = visibleCols[col].copy(filterText = newFilter)
+            onTransform(results, updateColumnns(newCol))
+        }
+
+        //onTransform(ResultListSpreadSheet(results, updateColumnns(newCol), onTransform))
+    }
+
+    override fun onCellLongPress(row: Int, col: Int) {
 
     }
+
+    fun updateColumnns(newColumnData: ColumnData): List<ColumnData>{
+        return columns.map { if(it.key == newColumnData.key) newColumnData else it  }
+    }
+
+
 
 
 }

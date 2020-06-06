@@ -236,11 +236,12 @@
     <fragment
         android:id="@+id/sheetFragment"
         android:name="com.jaredlinden.timingtrials.spreadsheet.SheetFragment"
-        android:label="SheetFragment" >
+        tools:layout="@layout/fragment_spreadsheet"
+        android:label="Results">
         <argument
             android:name="itemId"
-            app:argType="long"
-            android:defaultValue="0L" />
+            android:defaultValue="0L"
+            app:argType="long" />
         <argument
             android:name="itemTypeId"
             app:argType="string" />

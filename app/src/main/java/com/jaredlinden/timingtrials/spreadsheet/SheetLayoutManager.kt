@@ -82,6 +82,15 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
             return
         }
 
+        //Incase remebered row is greater than new total rows
+        if(options.numberOfRows in 1 until topRow){
+            topRow = 1
+        }
+
+        if(options.numberOfColumns in 1 until leftColumn){
+            leftColumn = options.numberOfColumns
+        }
+
         val jumpColumn = leftColumn
         val jumpRow = topRow
 

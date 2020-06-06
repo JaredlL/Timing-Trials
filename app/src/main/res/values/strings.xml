@@ -23,6 +23,7 @@
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
     <string name="club">Club</string>
+    <string name="click_again_to_clear">Click again to clear filter</string>
     <string name="current_club">Current Club</string>
     <string name="current_category">Current Category</string>
     <string name="begin_tt">Begin TT!</string>
@@ -110,4 +111,5 @@
     <string name="edit_numbering">Edit Numbering</string>
     <string name="column_filter">Filters</string>
     <string name="show_column">Show Column</string>
+    <string name="rest_filters">Clear Filters</string>
 </resources>

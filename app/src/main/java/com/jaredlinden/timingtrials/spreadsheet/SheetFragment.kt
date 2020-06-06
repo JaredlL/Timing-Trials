@@ -10,10 +10,13 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentSpreadsheetBinding
 import com.jaredlinden.timingtrials.util.getLengthConverter
 import com.jaredlinden.timingtrials.util.getViewModel
@@ -38,24 +41,31 @@ class SheetFragment : Fragment()  {
 
         val vm = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }
 
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = "Results"
+        //(requireActivity() as AppCompatActivity).supportActionBar?.title = "Results"
 
         val displayMetrics = DisplayMetrics()
         activity?.windowManager?.defaultDisplay?.getMetrics(displayMetrics)
 
         val density = displayMetrics.density.toInt()
-        val adapter = SheetAdapter(requireContext(), density)
+        val adapter = SheetAdapter(requireContext(), density, ::snackBarCallback)
         val recyclerView = binding.recyclerView
 
         vm.getItemName(args.itemId, args.itemTypeId).observe(viewLifecycleOwner, Observer {
-            val s = it?:""
-            (requireActivity() as AppCompatActivity).supportActionBar?.title = "$s Results"
+            it?.let { name ->
+                if(args.itemTypeId == Rider::class.java.simpleName){
+                    vm.setRiderColumnFilter(name)
+                }else{
+                    vm.setCourseColumnFilter(name)
+                }
+            }
+
         })
 
         vm.getResultSheet(getLengthConverter()).observe(viewLifecycleOwner, Observer { res->
             res?.let {
-                recyclerView.layoutManager = SheetLayoutManager(it)
                 adapter.setNewItems(it)
+                recyclerView.layoutManager = SheetLayoutManager(it)
+
                 //recyclerView.invalidate()
             }
         })
@@ -81,10 +91,40 @@ class SheetFragment : Fragment()  {
         bottomSheetBehavior = BottomSheetBehavior.from(binding.filterSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+
+            }
+
+            //Hide keyboard when bottom sheet drops
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if(newState == BottomSheetBehavior.STATE_HIDDEN){
+                    val view: View? = requireActivity().currentFocus
+                    view?.let { v ->
+                        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+                        imm?.hideSoftInputFromWindow(v.windowToken, 0)
+
+                    }
+                }
+            }
+
+        })
 
 
 
         return binding.root
+    }
+
+    var hasShownSnackBar = false
+    fun snackBarCallback(){
+        if(!hasShownSnackBar){
+            view?.let {
+                Snackbar.make(it, R.string.click_again_to_clear, Snackbar.LENGTH_SHORT).show()
+                hasShownSnackBar = true
+            }
+        }
+
+
     }
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
@@ -95,13 +135,7 @@ class SheetFragment : Fragment()  {
                 if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED || bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN){
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                 }else if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED){
-                    val view: View? = requireActivity().currentFocus
-                    view?.let { v ->
-                        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                        imm?.hideSoftInputFromWindow(v.windowToken, 0)
-                    }
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
                 }
 
                 true
