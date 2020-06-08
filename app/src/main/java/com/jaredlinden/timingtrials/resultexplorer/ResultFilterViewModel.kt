@@ -29,7 +29,8 @@ class ResultFilterViewModel(column:ColumnData, val sheetVm:ISheetViewModel) {
     val filterText = MutableLiveData(column.filterText)
     val sortIndex= MutableLiveData(column.sortOrder)
     val description = Transformations.map(mutableColumn){
-        it.description
+        it?.description
+
     }
 
     fun clearText(){

@@ -1,27 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
+    android:id="@+id/headerLayout"
+    android:clickable="true"
+    android:focusable="true"
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/spreadSheetTextView"
-        android:layout_width="match_parent"
+        android:id="@+id/spreadSheetHeaderTextView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:clickable="true"
-        android:focusable="true"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="1sp"
+        android:layout_marginBottom="1sp"
+
         android:background="?android:attr/selectableItemBackground"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/headerImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Hi">
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="Time">
 
     </TextView>
+
+    <ImageView
+        android:id="@+id/headerImageView"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_baseline_arrow_drop_up_24"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/spreadSheetHeaderTextView"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

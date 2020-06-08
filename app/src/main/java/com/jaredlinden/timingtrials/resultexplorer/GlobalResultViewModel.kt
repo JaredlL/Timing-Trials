@@ -3,6 +3,7 @@ package com.jaredlinden.timingtrials.resultexplorer
 import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.data.IResult
 import com.jaredlinden.timingtrials.data.Rider
+import com.jaredlinden.timingtrials.data.TimeTrial
 import com.jaredlinden.timingtrials.data.TimeTrialRiderResult
 import com.jaredlinden.timingtrials.data.roomrepo.*
 import com.jaredlinden.timingtrials.domain.*
@@ -13,6 +14,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 
@@ -78,22 +81,17 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
 
     fun getResultSheet(conv: LengthConverter): LiveData<ResultListSpreadSheet>{
         if(resultSpreadSheet.value == null) {
-            val newSheet = ResultListSpreadSheet(listOf(), ResultFilterViewModel.getAllColumns(conv), ::newTransform)
-            resultSpreadSheet.value = newSheet
-            columns.value = newSheet.columns.map { ResultFilterViewModel(it, this) }
+
+            resultSpreadSheet.addSource(allResults){res->
+                val cols = ResultFilterViewModel.getAllColumns(conv)
+                columns.value = cols.map { ResultFilterViewModel(it, this) }
+                newTransform(res, cols)
+            }
         }
         return  resultSpreadSheet
     }
 
 
-    init {
-        resultSpreadSheet.addSource(allResults){res->
-            resultSpreadSheet.value?.let {
-                val cop = ResultListSpreadSheet(res, it.columns, it.onTransform)
-                resultSpreadSheet.value = cop
-            }
-        }
-    }
 
     override fun updateColumn(newColumn: ColumnData) {
         resultSpreadSheet.value?.let {
@@ -102,11 +100,27 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
         }
     }
 
+    private val queue = ConcurrentLinkedQueue<Pair<List<IResult>, List<ColumnData>>>()
+    private var isCarolineAlive = AtomicBoolean()
+
     fun newTransform(results: List<IResult>, columns: List<ColumnData>){
-        viewModelScope.launch(Dispatchers.Default) {
-            val newSs = ResultListSpreadSheet(results, columns, ::newTransform)
-            resultSpreadSheet.postValue(newSs)
+        if(!isCarolineAlive.get()){
+            queue.add(Pair(results, columns))
+            viewModelScope.launch(Dispatchers.Default) {
+                isCarolineAlive.set(true)
+                var mnew:ResultListSpreadSheet? = null
+                while (queue.peek() != null){
+                   queue.poll()?.let {
+                       mnew = ResultListSpreadSheet(it.first, it.second, ::newTransform)
+                   }
+                }
+                mnew?.let { resultSpreadSheet.postValue(it) }
+                isCarolineAlive.set(false)
+            }
+        }else{
+            queue.add(Pair(results, columns))
         }
+
     }
 
 

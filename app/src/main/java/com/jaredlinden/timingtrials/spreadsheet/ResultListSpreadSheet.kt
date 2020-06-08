@@ -31,11 +31,11 @@ class  ResultListSpreadSheet(val results: List<IResult>,
     private val colWidths: List<Int> = data.fold(headings.map { it.length }, {currentLengths,strings -> currentLengths.zip(strings).map { if(it.first >= it.second.length ) it.first else it.second.length } })
 
     override fun getColumnWidth(column: Int): Int {
-        return if(headingWidths[column] != colWidths[column]) colWidths[column] + 2 else colWidths[column]
+        return colWidths[column]//if(headingWidths[column] != colWidths[column]) colWidths[column] + 1 else colWidths[column]
     }
 
     override fun getRowHeight(row: Int): Int {
-        return 30
+        return 1
     }
 
     override fun onColumnClick(columnPosition: Int) {

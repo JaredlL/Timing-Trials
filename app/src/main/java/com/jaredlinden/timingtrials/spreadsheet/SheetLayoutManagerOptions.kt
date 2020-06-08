@@ -11,6 +11,7 @@ interface ISheetLayoutManagerOptions {
     fun onColumnClick(columnPosition: Int)
     fun onCellClick(row: Int, col: Int)
     fun onCellLongPress(row: Int, col: Int)
+
 }
 
 class SheetLayoutManagerOptions(override val data: List<List<String>>, override val headings: List<String>) : ISheetLayoutManagerOptions {

@@ -46,9 +46,22 @@ class SheetFragment : Fragment()  {
         val displayMetrics = DisplayMetrics()
         activity?.windowManager?.defaultDisplay?.getMetrics(displayMetrics)
 
+
+
         val density = displayMetrics.density.toInt()
-        val adapter = SheetAdapter(requireContext(), density, ::snackBarCallback)
+        val adapter = SheetAdapter(requireContext(), displayMetrics, ::snackBarCallback)
         val recyclerView = binding.recyclerView
+
+
+
+        vm.getResultSheet(getLengthConverter()).observe(viewLifecycleOwner, Observer { res->
+            res?.let {
+                adapter.setNewItems(it)
+                recyclerView.layoutManager = SheetLayoutManager(it)
+
+                //recyclerView.invalidate()
+            }
+        })
 
         vm.getItemName(args.itemId, args.itemTypeId).observe(viewLifecycleOwner, Observer {
             it?.let { name ->
@@ -59,15 +72,6 @@ class SheetFragment : Fragment()  {
                 }
             }
 
-        })
-
-        vm.getResultSheet(getLengthConverter()).observe(viewLifecycleOwner, Observer { res->
-            res?.let {
-                adapter.setNewItems(it)
-                recyclerView.layoutManager = SheetLayoutManager(it)
-
-                //recyclerView.invalidate()
-            }
         })
 
 //        vm.getRiderResultList(args.itemId, args.itemTypeId).observe(viewLifecycleOwner, Observer {res->
