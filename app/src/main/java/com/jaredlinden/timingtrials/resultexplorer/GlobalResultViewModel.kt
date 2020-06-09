@@ -60,34 +60,41 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
     fun setRiderColumnFilter(riderName: String){
         resultSpreadSheet.value?.let { sheet->
            sheet.columns.firstOrNull { it.definition.javaClass == RiderNameColumn::class.java}?.copy(filterText = riderName)?.let {
-               newTransform(sheet.results, sheet.updateColumnns(it))
+               newTransform(sheet.results, sheet.updateColumnns(it), sheet)
            }
         }
     }
 
     fun clearAllColumnFilters(){
         resultSpreadSheet.value?.let { sheet->
-                newTransform(sheet.results, sheet.columns.map { it.copy(filterText = "", isVisible = true) })
+                newTransform(sheet.results, sheet.columns.map { it.copy(filterText = "", isVisible = true) }, sheet)
         }
     }
 
     fun setCourseColumnFilter(courseName: String){
         resultSpreadSheet.value?.let { sheet->
             sheet.columns.firstOrNull { it.definition.javaClass == CourseNameColumn::class.java}?.copy(filterText = courseName)?.let {
-                newTransform(sheet.results, sheet.updateColumnns(it))
+                newTransform(sheet.results, sheet.updateColumnns(it), sheet)
             }
         }
     }
 
-    fun getResultSheet(conv: LengthConverter): LiveData<ResultListSpreadSheet>{
-        if(resultSpreadSheet.value == null) {
-
-            resultSpreadSheet.addSource(allResults){res->
+    fun getResultSheet(conv: LengthConverter, stringMeasure: (s:String) -> Float): LiveData<ResultListSpreadSheet>{
+        val current = resultSpreadSheet.value
+        if(current == null) {
+            resultSpreadSheet.addSource(allResults) { res ->
                 val cols = ResultFilterViewModel.getAllColumns(conv)
                 columns.value = cols.map { ResultFilterViewModel(it, this) }
-                newTransform(res, cols)
+                val sheet = ResultListSpreadSheet(listOf(), listOf(), ::newTransform, stringMeasure)
+                newTransform(res, cols, sheet)
             }
-        }
+            }else{
+            val cols = ResultFilterViewModel.getAllColumns(conv)
+            columns.value = cols.map { ResultFilterViewModel(it, this) }
+            val newSsheet = ResultListSpreadSheet(current.results, cols, ::newTransform, stringMeasure)
+            newTransform(newSsheet.results, newSsheet.columns, newSsheet)
+            }
+
         return  resultSpreadSheet
     }
 
@@ -96,29 +103,29 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
     override fun updateColumn(newColumn: ColumnData) {
         resultSpreadSheet.value?.let {
             val newCols = it.columns.map { columnData -> if(newColumn.key == columnData.key) newColumn else columnData}
-                newTransform(it.results, newCols)
+                newTransform(it.results, newCols, it)
         }
     }
 
-    private val queue = ConcurrentLinkedQueue<Pair<List<IResult>, List<ColumnData>>>()
+    private val queue = ConcurrentLinkedQueue<Triple<List<IResult>, List<ColumnData>, ResultListSpreadSheet>>()
     private var isCarolineAlive = AtomicBoolean()
 
-    fun newTransform(results: List<IResult>, columns: List<ColumnData>){
+    fun newTransform(results: List<IResult>, columns: List<ColumnData>, prev: ResultListSpreadSheet){
         if(!isCarolineAlive.get()){
-            queue.add(Pair(results, columns))
+            queue.add(Triple(results, columns, prev))
             viewModelScope.launch(Dispatchers.Default) {
                 isCarolineAlive.set(true)
                 var mnew:ResultListSpreadSheet? = null
                 while (queue.peek() != null){
                    queue.poll()?.let {
-                       mnew = ResultListSpreadSheet(it.first, it.second, ::newTransform)
+                       mnew = it.third.copy(it.first, it.second)
                    }
                 }
                 mnew?.let { resultSpreadSheet.postValue(it) }
                 isCarolineAlive.set(false)
             }
         }else{
-            queue.add(Pair(results, columns))
+            queue.add(Triple(results, columns, prev))
         }
 
     }

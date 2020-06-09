@@ -1,10 +1,12 @@
 package com.jaredlinden.timingtrials.spreadsheet
 
 import android.content.Context
+import android.graphics.Paint
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
@@ -47,14 +49,23 @@ class SheetFragment : Fragment()  {
         activity?.windowManager?.defaultDisplay?.getMetrics(displayMetrics)
 
 
+        val tv: TextView = layoutInflater.inflate(R.layout.list_item_spreadsheet, null).findViewById(R.id.spreadSheetTextView)
+        val p = Paint().apply {
+            typeface = tv.typeface
+            textSize = tv.textSize
+        }
 
         val density = displayMetrics.density.toInt()
-        val adapter = SheetAdapter(requireContext(), displayMetrics, ::snackBarCallback)
+        val adapter = SheetAdapter(requireContext(), displayMetrics, p, ::snackBarCallback)
         val recyclerView = binding.recyclerView
 
 
 
-        vm.getResultSheet(getLengthConverter()).observe(viewLifecycleOwner, Observer { res->
+
+
+
+
+        vm.getResultSheet(getLengthConverter()) {s -> p.measureText(s)}.observe(viewLifecycleOwner, Observer { res->
             res?.let {
                 adapter.setNewItems(it)
                 recyclerView.layoutManager = SheetLayoutManager(it)

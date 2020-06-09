@@ -7,7 +7,8 @@ import com.jaredlinden.timingtrials.domain.SortType
 
 class  ResultListSpreadSheet(val results: List<IResult>,
                              val columns: List<ColumnData>,
-                             val onTransform: (x:List<IResult>, y: List<ColumnData>) -> Unit
+                             val onTransform: (x:List<IResult>, y: List<ColumnData>, z: ResultListSpreadSheet) -> Unit,
+                             val measureString: (s:String) -> Float
 )
     :ISheetLayoutManagerOptions {
 
@@ -15,12 +16,14 @@ class  ResultListSpreadSheet(val results: List<IResult>,
 
     override val data: List<List<String>> = results.filter { res-> columns.all { it.passesFilter(res) } }.map { res -> visibleCols.map { it.getValue(res) } }
 
-    private val colWidths: List<Int> = data.fold(visibleCols.map { it.description.length }, {currentLengths,strings -> currentLengths.zip(strings).map { if(it.first >= it.second.length ) it.first else it.second.length } })
+    //private val colWidths: List<Int> = data.fold(visibleCols.map { it.description.length }, {currentLengths,strings -> currentLengths.zip(strings).map { if(it.first >= it.second.length ) it.first else it.second.length } })
+    private val colWidths: List<Float> = data.fold(visibleCols.map { measureString(it.description) }, {currentLongest,strings -> currentLongest.zip(strings).map { if (it.first >= measureString(it.second) ) it.first else measureString(it.second)} })
 
     override val sheetColumns: List<ISheetColumn> = visibleCols.zip(colWidths) { colData,w-> object : ISheetColumn{
 
         override val headingText: String = colData.description
-        override val width: Int = w
+        override val headingTextWidth: Float = measureString(headingText)
+        override val width: Float = w
         override val sortType: SortType = colData.sortType
         override fun onClick() {
 
@@ -35,15 +38,15 @@ class  ResultListSpreadSheet(val results: List<IResult>,
                 if(colData.key == columnData.key)
                     columnData.copy(sortType =  newSortType)
                 else columnData.copy(sortType = SortType.NONE)
-            })
+            }, this@ResultListSpreadSheet)
         }
 
     }
     }
 
-    override fun getColumnWidth(column: Int): Int {
-       return sheetColumns[column].width
-    }
+//    override fun getColumnWidth(column: Int): Float {
+//       return sheetColumns[column].width
+//    }
 
     override val numberOfRows: Int = data.size
 
@@ -72,7 +75,7 @@ class  ResultListSpreadSheet(val results: List<IResult>,
         val newFilter = if(cellString != currentColFilter) cellString else ""
         if(visibleCols[col].filterText != newFilter){
             val newCol = visibleCols[col].copy(filterText = newFilter)
-            onTransform(results, updateColumnns(newCol))
+            onTransform(results, updateColumnns(newCol), this)
         }
 
         //onTransform(ResultListSpreadSheet(results, updateColumnns(newCol), onTransform))
@@ -84,6 +87,10 @@ class  ResultListSpreadSheet(val results: List<IResult>,
 
     fun updateColumnns(newColumnData: ColumnData): List<ColumnData>{
         return columns.map { if(it.key == newColumnData.key) newColumnData else it  }
+    }
+
+    fun copy(results: List<IResult> = this.results, columns: List<ColumnData> = this.columns): ResultListSpreadSheet{
+        return ResultListSpreadSheet(results, columns, onTransform, measureString)
     }
 
 

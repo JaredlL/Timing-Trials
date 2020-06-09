@@ -5,6 +5,7 @@
     <color name="colorAccent">#D81B60</color>
     <color name="mainBackground">#242933</color>
     <color name="buttonInactive">#4D27334D</color>
+    <color name="spreadsheetHeader">#A5A8AC</color>
     <color name="pressedButtonShadow">#D851552F</color>
     <color name="numberColor">#CDDC39</color>
     <color name="eventButtonColor">#8BF780</color>

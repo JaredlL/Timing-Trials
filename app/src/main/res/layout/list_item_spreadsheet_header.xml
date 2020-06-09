@@ -7,7 +7,7 @@
     android:id="@+id/headerLayout"
     android:clickable="true"
     android:focusable="true"
-    android:background="@drawable/background_rider_status_inactive"
+    android:background="@drawable/background_spreadsheet_heading"
     android:layout_height="wrap_content">
 
     <TextView
