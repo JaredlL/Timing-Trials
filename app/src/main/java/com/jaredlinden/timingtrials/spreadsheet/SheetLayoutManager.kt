@@ -31,7 +31,7 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
         enum class Direction{ LIMITED, UNLIMITED }
     }
 
-    private val totalColumns = options.numberOfColumns + 1
+    private val totalColumns = options.sheetColumns.size + 1
     private val totalRows = options.numberOfRows + 1
     private val totalItems = totalColumns * totalRows
 
@@ -87,8 +87,8 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
             topRow = 1
         }
 
-        if(options.numberOfColumns in 1 until leftColumn){
-            leftColumn = options.numberOfColumns
+        if(totalColumns -1 in 1 until leftColumn){
+            leftColumn = totalColumns -1
         }
 
         val jumpColumn = leftColumn
@@ -222,7 +222,7 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
             do {
                 dd = processUnlimitedScroll(dd, recycler, tilt)
                 scrapOffscreenViews(recycler, direction, tilt)
-            } while (dd > 0 && ((topRow <= options.numberOfRows && tilt == Tilt.VERTICAL) || (leftColumn <= options.numberOfColumns && tilt == Tilt.HORIZONTAL)))
+            } while (dd > 0 && ((topRow < totalRows && tilt == Tilt.VERTICAL) || (leftColumn < totalColumns && tilt == Tilt.HORIZONTAL)))
         }
         return 0
     }

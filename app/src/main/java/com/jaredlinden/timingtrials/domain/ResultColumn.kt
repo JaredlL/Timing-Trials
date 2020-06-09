@@ -18,6 +18,10 @@ import org.threeten.bp.OffsetDateTime
 //    fun compare(result1 : IResult, result2: IResult): Int
 //}
 
+enum class SortType{
+    NONE, ASCENDING, DESCENDING
+}
+
 interface IColumnDefinition{
     val key: String
     val description : String
@@ -29,7 +33,7 @@ interface IColumnDefinition{
 }
 
 
-data class ColumnData(val definition: IColumnDefinition, val sortOrder: Int = 0, val filterText: String = "", val isVisible: Boolean = true, val compareAscending:Boolean = true){
+data class ColumnData(val definition: IColumnDefinition, val sortOrder: Int = 0, val filterText: String = "", val isVisible: Boolean = true, val sortType:SortType = SortType.NONE){
     val key = definition.key
     val description = definition.description
     val imageRes = definition.imageResourceId

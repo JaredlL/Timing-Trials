@@ -2,11 +2,7 @@ package com.jaredlinden.timingtrials.spreadsheet
 
 import com.jaredlinden.timingtrials.data.IResult
 import com.jaredlinden.timingtrials.domain.ColumnData
-import com.jaredlinden.timingtrials.util.ConverterUtils
-import com.jaredlinden.timingtrials.util.LengthConverter
-import com.jaredlinden.timingtrials.util.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.jaredlinden.timingtrials.domain.SortType
 
 
 class  ResultListSpreadSheet(val results: List<IResult>,
@@ -18,33 +14,53 @@ class  ResultListSpreadSheet(val results: List<IResult>,
     private val visibleCols = columns.filter { it.isVisible }
 
     override val data: List<List<String>> = results.filter { res-> columns.all { it.passesFilter(res) } }.map { res -> visibleCols.map { it.getValue(res) } }
-    override val headings: List<String> = visibleCols.map { it.description }
 
-    override val numberOfColumns: Int = visibleCols.size
+    private val colWidths: List<Int> = data.fold(visibleCols.map { it.description.length }, {currentLengths,strings -> currentLengths.zip(strings).map { if(it.first >= it.second.length ) it.first else it.second.length } })
+
+    override val sheetColumns: List<ISheetColumn> = visibleCols.zip(colWidths) { colData,w-> object : ISheetColumn{
+
+        override val headingText: String = colData.description
+        override val width: Int = w
+        override val sortType: SortType = colData.sortType
+        override fun onClick() {
+
+            val (newSortType, multiplier) = when(colData.sortType){
+                SortType.DESCENDING -> Pair(SortType.ASCENDING, -1)
+                else -> Pair(SortType.DESCENDING, 1)
+            }
+
+            val newData = results.sortedWith (Comparator{ r1,r2 -> multiplier * colData.compare(r1,r2) })
+
+            onTransform(newData, columns.map { columnData ->
+                if(colData.key == columnData.key)
+                    columnData.copy(sortType =  newSortType)
+                else columnData.copy(sortType = SortType.NONE)
+            })
+        }
+
+    }
+    }
+
+    override fun getColumnWidth(column: Int): Int {
+       return sheetColumns[column].width
+    }
 
     override val numberOfRows: Int = data.size
 
     override val isEmpty: Boolean = data.isEmpty()
 
-    private val headingWidths = headings.map { it.length }
-
-    private val colWidths: List<Int> = data.fold(headings.map { it.length }, {currentLengths,strings -> currentLengths.zip(strings).map { if(it.first >= it.second.length ) it.first else it.second.length } })
-
-    override fun getColumnWidth(column: Int): Int {
-        return colWidths[column]//if(headingWidths[column] != colWidths[column]) colWidths[column] + 1 else colWidths[column]
-    }
 
     override fun getRowHeight(row: Int): Int {
         return 1
     }
 
-    override fun onColumnClick(columnPosition: Int) {
-        val clickedCol = columns.filter { it.isVisible }[columnPosition]
-        val multiplier = if (clickedCol.compareAscending) 1 else -1
-        val newData = results.sortedWith (Comparator{ r1,r2 -> multiplier * clickedCol.compare(r1,r2) })
-        onTransform(newData, columns.map { columnData -> if(clickedCol.key == columnData.key) columnData.copy(compareAscending = !columnData.compareAscending) else columnData  })
-        //onTransform(ResultListSpreadSheet(newData,columns.map { columnData -> if(clickedCol.key == columnData.key) columnData.copy(compareAscending = !columnData.compareAscending) else columnData  },onTransform))
-    }
+//    fun onColumnClick(columnPosition: Int) {
+//        val clickedCol = columns.filter { it.isVisible }[columnPosition]
+//        val multiplier = if (clickedCol.compareAscending) 1 else -1
+//        val newData = results.sortedWith (Comparator{ r1,r2 -> multiplier * clickedCol.compare(r1,r2) })
+//        onTransform(newData, columns.map { columnData -> if(clickedCol.key == columnData.key) columnData.copy(compareAscending = !columnData.compareAscending) else columnData  })
+//        //onTransform(ResultListSpreadSheet(newData,columns.map { columnData -> if(clickedCol.key == columnData.key) columnData.copy(compareAscending = !columnData.compareAscending) else columnData  },onTransform))
+//    }
 
 //    fun updateColumn(newColumnData: ColumnData): ResultListSpreadSheet{
 //        return ResultListSpreadSheet(results,columns.map { columnData -> if(newColumnData.key == columnData.key) newColumnData else columnData  },onTransform);

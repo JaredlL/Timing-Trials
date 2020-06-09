@@ -23,7 +23,9 @@ class ResultFilterViewModel(column:ColumnData, val sheetVm:ISheetViewModel) {
     private val mutableColumn = MediatorLiveData<ColumnData>().apply { value = currentCol() }
 
 
-    val imageRes = column.imageRes
+    val imageRes = Transformations.map(mutableColumn){
+        it?.imageRes
+    }
 
     val isVisible = MutableLiveData(column.isVisible)
     val filterText = MutableLiveData(column.filterText)
@@ -43,7 +45,7 @@ class ResultFilterViewModel(column:ColumnData, val sheetVm:ISheetViewModel) {
                 isVisible.setIfNotEqual(col.isVisible)
                 filterText.setIfNotEqual(col.filterText)
                 sortIndex.setIfNotEqual(col.sortOrder)
-                //mutableColumn.value = col
+                mutableColumn.value = col
             }
         }
 
