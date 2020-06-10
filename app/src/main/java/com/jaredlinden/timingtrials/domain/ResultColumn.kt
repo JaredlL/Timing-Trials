@@ -60,7 +60,7 @@ class RiderNameColumn:IColumnDefinition{
     }
 
     override fun compare(result1: IResult, result2: IResult): Int {
-        return result1.rider.fullName().compareTo(result2.rider.fullName())
+        return -result1.rider.fullName().compareTo(result2.rider.fullName())
     }
 
     override fun passesFilter(filterText: String, result: IResult): Boolean {
@@ -87,7 +87,7 @@ class CourseNameColumn : IColumnDefinition{
     }
 
     override fun compare(result1: IResult, result2: IResult): Int {
-        return result1.course.courseName.compareTo(result2.course.courseName)
+        return -result1.course.courseName.compareTo(result2.course.courseName)
     }
 
     override fun passesFilter(filterText: String, result: IResult): Boolean {
@@ -112,7 +112,7 @@ class ClubColumn : IColumnDefinition{
     }
 
     override fun compare(result1: IResult, result2: IResult): Int {
-        return result1.riderClub.compareTo(result2.riderClub)
+        return -result1.riderClub.compareTo(result2.riderClub)
     }
 
     override fun passesFilter(filterText: String, result: IResult): Boolean {
@@ -136,7 +136,7 @@ class CategoryColumn : IColumnDefinition{
     }
 
     override fun compare(result1: IResult, result2: IResult): Int {
-        return result1.category.compareTo(result2.category)
+        return -result1.category.compareTo(result2.category)
     }
 
     override fun passesFilter(filterText: String, result: IResult): Boolean {
@@ -162,7 +162,7 @@ class GenderColumn : IColumnDefinition{
     }
 
     override fun compare(result1: IResult, result2: IResult): Int {
-        return result1.gender.compareTo(result2.gender)
+        return -result1.gender.compareTo(result2.gender)
     }
     override fun passesFilter(filterText: String, result: IResult): Boolean {
         return result.gender.smallString().contains(filterText, true)

@@ -67,7 +67,7 @@ object ConverterUtils{
 
 }
 
-class LengthConverter(val unitKey: String){
+data class LengthConverter(val unitKey: String){
 
     val unitDef: LengthDef = unitList.firstOrNull { it.key == unitKey }?: unitList.first()
 
@@ -100,6 +100,8 @@ class LengthConverter(val unitKey: String){
                 LengthDef("meters", "Meters", "m", 1.0)
 
         )
+
+        val default: LengthConverter = LengthConverter("km")
     }
 
 }

@@ -20,6 +20,7 @@ import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentSpreadsheetBinding
+import com.jaredlinden.timingtrials.resultexplorer.GlobalResultViewModelData
 import com.jaredlinden.timingtrials.util.getLengthConverter
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
@@ -28,6 +29,12 @@ import com.jaredlinden.timingtrials.util.injector
 class SheetFragment : Fragment()  {
 
     private val args: SheetFragmentArgs by navArgs()
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        //this.arguments?.clear()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
@@ -55,35 +62,41 @@ class SheetFragment : Fragment()  {
             textSize = tv.textSize
         }
 
+        vm.setColumnsContext(GlobalResultViewModelData(args.itemId, args.itemTypeId, getLengthConverter()), p)
+
         val density = displayMetrics.density.toInt()
         val adapter = SheetAdapter(requireContext(), displayMetrics, p, ::snackBarCallback)
         val recyclerView = binding.recyclerView
 
-
-
-
-
-
-
-        vm.getResultSheet(getLengthConverter()) {s -> p.measureText(s)}.observe(viewLifecycleOwner, Observer { res->
-            res?.let {
-                adapter.setNewItems(it)
-                recyclerView.layoutManager = SheetLayoutManager(it)
-
-                //recyclerView.invalidate()
-            }
+        vm.resultSpreadSheet.observe(viewLifecycleOwner, Observer { it?.let {
+            adapter.setNewItems(it)
+            recyclerView.layoutManager = SheetLayoutManager(it)
+        }
         })
 
-        vm.getItemName(args.itemId, args.itemTypeId).observe(viewLifecycleOwner, Observer {
-            it?.let { name ->
-                if(args.itemTypeId == Rider::class.java.simpleName){
-                    vm.setRiderColumnFilter(name)
-                }else{
-                    vm.setCourseColumnFilter(name)
-                }
-            }
 
-        })
+
+
+
+//        vm.getResultSheet(getLengthConverter()) {s -> p.measureText(s)}.observe(viewLifecycleOwner, Observer { res->
+//            res?.let {
+//                adapter.setNewItems(it)
+//                recyclerView.layoutManager = SheetLayoutManager(it)
+//
+//                //recyclerView.invalidate()
+//            }
+//        })
+
+//        vm.getItemName(args.itemId, args.itemTypeId).observe(viewLifecycleOwner, Observer {
+//            it?.let { name ->
+//                if(args.itemTypeId == Rider::class.java.simpleName){
+//                    vm.setRiderColumnFilter(name)
+//                }else{
+//                    vm.setCourseColumnFilter(name)
+//                }
+//            }
+//
+//        })
 
 //        vm.getRiderResultList(args.itemId, args.itemTypeId).observe(viewLifecycleOwner, Observer {res->
 //            res?.let {

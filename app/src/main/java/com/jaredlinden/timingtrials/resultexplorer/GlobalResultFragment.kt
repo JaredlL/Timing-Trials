@@ -53,29 +53,29 @@ class GlobalResultFragment : Fragment() {
         }
 
 
-        genericItemViewModel.typeIdLiveData.observe(viewLifecycleOwner, object : Observer<GenericListItemNext> {
-            override fun onChanged(t: GenericListItemNext?) {
-
-            }
-        })
-
-        genericItemViewModel.resMed.observe(viewLifecycleOwner, object : Observer<GlobalResultData> {
-            override fun onChanged(data: GlobalResultData?) {
-                data?.let {
-                    (requireActivity() as AppCompatActivity).supportActionBar?.title = data.title
-                    binding.listHeading.item = data.resultHeading
-                    adapter.setItems(data.resultsList)
-                }
-
-            }
-        })
-
-
-
-
-
-
-        genericItemViewModel.setTypeIdData(GenericListItemNext(args.itemTypeId, args.itemId))
+//        genericItemViewModel.typeIdLiveData.observe(viewLifecycleOwner, object : Observer<GenericListItemNext> {
+//            override fun onChanged(t: GenericListItemNext?) {
+//
+//            }
+//        })
+//
+//        genericItemViewModel.resMed.observe(viewLifecycleOwner, object : Observer<GlobalResultData> {
+//            override fun onChanged(data: GlobalResultData?) {
+//                data?.let {
+//                    (requireActivity() as AppCompatActivity).supportActionBar?.title = data.title
+//                    binding.listHeading.item = data.resultHeading
+//                    adapter.setItems(data.resultsList)
+//                }
+//
+//            }
+//        })
+//
+//
+//
+//
+//
+//
+//        genericItemViewModel.setTypeIdData(GenericListItemNext(args.itemTypeId, args.itemId))
 
         adapter.onClick = {
             if (it.itemType == TimeTrial::class.java.simpleName) {
