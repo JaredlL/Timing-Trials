@@ -1,11 +1,13 @@
 package com.jaredlinden.timingtrials.domain.csv
 
 import com.jaredlinden.timingtrials.data.TimeTrial
+import com.jaredlinden.timingtrials.spreadsheet.ResultListSpreadSheet
 import com.jaredlinden.timingtrials.timetrialresults.ResultRowViewModel
+import com.opencsv.CSVWriter
 import org.threeten.bp.format.DateTimeFormatter
 import java.io.*
 
-class CsvResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowViewModel>){
+class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowViewModel>){
 
 
     fun writeToPath(filePath: OutputStream){
@@ -54,3 +56,15 @@ class CsvResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowView
     }
 
 }
+class CsvSheetWriter(val sheet: ResultListSpreadSheet){
+    fun writeToPath(ouputStream: OutputStream){
+
+        val all = listOf(sheet.sheetColumns.map { it.headingText }) + (sheet.data)
+
+       val csvWriter =  CSVWriter(ouputStream.bufferedWriter())
+        csvWriter.writeAll(all.map { it.toTypedArray() })
+        csvWriter.flush()
+        csvWriter.close()
+    }
+}
+

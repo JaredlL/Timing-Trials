@@ -1,13 +1,19 @@
 package com.jaredlinden.timingtrials.spreadsheet
 
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.graphics.Paint
+import android.net.Uri
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -16,19 +22,21 @@ import androidx.lifecycle.Transformations
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
-import com.jaredlinden.timingtrials.IFabCallbacks
-import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.*
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentSpreadsheetBinding
+import com.jaredlinden.timingtrials.domain.csv.CsvSheetWriter
+import com.jaredlinden.timingtrials.domain.csv.CsvTimeTrialResultWriter
 import com.jaredlinden.timingtrials.resultexplorer.GlobalResultViewModelData
 import com.jaredlinden.timingtrials.util.getLengthConverter
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
+import java.io.IOException
 
 
 class SheetFragment : Fragment()  {
 
-    private val args: SheetFragmentArgs by navArgs()
+    //private val args: SheetFragmentArgs by navArgs()
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -38,6 +46,11 @@ class SheetFragment : Fragment()  {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
+        val itemTypeId = arguments?.getString("itemTypeId")?:""
+        val itemId = arguments?.getLong("itemId")?:0L
+
+        arguments?.remove("itemId")
+        arguments?.remove("itemTypeId")
 
         val fabCallback = (requireActivity() as? IFabCallbacks)
         fabCallback?.setVisibility(View.GONE)
@@ -50,7 +63,6 @@ class SheetFragment : Fragment()  {
 
         val vm = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }
 
-        //(requireActivity() as AppCompatActivity).supportActionBar?.title = "Results"
 
         val displayMetrics = DisplayMetrics()
         activity?.windowManager?.defaultDisplay?.getMetrics(displayMetrics)
@@ -62,7 +74,7 @@ class SheetFragment : Fragment()  {
             textSize = tv.textSize
         }
 
-        vm.setColumnsContext(GlobalResultViewModelData(args.itemId, args.itemTypeId, getLengthConverter()), p)
+        vm.setColumnsContext(GlobalResultViewModelData(itemId, itemTypeId, getLengthConverter()), p)
 
         val density = displayMetrics.density.toInt()
         val adapter = SheetAdapter(requireContext(), displayMetrics, p, ::snackBarCallback)
@@ -74,45 +86,6 @@ class SheetFragment : Fragment()  {
         }
         })
 
-
-
-
-
-//        vm.getResultSheet(getLengthConverter()) {s -> p.measureText(s)}.observe(viewLifecycleOwner, Observer { res->
-//            res?.let {
-//                adapter.setNewItems(it)
-//                recyclerView.layoutManager = SheetLayoutManager(it)
-//
-//                //recyclerView.invalidate()
-//            }
-//        })
-
-//        vm.getItemName(args.itemId, args.itemTypeId).observe(viewLifecycleOwner, Observer {
-//            it?.let { name ->
-//                if(args.itemTypeId == Rider::class.java.simpleName){
-//                    vm.setRiderColumnFilter(name)
-//                }else{
-//                    vm.setCourseColumnFilter(name)
-//                }
-//            }
-//
-//        })
-
-//        vm.getRiderResultList(args.itemId, args.itemTypeId).observe(viewLifecycleOwner, Observer {res->
-//            res?.let {
-//                val resultSheet = if(args.itemTypeId == Rider::class.java.simpleName){
-//                    RiderResultListSpreadSheet(it, getLengthConverter())
-//                }else{
-//                    CourseResultListSpreadSheet(it, getLengthConverter())
-//                }
-//                recyclerView.layoutManager = SheetLayoutManager(resultSheet)
-//                adapter.setNewItems(resultSheet)
-//
-//            }
-//
-//        })
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
         recyclerView.setHasFixedSize(true)
         recyclerView.adapter = adapter
 
@@ -168,7 +141,88 @@ class SheetFragment : Fragment()  {
 
                 true
             }
+            R.id.resultExplorerExport -> {
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    val count = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }.resultSpreadSheet.value?.data?.size?:0
+                    val s = if(count == 0) " " else " $count "
+                    putExtra(Intent.EXTRA_TITLE, "TimingTrials${s}Results Export.csv")
+                    //MIME types
+                    type = "text/csv"
+                    // Optionally, specify a URI for the directory that should be opened in
+                    // the system file picker before your app creates the document.
+                    //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
+                }
+                startActivityForResult(intent, REQUEST_EXPLORER_CREATE_FILE_CSV)
+                true
+            }
+
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            REQUEST_EXPLORER_CREATE_FILE_CSV->{
+                data?.data?.let {
+                    writeCsv(it)
+                }
+            }
+        }
+    }
+
+    private fun writeCsv(uri: Uri){
+
+        val vmSheet = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }.resultSpreadSheet.value
+
+        vmSheet?.let{sheet->
+            try {
+                val outputStream = requireActivity().contentResolver.openOutputStream(uri)
+                if(haveOrRequestFilePermission() && outputStream != null){
+                    val trans = CsvSheetWriter(sheet)
+                    trans.writeToPath(outputStream)
+
+
+                    var intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    intent.setDataAndType(uri, "text/csv")
+                    //intent.data = uri
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+                    val activities: List<ResolveInfo> = requireActivity().packageManager.queryIntentActivities(
+                            intent,
+                            PackageManager.MATCH_DEFAULT_ONLY
+                    )
+                    if(activities.isEmpty()){
+                        intent = Intent()
+                        intent.action = Intent.ACTION_VIEW
+                        intent.setDataAndType(uri, "text/*")
+                        //intent.data = uri
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+
+                    startActivity(intent)
+                }
+            }
+            catch(e: IOException)
+            {
+                e.printStackTrace()
+                Snackbar.make((requireActivity() as MainActivity).rootCoordinator, "Save failed - ${e.message}", Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    fun haveOrRequestFilePermission(): Boolean{
+        return if(ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+//            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+//                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
+//            }else{
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
+            false
+            // }
+        }else{
+            true
         }
     }
 

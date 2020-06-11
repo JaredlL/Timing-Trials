@@ -8,4 +8,10 @@
         android:title="@string/screenshot"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/resultExplorerExport"
+        android:icon="@drawable/ic_file_upload_black_24dp"
+        android:title="@string/export_csv"
+        app:showAsAction="ifRoom" />
+
 </menu>

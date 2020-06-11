@@ -52,6 +52,8 @@ class  ResultListSpreadSheet(val results: List<IResult>,
 
     override val isEmpty: Boolean = data.isEmpty()
 
+    override val focusedColumn: Int = 1
+
 
     override fun getRowHeight(row: Int): Int {
         return 1

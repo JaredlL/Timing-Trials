@@ -158,7 +158,7 @@ class GenderColumn : IColumnDefinition{
 
 
     override fun getValue(result: IResult): String {
-        return result.gender.smallString()
+        return result.gender.fullString()
     }
 
     override fun compare(result1: IResult, result2: IResult): Int {
@@ -181,7 +181,7 @@ class TimeColumn : IColumnDefinition{
     override val imageResourceId: Int = com.jaredlinden.timingtrials.R.drawable.ic_timer_black_24dp
 
     override fun getValue(result: IResult): String {
-        return result.resultTime?.let { ConverterUtils.toSecondsDisplayString(it) }?:""
+        return result.resultTime?.let { ConverterUtils.toTenthsDisplayString(it) }?:""
     }
 
     override fun compare(result1: IResult, result2: IResult): Int {

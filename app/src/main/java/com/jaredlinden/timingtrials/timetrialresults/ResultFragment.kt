@@ -34,7 +34,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jaredlinden.timingtrials.*
 import com.jaredlinden.timingtrials.databinding.FragmentTimetrialResultBinding
 import com.jaredlinden.timingtrials.domain.JsonResultsWriter
-import com.jaredlinden.timingtrials.domain.csv.CsvResultWriter
+import com.jaredlinden.timingtrials.domain.csv.CsvTimeTrialResultWriter
 import com.jaredlinden.timingtrials.util.Utils
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
@@ -205,7 +205,7 @@ class ResultFragment : Fragment() {
             try {
                 val outputStream = requireActivity().contentResolver.openOutputStream(uri)
                 if(haveOrRequestFilePermission() && outputStream != null){
-                    val trans = CsvResultWriter(tt, results)
+                    val trans = CsvTimeTrialResultWriter(tt, results)
                     trans.writeToPath(outputStream)
 
 

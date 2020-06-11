@@ -17,7 +17,7 @@
         android:clickable="false"
         android:focusable="false"
         android:duplicateParentState="true"
-        android:textSize="15sp"
+        android:textSize="14sp"
         tools:text="Time">
 
     </TextView>
