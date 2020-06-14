@@ -9,6 +9,15 @@
 <!--        <item name="windowNoTitle">true</item>-->
     </style>
 
+    <style name="ThemeDark" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="colorAccent">@color/primaryLightColor</item>
+        <item name="android:textColorPrimary">@color/primaryTextColor</item>
+        <!--        <item name="windowNoTitle">true</item>-->
+    </style>
+
 
 
     <style name="CustomDialog" parent="@style/Theme.AppCompat.Light.Dialog">
@@ -24,13 +33,6 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
-    <style name="AppTheme.TabBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
-    </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 

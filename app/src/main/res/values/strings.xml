@@ -28,6 +28,7 @@
     <string name="current_category">Current Category</string>
     <string name="begin_tt">Begin TT!</string>
     <string name="ok">OK</string>
+    <string name="edit_notes">Edit Notes</string>
     <string name="resume">Resume</string>
     <string name="select_riders">Select Riders</string>
     <string name="order_riders">Order Riders</string>
@@ -109,7 +110,15 @@
     <string name="start_in_string">Start in: %1$d minutes</string>
     <string name="search">Search</string>
     <string name="edit_numbering">Edit Numbering</string>
-    <string name="column_filter">Filters</string>
-    <string name="show_column">Show Column</string>
-    <string name="rest_filters">Clear Filters</string>
+    <string name="column_filter">Filter</string>
+    <string name="columns">Columns</string>
+    <string name="column">Column</string>
+    <string name="show_column">Show</string>
+    <string name="rest_filters">Reset Columns</string>
+    <string name="explore_results">Explore Results</string>
+    <string name="no_results">No Results</string>
+    <string name="edit_description">Edit Description</string>
+    <string name="course_length">Course Length</string>
+    <string name="ctt_name">CTT Name</string>
+    <string name="first_number">First Number:</string>
 </resources>

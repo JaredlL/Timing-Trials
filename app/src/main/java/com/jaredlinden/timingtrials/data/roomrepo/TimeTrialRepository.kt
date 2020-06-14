@@ -86,9 +86,9 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    override suspend fun insertNewHeader(timeTrial: TimeTrialHeader):Long {
+    override suspend fun insertNewHeader(timeTrialHeader: TimeTrialHeader):Long {
         Timber.d("JAREDMSG -> TTREPO -> Inserting New TT Header into DB from background thread")
-        return timeTrialDao.insert(timeTrial)
+        return timeTrialDao.insert(timeTrialHeader)
     }
 
 

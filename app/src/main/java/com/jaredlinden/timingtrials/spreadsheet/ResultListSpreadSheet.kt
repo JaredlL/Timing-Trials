@@ -8,6 +8,7 @@ import com.jaredlinden.timingtrials.domain.SortType
 class ResultListSpreadSheet(val results: List<IResult>,
                             val columns: List<ColumnData>,
                             val onTransform: (x: List<IResult>, y: List<ColumnData>, z: ResultListSpreadSheet) -> Unit,
+                            val onNavigateToTt: (Long) -> Unit,
                             val measureString: (s: String) -> Float
 ) : ISheetLayoutManagerOptions {
 
@@ -65,15 +66,20 @@ class ResultListSpreadSheet(val results: List<IResult>,
     }
 
     override fun onCellLongPress(row: Int, col: Int) {
+        results[row].timeTrial?.id?.let {
+            onNavigateToTt(it)
+        }
 
     }
+
+    //var navigateToTt : (Long) -> Unit = {_ -> Unit}
 
     fun updateColumnns(newColumnData: ColumnData): List<ColumnData> {
         return columns.map { if (it.key == newColumnData.key) newColumnData else it }
     }
 
     fun copy(results: List<IResult> = this.results, columns: List<ColumnData> = this.columns): ResultListSpreadSheet {
-        return ResultListSpreadSheet(results, columns, onTransform, measureString)
+        return ResultListSpreadSheet(results, columns, onTransform, onNavigateToTt, measureString)
     }
 
 

@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:text="Start at:"
+            android:text="@string/first_number"
             app:layout_constraintBottom_toBottomOf="@+id/editText2"
             app:layout_constraintEnd_toStartOf="@+id/editText2" />
 

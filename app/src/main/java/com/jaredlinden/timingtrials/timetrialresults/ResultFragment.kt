@@ -3,6 +3,7 @@ package com.jaredlinden.timingtrials.timetrialresults
 import android.annotation.TargetApi
 import android.content.ContentValues
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -18,7 +19,9 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 import android.provider.MediaStore.VOLUME_EXTERNAL
+import android.text.InputType
 import android.view.*
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -31,6 +34,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.*
 import com.jaredlinden.timingtrials.databinding.FragmentTimetrialResultBinding
 import com.jaredlinden.timingtrials.domain.JsonResultsWriter
@@ -38,7 +42,6 @@ import com.jaredlinden.timingtrials.domain.csv.CsvTimeTrialResultWriter
 import com.jaredlinden.timingtrials.util.Utils
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_timetrial_result.*
 import timber.log.Timber
 import java.io.File
@@ -139,6 +142,25 @@ class ResultFragment : Fragment() {
                     //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
                 }
                 startActivityForResult(intent, REQUEST_CREATE_FILE_CSV)
+                true
+            }
+            R.id.resultMenuEditDescription ->{
+                val alert = AlertDialog.Builder(requireContext())
+                val edittext = EditText(requireContext())
+                edittext.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+                edittext.setText(resultViewModel.timeTrial.value?.timeTrialHeader?.notes?:"")
+                alert.setTitle(R.string.edit_notes)
+
+                alert.setView(edittext)
+
+                alert.setPositiveButton(R.string.ok) { _, _ ->
+                    resultViewModel.updateNotes(edittext.text.toString())
+
+                }
+
+                alert.setNegativeButton(R.string.cancel) { _, _ -> }
+
+                alert.show()
                 true
             }
             R.id.resultMenuJson->{

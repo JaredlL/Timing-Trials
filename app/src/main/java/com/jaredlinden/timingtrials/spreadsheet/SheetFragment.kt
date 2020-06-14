@@ -19,6 +19,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -28,9 +31,12 @@ import com.jaredlinden.timingtrials.databinding.FragmentSpreadsheetBinding
 import com.jaredlinden.timingtrials.domain.csv.CsvSheetWriter
 import com.jaredlinden.timingtrials.domain.csv.CsvTimeTrialResultWriter
 import com.jaredlinden.timingtrials.resultexplorer.GlobalResultViewModelData
+import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.getLengthConverter
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
+import kotlinx.android.synthetic.main.fragment_spreadsheet.*
 import java.io.IOException
 
 
@@ -76,14 +82,29 @@ class SheetFragment : Fragment()  {
 
         vm.setColumnsContext(GlobalResultViewModelData(itemId, itemTypeId, getLengthConverter()), p)
 
-        val density = displayMetrics.density.toInt()
         val adapter = SheetAdapter(requireContext(), displayMetrics, p, ::snackBarCallback)
         val recyclerView = binding.recyclerView
 
         vm.resultSpreadSheet.observe(viewLifecycleOwner, Observer { it?.let {
-            adapter.setNewItems(it)
-            recyclerView.layoutManager = SheetLayoutManager(it)
+            if(it.isEmpty){
+
+                recyclerView.visibility = View.INVISIBLE
+                adapter.setNewItems(it)
+                recyclerView.layoutManager = SheetLayoutManager(it)
+
+            }else{
+                emptyTextView.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+                adapter.setNewItems(it)
+                recyclerView.layoutManager = SheetLayoutManager(it)
+            }
+
         }
+        })
+
+        vm.navigateToTTId.observe(viewLifecycleOwner, EventObserver {
+            val action = SheetFragmentDirections.actionSheetFragmentToResultFragment(it)
+            findNavController().navigate(action)
         })
 
         recyclerView.setHasFixedSize(true)

@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //setTheme(R.style.AppTheme_AppBarOverlay)
 
 
         val collapsingToolbar = collapsing_toolbar_layout
@@ -214,9 +215,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     main_app_bar_layout.setExpanded(true)
                 }
                 R.id.editRiderFragment->{
-                    main_app_bar_layout.setExpanded(true)
-                }
-                R.id.globalResultFragment->{
                     main_app_bar_layout.setExpanded(true)
                 }
                 R.id.resultFragment->{

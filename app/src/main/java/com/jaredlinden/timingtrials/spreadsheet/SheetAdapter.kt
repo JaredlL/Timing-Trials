@@ -88,19 +88,6 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
 
-//        if(widthOfALetter == null){
-//            val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_spreadsheet, parent, false)
-//            val tv: TextView = view.findViewById(R.id.spreadSheetTextView)
-//            tv.text = "0"
-//
-//
-//            val widthMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
-//            val heightMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
-//            tv.measure(widthMeasureSpec, heightMeasureSpec)
-//            widthOfALetter = tv.measuredWidth + 1
-//            hieghtOfALetter = tv.measuredHeight + 2
-//
-//        }
 
 
        return when(viewType){
@@ -167,8 +154,13 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
     val widthOfALetter: Int = paint.measureText("0").toInt() + oneDpInPixel * 2
     val hieghtOfALetter: Int = android.graphics.Rect().also {r ->  paint.getTextBounds("000",0,2,r) }.height() * 2 //+ oneDpInPixel
 
-    private fun getRowHeight():Int{
-        return widthOfALetter * 3
+    private fun getRowHeight(row:Int):Int{
+
+        return if(row == 0){
+            (widthOfALetter * 3.5).toInt()
+        }else{
+            widthOfALetter * 3
+        }
     }
 
 
@@ -191,39 +183,33 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
         if (numColumns < 1) {
             cellsValue = ""
         } else {
-            //cellsValue = sheet.getRow(r).getCell(c).cellValue
+
             cellsValue = mOptions.data[r][c]
         }
 
         viewHolder.textView.text = cellsValue
 
 
-//        val baseWidth = mOptions.getColumnWidth(c)
-//        val calcWidth = (baseWidth *  (widthOfALetter?:0)) + (widthOfImage * 2).toInt()
-
-        viewHolder.textView.width = getColumnWidthInPixels(c).toInt() //+ (widthOfImage?:0)
+        viewHolder.textView.width = getColumnWidthInPixels(c)
 
 
-        //val denseHeight = (hieghtOfALetter?:1) * mOptions.getRowHeight(r)
 
-        viewHolder.textView.height = getRowHeight()
+        viewHolder.textView.height = getRowHeight(r+2)
         viewHolder.textView.setGravity(Gravity.CENTER)
 
-        //val alpha = 0;
         val alpha = 255
 
-//        val sdk = android.os.Build.VERSION.SDK_INT
-//        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-//            viewHolder.textView.setBackgroundDrawable(ColorDrawable(Color.argb(alpha, 255, 255, 255)))
-//
-//        } else {
-//            viewHolder.textView.setBackground(ColorDrawable(Color.argb(alpha, 255, 255, 255)))
-//        }
 
         viewHolder.textView.setOnClickListener {
             //Toast.makeText(context, "$r,$c", Toast.LENGTH_SHORT).show()
             mOptions.onCellClick(r,c)
             snackBarCallback()
+
+        }
+        viewHolder.textView.setOnLongClickListener {
+            //Toast.makeText(context, "$r,$c", Toast.LENGTH_SHORT).show()
+            mOptions.onCellLongPress(r,c)
+            true
 
         }
     }
@@ -242,14 +228,7 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
         val gray = 193
 
         val sdk = android.os.Build.VERSION.SDK_INT
-//        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-//            //setBackgroundDrawable();
-//            viewHolder.textView.setBackgroundDrawable(ColorDrawable(Color.argb(255, 190,201,223)))
-//
-//        } else {
-//            viewHolder.textView.setBackground(ColorDrawable(Color.argb(255, 190,201,223)))
-//
-//        }
+
                 if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
             //setBackgroundDrawable();
             viewHolder.textView.setBackgroundDrawable(drawable)
@@ -260,17 +239,13 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
         }
 
 
-        if(position == 0){
+        if(row+1 <= 0){
 
             viewHolder.textView.text = ""
-            val height = (hieghtOfALetter?:1) * mOptions.getRowHeight(row)
-            viewHolder.textView.height = getRowHeight()
+            viewHolder.textView.height = getRowHeight(0)
 
         }else{
-
-            val height = (hieghtOfALetter?:1) * mOptions.getRowHeight(row)
-            viewHolder.textView.height = getRowHeight()
-
+            viewHolder.textView.height = getRowHeight(8)
             val rm = (row + 1).toString()
             viewHolder.textView.text = rm
         }
@@ -292,39 +267,37 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
 
         val colData = mOptions.sheetColumns[mc]
 
-        //viewHolder.textView.compoundDrawables.forEach { it?.setVisible(false, false) }
-        //viewHolder.textView.width = colData.width * (widthOfALetter?:1)
         val widthOfText = colData.headingTextWidth.toInt()
         val fullColWidth = getColumnWidthInPixels(mc)
         val leftPadding = ((fullColWidth - widthOfText) / 2)
         val rightPadding = if ((fullColWidth - widthOfText).rem(2) == 1) leftPadding + 1 else leftPadding
 
-        viewHolder.textView.height = getRowHeight()
+        viewHolder.textView.height = getRowHeight(0)
         when(colData.sortType){
             SortType.ASCENDING->{
                 viewHolder.textView.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.ic_baseline_arrow_drop_down_24, 0)
                 val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-                params.setMargins(leftPadding, 0, (rightPadding - widthOfImage).toInt(), 0)
+                params.setMargins(leftPadding, 0, (rightPadding - widthOfImage), 0)
                 viewHolder.textView.setLayoutParams(params)
-                viewHolder.textView.width = (widthOfText + widthOfImage).toInt()
+                viewHolder.textView.width = (widthOfText + widthOfImage)
             }
             SortType.DESCENDING->{
                 viewHolder.textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_baseline_arrow_drop_up_24, 0)
                 val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-                params.setMargins(leftPadding, 0, (rightPadding - widthOfImage).toInt(), 0)
+                params.setMargins(leftPadding, 0, (rightPadding - widthOfImage), 0)
                 viewHolder.textView.setLayoutParams(params)
-                viewHolder.textView.width = (widthOfText + widthOfImage).toInt()
+                viewHolder.textView.width = (widthOfText + widthOfImage)
             }
             else->{
                 viewHolder.textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
                 val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
                 params.setMargins(0, 0, 0, 0)
                 viewHolder.textView.setLayoutParams(params)
-                viewHolder.textView.width = fullColWidth.toInt()
+                viewHolder.textView.width = fullColWidth
             }
 
         }
-        //viewHolder.textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_baseline_arrow_drop_down_24, 0, 0, 0)
+
 
         viewHolder.textView.text = colData.headingText
 
@@ -343,21 +316,6 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
 
     }
 
-//    private fun setBackground(viewHolder: ColumnHeaderViewHolder) {
-//
-//        //val gray = 84
-//        val gray = 193
-//
-//        val sdk = android.os.Build.VERSION.SDK_INT
-//        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-//            //setBackgroundDrawable();
-//            viewHolder.layout.setBackgroundDrawable(ColorDrawable(Color.argb(255, gray,gray,gray)))
-//
-//        } else {
-//            viewHolder.layout.setBackground(ColorDrawable(Color.argb(255, gray,gray,gray)))
-//
-//        }
-//    }
 
     // translate position to column and row
     private fun posToMarkers(pos: Int): Coordinate {

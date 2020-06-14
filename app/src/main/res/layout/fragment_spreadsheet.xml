@@ -22,6 +22,15 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <TextView
+                android:id="@+id/emptyTextView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="20dp"
+                android:textAlignment="center"
+                android:visibility="gone"
+                android:text="@string/no_results" />
+
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/filter_sheet"
                 android:name="com.jaredlinden.timingtrials.resultexplorer.ResultsFilterFragment"

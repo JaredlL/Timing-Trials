@@ -46,6 +46,13 @@ class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRep
 
     }
 
+    fun updateNotes(newNotes: String){
+        timeTrial.value?.timeTrialHeader?.let {
+            viewModelScope.launch(Dispatchers.IO) { timeTrialRepository.update(it.copy(notes = newNotes)) }
+
+        }
+    }
+
     fun getHeading(tt: TimeTrial): ResultRowViewModel{
         val mutList: MutableList<String> = mutableListOf()
 

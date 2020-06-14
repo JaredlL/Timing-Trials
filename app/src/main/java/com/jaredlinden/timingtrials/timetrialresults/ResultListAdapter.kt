@@ -25,12 +25,6 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
                 }else{
                     resultTextView.typeface = Typeface.DEFAULT
                 }
-                //TODO Seems to be bugged
-//                if(position/rowLength != 0 && (position / rowLength).rem(2) == 0){
-//                    riderLayout.setBackgroundColor(Color.rgb(240, 240, 240))
-//                }else{
-//                    riderLayout.setBackgroundColor(Color.TRANSPARENT)
-//                }
                 executePendingBindings()
             }
 
@@ -71,7 +65,7 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
 
     val layoutInflater = LayoutInflater.from(context)
     var rowCount = 0
-    //var itemHeight = 0
+
 
     fun setResults(newResults: List<ResultRowViewModel>){
 

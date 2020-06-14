@@ -32,11 +32,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
                 android:text="@string/timetrial_name"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toTopOf="@+id/divider"
-                app:layout_constraintEnd_toStartOf="@+id/guideline2"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@string/timetrial_name" />
@@ -67,7 +65,7 @@
                 android:textSize="18sp"
                 app:layout_constraintBottom_toTopOf="@+id/divider"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/guideline2"
+                app:layout_constraintStart_toEndOf="@+id/textView6"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="New Time Trial" />
 
@@ -76,6 +74,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_marginEnd="8dp"
                 android:padding="4dp"
                 android:text="@{viewModel.courseName}"
@@ -173,13 +172,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginEnd="8dp"
                 android:layout_marginBottom="20dp"
                 android:entries="@{viewModel.availableLaps}"
                 android:selectedItemPosition="@={viewModel.selectedLapsPosition}"
                 app:layout_constraintBottom_toTopOf="@+id/divider3"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/textView11"
+                app:layout_constraintEnd_toEndOf="@+id/autocomplete"
+                app:layout_constraintStart_toStartOf="@+id/guideline2"
                 app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
             <TextView
@@ -225,6 +223,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:ems="10"
                 android:text="@{viewModel.startTimeString}"
                 android:textSize="18sp"
@@ -256,6 +255,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/rider_start_offset"
+                android:textAlignment="center"
                 app:layout_constraintBottom_toBottomOf="@+id/editText3"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/editText3" />

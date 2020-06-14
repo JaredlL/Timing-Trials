@@ -4,6 +4,7 @@ import androidx.room.*
 import com.jaredlinden.timingtrials.domain.TimeTrialHelper
 import org.threeten.bp.*
 import org.threeten.bp.temporal.ChronoUnit
+import java.util.*
 
 
 @Entity(tableName = "timetrial_table", indices = [Index("courseId")],
@@ -18,6 +19,7 @@ data class TimeTrialHeader(val ttName: String,
                            val numberRules: NumberRules = NumberRules(),
                            val timeStamps: List<Long> = listOf(),
                            val notes: String = "",
+                           val guid:String = UUID.randomUUID().toString(),
                            @PrimaryKey(autoGenerate = true) override val id: Long? = null) : ITimingTrialsEntity {
 
 

@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="@string/column_filter"
+            android:text="@string/column"
             app:layout_constraintBottom_toTopOf="@+id/filterRecycler"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -53,6 +53,17 @@
             android:text="@string/rest_filters"
             app:layout_constraintBottom_toTopOf="@+id/filterRecycler"
             app:layout_constraintEnd_toStartOf="@+id/textView25"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView28"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/column_filter"
+            app:layout_constraintBottom_toTopOf="@+id/filterRecycler"
+            app:layout_constraintStart_toEndOf="@+id/filterTextView"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
