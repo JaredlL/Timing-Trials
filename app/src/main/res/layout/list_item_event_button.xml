@@ -50,7 +50,7 @@
             android:layout_marginBottom="4dp"
             android:background="@drawable/background_event_button"
             android:checked="@={event.eventSelected}"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+
             android:textOff="@string/press_assign_rider"
             android:textOn="@string/now_choose_rider"
             android:textSize="14sp"

@@ -1,6 +1,7 @@
 package com.jaredlinden.timingtrials
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
@@ -9,6 +10,8 @@ import android.provider.OpenableColumns
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -20,6 +23,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import com.jaredlinden.timingtrials.timing.TimingActivity
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.getViewModel
@@ -55,23 +59,32 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-
-    //lateinit var mMainFab: FloatingActionButton
     lateinit var rootCoordinator: CoordinatorLayout
 
     var drawButtonPressed = 0
+    private val listner = SharedPreferences.OnSharedPreferenceChangeListener{i,j->
+        val b = i.getString("dayNight", "System Default")
+        when(b){
+            "Light" -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
+            "Dark" -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
+            "System Default" -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
+            "Follow Battery Saver Feature" -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_AUTO_BATTERY)
+            else -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //setTheme(R.style.AppTheme_AppBarOverlay)
+
 
 
         val collapsingToolbar = collapsing_toolbar_layout
         val navController = findNavController(R.id.nav_host_fragment)
-        //appBarConfiguration = AppBarConfiguration(navController.graph)
-         appBarConfiguration = AppBarConfiguration(navController.graph, drawer_layout)
+
+        appBarConfiguration = AppBarConfiguration(navController.graph, drawer_layout)
         collapsingToolbar.setupWithNavController(toolbar, navController, appBarConfiguration)
 
         main_app_bar_layout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -88,6 +101,9 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         })
 
 
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listner)
+
+
         mainFab.setOnClickListener {
             fabAction()
         }
@@ -95,8 +111,8 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         setSupportActionBar(toolbar)
         nav_view.setupWithNavController(navController)
         setupActionBarWithNavController(navController, appBarConfiguration)
-        //mMainFab = mainFab
         rootCoordinator = mainActivityCoordinator
+
         val vm = getViewModel { injector.mainViewModel()}
         vm.timingTimeTrial.observe(this, Observer {
             it?.let {
@@ -327,10 +343,10 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     }
 
     private fun refreshFab(){
-        if((!toolbarCollapsed && fabShouldShow) && mainFab.visibility != View.VISIBLE){
-            mainFab.show()
-        }else if ((!fabShouldShow || toolbarCollapsed) && mainFab.visibility == View.VISIBLE) {
-            mainFab.hide()
+        if((!toolbarCollapsed && fabShouldShow) && mainFab?.visibility != View.VISIBLE){
+            mainFab?.show()
+        }else if ((!fabShouldShow || toolbarCollapsed) && mainFab?.visibility == View.VISIBLE) {
+            mainFab?.hide()
         }
     }
 

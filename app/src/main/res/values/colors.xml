@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimary">#508991</color>
+    <color name="colorPrimaryDark">#172A3A</color>
+    <color name="colorAccent">#EE6055</color>
+    <color name="textColorPrimary">#508991</color>
+    <color name="textColor">#ffffff</color>
     <color name="mainBackground">#242933</color>
     <color name="buttonInactive">#4D27334D</color>
     <color name="spreadsheetHeader">#A5A8AC</color>
@@ -10,6 +12,7 @@
     <color name="numberColor">#CDDC39</color>
     <color name="eventButtonColor">#8BF780</color>
     <color name="eventButtonShadow">#BF73B86B</color>
+    <color name="tt_logo_background">#8EE4AF</color>
     <color name="imageColor">#FF000000</color>
     <color name="blueGray50">#ECEFF1</color>
     <color name="blueGray100">#CFD8DC</color>
