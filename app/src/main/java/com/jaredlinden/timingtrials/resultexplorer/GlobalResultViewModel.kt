@@ -8,7 +8,9 @@ import com.jaredlinden.timingtrials.domain.*
 import com.jaredlinden.timingtrials.spreadsheet.ResultListSpreadSheet
 import com.jaredlinden.timingtrials.util.LengthConverter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -63,7 +65,7 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
         if(c == null){
             columnViewModels.value = ResultFilterViewModel.getAllColumns((newData.converter)).map { ResultFilterViewModel(it, this) }
         }else{
-            c.forEach { it.mutableColumn.value = it.mutableColumn.value?.copy(isFocused = false)}
+            //c.forEach { it.mutableColumn.value = it.mutableColumn.value?.copy(isFocused = false)}
         }
 
         if(columnsContext.value != newData){
@@ -124,7 +126,7 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
 
     override fun updateColumn(newColumn: ColumnData) {
         resultSpreadSheet.value?.let {
-            val newCols = it.columns.map { columnData -> if(newColumn.key == columnData.key) newColumn else columnData}
+            val newCols = columnViewModels.value?.mapNotNull { it.mutableColumn.value }?:it.columns
             newTransform(it.results, newCols, it)
         }
     }
@@ -185,9 +187,11 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
                 isCarolineAlive.set(true)
                 var mnew:ResultListSpreadSheet? = null
                 while (queue.peek() != null){
-                   queue.poll()?.let {
-                       mnew = it.third.copy(it.first, it.second)
+                   queue.poll()?.let { qss->
+                       val n = mnew
+                       mnew = n?.copy(qss.first, qss.second) ?: qss.third.copy(qss.first, qss.second)
                    }
+
                 }
                 mnew?.let { resultSpreadSheet.postValue(it) }
                 isCarolineAlive.set(false)

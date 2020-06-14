@@ -117,19 +117,21 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
         val mOffset = layoutDataPair.second
         var hasAdded = false
 
+        val totalColsWidth = options.sheetColumns.sumBy { it.width.toInt() }
+
         while (height - filledHeight >= 0 && rowInc < totalRows) {
             while (width - filledWidth >= 0 && columnInc < totalColumns) {
                 cellView = layoutChildView(recycler, currentColumn, currentRow, filledWidth, filledHeight, Direction.UNLIMITED, Tilt.VERTICAL)
                 val cellWidth = getDecoratedSide(cellView, Tilt.VERTICAL)
                 filledWidth += cellWidth
-                if(!hasAdded && mOffset < 0){
+                if(!hasAdded && mOffset < 0 && totalColsWidth > width){
                     rowMarkersWidth = filledWidth
                     filledWidth = mOffset - filledWidth
                     hasAdded = true
                 }
                 currentColumn = jumpColumn + columnInc++
                 cellHeight = getDecoratedSide(cellView, Tilt.HORIZONTAL) // we don't need to measure this each time
-                if(currentColumn == totalColumns){
+                if(currentColumn == totalColumns && totalColsWidth > width){
                     correctionOffset =  width - filledWidth
                 }
 
@@ -143,7 +145,7 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
         }
 
 
-        if(correctionOffset > 0){
+        if(correctionOffset > 0 && totalColsWidth > width){
             offsetCells(-correctionOffset, ROW)
         }
     }
