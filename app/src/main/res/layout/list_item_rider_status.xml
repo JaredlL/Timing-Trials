@@ -5,9 +5,9 @@
     <data>
         <variable
             name="viewModel"
-            type="com.android.jared.linden.timingtrials.ui.RiderStatusViewWrapper"/>
+            type="com.jaredlinden.timingtrials.ui.RiderStatusViewWrapper"/>
         <import type="android.view.View"/>
-        <import type="com.android.jared.linden.timingtrials.ui.RiderStatus"/>
+        <import type="com.jaredlinden.timingtrials.ui.RiderStatus"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

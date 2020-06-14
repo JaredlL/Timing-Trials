@@ -7,14 +7,14 @@ apply plugin: 'androidx.navigation.safeargs.kotlin'
 repositories { mavenCentral() }
 
 android {
-    dataBinding {
-        enabled true
+    buildFeatures {
+        dataBinding true
     }
 
 
     compileSdkVersion 29
     defaultConfig {
-        applicationId "com.android.jared.linden.timingtrials"
+        applicationId "com.jaredlinden.timingtrials"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
@@ -48,14 +48,14 @@ dependencies {
 
     //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test:core:1.3.0-alpha04'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2-alpha04'
-    androidTestImplementation 'androidx.test:runner:1.3.0-alpha04'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-alpha04'
+    androidTestImplementation 'androidx.test:core:1.3.0-rc01'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2-rc01'
+    androidTestImplementation 'androidx.test:runner:1.3.0-rc01'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-rc01'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "androidx.appcompat:appcompat:1.2.0-alpha02"
-    implementation 'com.google.android.material:material:1.2.0-alpha05'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation "com.google.android.material:material:$rootProject.materialVersion"
     implementation "androidx.preference:preference-ktx:$rootProject.preferenceVersion"
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
@@ -72,7 +72,7 @@ dependencies {
     //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
 
-    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.19'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.20'
 
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"
@@ -105,12 +105,15 @@ dependencies {
     //GSON
     implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
 
+    //CSV
+    implementation 'com.opencsv:opencsv:5.2'
+
     //Threeten Time
-    implementation 'com.jakewharton.threetenabp:threetenabp:1.2.2'
-    testImplementation('org.threeten:threetenbp:1.4.1') {
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.2.4'
+    testImplementation('org.threeten:threetenbp:1.4.4') {
         exclude group: 'com.jakewharton.threetenabp', module: 'threetenabp'
     }
-    androidTestImplementation('org.threeten:threetenbp:1.4.1') {
+    androidTestImplementation('org.threeten:threetenbp:1.4.4') {
         exclude group: 'com.jakewharton.threetenabp', module: 'threetenabp'
     }
 

@@ -9,10 +9,17 @@
         android:id="@+id/app_bar_export"
         android:icon="@drawable/ic_file_upload_black_24dp"
         android:title="@string/export_data" />
+
+    <item
+        android:id="@+id/app_bar_spreadsheet"
+        android:icon="@drawable/ic_filter_1_black_24dp"
+        android:title="@string/explore_results" />
+
     <item
         android:id="@+id/app_bar_settings"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/settings" />
+
     <item
         android:id="@+id/app_bar_test"
         android:icon="@drawable/ic_dashboard_black_24dp"

@@ -12,8 +12,12 @@
         android:entries="@array/unitsArray"
         android:entryValues="@array/unitsValues"/>
 
-    <SwitchPreferenceCompat
-        app:key="darkMode"
-        app:title="Enable Dark Mode"/>
+    <ListPreference
+        app:icon="@drawable/ic_baseline_category_24"
+        app:key="dayNight"
+        app:title="Light/Dark theme"
+        app:summary="Light or Dark theme"
+        android:entries="@array/dayNightArray"
+        android:entryValues="@array/dayNightValues"/>
 
 </PreferenceScreen>

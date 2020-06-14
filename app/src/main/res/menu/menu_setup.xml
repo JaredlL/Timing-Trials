@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.android.jared.linden.timingtrials.setup.SetupActivity">
+    tools:context="com.jaredlinden.timingtrials.setup.SetupActivity">
     <item
         android:id="@+id/settings_app_bar_search"
         android:icon="@drawable/ic_search_white_24dp"

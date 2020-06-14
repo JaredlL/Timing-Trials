@@ -276,8 +276,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-438" />
-                            <option name="y" value="2330" />
+                            <option name="x" value="-670" />
+                            <option name="y" value="2496" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -304,12 +304,29 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_setupViewPagerFragment_to_numberOptionsDialog">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_setupViewPagerFragment_to_selectCourseFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
                           </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="sheetFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-554" />
+                            <option name="y" value="1867" />
+                          </Point>
                         </option>
                       </LayoutPositions>
                     </value>

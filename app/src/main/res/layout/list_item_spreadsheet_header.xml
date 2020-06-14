@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:id="@+id/headerLayout"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="@drawable/background_spreadsheet_heading"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/spreadSheetHeaderTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:focusable="false"
+        android:duplicateParentState="true"
+        android:textSize="14sp"
+        tools:text="Time">
+
+    </TextView>
+
+</LinearLayout>

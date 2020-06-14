@@ -6,12 +6,13 @@
             <item
             android:state_pressed="true" >
             <shape android:shape="rectangle">
-                <corners android:radius="8dp" />
-                <gradient
-                    android:angle="270"
-                    android:endColor="@color/eventButtonColor"
-                    android:centerColor="@color/eventButtonColor"
-                    android:startColor="@color/eventButtonShadow" />
+                <corners android:radius="24dp" />
+                <solid android:color="@color/colorAccent"/>
+<!--                <gradient-->
+<!--                    android:angle="270"-->
+<!--                    android:endColor="@color/eventButtonColor"-->
+<!--                    android:centerColor="@color/eventButtonColor"-->
+<!--                    android:startColor="@color/eventButtonShadow" />-->
                 <stroke
                     android:width="1dip"
                     android:color="@color/mainBackground" />
@@ -23,12 +24,13 @@
             <item>
                 <shape android:shape="rectangle">
 
-                    <corners android:radius="8dp" />
-                    <gradient
-                        android:angle="90"
-                        android:endColor="@color/eventButtonColor"
-                        android:centerColor="@color/eventButtonColor"
-                        android:startColor="@color/eventButtonShadow" />
+                    <corners android:radius="24dp" />
+                    <solid android:color="@color/colorPrimary"/>
+<!--                    <gradient-->
+<!--                        android:angle="90"-->
+<!--                        android:endColor="@color/eventButtonColor"-->
+<!--                        android:centerColor="@color/eventButtonColor"-->
+<!--                        android:startColor="@color/eventButtonShadow" />-->
                     <stroke
                         android:width="1dip"
                         android:color="@color/mainBackground" />

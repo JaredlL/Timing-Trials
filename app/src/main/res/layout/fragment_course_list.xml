@@ -30,7 +30,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="8dp"
-                android:background="@android:color/background_light"
                 app:layout_constraintTop_toBottomOf="@+id/courseHeading"
                 tools:listitem="@layout/list_item_course" />
 
@@ -41,7 +40,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/select_course"
-                android:textSize="18sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/courseHeading"
                 app:layout_constraintEnd_toEndOf="parent"

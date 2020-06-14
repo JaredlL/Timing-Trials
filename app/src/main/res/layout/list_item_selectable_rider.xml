@@ -8,7 +8,7 @@
     <data>
         <variable
             name="rider"
-            type="com.android.jared.linden.timingtrials.data.Rider"/>
+            type="com.jaredlinden.timingtrials.data.Rider"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

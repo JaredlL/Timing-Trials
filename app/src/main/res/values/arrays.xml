@@ -16,4 +16,18 @@
         <item>Recent Activity</item>
         <item>Alphabetical</item>
     </string-array>
+
+    <string-array name="dayNightArray">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>System Default</item>
+        <item>Follow Android Battery Saver Feature</item>
+    </string-array>
+
+    <string-array name="dayNightValues">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>System Default</item>
+        <item>Follow Battery Saver Feature</item>
+    </string-array>
 </resources>
