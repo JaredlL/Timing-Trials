@@ -82,6 +82,9 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
             return
         }
 
+        val layoutDataPair = workOutLeftColumnForFocus()
+        leftColumn = layoutDataPair.first
+
         //Incase remebered row is greater than new total rows
         if(options.numberOfRows in 1 until topRow){
             topRow = 1
@@ -108,20 +111,88 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
             detachAndScrapAttachedViews(recycler)
         }
 
+        var correctionOffset = 0
+        var rowMarkersWidth  = 0
+
+        val mOffset = layoutDataPair.second
+        var hasAdded = false
+
         while (height - filledHeight >= 0 && rowInc < totalRows) {
             while (width - filledWidth >= 0 && columnInc < totalColumns) {
                 cellView = layoutChildView(recycler, currentColumn, currentRow, filledWidth, filledHeight, Direction.UNLIMITED, Tilt.VERTICAL)
-                filledWidth += getDecoratedSide(cellView, Tilt.VERTICAL)
+                val cellWidth = getDecoratedSide(cellView, Tilt.VERTICAL)
+                filledWidth += cellWidth
+                if(!hasAdded && mOffset < 0){
+                    rowMarkersWidth = filledWidth
+                    filledWidth = mOffset - filledWidth
+                    hasAdded = true
+                }
                 currentColumn = jumpColumn + columnInc++
                 cellHeight = getDecoratedSide(cellView, Tilt.HORIZONTAL) // we don't need to measure this each time
-            }
+                if(currentColumn == totalColumns){
+                    correctionOffset =  width - filledWidth
+                }
 
+            }
+            hasAdded = false
             currentColumn = HEADER_COLUMN
             columnInc = 0
             filledWidth = 0
             filledHeight += cellHeight
             currentRow = jumpRow + rowInc++
         }
+
+
+        if(correctionOffset > 0){
+            offsetCells(-correctionOffset, ROW)
+        }
+    }
+
+    fun workOutLeftColumnForFocus(): Pair<Int, Int>{
+
+
+
+        val col = options.focusedColumn
+
+
+
+        if(options.focusedColumn <= 0){
+            return Pair(1, 0)
+        }
+        val actualCol = options.sheetColumns[col]
+
+        val midPointOfCell = (options.sheetColumns[col].width / 2).toInt()
+        val midPointOfScreen = width / 2
+
+        val cellsBefore = options.sheetColumns.take(col).reversed()
+        val cellsAfter = options.sheetColumns.drop(col+1)
+
+        val widthAfter = cellsAfter.sumBy { it.width.toInt() } + midPointOfCell
+
+        var start = midPointOfScreen - midPointOfCell
+        var colToStart = col
+        var listOx: MutableList<ISheetColumn> = mutableListOf()
+        for (x in cellsBefore){
+
+            val w = x.width.toInt()
+            start -= w
+            colToStart--
+            listOx.add(x)
+
+            if(start <= 0 && widthAfter > midPointOfScreen){
+                break
+            }
+        }
+        if(start > 0) start = 0
+
+        var end = width
+        for(y in cellsAfter){
+
+
+        }
+
+        return Pair(colToStart+1, start)
+
     }
 
 

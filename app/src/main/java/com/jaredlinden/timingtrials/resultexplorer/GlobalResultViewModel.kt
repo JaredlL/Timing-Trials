@@ -6,12 +6,9 @@ import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.data.roomrepo.*
 import com.jaredlinden.timingtrials.domain.*
 import com.jaredlinden.timingtrials.spreadsheet.ResultListSpreadSheet
-import com.jaredlinden.timingtrials.ui.GenericListItemNext
 import com.jaredlinden.timingtrials.util.LengthConverter
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -50,9 +47,11 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
     private val columnsContext: MutableLiveData<GlobalResultViewModelData> = MutableLiveData()
     private val allResults = timeTrialRiderRepository.getAllResults()
 
-    val columns = MutableLiveData<List<ResultFilterViewModel>>()
+    val columnViewModels = MutableLiveData<List<ResultFilterViewModel>>()
 
     override val resultSpreadSheet: MediatorLiveData<ResultListSpreadSheet> = MediatorLiveData()
+
+    //val rss: LiveData<ResultListSpreadSheet> = Transformations.switchMap(
 
     var m_paint: Paint? = null
 
@@ -60,14 +59,17 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
     fun setColumnsContext(newData: GlobalResultViewModelData, paint: Paint){
 
         m_paint = paint
-        if(columns.value == null){
-            columns.value = ResultFilterViewModel.getAllColumns((newData.converter)).map { ResultFilterViewModel(it, this) }
+        val c =columnViewModels.value
+        if(c == null){
+            columnViewModels.value = ResultFilterViewModel.getAllColumns((newData.converter)).map { ResultFilterViewModel(it, this) }
+        }else{
+            c.forEach { it.mutableColumn.value = it.mutableColumn.value?.copy(isFocused = false)}
         }
 
         if(columnsContext.value != newData){
             //originalColContex = newData
             resultSpreadSheet.value?.let {
-                resultSpreadSheet.value = ResultListSpreadSheet(it.results, ResultFilterViewModel.getAllColumns(newData.converter), ::newTransform){ s -> m_paint?.measureText(s)?:s.length.toFloat()}
+                resultSpreadSheet.value = ResultListSpreadSheet(it.results, columnViewModels.value?.mapNotNull { it.mutableColumn.value }?: listOf() , ::newTransform){ s -> m_paint?.measureText(s)?:s.length.toFloat()}
             }
             columnsContext.value = newData
         }
@@ -84,7 +86,7 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
     private val orig = ResultListSpreadSheet(listOf(), ResultFilterViewModel.getAllColumns(LengthConverter.default), ::newTransform) {s -> s.length.toFloat()}
     init {
         resultSpreadSheet.value = orig
-        columns.value = orig.columns.map { ResultFilterViewModel(it, this) }
+        columnViewModels.value = orig.columns.map { ResultFilterViewModel(it, this) }
 
         resultSpreadSheet.addSource(Transformations.switchMap(columnsContext){ it?.let { getItemName(it.itemId, it.itemType)} }){res->
 

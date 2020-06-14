@@ -19,6 +19,7 @@ interface ISheetColumn{
     val headingText:String
     val headingTextWidth: Float
     val width: Float
+    val focused: Boolean
     val sortType: SortType
     fun onClick()
 }

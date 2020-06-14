@@ -161,7 +161,7 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
     }
 
     private val sidePadding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8F, displayMetrics).toInt()
-    private val widthOfImage = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24F, displayMetrics).toInt()
+    private val widthOfImage = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 26F, displayMetrics).toInt()
     private val oneDpInPixel = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1F, displayMetrics).toInt()
 
     val widthOfALetter: Int = paint.measureText("0").toInt() + oneDpInPixel * 2

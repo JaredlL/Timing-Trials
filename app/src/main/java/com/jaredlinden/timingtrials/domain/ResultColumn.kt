@@ -33,7 +33,7 @@ interface IColumnDefinition{
 }
 
 
-data class ColumnData(val definition: IColumnDefinition, val sortOrder: Int = 0, val filterText: String = "", val isVisible: Boolean = true, val sortType:SortType = SortType.NONE){
+data class ColumnData(val definition: IColumnDefinition, val sortOrder: Int = 0, val filterText: String = "", val isVisible: Boolean = true, val sortType:SortType = SortType.NONE, val isFocused:Boolean = false){
     val key = definition.key
     val description = definition.description
     val imageRes = definition.imageResourceId
@@ -165,7 +165,7 @@ class GenderColumn : IColumnDefinition{
         return -result1.gender.compareTo(result2.gender)
     }
     override fun passesFilter(filterText: String, result: IResult): Boolean {
-        return result.gender.smallString().contains(filterText, true)
+        return getValue(result).contains(filterText, true)
     }
 }
 

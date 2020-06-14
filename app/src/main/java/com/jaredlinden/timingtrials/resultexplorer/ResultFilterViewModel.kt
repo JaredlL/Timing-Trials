@@ -12,7 +12,7 @@ import com.jaredlinden.timingtrials.util.setIfNotEqual
 
 
 
-class ResultFilterViewModel(column:ColumnData, val sheetVm:ISheetViewModel) {
+class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
 
     private val columnKey = column.key
 
@@ -20,16 +20,16 @@ class ResultFilterViewModel(column:ColumnData, val sheetVm:ISheetViewModel) {
        return sheetVm.resultSpreadSheet.value?.columns?.firstOrNull{it.key == columnKey}
     }
 
-    private val mutableColumn = MediatorLiveData<ColumnData>().apply { value = currentCol() }
+    val mutableColumn = MediatorLiveData<ColumnData>().apply { value = currentCol() }
 
 
     val imageRes = Transformations.map(mutableColumn){
         it?.imageRes
     }
 
-    val isVisible = MutableLiveData(column.isVisible)
-    val filterText = MutableLiveData(column.filterText)
-    val sortIndex= MutableLiveData(column.sortOrder)
+    val isVisible = MutableLiveData(true)
+    val filterText = MutableLiveData("")
+    val sortIndex= MutableLiveData(0)
     val description = Transformations.map(mutableColumn){
         it?.description
 
@@ -82,6 +82,22 @@ class ResultFilterViewModel(column:ColumnData, val sheetVm:ISheetViewModel) {
                     ColumnData(SpeedColumn(distConverter)))
 
         }
+
+
+            fun getAllKeys():List<String>{
+                return listOf(
+                        RiderNameColumn.columnKey,
+                        CourseNameColumn.columnKey,
+                        TimeColumn.columnKey,
+                        ClubColumn.columnKey,
+                        GenderColumn.columnKey,
+                        CategoryColumn.columnKey,
+                        LapsColumn.columnKey,
+                        DateColumn.columnKey,
+                        DistanceColumn.columnKey,
+                        SpeedColumn.columnKey)
+
+            }
 
     }
 
