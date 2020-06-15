@@ -251,8 +251,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
 
     private fun markerToPos(r: Int, c: Int): Int {
         return r * totalColumns + c
-//        val t = c + r + 1
-//        return t * (t + 1) / 2 - c - 1
     }
 
     // row and column headers get scrolled under, top left header scrolled under by all
@@ -499,6 +497,7 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
                 when (tag) {
                     COLUMN -> child.offsetTopAndBottom(-d)
                     ROW -> child.offsetLeftAndRight(-d)
+                    TOP_LEFT -> child.offsetTopAndBottom(-d)
                 }
             }
         }

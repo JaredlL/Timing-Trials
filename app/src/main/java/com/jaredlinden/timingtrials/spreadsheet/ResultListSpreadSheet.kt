@@ -7,38 +7,51 @@ import com.jaredlinden.timingtrials.domain.SortType
 
 class ResultListSpreadSheet(val results: List<IResult>,
                             val columns: List<ColumnData>,
-                            val onTransform: (x: List<IResult>, y: List<ColumnData>, z: ResultListSpreadSheet) -> Unit,
+                            val setNewColumns: (columns: List<ColumnData>) -> Unit,
                             val onNavigateToTt: (Long) -> Unit,
                             val measureString: (s: String) -> Float
 ) : ISheetLayoutManagerOptions {
 
     private val visibleCols = columns.filter { it.isVisible }
 
-    override val data: List<List<String>> = results.filter { res -> columns.all { it.passesFilter(res) } }.map { res -> visibleCols.map { it.getValue(res) } }
+    private val comp: Comparator<IResult>? = columns.firstOrNull { it.sortType != SortType.NONE}?.let {
+        when (it.sortType){
+            SortType.ASCENDING -> Comparator { r1, r2 -> -1 * it.compare(r1, r2)}
+            else -> Comparator { r1, r2 -> it.compare(r1, r2)}
+        }
+    }
+
+
+
+    override val data: List<List<String>> =
+            if (comp != null) {
+                results.sortedWith(comp).filter { res -> columns.all { it.passesFilter(res) } }.map { res -> visibleCols.map { it.getValue(res) } }
+            } else {
+                results.filter { res -> columns.all { it.passesFilter(res) } }.map { res -> visibleCols.map { it.getValue(res) } }
+            }
+
 
     private val colWidths: List<Float> = data.fold(visibleCols.map { measureString(it.description) }, { currentLongest, strings -> currentLongest.zip(strings).map { if (it.first >= measureString(it.second)) it.first else measureString(it.second) } })
 
-    override val sheetColumns: List<ISheetColumn> = visibleCols.zip(colWidths) { colData, w ->
+    override val sheetColumns: List<ISheetColumn> = visibleCols.zip(colWidths) { colData, width ->
         object : ISheetColumn {
 
             override val headingText: String = colData.description
             override val headingTextWidth: Float = measureString(headingText)
-            override val width: Float = w
+            override val width: Float = width
             override val focused: Boolean = colData.isFocused
             override val sortType: SortType = colData.sortType
             override fun onClick() {
 
-                val (newSortType, multiplier) = when (colData.sortType) {
-                    SortType.DESCENDING -> Pair(SortType.ASCENDING, -1)
-                    else -> Pair(SortType.DESCENDING, 1)
+                val newSortType = when (colData.sortType) {
+                    SortType.DESCENDING -> SortType.ASCENDING
+                    else -> SortType.DESCENDING
                 }
+                val newCols = columns.map { columnData -> if (colData.key == columnData.key) columnData.copy(sortType = newSortType, isFocused = true) else columnData.copy(sortType = SortType.NONE, isFocused = false) }
+                setNewColumns(newCols)
 
-                val newData = results.sortedWith(Comparator { r1, r2 -> multiplier * colData.compare(r1, r2) })
-
-                onTransform(newData, columns.map { columnData ->
-                    if (colData.key == columnData.key) columnData.copy(sortType = newSortType, isFocused = true) else columnData.copy(sortType = SortType.NONE, isFocused = false) },
-                        this@ResultListSpreadSheet)
             }
+
         }
     }
 
@@ -60,7 +73,7 @@ class ResultListSpreadSheet(val results: List<IResult>,
         val newFilter = if (cellString != currentColFilter) cellString else ""
         if (visibleCols[col].filterText != newFilter) {
             val newCol = visibleCols[col].copy(filterText = newFilter, isFocused = true)
-            onTransform(results, columns.map { if (it.key == newCol.key) newCol else it.copy(isFocused = false) }, this)
+            setNewColumns(columns.map { if (it.key == newCol.key) newCol else it.copy(isFocused = false) })
         }
 
     }
@@ -72,14 +85,8 @@ class ResultListSpreadSheet(val results: List<IResult>,
 
     }
 
-    //var navigateToTt : (Long) -> Unit = {_ -> Unit}
-
-    fun updateColumnns(newColumnData: ColumnData): List<ColumnData> {
-        return columns.map { if (it.key == newColumnData.key) newColumnData else it }
-    }
-
     fun copy(results: List<IResult> = this.results, columns: List<ColumnData> = this.columns): ResultListSpreadSheet {
-        return ResultListSpreadSheet(results, columns, onTransform, onNavigateToTt, measureString)
+        return ResultListSpreadSheet(results, columns, setNewColumns, onNavigateToTt, measureString)
     }
 
 

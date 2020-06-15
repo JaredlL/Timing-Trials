@@ -37,11 +37,9 @@ class ResultsFilterFragment : BottomSheetDialogFragment(){
 
         //val cols = ResultFilterViewModel.getAllColumnViewModels(getLengthConverter())
 
-        vm.columnViewModels.observe(viewLifecycleOwner, Observer {it?.let {
-            adapter.setItems(it)
+            adapter.setItems(vm.columnViewModels)
             view?.jumpDrawablesToCurrentState()
-        }
-        })
+
 
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)

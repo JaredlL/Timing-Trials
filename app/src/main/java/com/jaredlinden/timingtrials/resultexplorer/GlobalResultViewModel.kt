@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 
 interface ISheetViewModel{
-    val resultSpreadSheet: LiveData<ResultListSpreadSheet>
+    val columns: MutableLiveData<List<ColumnData>>
     fun updateColumn(newColumn: ColumnData)
 }
 
@@ -37,30 +37,39 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
     private val columnsContext: MutableLiveData<GlobalResultViewModelData> = MutableLiveData()
     private val allResults = timeTrialRiderRepository.getAllResults()
 
-    val columnViewModels = MutableLiveData<List<ResultFilterViewModel>>()
 
-    override val resultSpreadSheet: MediatorLiveData<ResultListSpreadSheet> = MediatorLiveData()
+    private val cols = ColumnData.getAllColumns(LengthConverter.default)
 
-    //val rss: LiveData<ResultListSpreadSheet> = Transformations.switchMap(
+    //This drives the spreadsheet data display
+    override val columns: MutableLiveData<List<ColumnData>> = MutableLiveData(cols)
+
+    val columnViewModels = cols.map { ResultFilterViewModel(it, this) }
+
+    val resultSpreadSheet: MediatorLiveData<ResultListSpreadSheet> = MediatorLiveData()
+
 
     var m_paint: Paint? = null
 
-    //var originalColContex:  GlobalResultViewModelData? = null
     fun setColumnsContext(newData: GlobalResultViewModelData, paint: Paint){
 
         m_paint = paint
-        val c =columnViewModels.value
-        if(c == null){
-            columnViewModels.value = ResultFilterViewModel.getAllColumns((newData.converter)).map { ResultFilterViewModel(it, this) }
-        }else{
-            //c.forEach { it.mutableColumn.value = it.mutableColumn.value?.copy(isFocused = false)}
-        }
 
-        if(columnsContext.value != newData){
-            //originalColContex = newData
-            resultSpreadSheet.value?.let {
-                resultSpreadSheet.value = ResultListSpreadSheet(it.results, columnViewModels.value?.mapNotNull { it.mutableColumn.value }?: listOf() , ::newTransform, ::navigateToTt){ s -> m_paint?.measureText(s)?:s.length.toFloat()}
+
+
+        val currentCols = columns.value
+
+        if(currentCols != null){
+            val newCols = ColumnData.updateConverter(currentCols,newData.converter)
+
+            if(currentCols != newCols){
+                columns.value = newCols
             }
+
+
+        }else{
+            columns.value = ColumnData.getAllColumns(newData.converter)
+        }
+        if(columnsContext.value != newData){
             columnsContext.value = newData
         }
     }
@@ -71,7 +80,7 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
         navigateToTTId.value = Event(ttId)
     }
 
-    fun getItemName(itemId: Long, itemTypeId: String) : LiveData<ITimingTrialsEntity?>{
+    private fun getItemName(itemId: Long, itemTypeId: String) : LiveData<ITimingTrialsEntity?>{
         return if(itemTypeId == Rider::class.java.simpleName){
             Transformations.map(riderRepository.getRider(itemId)){it}
         }else{
@@ -79,10 +88,9 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
         }
     }
 
-    private val orig = ResultListSpreadSheet(listOf(), ResultFilterViewModel.getAllColumns(LengthConverter.default), ::newTransform, ::navigateToTt) {s -> s.length.toFloat()}
+    private val orig = ResultListSpreadSheet(listOf(), cols, ::setNewColumns, ::navigateToTt) {s -> m_paint?.measureText(s)?:s.length *16F}
     init {
         resultSpreadSheet.value = orig
-        columnViewModels.value = orig.columns.map { ResultFilterViewModel(it, this) }
 
         resultSpreadSheet.addSource(Transformations.switchMap(columnsContext){ it?.let { getItemName(it.itemId, it.itemType)} }){res->
 
@@ -96,9 +104,20 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
 
         resultSpreadSheet.addSource(allResults){res->
             res?.let {
-                resultSpreadSheet.value?.let {
-                    newTransform(res, it.columns, it)
+                columns.value?.let { cols->
+                    resultSpreadSheet.value?.let {
+                        newTransform(res, cols, it)
+                    }
                 }
+
+            }
+        }
+        resultSpreadSheet.addSource(columns){res->
+            res?.let {cols->
+                resultSpreadSheet.value?.let {
+                    newTransform(it.results, cols, it)
+                }
+
             }
         }
 
@@ -106,35 +125,48 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
 
 
     override fun updateColumn(newColumn: ColumnData) {
-        resultSpreadSheet.value?.let {
-            val newCols = columnViewModels.value?.mapNotNull { it.mutableColumn.value }?:it.columns
-            newTransform(it.results, newCols, it)
+        columns.value?.let { currentCols->
+            val newCols = currentCols.map { if(it.key == newColumn.key) newColumn else it }
+            setNewColumns(newCols)
         }
     }
 
 
     fun setRiderColumnFilter(riderName: String){
-        resultSpreadSheet.value?.let { sheet->
-            val newCols = sheet.columns.map { if(it.definition.javaClass == RiderNameColumn::class.java) it.copy(filterText = riderName) else it }
-            newTransform(sheet.results, newCols, sheet)
+        columns.value?.let { currentCols->
+            val newCols = currentCols.map { if(it.definition.javaClass == RiderNameColumn::class.java) it.copy(filterText = riderName) else it.copy(filterText = "") }
+            setNewColumns(newCols)
         }
     }
 
     fun clearAllColumnFilters(){
-        resultSpreadSheet.value?.let { sheet->
-                newTransform(sheet.results, sheet.columns.map { it.copy(filterText = "", isVisible = true, isFocused = false, sortType = SortType.NONE) }, sheet)
+        columns.value?.let { currentCols->
+            val newCols = currentCols.map { it.copy(filterText = "", isVisible = true, isFocused = false, sortType = SortType.NONE) }
+            setNewColumns(newCols)
         }
     }
 
     fun setCourseColumnFilter(courseName: String){
-        resultSpreadSheet.value?.let { sheet->
-            val newCols = sheet.columns.map { if(it.definition.javaClass == CourseNameColumn::class.java) it.copy(filterText = courseName) else it }
-            newTransform(sheet.results, newCols, sheet)
+        columns.value?.let { currentCols->
+            val newCols = currentCols.map { if(it.definition.javaClass == CourseNameColumn::class.java) it.copy(filterText = courseName) else it.copy(filterText = "") }
+            setNewColumns(newCols)
+        }
+    }
+
+    private fun updateColsIfNotEqual(newCols: List<ColumnData>){
+        val current = columns.value
+        if(current == null){
+            columns.value = newCols
+        }
+        else if(current != newCols){
+            columns.value = newCols
         }
     }
 
 
-
+    fun setNewColumns(columns: List<ColumnData>){
+        updateColsIfNotEqual(columns)
+    }
 
 
     private val queue = ConcurrentLinkedQueue<Triple<List<IResult>, List<ColumnData>, ResultListSpreadSheet>>()
@@ -162,23 +194,4 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
 
     }
 
-
-
-//    fun setTypeIdData(next: GenericListItemNext){
-//        resMed.value = GlobalResultData("", dataSource.getHeading(next), listOf())
-//        typeIdLiveData.value = next
-//    }
-//
-//    val resMed = MediatorLiveData<GlobalResultData>().apply {
-//
-//    }
-//
-//    init {
-//        resMed.addSource( Transformations.switchMap(typeIdLiveData){dataSource.getResultList(it)}){
-//           resMed.value = resMed.value?.copy(resultsList =  it)
-//        }
-//        resMed.addSource( Transformations.switchMap(typeIdLiveData){dataSource.getResutTitle(it)}){
-//            resMed.value = resMed.value?.copy(title =  it)
-//        }
-//    }
 }

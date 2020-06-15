@@ -51,8 +51,8 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
 
         var text = ""
         val textView: TextView = view.findViewById(R.id.spreadSheetHeaderTextView)
-        //val imageView: ImageView = view.findViewById(R.id.headerImageView)
         val layout: LinearLayout = view.findViewById(R.id.headerLayout)
+
         fun bind(resultText: String){
             textView.text = resultText
         }
@@ -194,7 +194,7 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
 
 
 
-        viewHolder.textView.height = getRowHeight(r+2)
+        viewHolder.textView.height = getRowHeight(r+4)
         viewHolder.textView.setGravity(Gravity.CENTER)
 
         val alpha = 255
@@ -245,9 +245,10 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
             viewHolder.textView.height = getRowHeight(0)
 
         }else{
-            viewHolder.textView.height = getRowHeight(8)
+
             val rm = (row + 1).toString()
             viewHolder.textView.text = rm
+            viewHolder.textView.height = getRowHeight(8)
         }
 
 

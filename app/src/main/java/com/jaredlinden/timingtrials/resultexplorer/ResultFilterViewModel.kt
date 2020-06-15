@@ -17,7 +17,7 @@ class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
     private val columnKey = column.key
 
     private fun currentCol(): ColumnData?{
-       return sheetVm.resultSpreadSheet.value?.columns?.firstOrNull{it.key == columnKey}
+       return sheetVm.columns.value?.firstOrNull{it.key == columnKey}
     }
 
     val mutableColumn = MediatorLiveData<ColumnData>().apply { value = currentCol() }
@@ -40,7 +40,7 @@ class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
     }
 
     init {
-        mutableColumn.addSource(Transformations.map(sheetVm.resultSpreadSheet){it?.columns?.firstOrNull{it.key == columnKey}}){res->
+        mutableColumn.addSource(Transformations.map(sheetVm.columns){it.firstOrNull{it.key == columnKey}}){res->
             res?.let { col->
                 isVisible.setIfNotEqual(col.isVisible)
                 filterText.setIfNotEqual(col.filterText)
@@ -67,38 +67,6 @@ class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
 
 
 
-    companion object{
-        fun getAllColumns(distConverter: LengthConverter):List<ColumnData>{
-            return listOf(
-                    ColumnData(RiderNameColumn()),
-                    ColumnData(CourseNameColumn()),
-                    ColumnData(TimeColumn()),
-                    ColumnData(ClubColumn()),
-                    ColumnData(GenderColumn()),
-                    ColumnData(CategoryColumn()),
-                    ColumnData(LapsColumn()),
-                    ColumnData(DateColumn()),
-                    ColumnData(DistanceColumn(distConverter)),
-                    ColumnData(SpeedColumn(distConverter)))
 
-        }
-
-
-            fun getAllKeys():List<String>{
-                return listOf(
-                        RiderNameColumn.columnKey,
-                        CourseNameColumn.columnKey,
-                        TimeColumn.columnKey,
-                        ClubColumn.columnKey,
-                        GenderColumn.columnKey,
-                        CategoryColumn.columnKey,
-                        LapsColumn.columnKey,
-                        DateColumn.columnKey,
-                        DistanceColumn.columnKey,
-                        SpeedColumn.columnKey)
-
-            }
-
-    }
 
 }

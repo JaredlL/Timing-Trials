@@ -33,13 +33,64 @@ interface IColumnDefinition{
 }
 
 
-data class ColumnData(val definition: IColumnDefinition, val sortOrder: Int = 0, val filterText: String = "", val isVisible: Boolean = true, val sortType:SortType = SortType.NONE, val isFocused:Boolean = false){
+data class ColumnData(
+        val definition: IColumnDefinition,
+        val sortOrder: Int = 0,
+        val filterText: String = "",
+        val isVisible: Boolean = true,
+        val sortType:SortType = SortType.NONE,
+        val isFocused:Boolean = false){
+
     val key = definition.key
     val description = definition.description
     val imageRes = definition.imageResourceId
     fun getValue(result: IResult): String = definition.getValue(result)
     fun compare(result1: IResult, result2: IResult): Int = definition.compare(result1, result2)
     fun passesFilter(result: IResult):Boolean = definition.passesFilter(filterText, result)
+
+    companion object{
+        fun getAllColumns(distConverter: LengthConverter):List<ColumnData>{
+            return listOf(
+                    ColumnData(RiderNameColumn()),
+                    ColumnData(CourseNameColumn()),
+                    ColumnData(TimeColumn()),
+                    ColumnData(ClubColumn()),
+                    ColumnData(GenderColumn()),
+                    ColumnData(CategoryColumn()),
+                    ColumnData(LapsColumn()),
+                    ColumnData(DateColumn()),
+                    ColumnData(DistanceColumn(distConverter)),
+                    ColumnData(SpeedColumn(distConverter)))
+
+        }
+
+        fun updateConverter(oldList: List<ColumnData>, newConverter: LengthConverter): List<ColumnData>{
+            return oldList.map { cd->
+                when(cd.definition){
+                    is DistanceColumn ->  cd.copy(definition = DistanceColumn(newConverter))
+                    is SpeedColumn ->cd.copy(definition = SpeedColumn(newConverter))
+                    else -> cd
+                }
+            }
+        }
+
+
+        fun getAllKeys():List<String>{
+            return listOf(
+                    RiderNameColumn.columnKey,
+                    CourseNameColumn.columnKey,
+                    TimeColumn.columnKey,
+                    ClubColumn.columnKey,
+                    GenderColumn.columnKey,
+                    CategoryColumn.columnKey,
+                    LapsColumn.columnKey,
+                    DateColumn.columnKey,
+                    DistanceColumn.columnKey,
+                    SpeedColumn.columnKey)
+
+        }
+
+    }
 }
 
 
