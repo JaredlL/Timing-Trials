@@ -7,8 +7,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:background="@color/cardview_light_background"
         android:fitsSystemWindows="true"
+        android:background="?android:attr/colorBackground"
         android:layout_height="match_parent">
 
         <TextView

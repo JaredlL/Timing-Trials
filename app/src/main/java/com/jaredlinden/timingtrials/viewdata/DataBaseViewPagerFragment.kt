@@ -110,6 +110,7 @@ class DataBaseViewPagerFragment: Fragment() {
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
             isIconified=false // Do not iconify the widget; expand it by default
             isIconifiedByDefault = false
+            this.clearFocus()
             val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{

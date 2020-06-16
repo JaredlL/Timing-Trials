@@ -30,6 +30,8 @@ class ResultsFilterFragment : BottomSheetDialogFragment(){
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
+        setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.AppTheme)
+
         val vm = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }
 
         val adapter = ResultFilterAdapter(requireContext(), viewLifecycleOwner).apply { setHasStableIds(true)}

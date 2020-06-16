@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#508991</color>
-    <color name="colorPrimaryDark">#172A3A</color>
+    <color name="colorPrimary">#b8e1ff</color>
+    <color name="colorPrimaryDark">#87afcc</color>
     <color name="colorAccent">#EE6055</color>
     <color name="textColorPrimary">#508991</color>
     <color name="textColor">#ffffff</color>
@@ -14,20 +14,14 @@
     <color name="eventButtonShadow">#BF73B86B</color>
     <color name="tt_logo_background">#8EE4AF</color>
     <color name="imageColor">#FF000000</color>
-    <color name="blueGray50">#ECEFF1</color>
-    <color name="blueGray100">#CFD8DC</color>
-    <color name="blueGray200">#B0BEC5</color>
-    <color name="blueGray300">#90A4AE</color>
-    <color name="blueGray400">#78909C</color>
-    <color name="blueGray500">#607D8B</color>
-    <color name="blueGray600">#546E7A</color>
-    <color name="blueGray700">#455A64</color>
-    <color name="blueGray800">#37474F</color>
-    <color name="blueGray900">#263238</color>
 
-    <color name="primaryColor">#546e7a</color>
-    <color name="primaryLightColor">#819ca9</color>
-    <color name="primaryDarkColor">#29434e</color>
-    <color name="primaryTextColor">#ffffff</color>
+    <color name="primaryColor">#b8e1ff</color>
+    <color name="primaryLightColor">#ebffff</color>
+    <color name="primaryDarkColor">#87afcc</color>
+    <color name="secondaryColor">#f2b7c6</color>
+    <color name="secondaryLightColor">#ffeaf9</color>
+    <color name="secondaryDarkColor">#bf8795</color>
+    <color name="primaryTextColor">#000000</color>
+    <color name="secondaryTextColor">#000000</color>
 
 </resources>
