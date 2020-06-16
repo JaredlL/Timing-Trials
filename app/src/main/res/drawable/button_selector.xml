@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ripple android:color="@color/colorPrimary"
+<ripple android:color="@color/primaryColor"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <selector>
@@ -7,7 +7,7 @@
             android:state_pressed="true" >
             <shape android:shape="rectangle">
                 <corners android:radius="24dp" />
-                <solid android:color="@color/colorAccent"/>
+                <solid android:color="@color/secondaryColor"/>
 <!--                <gradient-->
 <!--                    android:angle="270"-->
 <!--                    android:endColor="@color/eventButtonColor"-->
@@ -25,7 +25,7 @@
                 <shape android:shape="rectangle">
 
                     <corners android:radius="24dp" />
-                    <solid android:color="@color/colorPrimary"/>
+                    <solid android:color="@color/primaryColor"/>
 <!--                    <gradient-->
 <!--                        android:angle="90"-->
 <!--                        android:endColor="@color/eventButtonColor"-->

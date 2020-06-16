@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#b8e1ff</color>
-    <color name="colorPrimaryDark">#87afcc</color>
-    <color name="colorAccent">#EE6055</color>
-    <color name="textColorPrimary">#508991</color>
-    <color name="textColor">#ffffff</color>
+<!--    <color name="colorPrimary">#b8e1ff</color>-->
+<!--    <color name="colorPrimaryDark">#87afcc</color>-->
+<!--    <color name="colorAccent">#EE6055</color>-->
+<!--    <color name="textColorPrimary">#508991</color>-->
+<!--    <color name="textColor">#ffffff</color>-->
     <color name="mainBackground">#242933</color>
     <color name="buttonInactive">#4D27334D</color>
     <color name="spreadsheetHeader">#A5A8AC</color>
@@ -15,12 +15,12 @@
     <color name="tt_logo_background">#8EE4AF</color>
     <color name="imageColor">#FF000000</color>
 
-    <color name="primaryColor">#b8e1ff</color>
-    <color name="primaryLightColor">#ebffff</color>
-    <color name="primaryDarkColor">#87afcc</color>
-    <color name="secondaryColor">#f2b7c6</color>
-    <color name="secondaryLightColor">#ffeaf9</color>
-    <color name="secondaryDarkColor">#bf8795</color>
+    <color name="primaryColor">#ee6055</color>
+    <color name="primaryLightColor">#ee8555</color>
+    <color name="primaryDarkColor">#75423f</color>
+    <color name="secondaryColor">#55ee80</color>
+    <color name="secondaryDarkColor">#8bee55</color>
+    <color name="secondaryLightColor">#c1c8e4</color>
     <color name="primaryTextColor">#000000</color>
     <color name="secondaryTextColor">#000000</color>
 

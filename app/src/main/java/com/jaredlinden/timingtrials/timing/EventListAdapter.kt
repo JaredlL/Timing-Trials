@@ -34,10 +34,10 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
 
                 when (eventWrapper.event.eventType) {
                     TimelineEventType.RIDER_PASSED -> {
-                        text1.setTextColor(context.resources.getColor(R.color.colorPrimary))
+                        text1.setTextColor(context.resources.getColor(R.color.primaryColor))
                     }
                     TimelineEventType.RIDER_FINISHED -> {
-                        text1.setTextColor(context.resources.getColor(R.color.colorAccent))
+                        text1.setTextColor(context.resources.getColor(R.color.secondaryDarkColor))
                     }
                     else -> {
                         text1.setTextColor(context.resources.getColor(R.color.mainBackground))
