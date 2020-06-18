@@ -14,10 +14,11 @@
         android:id="@+id/spreadSheetHeaderTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="?attr/colorOnPrimarySurface"
         android:clickable="false"
-        android:focusable="false"
         android:duplicateParentState="true"
-        android:textSize="14sp"
+        android:focusable="false"
+        android:textSize="15sp"
         tools:text="Time">
 
     </TextView>

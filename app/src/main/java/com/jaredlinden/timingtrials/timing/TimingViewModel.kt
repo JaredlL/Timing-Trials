@@ -327,6 +327,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                     }
                     isCorotineAlive.set(false)
                     deleted = true
+                    ttDeleted.postValue(Event(true))
                 }else{
                     delay(5L)
                 }
@@ -334,10 +335,14 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         }
     }
 
+    val ttDeleted: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val ttConvertedToSetup: MutableLiveData<Event<Boolean>> = MutableLiveData()
+
     fun backToSetup(){
         timeTrial.value?.let {
             val headerCopy = it.timeTrialHeader.copy(status = TimeTrialStatus.SETTING_UP)
-            updateTimeTrial(it.copy(timeTrialHeader = headerCopy))
+            val riderListCopy = it.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(splits = listOf(), finishCode = null)) }
+            updateTimeTrial(it.copy(timeTrialHeader = headerCopy, riderList = riderListCopy))
         }
 
     }

@@ -12,7 +12,7 @@
 
             android:shape="rectangle">
 
-            <solid android:color="?attr/colorPrimarySurface" />
+            <solid android:color="@color/spreadsheetHeader" />
             <stroke
                 android:width="1dip"
                 android:color="?attr/colorPrimaryDark" />

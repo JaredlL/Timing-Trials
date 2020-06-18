@@ -240,7 +240,7 @@ class NumberOptionsDialog: DialogFragment(){
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val mViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.orderRidersViewModel
 
-        setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Theme_AppCompat_Dialog_Alert);
+        setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Theme_AppCompat_Dialog_Alert)
 
         val binding = DataBindingUtil.inflate<FragmentNumberOptionsBinding>(inflater, R.layout.fragment_number_options, container, false).apply {
             viewModel = mViewModel

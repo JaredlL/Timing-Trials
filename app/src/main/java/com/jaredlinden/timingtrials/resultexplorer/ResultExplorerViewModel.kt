@@ -5,13 +5,10 @@ import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.data.roomrepo.*
 import com.jaredlinden.timingtrials.domain.*
-import com.jaredlinden.timingtrials.spreadsheet.ResultListSpreadSheet
 import com.jaredlinden.timingtrials.util.Event
 import com.jaredlinden.timingtrials.util.LengthConverter
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -25,9 +22,7 @@ interface ISheetViewModel{
 data class GlobalResultViewModelData(val itemId: Long, val  itemType: String, val converter: LengthConverter)
 
 
-//TODO Refactor spreadsheet so its driven by the columns
-
-class GlobalResultViewModel @Inject constructor(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository,private val courseRepository: ICourseRepository, private val timeTrialRiderRepository: TimeTrialRiderRepository) : ViewModel(), ISheetViewModel {
+class ResultExplorerViewModel @Inject constructor(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository, private val courseRepository: ICourseRepository, private val timeTrialRiderRepository: TimeTrialRiderRepository) : ViewModel(), ISheetViewModel {
 
 
 
@@ -45,7 +40,7 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
 
     val columnViewModels = cols.map { ResultFilterViewModel(it, this) }
 
-    val resultSpreadSheet: MediatorLiveData<ResultListSpreadSheet> = MediatorLiveData()
+    val resultSpreadSheet: MediatorLiveData<ResultExplorerSpreadSheet> = MediatorLiveData()
 
 
     var m_paint: Paint? = null
@@ -88,7 +83,9 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
         }
     }
 
-    private val orig = ResultListSpreadSheet(listOf(), cols, ::setNewColumns, ::navigateToTt) {s -> m_paint?.measureText(s)?:s.length *16F}
+    private val orig = ResultExplorerSpreadSheet(listOf(), cols, ::setNewColumns, ::navigateToTt) { s ->
+        m_paint?.measureText(s) ?: s.length * 16F
+    }
     init {
         resultSpreadSheet.value = orig
 
@@ -169,15 +166,15 @@ class GlobalResultViewModel @Inject constructor(private val timeTrialRepository:
     }
 
 
-    private val queue = ConcurrentLinkedQueue<Triple<List<IResult>, List<ColumnData>, ResultListSpreadSheet>>()
+    private val queue = ConcurrentLinkedQueue<Triple<List<IResult>, List<ColumnData>, ResultExplorerSpreadSheet>>()
     private var isCarolineAlive = AtomicBoolean()
 
-    fun newTransform(results: List<IResult>, columns: List<ColumnData>, prev: ResultListSpreadSheet){
+    fun newTransform(results: List<IResult>, columns: List<ColumnData>, prev: ResultExplorerSpreadSheet){
         if(!isCarolineAlive.get()){
             queue.add(Triple(results, columns, prev))
             viewModelScope.launch(Dispatchers.Default) {
                 isCarolineAlive.set(true)
-                var mnew:ResultListSpreadSheet? = null
+                var mnew: ResultExplorerSpreadSheet? = null
                 while (queue.peek() != null){
                    queue.poll()?.let { qss->
                        val n = mnew

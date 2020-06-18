@@ -16,7 +16,6 @@ interface ITimeTrialSetupViewModel {
     val selectCourseViewModel: ISelectCourseViewModel
     val selectRidersViewModel: ISelectRidersViewModel
     val timeTrialPropertiesViewModel: ITimeTrialPropertiesViewModel
-    val setupConformationViewModel: ISetupConformationViewModel
 }
 
 
@@ -102,7 +101,6 @@ class SetupViewModel @Inject constructor(
     override val selectCourseViewModel: ISelectCourseViewModel = ISelectCourseViewModel.SelectCourseViewModelImpl(this)
     override val selectRidersViewModel: ISelectRidersViewModel = SelectRidersViewModelImpl(this)
     override val timeTrialPropertiesViewModel: ITimeTrialPropertiesViewModel = TimeTrialPropertiesViewModelImpl(this)
-    override val setupConformationViewModel: ISetupConformationViewModel = SetupConfirmationViewModel(this)
 
 
     @ExperimentalCoroutinesApi

@@ -4,7 +4,7 @@ import android.content.Context
 import com.jaredlinden.timingtrials.TitleViewModel
 import com.jaredlinden.timingtrials.edititem.EditCourseViewModel
 import com.jaredlinden.timingtrials.edititem.EditRiderViewModel
-import com.jaredlinden.timingtrials.resultexplorer.GlobalResultViewModel
+import com.jaredlinden.timingtrials.resultexplorer.ResultExplorerViewModel
 import com.jaredlinden.timingtrials.timetrialresults.ResultViewModel
 import com.jaredlinden.timingtrials.setup.SetupViewModel
 import com.jaredlinden.timingtrials.timing.TimingViewModel
@@ -44,7 +44,7 @@ interface AppComponent{
 
     fun resultViewModel(): ResultViewModel
 
-    fun globalResultViewModel(): GlobalResultViewModel
+    fun globalResultViewModel(): ResultExplorerViewModel
 
     fun importViewModel(): IOViewModel
 

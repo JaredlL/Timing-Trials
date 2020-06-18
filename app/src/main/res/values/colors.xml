@@ -7,13 +7,14 @@
 <!--    <color name="textColor">#ffffff</color>-->
     <color name="mainBackground">#242933</color>
     <color name="buttonInactive">#9ba0a4</color>
-    <color name="spreadsheetHeader">#A5A8AC</color>
+    <color name="spreadsheetHeader">#6ebfff</color>
     <color name="pressedButtonShadow">#D851552F</color>
     <color name="numberColor">#CDDC39</color>
     <color name="eventButtonColor">#8BF780</color>
     <color name="eventButtonShadow">#BF73B86B</color>
-    <color name="tt_logo_background">#8EE4AF</color>
+    <color name="tt_logo_background">#1FE08D</color>
     <color name="imageColor">#FF000000</color>
+
 
     <color name="primaryCompliment">#dc782b</color>
     <color name="primaryColor">#2B8FDC</color>

@@ -3,7 +3,6 @@ package com.jaredlinden.timingtrials.timetrialresults
 import android.annotation.TargetApi
 import android.content.ContentValues
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -21,6 +20,7 @@ import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.text.InputType
 import android.view.*
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -61,7 +61,15 @@ class ResultFragment : Fragment() {
     {
 
         viewManager = GridLayoutManager(requireActivity(), 2)
-        resultGridAdapter = ResultListAdapter(requireActivity())
+
+
+
+        resultGridAdapter = ResultListAdapter(requireActivity()) { id->
+            id?.let {
+                val action = ResultFragmentDirections.actionResultFragmentToEditResultFragment(id, 0L)
+                findNavController().navigate(action)
+            }
+        }
         resultGridAdapter.setHasStableIds(true)
 
         setHasOptionsMenu(true)
@@ -84,11 +92,11 @@ class ResultFragment : Fragment() {
         resultViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
             res?.let {
                 binding.titleText.text = it.timeTrialHeader.ttName
-                if(res.timeTrialHeader.notes.isBlank()){
+                if(res.timeTrialHeader.description.isBlank()){
                     binding.resultNotesTextView.visibility = View.GONE
                 }else{
                     binding.resultNotesTextView.visibility = View.VISIBLE
-                    binding.resultNotesTextView.text = res.timeTrialHeader.notes
+                    binding.resultNotesTextView.text = res.timeTrialHeader.description
                 }
             }
         })
@@ -131,6 +139,12 @@ class ResultFragment : Fragment() {
                 }
                 true
             }
+
+            R.id.resultMenuClearNotes ->{
+                resultViewModel.clearNotesColumn()
+                true
+            }
+
             R.id.resultMenuCsv ->{
                 val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
@@ -147,14 +161,16 @@ class ResultFragment : Fragment() {
             R.id.resultMenuEditDescription ->{
                 val alert = AlertDialog.Builder(requireContext())
                 val edittext = EditText(requireContext())
-                edittext.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-                edittext.setText(resultViewModel.timeTrial.value?.timeTrialHeader?.notes?:"")
-                alert.setTitle(R.string.edit_notes)
+
+                edittext.setText(resultViewModel.timeTrial.value?.timeTrialHeader?.description?:"")
+                alert.setTitle(R.string.edit_description)
 
                 alert.setView(edittext)
-
+                edittext.isSingleLine = false
+                edittext.imeOptions = EditorInfo.IME_FLAG_NO_ENTER_ACTION;
+                edittext.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
                 alert.setPositiveButton(R.string.ok) { _, _ ->
-                    resultViewModel.updateNotes(edittext.text.toString())
+                    resultViewModel.updateDescription(edittext.text.toString())
 
                 }
 

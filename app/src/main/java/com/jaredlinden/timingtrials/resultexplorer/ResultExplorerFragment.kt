@@ -1,4 +1,4 @@
-package com.jaredlinden.timingtrials.spreadsheet
+package com.jaredlinden.timingtrials.resultexplorer
 
 import android.content.Context
 import android.content.Intent
@@ -11,36 +11,28 @@ import android.util.DisplayMetrics
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.*
-import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentSpreadsheetBinding
 import com.jaredlinden.timingtrials.domain.csv.CsvSheetWriter
-import com.jaredlinden.timingtrials.domain.csv.CsvTimeTrialResultWriter
-import com.jaredlinden.timingtrials.resultexplorer.GlobalResultViewModelData
+import com.jaredlinden.timingtrials.spreadsheet.SheetAdapter
+import com.jaredlinden.timingtrials.spreadsheet.SheetLayoutManager
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.getLengthConverter
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
-import com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
 import kotlinx.android.synthetic.main.fragment_spreadsheet.*
 import java.io.IOException
 
 
-class SheetFragment : Fragment()  {
+class ResultExplorerFragment : Fragment()  {
 
     //private val args: SheetFragmentArgs by navArgs()
 
@@ -103,7 +95,7 @@ class SheetFragment : Fragment()  {
         })
 
         vm.navigateToTTId.observe(viewLifecycleOwner, EventObserver {
-            val action = SheetFragmentDirections.actionSheetFragmentToResultFragment(it)
+            val action = ResultExplorerFragmentDirections.actionSheetFragmentToResultFragment(it)
             findNavController().navigate(action)
         })
 

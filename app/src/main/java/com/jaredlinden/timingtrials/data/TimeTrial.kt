@@ -18,7 +18,7 @@ data class TimeTrialHeader(val ttName: String,
                            val status: TimeTrialStatus = TimeTrialStatus.SETTING_UP,
                            val numberRules: NumberRules = NumberRules(),
                            val timeStamps: List<Long> = listOf(),
-                           val notes: String = "",
+                           val description: String = "",
                            val guid:String = UUID.randomUUID().toString(),
                            @PrimaryKey(autoGenerate = true) override val id: Long? = null) : ITimingTrialsEntity {
 

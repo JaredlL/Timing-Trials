@@ -107,7 +107,11 @@
             app:enterAnim="@anim/fragment_close_enter"
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"/> />
+            app:popExitAnim="@anim/fragment_close_exit" />
+        <deepLink
+            android:id="@+id/deepLink2"
+            app:uri="timingtrials/home" />
+        />
     </fragment>
     <fragment
         android:id="@+id/editCourseFragment"
@@ -150,11 +154,14 @@
             app:popExitAnim="@anim/fragment_close_exit" />
         <argument
             android:name="timeTrialId"
-            app:argType="long"
-            android:defaultValue="-1L" />
+            android:defaultValue="-1L"
+            app:argType="long" />
         <action
             android:id="@+id/action_setupViewPagerFragment_to_numberOptionsDialog"
             app:destination="@id/numberOptionsDialog" />
+        <deepLink
+            android:id="@+id/deepLink3"
+            app:uri="timingtrials/setup" />
     </fragment>
     <fragment
         android:id="@+id/selectCourseFragment"
@@ -189,6 +196,13 @@
             android:id="@+id/deepLink"
             android:autoVerify="true"
             app:uri="timingtrials/timetrial_results" />
+        <action
+            android:id="@+id/action_resultFragment_to_editResultFragment"
+            app:destination="@id/editResultFragment"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"/>
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -202,7 +216,7 @@
         android:label="NumberOptionsDialog" />
     <fragment
         android:id="@+id/sheetFragment"
-        android:name="com.jaredlinden.timingtrials.spreadsheet.SheetFragment"
+        android:name="com.jaredlinden.timingtrials.resultexplorer.ResultExplorerFragment"
         tools:layout="@layout/fragment_spreadsheet"
         android:label="Results">
         <argument
@@ -219,5 +233,19 @@
             app:exitAnim="@anim/fragment_close_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+    <fragment
+        android:id="@+id/editResultFragment"
+        android:name="com.jaredlinden.timingtrials.edititem.EditResultFragment"
+        android:label="Edit Result"
+        tools:layout="@layout/fragment_edit_result">
+        <argument
+            android:name="resultId"
+            android:defaultValue="0L"
+            app:argType="long" />
+        <argument
+            android:name="timeTrialId"
+            app:argType="long"
+            android:defaultValue="0L" />
     </fragment>
 </navigation>

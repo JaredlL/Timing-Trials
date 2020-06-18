@@ -281,7 +281,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
             val headerToInsert = header.copy(
                     ttName = headerName,
-                    notes = header.notes,
+                    description = header.description,
                     courseId = courseInDb?.id,
                     status = status,
                     interval = interval,

@@ -1,7 +1,7 @@
 package com.jaredlinden.timingtrials.domain.csv
 
 import com.jaredlinden.timingtrials.data.TimeTrial
-import com.jaredlinden.timingtrials.spreadsheet.ResultListSpreadSheet
+import com.jaredlinden.timingtrials.resultexplorer.ResultExplorerSpreadSheet
 import com.jaredlinden.timingtrials.timetrialresults.ResultRowViewModel
 import com.opencsv.CSVWriter
 import org.threeten.bp.format.DateTimeFormatter
@@ -56,7 +56,7 @@ class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<Resu
     }
 
 }
-class CsvSheetWriter(val sheet: ResultListSpreadSheet){
+class CsvSheetWriter(val sheet: ResultExplorerSpreadSheet){
     fun writeToPath(ouputStream: OutputStream){
 
         val all = listOf(sheet.sheetColumns.map { it.headingText }) + (sheet.data)
