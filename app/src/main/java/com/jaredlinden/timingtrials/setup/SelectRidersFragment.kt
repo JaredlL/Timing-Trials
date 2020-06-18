@@ -64,10 +64,10 @@ class SelectRidersFragment : Fragment() {
         }
 
         adapter.addRiderToSelection = {
-            viewModel.addRiderToTt(it)
+            viewModel.riderSelected(it)
         }
         adapter.removeRiderFromSelection = {
-            viewModel.removeRiderFromTt(it)
+            viewModel.riderUnselected(it)
         }
 
         viewModel.selectedRidersInformation.observe(viewLifecycleOwner, Observer {result->

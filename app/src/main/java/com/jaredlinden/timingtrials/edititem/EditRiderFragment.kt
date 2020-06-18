@@ -15,7 +15,7 @@ import androidx.navigation.fragment.navArgs
 import com.jaredlinden.timingtrials.IFabCallbacks
 
 import com.jaredlinden.timingtrials.R
-import com.jaredlinden.timingtrials.databinding.FragmentRiderBinding
+import com.jaredlinden.timingtrials.databinding.FragmentEditRiderBinding
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 
@@ -65,7 +65,7 @@ class EditRiderFragment : Fragment() {
         fabCallback.setImage(R.drawable.ic_done_white_24dp)
         fabCallback.setVisibility(View.VISIBLE)
 
-        val binding = DataBindingUtil.inflate<FragmentRiderBinding>(inflater, R.layout.fragment_rider, container, false).apply {
+        val binding = DataBindingUtil.inflate<FragmentEditRiderBinding>(inflater, R.layout.fragment_edit_rider, container, false).apply {
             viewModel = riderViewModel
             lifecycleOwner = (this@EditRiderFragment)
             autoCompleteClub.setAdapter(clubAdapter)

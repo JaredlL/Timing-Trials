@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
-import com.jaredlinden.timingtrials.databinding.FragmentCourseBinding
+import com.jaredlinden.timingtrials.databinding.FragmentEditCourseBinding
 import com.jaredlinden.timingtrials.util.getLengthConverter
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
@@ -46,7 +46,7 @@ class EditCourseFragment : Fragment() {
         fabCallback.setImage(R.drawable.ic_done_white_24dp)
         fabCallback.setVisibility(View.VISIBLE)
 
-        val binding = DataBindingUtil.inflate<FragmentCourseBinding>(inflater, R.layout.fragment_course, container, false).apply {
+        val binding = DataBindingUtil.inflate<FragmentEditCourseBinding>(inflater, R.layout.fragment_edit_course, container, false).apply {
             viewModel = courseViewModel
             lifecycleOwner = (this@EditCourseFragment)
             fabCallback.setAction {

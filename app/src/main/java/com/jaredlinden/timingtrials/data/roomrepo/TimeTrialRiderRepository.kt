@@ -10,7 +10,7 @@ import javax.inject.Singleton
 @Singleton
 class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao: TimeTrialRiderDao){
 
-    fun update(timeTrialRider: TimeTrialRider){
+    suspend fun update(timeTrialRider: TimeTrialRider){
         timeTrialRiderDao.update(timeTrialRider)
     }
 
@@ -24,6 +24,10 @@ class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao
 
     fun delete(timeTrialRider: TimeTrialRider) {
         timeTrialRiderDao.delete(timeTrialRider)
+    }
+
+    fun getResultById(resultId: Long): LiveData<TimeTrialRiderResult?>{
+        return timeTrialRiderDao.getResultById(resultId)
     }
 
     fun getRiderResults(riderId: Long): LiveData<List<TimeTrialRiderResult>>{

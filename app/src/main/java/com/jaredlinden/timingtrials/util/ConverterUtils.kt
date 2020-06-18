@@ -47,6 +47,46 @@ object ConverterUtils{
             val secs =  (milis/1000)
             return String.format("%d:%02d:%02d.%1d", secs / 3600, (secs % 3600) / 60, (secs % 60),  (milis % 1000) / 100)
         }?:""
+    }
+
+    fun fromTenthsDisplayString(tenthsString: String): Long?{
+        val splitAtPoint = tenthsString.split(".")
+        if(splitAtPoint.size > 1){
+
+            val ms = splitAtPoint.last().let { ".$it" }.toDoubleOrNull()?.let { it * 1000}?.toInt()?:0
+
+            val splits = splitAtPoint.first().split(":").reversed()
+            val sec = splits.getOrNull(0)?.toIntOrNull()?.times(1000)?:0
+            val min = splits.getOrNull(1)?.toIntOrNull()?.times(1000 * 60)?:0
+            val hour = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
+
+            val sum = (hour + min + sec + ms).toLong()
+            val fval = if(sum > 0) sum else null
+
+            return fval
+
+        }else{
+            val splits = splitAtPoint.first().split(":").reversed()
+            var ms = 0
+            var sec = 0
+            var min = 0
+            var hour = 0
+
+            if(splits.firstOrNull()?.length == 1){
+                ms = splits.getOrNull(0)?.let { ".$it" }?.toDoubleOrNull()?.let { it * 1000}?.toInt()?:0
+                sec = splits.getOrNull(1)?.toIntOrNull()?.times(1000)?:0
+                min = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60)?:0
+                hour = splits.getOrNull(3)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
+            }else{
+                sec = splits.getOrNull(0)?.toIntOrNull()?.times(1000)?:0
+                min = splits.getOrNull(1)?.toIntOrNull()?.times(1000 * 60)?:0
+                hour = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
+            }
+            val sum = (hour + min + sec + ms).toLong()
+            val fval = if(sum > 0) sum else null
+
+            return fval
+        }
 
     }
 

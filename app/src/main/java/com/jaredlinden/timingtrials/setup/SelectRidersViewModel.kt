@@ -9,8 +9,8 @@ import org.threeten.bp.OffsetDateTime
 
 interface ISelectRidersViewModel{
     val selectedRidersInformation: LiveData<SelectedRidersInformation>
-    fun addRiderToTt(newSelectedRider: Rider)
-    fun removeRiderFromTt(riderToRemove: Rider)
+    fun riderSelected(newSelectedRider: Rider)
+    fun riderUnselected(riderToRemove: Rider)
     fun setRiderFilter(filterString: String)
     fun setSortMode(sortMode: Int)
     val riderFilter:MutableLiveData<String>
@@ -53,13 +53,13 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
         riderFilter.value = filterString
     }
 
-    override fun addRiderToTt(newSelectedRider: Rider) {
+    override fun riderSelected(newSelectedRider: Rider) {
         ttSetup.timeTrial.value?.let { tt->
             ttSetup.updateTimeTrial(tt.addRider(newSelectedRider))
         }
     }
 
-    override fun removeRiderFromTt(riderToRemove: Rider) {
+    override fun riderUnselected(riderToRemove: Rider) {
         ttSetup.timeTrial.value?.let { tt->
             ttSetup.updateTimeTrial(tt.removeRider(riderToRemove))
         }
@@ -98,13 +98,13 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
                }
 
            }
-            selectedRidersMediator.value = SelectedRidersInformation(filteredRiders, timeTrial)
+            selectedRidersMediator.value = SelectedRidersInformation(filteredRiders, timeTrial.riderList.mapNotNull { it.riderData.id })
         }
     }
 
 
 }
 
-data class SelectedRidersInformation(val allRiderList: List<Rider>, val timeTrial: TimeTrial)
+data class SelectedRidersInformation(val allRiderList: List<Rider>, val selectedIds: List<Long>)
 
 

@@ -40,7 +40,7 @@ enum class TimeTrialStatus(val type: Int){
 }
 
 enum class FinishCode(val type: Long){
-    INVALID(0),
-    DNF(-1),
-    DNS(-2)
+    INVALID(0L),
+    DNF(-1L),
+    DNS(-2L)
 }

@@ -347,7 +347,6 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
     }
 
-    @ExperimentalCoroutinesApi
     override fun onCleared() {
         super.onCleared()
         viewModelScope.cancel()

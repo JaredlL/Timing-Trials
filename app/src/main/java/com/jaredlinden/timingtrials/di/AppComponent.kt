@@ -10,6 +10,7 @@ import com.jaredlinden.timingtrials.setup.SetupViewModel
 import com.jaredlinden.timingtrials.timing.TimingViewModel
 import com.jaredlinden.timingtrials.viewdata.ListViewModel
 import com.jaredlinden.timingtrials.TestViewModel
+import com.jaredlinden.timingtrials.edititem.EditResultViewModel
 import com.jaredlinden.timingtrials.viewdata.IOViewModel
 import dagger.BindsInstance
 import dagger.Component
@@ -47,6 +48,8 @@ interface AppComponent{
     fun globalResultViewModel(): ResultExplorerViewModel
 
     fun importViewModel(): IOViewModel
+
+    fun editResultViewModel(): EditResultViewModel
 
 }
 

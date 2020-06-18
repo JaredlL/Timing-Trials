@@ -1,6 +1,7 @@
 package com.jaredlinden.timingtrials.util
 
 import android.app.Activity
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -21,6 +22,11 @@ fun Fragment.getLengthConverter():LengthConverter{
     //val unitString =  requireActivity().getPreferences(Context.MODE_PRIVATE).getString("unit", "km")?:"km"
     val unitString = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getString("units", "km")?:"km"
     return LengthConverter(unitString)
+}
+
+fun Fragment.hideKeyboard(){
+    val imm: InputMethodManager = context!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.hideSoftInputFromWindow(view!!.windowToken, 0)
 }
 
 inline fun <reified T: ViewModel> Fragment.getViewModel(crossinline factory: () -> T): T = T::class.java.let { clazz ->
