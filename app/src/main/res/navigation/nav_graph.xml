@@ -247,5 +247,21 @@
             android:name="timeTrialId"
             app:argType="long"
             android:defaultValue="0L" />
+        <action
+            android:id="@+id/action_editResultFragment_to_selectRidersFragment"
+            app:destination="@id/selectRidersFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/selectRidersFragment"
+        android:name="com.jaredlinden.timingtrials.setup.SelectRidersFragment"
+        android:label="SelectRidersFragment"
+         tools:layout="@layout/fragment_selectrider_list">
+        <action
+            android:id="@+id/action_selectRidersFragment_to_editRiderFragment"
+            app:destination="@id/editRiderFragment" />
+        <argument
+            android:name="selectionMode"
+            app:argType="integer"
+            android:defaultValue="1" />
     </fragment>
 </navigation>

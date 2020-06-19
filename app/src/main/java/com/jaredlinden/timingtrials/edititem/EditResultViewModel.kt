@@ -3,9 +3,13 @@ package com.jaredlinden.timingtrials.edititem
 import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.data.FinishCode
 import com.jaredlinden.timingtrials.data.Gender
+import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.data.TimeTrialRiderResult
+import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
+import com.jaredlinden.timingtrials.setup.ISelectRidersViewModel
+import com.jaredlinden.timingtrials.setup.SelectedRidersInformation
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.Event
 import com.jaredlinden.timingtrials.util.Utils
@@ -15,7 +19,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRiderRepository) : ViewModel() {
+class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRiderRepository, val riderRepository: IRiderRepository) : ViewModel(), ISelectRidersViewModel {
 
 
 
@@ -101,10 +105,30 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
         viewModelScope.cancel()
     }
 
+    override val selectedRidersInformation: LiveData<SelectedRidersInformation> = Transformations.map(riderRepository.allRiders){
+        it?.let {
 
+        }
+    }
 
+    override fun riderSelected(newSelectedRider: Rider) {
+        TODO("Not yet implemented")
+    }
 
+    override fun riderUnselected(riderToRemove: Rider) {
+        TODO("Not yet implemented")
+    }
 
+    override fun setRiderFilter(filterString: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun setSortMode(sortMode: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override val riderFilter: MutableLiveData<String>
+        get() = TODO("Not yet implemented")
 
 
 }

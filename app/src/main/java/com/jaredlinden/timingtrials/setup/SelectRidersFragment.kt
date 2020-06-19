@@ -11,12 +11,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 
 import com.jaredlinden.timingtrials.adapters.SelectableRiderListAdapter
 import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
+import com.jaredlinden.timingtrials.edititem.EditResultFragmentArgs
 import com.jaredlinden.timingtrials.util.*
 
 
@@ -26,19 +28,25 @@ import com.jaredlinden.timingtrials.util.*
  * create an instance of this fragment.
  *
  */
+
+
 class SelectRidersFragment : Fragment() {
 
-    private lateinit var  viewModel: ISelectRidersViewModel
-    private lateinit var adapter: SelectableRiderListAdapter
-    private lateinit var viewManager: RecyclerView.LayoutManager
+
+
+    private val args: SelectRidersFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        viewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
+        val viewModel = if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI) {
+            requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
+        }else{
+            requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
+        }
 
-        viewManager = LinearLayoutManager(context)
-        adapter = SelectableRiderListAdapter(requireContext())
+        val viewManager = LinearLayoutManager(context)
+        val adapter = SelectableRiderListAdapter(requireContext())
 
         adapter.setHasStableIds(true)
         adapter.editRider = ::editRider
@@ -91,10 +99,12 @@ class SelectRidersFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance() =
+        val SELECT_RIDER_FRAGMENT_SINGLE = 0
+        val SELECT_RIDER_FRAGMENT_MULTI = 1
+
+        fun newInstance(selectionMode: SelectRidersFragmentArgs) =
                 SelectRidersFragment().apply {
-                    arguments = Bundle().apply {
-                    }
+                    arguments = selectionMode.toBundle()
                 }
     }
 }

@@ -10,7 +10,6 @@ import android.provider.OpenableColumns
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
@@ -62,14 +61,14 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     lateinit var rootCoordinator: CoordinatorLayout
 
     var drawButtonPressed = 0
-    private val listner = SharedPreferences.OnSharedPreferenceChangeListener{i,j->
-        val b = i.getString("dayNight", "System Default")
-        when(b){
-            "Light" -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
-            "Dark" -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
-            "System Default" -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
-            "Follow Battery Saver Feature" -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_AUTO_BATTERY)
-            else -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
+    private val listener = SharedPreferences.OnSharedPreferenceChangeListener{ i, _->
+
+        when(i.getString("dayNight", "System Default")){
+            "Light" -> setDefaultNightMode(MODE_NIGHT_NO)
+            "Dark" -> setDefaultNightMode(MODE_NIGHT_YES)
+            "System Default" -> setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
+            "Follow Battery Saver Feature" -> setDefaultNightMode(MODE_NIGHT_AUTO_BATTERY)
+            else -> setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
         }
 
     }
@@ -101,7 +100,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         })
 
 
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listner)
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener)
 
 
         mainFab.setOnClickListener {
@@ -322,7 +321,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }
     }
 
-    fun haveOrRequestFilePermission(): Boolean{
+    private fun haveOrRequestFilePermission(): Boolean{
         return if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
 //            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
 //                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()

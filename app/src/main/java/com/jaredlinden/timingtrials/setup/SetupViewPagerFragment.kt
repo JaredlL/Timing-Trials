@@ -221,7 +221,7 @@ class SetupPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
      */
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
             TIMETRIAL_PAGE_INDEX to {SetupTimeTrialFragment.newInstance()},
-            RIDER_PAGE_INDEX to { SelectRidersFragment.newInstance()},
+            RIDER_PAGE_INDEX to { SelectRidersFragment.newInstance(SelectRidersFragmentArgs(SelectRidersFragment.SELECT_RIDER_FRAGMENT_MULTI))},
             ORDER_RIDER_INDEX to { OrderRidersFragment.newInstance() }
 
     )
