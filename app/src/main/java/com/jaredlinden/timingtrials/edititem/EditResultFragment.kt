@@ -47,6 +47,8 @@ class EditResultFragment : Fragment() {
             resultVm.save()
         }
 
+        resultVm.setResult(args.resultId, args.timeTrialId)
+
         resultVm.changeRider.observe(viewLifecycleOwner, EventObserver{
             if(it){
                 val action = EditResultFragmentDirections.actionEditResultFragmentToSelectRidersFragment(SelectRidersFragment.SELECT_RIDER_FRAGMENT_SINGLE)
@@ -61,7 +63,7 @@ class EditResultFragment : Fragment() {
             }
         })
 
-        resultVm.setResult(args.resultId)
+
 
         val binding = DataBindingUtil.inflate<FragmentEditResultBinding>(inflater, R.layout.fragment_edit_result, container, false).apply {
             viewModel = resultVm

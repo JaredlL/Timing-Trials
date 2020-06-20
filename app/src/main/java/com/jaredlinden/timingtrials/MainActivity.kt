@@ -30,6 +30,7 @@ import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
+import com.jaredlinden.timingtrials.onboarding.OnboardingFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -42,6 +43,8 @@ const val REQUEST_IMPORT_FILE = 2
 const val REQUEST_CREATE_FILE_SPREADSHEET = 3
 const val REQUEST_CREATE_FILE_JSON = 4
 const val REQUEST_EXPLORER_CREATE_FILE_CSV = 5
+
+const val HAS_SHOWN_ONBOARDING = "hasShownOnboarding"
 
 interface IFabCallbacks{
     fun setVisibility(visibility: Int)
@@ -102,6 +105,10 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener)
 
+        if(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(HAS_SHOWN_ONBOARDING, false)){
+            OnboardingFragment().show(supportFragmentManager, "onboard")
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(HAS_SHOWN_ONBOARDING, true).apply()
+        }
 
         mainFab.setOnClickListener {
             fabAction()
@@ -143,6 +150,12 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 }
                 R.id.app_bar_settings -> {
                     drawer_layout.closeDrawer(GravityCompat.START)
+                    true
+
+                }
+                R.id.app_bar_onboard -> {
+                    drawer_layout.closeDrawer(GravityCompat.START)
+                    OnboardingFragment().show(supportFragmentManager, "onboard")
                     true
 
                 }
@@ -204,6 +217,8 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
 
                     }
+
+
                     R.id.app_bar_spreadsheet->{
                         val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(0,"")
                         navController.navigate(action)

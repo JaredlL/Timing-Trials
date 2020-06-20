@@ -1,14 +1,13 @@
 package com.jaredlinden.timingtrials.edititem
 
 import androidx.lifecycle.*
-import com.jaredlinden.timingtrials.data.FinishCode
-import com.jaredlinden.timingtrials.data.Gender
-import com.jaredlinden.timingtrials.data.Rider
-import com.jaredlinden.timingtrials.data.TimeTrialRiderResult
+import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
 import com.jaredlinden.timingtrials.setup.ISelectRidersViewModel
+import com.jaredlinden.timingtrials.setup.SORT_ALPHABETICAL
+import com.jaredlinden.timingtrials.setup.SORT_RECENT_ACTIVITY
 import com.jaredlinden.timingtrials.setup.SelectedRidersInformation
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.Event
@@ -17,18 +16,32 @@ import com.jaredlinden.timingtrials.util.setIfNotEqual
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
-class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRiderRepository, val riderRepository: IRiderRepository) : ViewModel(), ISelectRidersViewModel {
+class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRiderRepository, val riderRepository: IRiderRepository) : ViewModel(){
+
 
 
 
     private val resultId: MutableLiveData<Long> = MutableLiveData()
+    private val timeTrialId: MutableLiveData<Long> = MutableLiveData()
 
-    val result: MediatorLiveData<TimeTrialRiderResult?> = MediatorLiveData()
 
-    val rider = Transformations.map(result){
-        it?.rider
+    var originalRiderId: Long? = null
+    val result: MediatorLiveData<TimeTrialRider?> = MediatorLiveData()
+
+    val excludedRiderIds  =Transformations.switchMap(timeTrialId){
+           Transformations.map(resultRepository.getRidersForTimeTrial(it)){
+               it.map { it.riderData.id }
+           }
+    }
+
+    val rider = Transformations.switchMap(result){
+        it?.riderId?.let {
+           Transformations.map(riderRepository.getRider(it)){it?.fullName()}
+        }?:MutableLiveData("Select Rider...")
+        //it?.rider?.fullName()?:"Select Rider..."
     }
 
     //val gender: MutableLiveData<Gender> = MutableLiveData()
@@ -49,14 +62,64 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
         changeRider.value = Event(true)
     }
 
-    fun setResult(id: Long){
-        resultId.value = id
+    fun setResult(resId: Long, ttId: Long){
+        if(resId != 0L && resultId.value != resId){
+            timeTrialId.value = ttId
+            resultId.value = resId
+        }else if(ttId != 0L && result.value?.timeTrialId != ttId){
+            timeTrialId.value = ttId
+            changeRider.value = Event(true)
+            result.value = null
+        }
+
     }
+
+    val availibleRiders = Transformations.switchMap(excludedRiderIds){exclusions->
+        Transformations.map(riderRepository.allRiders){
+            it?.let {
+                it.filter { !exclusions.contains(it.id) || result.value?.riderId == it.id || it.id == originalRiderId }
+            }
+        }
+    }
+
+    val selectRiderVm: ISelectRidersViewModel = SelectSingleRiderViewModel(
+            availibleRiders,
+            resultRepository,
+            Transformations.map(result){ it?.riderId?.let { listOf(it) }?: listOf() },
+            ::changeRider) {Unit}
+
+
+    private fun changeRider(newRider: Rider){
+
+            val resultTimeTrialId = timeTrialId.value
+            if(newRider.id != null && resultTimeTrialId != null){
+                val currentResVal = result.value
+                if(currentResVal?.riderId != newRider.id){
+
+                    viewModelScope.launch(Dispatchers.IO) {
+
+                        val tt = resultRepository.getRidersForTimeTrialSuspend(resultTimeTrialId)
+                        if(originalRiderId != newRider.id && tt.mapNotNull { it.riderData.id }.any { it == newRider.id } ){
+                            selectRiderVm.showMessage.postValue(Event("This rider is already in the list of results for this timetrial!"))
+                            result.postValue(result.value)
+                        }else{
+                            result.postValue(currentResVal?.copy(riderId = newRider.id, club = newRider.club, category = newRider.category, gender = newRider.gender)?:TimeTrialRider.fromRiderAndTimeTrial(newRider, resultTimeTrialId))
+                            selectRiderVm.close.postValue(Event(true))
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
 
     init {
         result.addSource(Transformations.switchMap(resultId){it?.let { resultRepository.getResultById(it) }}){ttResult->
             ttResult?.let {
 
+                originalRiderId = it.rider.id
                 category.setIfNotEqual(ttResult.category)
                 club.setIfNotEqual(ttResult.riderClub)
                 note.setIfNotEqual(ttResult.notes)
@@ -69,15 +132,14 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
                 }
 
             }
-            result.value = ttResult
+            result.value = ttResult?.timeTrialData
 
         }
     }
 
     fun save(){
-        result.value?.let {
+        result.value?.let {ttr->
             viewModelScope.launch(Dispatchers.IO) {
-                val ttr = it.timeTrialData
                 val new = ttr.copy(
                         club = club.value?:"",
                         category = category.value?:"",
@@ -87,48 +149,106 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
                         gender = selectedGenderPosition.value?.let { Gender.values()[it] }?:Gender.UNKNOWN
 
                 )
-                if(new != ttr){
-                    resultRepository.update(new)
+                if(new != ttr || originalRiderId != ttr.riderId){
+                    if(new.id == null){
+                        resultRepository.insert(new)
+                    }else{
+                        resultRepository.update(new)
+                    }
+
                 }
 
                 resultSaved.postValue(Event(true))
+                selectRiderVm.riderFilter.postValue("")
             }
 
         }
 
     }
 
+}
+
+class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
+                                 val timeTrialRiderRepository: TimeTrialRiderRepository,
+                                 val selectedRiders: LiveData<List<Long>?>,
+                                 val addToSelection: (Rider) -> Unit,
+                                 val removeFromSelection:(Rider) -> Unit ) : ISelectRidersViewModel{
 
 
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.cancel()
+
+    override val selectedRidersInformation: MediatorLiveData<SelectedRidersInformation> = MediatorLiveData()
+
+    override val close: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    override val showMessage: MutableLiveData<Event<String>> = MutableLiveData()
+
+    override fun riderSelected(newSelectedRider: Rider)
+    {
+        addToSelection(newSelectedRider)
     }
 
-    override val selectedRidersInformation: LiveData<SelectedRidersInformation> = Transformations.map(riderRepository.allRiders){
-        it?.let {
+    override fun riderUnselected(riderToRemove: Rider) { removeFromSelection(riderToRemove)}
 
+    override fun setRiderFilter(filterString: String) {
+        riderFilter.value = filterString
+    }
+
+
+    val liveSortMode : MutableLiveData<Int> = MutableLiveData(SORT_RECENT_ACTIVITY)
+    override fun setSortMode(sortMode: Int) {
+        liveSortMode.value = sortMode
+    }
+
+    override val riderFilter: MutableLiveData<String> = MutableLiveData("")
+    private val lastYear = OffsetDateTime.now().minusYears(1).minusMonths(6)
+
+    private val ridersWithStartTimes = timeTrialRiderRepository.lastTimeTrialRiders()
+
+    private val ridersOrderedByRecentActivity = Transformations.switchMap(availibleRiders){riderList->
+        riderList?.let { rList->
+            Transformations.map(ridersWithStartTimes){lastTimeTrialList->
+                lastTimeTrialList?.let {
+                    val startTimeMap = it.asSequence().filter { it.startTime.isAfter(lastYear) }.groupBy { it.riderId }.map { Pair(it.key, it.value.count()) }.toMap()
+                    val ordered = rList.sortedByDescending { startTimeMap[it.id]?:0 }
+                    ordered
+                }?:riderList
+            }
         }
     }
 
-    override fun riderSelected(newSelectedRider: Rider) {
-        TODO("Not yet implemented")
+    init {
+        selectedRidersInformation.addSource(ridersOrderedByRecentActivity){res->
+            updateselectedRiderInfo(res, riderFilter.value, selectedRiders.value, liveSortMode.value?:SORT_RECENT_ACTIVITY)
+        }
+        selectedRidersInformation.addSource(selectedRiders){
+            updateselectedRiderInfo(ridersOrderedByRecentActivity.value, riderFilter.value, it, liveSortMode.value?:SORT_RECENT_ACTIVITY)
+        }
+        selectedRidersInformation.addSource(riderFilter){it
+            updateselectedRiderInfo(ridersOrderedByRecentActivity.value, it, selectedRiders.value, liveSortMode.value?:0)
+        }
+        selectedRidersInformation.addSource(liveSortMode){
+            updateselectedRiderInfo(ridersOrderedByRecentActivity.value, riderFilter.value, selectedRiders.value, it)
+        }
     }
 
-    override fun riderUnselected(riderToRemove: Rider) {
-        TODO("Not yet implemented")
+    fun updateselectedRiderInfo(allRiders: List<Rider>?, filterString: String?, selectedIds: List<Long>?, sortMode: Int){
+        if(allRiders != null && selectedIds != null){
+            val filteredRiders = if(filterString.isNullOrBlank()){
+                if(sortMode == SORT_ALPHABETICAL){
+                    allRiders.sortedBy { it.fullName() }
+                }else{
+                    allRiders
+                }
+
+            }else{
+                if(sortMode == SORT_ALPHABETICAL){
+                    allRiders.asSequence().filter { it.fullName().contains(filterString, ignoreCase = true) }.sortedBy { it.fullName() }.toList()
+                }else{
+                    allRiders.filter { it.fullName().contains(filterString, ignoreCase = true) }
+                }
+
+            }
+            selectedRidersInformation.value = SelectedRidersInformation(filteredRiders, selectedIds)
+        }
     }
-
-    override fun setRiderFilter(filterString: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setSortMode(sortMode: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override val riderFilter: MutableLiveData<String>
-        get() = TODO("Not yet implemented")
-
 
 }

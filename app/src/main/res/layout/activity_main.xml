@@ -77,7 +77,11 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_view_header"
         app:menu="@menu/menu_sidenav"
-        android:fitsSystemWindows="true" />
+        android:fitsSystemWindows="true">
+
+
+
+    </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>
 

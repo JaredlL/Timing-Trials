@@ -3,6 +3,8 @@ package com.jaredlinden.timingtrials.timing
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,6 +52,8 @@ class TimingActivity : AppCompatActivity() {
         }
     }
 
+
+
     val serviceCreated: MutableLiveData<Boolean> = MutableLiveData(false)
 
     override fun onDestroy() {
@@ -62,9 +66,9 @@ class TimingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_timing)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(timingToolBar)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        //supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         viewModel = getViewModel { injector.timingViewModel() }
 
@@ -269,6 +273,16 @@ class TimingActivity : AppCompatActivity() {
 
                 }
                 .create().show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_timing, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Toast.makeText(this, "Yo", Toast.LENGTH_SHORT).show()
+        return true
     }
 
 }

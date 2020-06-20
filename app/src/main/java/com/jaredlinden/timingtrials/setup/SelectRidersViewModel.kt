@@ -4,6 +4,7 @@ package com.jaredlinden.timingtrials.setup
 import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.data.TimeTrial
+import com.jaredlinden.timingtrials.util.Event
 import org.threeten.bp.OffsetDateTime
 
 
@@ -14,6 +15,8 @@ interface ISelectRidersViewModel{
     fun setRiderFilter(filterString: String)
     fun setSortMode(sortMode: Int)
     val riderFilter:MutableLiveData<String>
+    val showMessage: MutableLiveData<Event<String>>
+    val close: MutableLiveData<Event<Boolean>>
 }
 
 class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRidersViewModel {
@@ -41,13 +44,17 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
     }
 
 
-    val liveSortMode : MutableLiveData<Int> = MutableLiveData(0)
+    val liveSortMode : MutableLiveData<Int> = MutableLiveData(SORT_RECENT_ACTIVITY)
 
     override fun setSortMode(sortMode: Int) {
         liveSortMode.value = sortMode
     }
 
     override val riderFilter = MutableLiveData<String>()
+
+    override val showMessage: MutableLiveData<Event<String>> = MutableLiveData()
+
+    override val close: MutableLiveData<Event<Boolean>> = MutableLiveData()
 
     override fun setRiderFilter(filterString: String){
         riderFilter.value = filterString
@@ -84,15 +91,15 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
     fun updateselectedRiderInfo(allRiders: List<Rider>?, filterString: String?, timeTrial: TimeTrial?, sortMode: Int){
         if(allRiders != null && timeTrial != null){
            val filteredRiders = if(filterString.isNullOrBlank()){
-               if(sortMode == 1){
+               if(sortMode == SORT_ALPHABETICAL){
                    allRiders.sortedBy { it.fullName() }
                }else{
                    allRiders
                }
 
            }else{
-               if(sortMode == 1){
-                   allRiders.asSequence().filter { it.fullName().contains(filterString, ignoreCase = true) }.sortedBy { it.firstName }.toList()
+               if(sortMode == SORT_ALPHABETICAL){
+                   allRiders.asSequence().filter { it.fullName().contains(filterString, ignoreCase = true) }.sortedBy { it.fullName() }.toList()
                }else{
                    allRiders.filter { it.fullName().contains(filterString, ignoreCase = true) }
                }

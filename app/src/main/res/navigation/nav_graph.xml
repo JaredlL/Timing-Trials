@@ -254,14 +254,14 @@
     <fragment
         android:id="@+id/selectRidersFragment"
         android:name="com.jaredlinden.timingtrials.setup.SelectRidersFragment"
-        android:label="SelectRidersFragment"
-         tools:layout="@layout/fragment_selectrider_list">
+        android:label="Select Rider"
+        tools:layout="@layout/fragment_selectrider_list">
         <action
             android:id="@+id/action_selectRidersFragment_to_editRiderFragment"
             app:destination="@id/editRiderFragment" />
         <argument
             android:name="selectionMode"
-            app:argType="integer"
-            android:defaultValue="1" />
+            android:defaultValue="1"
+            app:argType="integer" />
     </fragment>
 </navigation>

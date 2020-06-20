@@ -1,6 +1,7 @@
 package com.jaredlinden.timingtrials.data
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "course_table")

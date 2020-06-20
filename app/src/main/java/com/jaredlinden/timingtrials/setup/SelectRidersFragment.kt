@@ -1,17 +1,23 @@
 package com.jaredlinden.timingtrials.setup
 
 
+import android.app.SearchManager
+import android.content.Context
 import android.os.Bundle
+import android.view.*
+import android.widget.SearchView
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
+import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 
@@ -36,13 +42,23 @@ class SelectRidersFragment : Fragment() {
 
     private val args: SelectRidersFragmentArgs by navArgs()
 
+    private lateinit var viewModel: ISelectRidersViewModel
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        val viewModel = if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI) {
+        viewModel = if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI) {
             requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
+
         }else{
-            requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
+            requireActivity().getViewModel { requireActivity().injector.editResultViewModel() }.selectRiderVm
+            //setHasOptionsMenu(true)
+        }
+
+        if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI){
+            setHasOptionsMenu(false)
+        }else{
+            setHasOptionsMenu(true)
         }
 
         val viewManager = LinearLayoutManager(context)
@@ -74,6 +90,7 @@ class SelectRidersFragment : Fragment() {
         adapter.addRiderToSelection = {
             viewModel.riderSelected(it)
         }
+
         adapter.removeRiderFromSelection = {
             viewModel.riderUnselected(it)
         }
@@ -84,6 +101,16 @@ class SelectRidersFragment : Fragment() {
             }
         })
 
+        viewModel.close.observe(viewLifecycleOwner, EventObserver{
+            if(it){
+                findNavController().popBackStack()
+            }
+        })
+
+        viewModel.showMessage.observe(viewLifecycleOwner, EventObserver{
+            Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+            //Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
+        })
 
 
 
@@ -91,9 +118,59 @@ class SelectRidersFragment : Fragment() {
         return binding.root
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_setup, menu)
+        menu.findItem(R.id.settings_app_bar_search).isVisible = true
+        menu.findItem(R.id.settings_menu_number_options).isVisible = false
+        val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        (menu.findItem(R.id.settings_app_bar_search).actionView as SearchView).apply {
+            // Assumes current activity is the searchable activity
+            setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
+            isIconified = false // Do not iconify the widget; expand it by default
+            isIconifiedByDefault = false
+            setQuery(viewModel.riderFilter.value ?: "", false)
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(searchText: String?): Boolean {
+                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+                    viewModel.setRiderFilter(searchText ?: "")
+                    return true
+                }
+
+                override fun onQueryTextChange(searchText: String?): Boolean {
+                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector. listViewModel() }
+                    viewModel.setRiderFilter(searchText ?: "")
+                    return true
+                }
+
+            })
+        }
+
+        menu.findItem(R.id.settings_menu_ordering).setOnMenuItemClickListener {
+            val current = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_RECENT_ACTIVITY)
+            AlertDialog.Builder(requireContext())
+                    .setTitle(resources.getString(R.string.choose_sort))
+                    //.setMessage("Choose Sorting")
+                    .setSingleChoiceItems(R.array.sortingArray, current) { _, j ->
+                        PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putInt(SORT_KEY, j).apply()
+                        viewModel.setSortMode(j)
+                    }
+                    .setPositiveButton(R.string.ok) { _, _ ->
+
+                    }
+                    .create().show()
+            true
+        }
+    }
+
     private fun editRider(riderId: Long){
-        val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(riderId)
-        findNavController().navigate(action)
+        if(findNavController().currentDestination?.id == R.id.selectRidersFragment){
+            val action = SelectRidersFragmentDirections.actionSelectRidersFragmentToEditRiderFragment(riderId)
+            findNavController().navigate(action)
+        }else{
+            val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(riderId)
+            findNavController().navigate(action)
+        }
+
     }
 
 

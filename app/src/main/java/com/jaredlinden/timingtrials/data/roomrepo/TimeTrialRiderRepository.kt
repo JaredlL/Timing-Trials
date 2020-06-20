@@ -50,14 +50,12 @@ class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao
         return timeTrialRiderDao.getRiderIdTimeTrialStartTime()
     }
 
-    fun getRidersForTimeTrial(ttHeader: TimeTrialHeader): LiveData<List<FilledTimeTrialRider>>{
-        val id = ttHeader.id
-        if(id != null){
-           return timeTrialRiderDao.getTimeTrialRiders(ttHeader.id)
-        }else{
-            return MutableLiveData<List<FilledTimeTrialRider>>()
-        }
+    fun getRidersForTimeTrial(ttId: Long): LiveData<List<FilledTimeTrialRider>>{
+        return timeTrialRiderDao.getTimeTrialRiders(ttId)
+    }
 
+    suspend fun getRidersForTimeTrialSuspend(ttId: Long): List<FilledTimeTrialRider>{
+        return timeTrialRiderDao.getTimeTrialRidersSuspend(ttId)
     }
 
 }

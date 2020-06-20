@@ -66,7 +66,7 @@ class ResultFragment : Fragment() {
 
         resultGridAdapter = ResultListAdapter(requireActivity()) { id->
             id?.let {
-                val action = ResultFragmentDirections.actionResultFragmentToEditResultFragment(id, 0L)
+                val action = ResultFragmentDirections.actionResultFragmentToEditResultFragment(id, resultViewModel.timeTrial.value?.timeTrialHeader?.id?:0L)
                 findNavController().navigate(action)
             }
         }
@@ -179,6 +179,15 @@ class ResultFragment : Fragment() {
                 alert.show()
                 true
             }
+
+            R.id.resultMenuAddRow ->{
+                resultViewModel.timeTrial.value?.timeTrialHeader?.id?.let {
+                    val action = ResultFragmentDirections.actionResultFragmentToEditResultFragment(0L, it)
+                    findNavController().navigate(action)
+                }
+                true
+            }
+
             R.id.resultMenuJson->{
                 val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)

@@ -169,7 +169,7 @@ class  TimePickerFragment2 : DialogFragment(){
         return activity?.let {
             val builder = AlertDialog.Builder(it)
             // Get the layout inflater
-            val inflater = requireActivity().layoutInflater
+            val inflater = it.layoutInflater
 
             val v = inflater.inflate(R.layout.fragment_timepicker, null)
             val currentTp: TimePicker = v.findViewById(R.id.timePicker1)

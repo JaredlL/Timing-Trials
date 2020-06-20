@@ -28,6 +28,10 @@ import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_number_options.*
 
 
+const val SORT_RECENT_ACTIVITY = 0
+const val SORT_ALPHABETICAL = 1
+const val SORT_KEY = "sorting"
+
 class SetupViewPagerFragment: Fragment() {
 
 
@@ -35,9 +39,7 @@ class SetupViewPagerFragment: Fragment() {
 
     private val args: SetupViewPagerFragmentArgs by navArgs()
 
-    val SORT_RECENT_ACTIVITY = 0
-    val SORT_ALPHABETICAL = 1
-    val SORT_KEY = "sorting"
+
 
     var setupMenu: Menu? = null
 
