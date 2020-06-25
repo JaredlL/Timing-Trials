@@ -3,6 +3,7 @@ package com.jaredlinden.timingtrials.timing
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.jaredlinden.timingtrials.R
@@ -34,13 +35,13 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
 
                 when (eventWrapper.event.eventType) {
                     TimelineEventType.RIDER_PASSED -> {
-                        text1.setTextColor(context.resources.getColor(R.color.primaryColor))
+                        text1.setTextColor(ContextCompat.getColor(context,R.color.secondaryColor))
                     }
                     TimelineEventType.RIDER_FINISHED -> {
-                        text1.setTextColor(context.resources.getColor(R.color.secondaryDarkColor))
+                        text1.setTextColor(ContextCompat.getColor(context,R.color.primaryColor))
                     }
                     else -> {
-                        text1.setTextColor(context.resources.getColor(R.color.mainBackground))
+                        text1.setTextColor(ContextCompat.getColor(context,R.color.material_on_surface_emphasis_medium))
                     }
                 }
                 val event = eventWrapper.event

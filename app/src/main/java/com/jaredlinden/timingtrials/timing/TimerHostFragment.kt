@@ -14,8 +14,6 @@ class TimerHostFragment : Fragment() {
 
         val v = inflater.inflate(R.layout.fragment_host, container, false)
 
-
-
         return v
 
     }

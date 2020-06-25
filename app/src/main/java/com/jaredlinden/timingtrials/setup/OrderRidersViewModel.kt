@@ -11,7 +11,7 @@ interface IOrderRidersViewModel{
     val startNumber: MutableLiveData<String>
     val exclusions: MutableLiveData<String>
     val numberDirection: MutableLiveData<NumbersDirection>
-    val numberRulesMediator: LiveData<NumberRules>
+    val numberRulesMediator: LiveData<IndexNumberRules>
 
 
 }
@@ -41,11 +41,11 @@ class OrderRidersViewModel(val setupViewModel: SetupViewModel) : IOrderRidersVie
     override val numberDirection: MutableLiveData<NumbersDirection> = MutableLiveData()
     override val startNumber: MutableLiveData<String> = MutableLiveData()
     override val exclusions: MutableLiveData<String> = MutableLiveData()
-    override val numberRulesMediator : MediatorLiveData<NumberRules> = MediatorLiveData()
+    override val numberRulesMediator : MediatorLiveData<IndexNumberRules> = MediatorLiveData()
 
     init {
         numberRulesMediator.addSource(_mTimeTrial) {
-            it?.timeTrialHeader?.numberRules?.let { nr ->
+            it?.timeTrialHeader?.numberRules?.indexRules?.let { nr ->
                 val exString = nr.exlusionsString()
                 if (startNumber.value != nr.terminus.toString()) startNumber.value = nr.terminus.toString()
                 if (exString != exclusions.toString()) exclusions.value = exString
@@ -56,10 +56,10 @@ class OrderRidersViewModel(val setupViewModel: SetupViewModel) : IOrderRidersVie
             numberRulesMediator.addSource(startNumber) { newSs ->
                 newSs.toIntOrNull()?.let {newSn->
                     val currentTt = _mTimeTrial.value
-                    val currentSn = _mTimeTrial.value?.timeTrialHeader?.numberRules?.terminus
+                    val currentSn = _mTimeTrial.value?.timeTrialHeader?.numberRules?.indexRules?.terminus
                     if (currentSn != null && currentTt != null) {
                         if (currentSn != newSn) {
-                            val newNumRules = currentTt.timeTrialHeader.numberRules.copy(terminus = newSn)
+                            val newNumRules = currentTt.timeTrialHeader.numberRules.copy( indexRules = currentTt.timeTrialHeader.numberRules.indexRules.copy( terminus = newSn))
                             setupViewModel.updateTimeTrial(currentTt.copy(timeTrialHeader = currentTt.timeTrialHeader.copy(numberRules = newNumRules)))
                         }
                     }
@@ -68,10 +68,10 @@ class OrderRidersViewModel(val setupViewModel: SetupViewModel) : IOrderRidersVie
 
             numberRulesMediator.addSource(numberDirection){newDir->
                 val currentTt = _mTimeTrial.value
-                val currentDir = _mTimeTrial.value?.timeTrialHeader?.numberRules?.direction
+                val currentDir = _mTimeTrial.value?.timeTrialHeader?.numberRules?.indexRules?.direction
                 if(newDir != null && currentDir!= null && currentTt != null){
                     if(currentDir != newDir){
-                        val newNumRules = currentTt.timeTrialHeader.numberRules.copy(direction = newDir)
+                        val newNumRules = currentTt.timeTrialHeader.numberRules.copy(indexRules = currentTt.timeTrialHeader.numberRules.indexRules.copy(direction = newDir))
                         setupViewModel.updateTimeTrial(currentTt.copy(timeTrialHeader = currentTt.timeTrialHeader.copy(numberRules = newNumRules)))
                     }
                 }
@@ -79,11 +79,11 @@ class OrderRidersViewModel(val setupViewModel: SetupViewModel) : IOrderRidersVie
 
             numberRulesMediator.addSource(exclusions){newExc->
                 val currentTt = _mTimeTrial.value
-                val currentExc = _mTimeTrial.value?.timeTrialHeader?.numberRules?.exclusions
+                val currentExc = _mTimeTrial.value?.timeTrialHeader?.numberRules?.indexRules?.exclusions
                 if(newExc != null && currentExc!= null && currentTt != null){
-                    val newList = NumberRules.stringToExclusions(newExc)
+                    val newList = IndexNumberRules.stringToExclusions(newExc)
                     if(currentExc != newList){
-                        val newNumRules = currentTt.timeTrialHeader.numberRules.copy(exclusions = newList)
+                        val newNumRules = currentTt.timeTrialHeader.numberRules.copy(indexRules = currentTt.timeTrialHeader.numberRules.indexRules.copy(exclusions = newList))
                         setupViewModel.updateTimeTrial(currentTt.copy(timeTrialHeader = currentTt.timeTrialHeader.copy(numberRules = newNumRules)))
                     }
                 }

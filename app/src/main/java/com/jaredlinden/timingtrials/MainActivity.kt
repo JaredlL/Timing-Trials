@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.OpenableColumns
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -35,6 +36,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.io.IOException
+import java.net.URL
 import kotlin.math.abs
 
 
@@ -76,6 +78,26 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
     }
 
+    fun showOnboading(){
+        val builder = AlertDialog.Builder(this)
+        val v = layoutInflater.inflate(R.layout.fragment_onboarding, null)
+        builder.setView(v)
+                // Add action buttons
+                .setPositiveButton(R.string.yes) { dialog, id ->
+                    val url = URL("https://bb.githack.com/lindenj/timingtrialsdata/raw/master/Timing Trials Export 20-06-20.tt")
+                    val vm = getViewModel { injector.importViewModel()}
+                    vm.readUrlInput(url)
+
+                    vm.importMessage.observe(this, EventObserver{
+                        Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+                    })
+                }
+                .setNegativeButton(R.string.no) { dialog, id ->
+
+                }
+        builder.create().show()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -106,7 +128,8 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener)
 
         if(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(HAS_SHOWN_ONBOARDING, false)){
-            OnboardingFragment().show(supportFragmentManager, "onboard")
+//            OnboardingFragment().show(supportFragmentManager, "onboard")
+            showOnboading()
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(HAS_SHOWN_ONBOARDING, true).apply()
         }
 
@@ -155,7 +178,8 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 }
                 R.id.app_bar_onboard -> {
                     drawer_layout.closeDrawer(GravityCompat.START)
-                    OnboardingFragment().show(supportFragmentManager, "onboard")
+                    //OnboardingFragment().show(supportFragmentManager, "onboard")
+                    showOnboading()
                     true
 
                 }
