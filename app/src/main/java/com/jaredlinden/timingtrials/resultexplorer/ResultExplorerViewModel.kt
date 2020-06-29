@@ -32,6 +32,7 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
     private val columnsContext: MutableLiveData<GlobalResultViewModelData> = MutableLiveData()
     private val allResults = timeTrialRiderRepository.getAllResults()
 
+    var hasShownSnackBar = false
 
     private val cols = ColumnData.getAllColumns(LengthConverter.default)
 

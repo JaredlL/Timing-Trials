@@ -211,9 +211,9 @@ class SetupViewPagerFragment: Fragment() {
 }
 
 
-const val TIMETRIAL_PAGE_INDEX = 0
-const val RIDER_PAGE_INDEX = 1
-const val ORDER_RIDER_INDEX = 2
+const val TIMETRIAL_PAGE_INDEX = 2
+const val RIDER_PAGE_INDEX = 0
+const val ORDER_RIDER_INDEX = 1
 
 
 class SetupPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {

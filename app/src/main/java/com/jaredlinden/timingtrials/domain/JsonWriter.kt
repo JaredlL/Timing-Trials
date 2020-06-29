@@ -35,7 +35,9 @@ class JsonResultsWriter{
 
         GsonBuilder().addSerializationExclusionStrategy(exclusionStrategy).create().toJson(output,writer)
         writer.close()
-        zip.closeEntry()
+        if(timeTrialList.size > 1){
+            zip.closeEntry()
+        }
         zip.close()
         //writer.close()
     }

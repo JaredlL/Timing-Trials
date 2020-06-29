@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+    <item
+        android:id="@+id/app_bar_new_timetrial"
+        android:icon="@drawable/ic_timer_black_24dp"
+        android:title="@string/new_timetrial" />
+
     <item
         android:id="@+id/app_bar_import"
         android:icon="@drawable/ic_file_download_black_24dp"

@@ -43,9 +43,7 @@ class OnboardingFragment : DialogFragment() {
                         val vm = requireActivity().getViewModel { requireActivity().injector.importViewModel()}
                         vm.readUrlInput(url)
 
-                        vm.importMessage.observe(requireActivity(), EventObserver{
-                            Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
-                        })
+// 
                     }
                     .setNegativeButton(R.string.no) { dialog, id ->
                         getDialog()?.cancel()

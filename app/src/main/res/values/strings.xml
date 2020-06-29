@@ -99,6 +99,7 @@
     <string name="sort">Sort</string>
     <string name="start_in_string">Start in: %1$d minutes</string>
     <string name="start_new_timetrial">Start New Timetrial</string>
+    <string name="new_timetrial">New Timetrial!</string>
     <string name="start_new">Start New</string>
     <string name="start_time">First rider to start at</string>
     <string name="start_tt">Start TT</string>
@@ -145,4 +146,8 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="add_late_rider">Add Late Rider</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="system_default">System Default</string>
+    <string name="follow_battery_saver_feature">Follow Battery Saver Feature</string>
 </resources>

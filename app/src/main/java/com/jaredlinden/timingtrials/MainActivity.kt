@@ -1,5 +1,6 @@
 package com.jaredlinden.timingtrials
 
+import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -9,6 +10,7 @@ import android.os.Bundle
 import android.provider.OpenableColumns
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.*
@@ -19,19 +21,18 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.jaredlinden.timingtrials.timing.TimingActivity
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.onboarding.OnboardingFragment
+import com.jaredlinden.timingtrials.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -40,13 +41,7 @@ import java.net.URL
 import kotlin.math.abs
 
 
-const val REQUEST_CREATE_FILE_CSV = 1
-const val REQUEST_IMPORT_FILE = 2
-const val REQUEST_CREATE_FILE_SPREADSHEET = 3
-const val REQUEST_CREATE_FILE_JSON = 4
-const val REQUEST_EXPLORER_CREATE_FILE_CSV = 5
 
-const val HAS_SHOWN_ONBOARDING = "hasShownOnboarding"
 
 interface IFabCallbacks{
     fun setVisibility(visibility: Int)
@@ -68,11 +63,11 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     var drawButtonPressed = 0
     private val listener = SharedPreferences.OnSharedPreferenceChangeListener{ i, _->
 
-        when(i.getString("dayNight", "System Default")){
-            "Light" -> setDefaultNightMode(MODE_NIGHT_NO)
-            "Dark" -> setDefaultNightMode(MODE_NIGHT_YES)
-            "System Default" -> setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
-            "Follow Battery Saver Feature" -> setDefaultNightMode(MODE_NIGHT_AUTO_BATTERY)
+        when(i.getString("dayNight", getString(R.string.system_default))){
+            getString(R.string.light) -> setDefaultNightMode(MODE_NIGHT_NO)
+            getString(R.string.dark) -> setDefaultNightMode(MODE_NIGHT_YES)
+            getString(R.string.system_default) -> setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
+            getString(R.string.follow_battery_saver_feature) -> setDefaultNightMode(MODE_NIGHT_AUTO_BATTERY)
             else -> setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
         }
 
@@ -96,6 +91,37 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
                 }
         builder.create().show()
+    }
+
+    val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // Permission is granted. Continue the action or workflow in your
+            // app.
+            //Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show()
+            permissionRequiredEvent.getContentIfNotHandled()?.invoke()
+        } else {
+            // Explain to the user that the feature is unavailable because the
+            // features requires a permission that the user has denied. At the
+            // same time, respect the user's decision. Don't link to system
+            // settings in an effort to convince the user to change their
+            // decision.
+            Toast.makeText(this, "Permission Denied. Allow permissions in android settings.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    var permissionRequiredEvent:Event<() -> Unit> = Event{}
+
+    val writeAllResults = registerForActivityResult(ActivityResultContracts.CreateDocument()){
+        it?.let {
+            writeAllResults(it)
+        }
+    }
+
+    val importData = registerForActivityResult(ActivityResultContracts.OpenDocument()){
+        it?.let {
+            importData(it)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -155,11 +181,17 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             drawButtonPressed = it.itemId
             when(it.itemId){
 
-                R.id.app_bar_import -> {
-                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                    intent.type = "*/*"
-                    startActivityForResult(intent, REQUEST_IMPORT_FILE)
+                R.id.app_bar_new_timetrial -> {
 
+                    drawer_layout.closeDrawer(GravityCompat.START)
+                    true
+                }
+
+                R.id.app_bar_import -> {
+//                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+//                    intent.type = "*/*"
+//                    startActivityForResult(intent, REQUEST_IMPORT_FILE)
+                    importData.launch(arrayOf("*/*"))
                     Toast.makeText(this, "Select CSV or .tt File", Toast.LENGTH_LONG).show()
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
@@ -192,16 +224,19 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     val date = LocalDateTime.now()
                     val fString = date.format(DateTimeFormatter.ofPattern("dd-MM-yy"))
 
-                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                        addCategory(Intent.CATEGORY_OPENABLE)
-                        putExtra(Intent.EXTRA_TITLE, "Timing Trials Export $fString.tt")
-                        //MIME types
-                        type = "text/*"
-                        // Optionally, specify a URI for the directory that should be opened in
-                        // the system file picker before your app creates the document.
-                        //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
-                    }
-                    startActivityForResult(intent, REQUEST_CREATE_FILE_JSON)
+                    permissionRequiredEvent = Event{ writeAllResults.launch("Timing Trials Export $fString.tt") }
+                    requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+//                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+//                        addCategory(Intent.CATEGORY_OPENABLE)
+//                        putExtra(Intent.EXTRA_TITLE, "Timing Trials Export $fString.tt")
+//                        //MIME types
+//                        type = "text/*"
+//                        // Optionally, specify a URI for the directory that should be opened in
+//                        // the system file picker before your app creates the document.
+//                        //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
+//                    }
+//                    startActivityForResult(intent, REQUEST_MAIN_CREATE_FILE_JSON)
                     true
                 }
                 else->{
@@ -242,6 +277,15 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
                     }
 
+                    R.id.app_bar_new_timetrial -> {
+                        val viewModel = getViewModel { injector.listViewModel() }
+                        viewModel.timeTrialInsertedEvent.observe(this@MainActivity, EventObserver {
+                            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
+                            navController.navigate(action)
+                        })
+                        viewModel.insertNewTimeTrial()
+                    }
+
 
                     R.id.app_bar_spreadsheet->{
                         val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(0,"")
@@ -280,8 +324,12 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             }
         }
 
-       intent?.data?.let {
-            importData(it)
+        intent?.let { intent->
+            val data = intent.data
+            if(!intent.getBooleanExtra(FROM_TIMING_TRIALS, false) && data != null){
+                importData(data)
+            }
+
         }
 
     }
@@ -322,56 +370,82 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         return result
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode){
-            REQUEST_IMPORT_FILE ->{
-                data?.data?.let {uri->
-                    importData(uri)
-                }
-            }
-            REQUEST_CREATE_FILE_JSON->{
-                data?.data?.let {uri->
-                    try {
-                        val outputStream = contentResolver.openOutputStream(uri)
-                        if(haveOrRequestFilePermission() && outputStream != null){
-                            val allTtsVm = getViewModel { injector.importViewModel()}
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        when(requestCode){
+//            REQUEST_IMPORT_FILE ->{
+//                data?.data?.let {uri->
+//                    importData(uri)
+//                }
+//            }
+//            REQUEST_MAIN_CREATE_FILE_JSON->{
+//                data?.data?.let {uri->
+//                    try {
+//                        val outputStream = contentResolver.openOutputStream(uri)
+//                        if(haveOrRequestFilePermission() && outputStream != null){
+//                            val allTtsVm = getViewModel { injector.importViewModel()}
+//
+//                            allTtsVm.writeAllTimeTrialsToPath(outputStream)
+//                            allTtsVm.importMessage.observe(this, EventObserver{
+//                                Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
+//                                val intent = Intent()
+//                                intent.action = Intent.ACTION_VIEW
+//                                intent.setDataAndType(uri, "text/*")
+//                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//                                startActivity(intent)
+//                            })
+//
+//                        }
+//                    }
+//                    catch(e: IOException)
+//                    {
+//                        e.printStackTrace()
+//                        Toast.makeText(this, "Save failed - ${e.message}", Toast.LENGTH_LONG).show()
+//                    }
+//                }
+//
+//            }
+//        }
+//    }
 
-                            allTtsVm.writeAllTimeTrialsToPath(outputStream)
-                            allTtsVm.importMessage.observe(this, EventObserver{
-                                Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
-                                val intent = Intent()
-                                intent.action = Intent.ACTION_VIEW
-                                intent.setDataAndType(uri, "text/*")
-                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                startActivity(intent)
-                            })
+    fun writeAllResults(uri: Uri){
+        try {
+            val outputStream = contentResolver.openOutputStream(uri)
+            if(outputStream != null){
+                val allTtsVm = getViewModel { injector.importViewModel()}
 
-                        }
-                    }
-                    catch(e: IOException)
-                    {
-                        e.printStackTrace()
-                        Toast.makeText(this, "Save failed - ${e.message}", Toast.LENGTH_LONG).show()
-                    }
-                }
+                allTtsVm.writeAllTimeTrialsToPath(outputStream)
+                allTtsVm.importMessage.observe(this, EventObserver{
+                    Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
+                    val intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    intent.setDataAndType(uri, "text/*")
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    intent.putExtra(FROM_TIMING_TRIALS, true)
+                    startActivity(intent)
+                })
 
             }
         }
-    }
-
-    private fun haveOrRequestFilePermission(): Boolean{
-        return if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-//            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-//                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
-//            }else{
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
-            false
-            // }
-        }else{
-            true
+        catch(e: IOException)
+        {
+            e.printStackTrace()
+            Toast.makeText(this, "Save failed - ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
+
+//    private fun haveOrRequestFilePermission(): Boolean{
+//        return if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+////            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+////                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
+////            }else{
+//            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
+//            false
+//            // }
+//        }else{
+//            true
+//        }
+//    }
 
     private var toolbarCollapsed = false
     private var fabShouldShow = true

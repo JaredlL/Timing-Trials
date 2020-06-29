@@ -1,5 +1,6 @@
 package com.jaredlinden.timingtrials.resultexplorer
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,6 +12,8 @@ import android.util.DisplayMetrics
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -24,23 +27,15 @@ import com.jaredlinden.timingtrials.databinding.FragmentSpreadsheetBinding
 import com.jaredlinden.timingtrials.domain.csv.CsvSheetWriter
 import com.jaredlinden.timingtrials.spreadsheet.SheetAdapter
 import com.jaredlinden.timingtrials.spreadsheet.SheetLayoutManager
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getLengthConverter
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.util.*
 import kotlinx.android.synthetic.main.fragment_spreadsheet.*
 import java.io.IOException
 
 
 class ResultExplorerFragment : Fragment()  {
 
-    //private val args: SheetFragmentArgs by navArgs()
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        //this.arguments?.clear()
-    }
+    lateinit var viewModel: ResultExplorerViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
@@ -59,25 +54,25 @@ class ResultExplorerFragment : Fragment()  {
 
         val binding = DataBindingUtil.inflate<FragmentSpreadsheetBinding>(inflater, R.layout.fragment_spreadsheet, container, false)
 
-        val vm = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }
+        viewModel = requireActivity().getViewModel { injector.globalResultViewModel() }
 
 
         val displayMetrics = DisplayMetrics()
         activity?.windowManager?.defaultDisplay?.getMetrics(displayMetrics)
 
 
-        val tv: TextView = layoutInflater.inflate(R.layout.list_item_spreadsheet, null).findViewById(R.id.spreadSheetTextView)
+        val tv: TextView = layoutInflater.inflate(R.layout.list_item_spreadsheet, container).findViewById(R.id.spreadSheetTextView)
         val p = Paint().apply {
             typeface = tv.typeface
             textSize = tv.textSize
         }
 
-        vm.setColumnsContext(GlobalResultViewModelData(itemId, itemTypeId, getLengthConverter()), p)
+        viewModel.setColumnsContext(GlobalResultViewModelData(itemId, itemTypeId, getLengthConverter()), p)
 
         val adapter = SheetAdapter(requireContext(), displayMetrics, p, ::snackBarCallback)
         val recyclerView = binding.recyclerView
 
-        vm.resultSpreadSheet.observe(viewLifecycleOwner, Observer { it?.let {
+        viewModel.resultSpreadSheet.observe(viewLifecycleOwner, Observer { it?.let {
             if(it.isEmpty){
 
                 recyclerView.visibility = View.INVISIBLE
@@ -94,7 +89,7 @@ class ResultExplorerFragment : Fragment()  {
         }
         })
 
-        vm.navigateToTTId.observe(viewLifecycleOwner, EventObserver {
+        viewModel.navigateToTTId.observe(viewLifecycleOwner, EventObserver {
             val action = ResultExplorerFragmentDirections.actionSheetFragmentToResultFragment(it)
             findNavController().navigate(action)
         })
@@ -129,16 +124,13 @@ class ResultExplorerFragment : Fragment()  {
         return binding.root
     }
 
-    var hasShownSnackBar = false
     fun snackBarCallback(){
-        if(!hasShownSnackBar){
+        if(!viewModel.hasShownSnackBar){
             view?.let {
                 Snackbar.make(it, R.string.click_again_to_clear, Snackbar.LENGTH_SHORT).show()
-                hasShownSnackBar = true
+                viewModel.hasShownSnackBar = true
             }
         }
-
-
     }
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
@@ -155,18 +147,10 @@ class ResultExplorerFragment : Fragment()  {
                 true
             }
             R.id.resultExplorerExport -> {
-                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    val count = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }.resultSpreadSheet.value?.data?.size?:0
-                    val s = if(count == 0) " " else " $count "
-                    putExtra(Intent.EXTRA_TITLE, "TimingTrials${s}Results Export.csv")
-                    //MIME types
-                    type = "text/csv"
-                    // Optionally, specify a URI for the directory that should be opened in
-                    // the system file picker before your app creates the document.
-                    //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
-                }
-                startActivityForResult(intent, REQUEST_EXPLORER_CREATE_FILE_CSV)
+                val count = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }.resultSpreadSheet.value?.data?.size?:0
+                val s = if(count == 0) " " else " $count "
+                permissionRequiredEvent = Event{ createCsvFile.launch("TimingTrials${s}Results Export.csv") }
+                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 true
             }
 
@@ -174,16 +158,21 @@ class ResultExplorerFragment : Fragment()  {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode){
-            REQUEST_EXPLORER_CREATE_FILE_CSV->{
-                data?.data?.let {
-                    writeCsv(it)
-                }
-            }
+    private val createCsvFile = registerForActivityResult(ActivityResultContracts.CreateDocument()){
+        it?.let {
+            writeCsv(it)
         }
     }
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            permissionRequiredEvent.getContentIfNotHandled()?.invoke()
+        } else {
+            Toast.makeText(requireContext(), "Permission Denied. Allow permissions in android settings.", Toast.LENGTH_LONG).show()
+        }
+    }
+    private var permissionRequiredEvent:Event<() -> Unit> = Event{}
 
     private fun writeCsv(uri: Uri){
 
@@ -192,7 +181,7 @@ class ResultExplorerFragment : Fragment()  {
         vmSheet?.let{sheet->
             try {
                 val outputStream = requireActivity().contentResolver.openOutputStream(uri)
-                if(haveOrRequestFilePermission() && outputStream != null){
+                if(outputStream != null){
                     val trans = CsvSheetWriter(sheet)
                     trans.writeToPath(outputStream)
 
@@ -200,7 +189,6 @@ class ResultExplorerFragment : Fragment()  {
                     var intent = Intent()
                     intent.action = Intent.ACTION_VIEW
                     intent.setDataAndType(uri, "text/csv")
-                    //intent.data = uri
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
                     val activities: List<ResolveInfo> = requireActivity().packageManager.queryIntentActivities(
@@ -211,9 +199,10 @@ class ResultExplorerFragment : Fragment()  {
                         intent = Intent()
                         intent.action = Intent.ACTION_VIEW
                         intent.setDataAndType(uri, "text/*")
-                        //intent.data = uri
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
                     }
+                    intent.putExtra(FROM_TIMING_TRIALS, true)
 
                     startActivity(intent)
                 }
@@ -226,21 +215,8 @@ class ResultExplorerFragment : Fragment()  {
         }
     }
 
-    fun haveOrRequestFilePermission(): Boolean{
-        return if(ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-//            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-//                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
-//            }else{
-            ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
-            false
-            // }
-        }else{
-            true
-        }
-    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        //menu.clear()
         inflater.inflate(R.menu.menu_results_explorer, menu)
     }
 }
