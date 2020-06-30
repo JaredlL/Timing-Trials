@@ -71,6 +71,7 @@
 
             <Button
                 android:id="@+id/coursebutton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -216,6 +217,7 @@
 
             <Button
                 android:id="@+id/startTimeButton2"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"

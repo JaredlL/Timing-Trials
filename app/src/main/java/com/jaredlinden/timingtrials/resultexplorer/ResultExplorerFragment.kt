@@ -42,8 +42,8 @@ class ResultExplorerFragment : Fragment()  {
         val itemTypeId = arguments?.getString("itemTypeId")?:""
         val itemId = arguments?.getLong("itemId")?:0L
 
-        arguments?.remove("itemId")
-        arguments?.remove("itemTypeId")
+//        arguments?.remove("itemId")
+//        arguments?.remove("itemTypeId")
 
         val fabCallback = (requireActivity() as? IFabCallbacks)
         fabCallback?.setVisibility(View.GONE)
@@ -61,7 +61,7 @@ class ResultExplorerFragment : Fragment()  {
         activity?.windowManager?.defaultDisplay?.getMetrics(displayMetrics)
 
 
-        val tv: TextView = layoutInflater.inflate(R.layout.list_item_spreadsheet, container).findViewById(R.id.spreadSheetTextView)
+        val tv: TextView = layoutInflater.inflate(R.layout.list_item_spreadsheet, null).findViewById(R.id.spreadSheetTextView)
         val p = Paint().apply {
             typeface = tv.typeface
             textSize = tv.textSize

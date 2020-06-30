@@ -1,17 +1,21 @@
 package com.jaredlinden.timingtrials.edititem
 
 
+import android.util.EventLog
 import androidx.lifecycle.*
+import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Gender
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
+import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
+import com.jaredlinden.timingtrials.util.Event
 import kotlinx.coroutines.*
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
 
 
-class EditRiderViewModel @Inject constructor(private val repository: IRiderRepository): ViewModel() {
+class EditRiderViewModel @Inject constructor(private val repository: IRiderRepository, private val results: TimeTrialRiderRepository): ViewModel() {
 
 
     val clubs: LiveData<List<String>> = repository.allClubs
@@ -27,15 +31,29 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
     val category = MutableLiveData<String>("")
     val genders = Gender.values().map { it.fullString() }
 
+    val statsString = Transformations.switchMap(mutableRider){
+        it?.id?.let {
+            results.getRiderResults(it)
+        }
+    }.map {res->
+        if(res!= null && res.isNotEmpty()){
+            "Rides: ${res.size}"
+        }else{
+            ""
+        }
+    }
+
+    val doJumpToRiderResults: MutableLiveData<Event<Long>> = MutableLiveData()
+    fun jumpToRiderResults(){
+        mutableRider.value?.id?.let { doJumpToRiderResults.value = Event(it) }
+
+    }
+
     private val currentId = MutableLiveData<Long>(0L)
 
     init {
         mutableRider.addSource(mutableRider){
             it?.let { rider->
-                val genInt = Gender.values().indexOf(rider.gender)
-                if(genInt != selectedGenderPosition.value){
-                    selectedGenderPosition.value = genInt
-                }
                 if(firstName.value != rider.firstName){
                     firstName.value = rider.firstName
                 }
@@ -52,6 +70,9 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
                 if(yearOfBirth.value != yobString){
                     yearOfBirth.value = yobString
                 }
+                val genInt = Gender.values().indexOf(rider.gender)
+                selectedGenderPosition.value = genInt
+
             }
         }
         mutableRider.addSource(firstName){res->
@@ -142,12 +163,29 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
                         lastName = rider.lastName.trim(),
                         club = rider.club.trim(),
                         category = rider.category.trim())
-                repository.insertOrUpdate(trimmed)
+
+                val existing = repository.ridersFromFirstLastName(trimmed.firstName, trimmed.lastName)
+                if(existing.isNotEmpty() && existing.first().id != trimmed.id){
+                    message.postValue(Event(R.string.error_rider_exists_with_name))
+                }else{
+                    if(trimmed.id?:0L == 0L){
+                        repository.insert(trimmed)
+                    }else{
+                        repository.update(trimmed)
+                    }
+                    updateSuccess.postValue(Event(true))
+                }
+
             }
-            mutableRider.postValue(Rider.createBlank())
+            //mutableRider.postValue(Rider.createBlank())
         }
 
     }
+
+    val message : MutableLiveData<Event<Int>> = MutableLiveData()
+    val updateSuccess : MutableLiveData<Event<Boolean>> = MutableLiveData()
+
+
 
     fun delete(){
         viewModelScope.launch(Dispatchers.IO) {

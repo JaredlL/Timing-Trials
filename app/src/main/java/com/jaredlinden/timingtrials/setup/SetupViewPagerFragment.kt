@@ -44,21 +44,28 @@ class SetupViewPagerFragment: Fragment() {
     var setupMenu: Menu? = null
 
     lateinit var prefListner : SharedPreferences.OnSharedPreferenceChangeListener
+    lateinit var viewPager : ViewPager2
+
+//    override fun onResume() {
+//        super.onResume()
+//        viewPager.adapter = SetupPagerAdapter(this)
+//    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
+        val setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
         val binding = FragmentDatabaseViewPagerBinding.inflate(inflater, container, false)
         val tabLayout = binding.tabs
-        val viewPager = binding.viewPager2
+        viewPager = binding.viewPager2
         viewPager.adapter = SetupPagerAdapter(this)
 
-        val setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
 
         setupViewModel.changeTimeTrial(args.timeTrialId)
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
                 setFabStatus(position)
+                setupViewModel.currentPage = position
             }
         })
 
@@ -89,6 +96,7 @@ class SetupViewPagerFragment: Fragment() {
 
 
 
+        viewPager.setCurrentItem(setupViewModel.currentPage, false)
 
         return binding.root
     }

@@ -9,12 +9,12 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 import android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY
@@ -27,7 +27,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -46,8 +45,6 @@ import com.jaredlinden.timingtrials.domain.csv.CsvTimeTrialResultWriter
 import com.jaredlinden.timingtrials.util.*
 import kotlinx.android.synthetic.main.fragment_timetrial_result.*
 import timber.log.Timber
-import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
 
@@ -175,10 +172,11 @@ class ResultFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.resultScreenshot -> {
-                //requestPermissionLauncher.launch(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
-                view?.let {
+                permissionRequiredEvent = Event{view?.let {
                     takeScreenShot(it)
-                }
+                }?:Unit}
+                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
                 true
             }
 
@@ -245,7 +243,7 @@ class ResultFragment : Fragment() {
                     resultViewModel.delete()
                     findNavController().popBackStack()
                 }
-                .setNegativeButton("Dismiss"){_,_->
+                .setNegativeButton(resources.getString(R.string.dismiss)){_,_->
 
                 }
                 .create().show()
@@ -260,7 +258,7 @@ class ResultFragment : Fragment() {
             try {
                 val outputStream = requireActivity().contentResolver.openOutputStream(uri)
                 if(outputStream != null){
-                    val trans = CsvTimeTrialResultWriter(tt, results)
+                    val trans = CsvTimeTrialResultWriter(tt, results, getLengthConverter())
                     trans.writeToPath(outputStream)
 
 
@@ -343,9 +341,9 @@ class ResultFragment : Fragment() {
 
             val ttName = resultViewModel.timeTrial.value?.timeTrialHeader?.ttName
             
-            val imgName = "${ttName?:nowChars}.jpeg"
+            val imgName = "${ttName?:nowChars}.png"
 
-            location on screen
+
 
             val scrollViewWidth = horizontalScrollView.getChildAt(0).width
             //val scrollViewWidth = 200
@@ -355,16 +353,23 @@ class ResultFragment : Fragment() {
             val gridHeight = if(sr == 0) fragResultRecyclerView.height else sr
 
             //https://dev.to/pranavpandey/android-create-bitmap-from-a-view-3lck
-            view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(gridHeight+300, View.MeasureSpec.EXACTLY))
+            view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(gridHeight+dpToPixels(300), View.MeasureSpec.EXACTLY))
 
             view.layout(0,0, view.measuredWidth, view.measuredHeight)
 
-            val tv1Height = view.findViewById<TextView>(R.id.resutWaterMarkTextView).height
-            val titleTextHeight = view.findViewById<TextView>(R.id.titleText).height
-            val notesHeight = view.findViewById<TextView>(R.id.resultNotesTextView).height
+            val resutWaterMarkTextView = view.findViewById<TextView>(R.id.resutWaterMarkTextView)
+            //resutWaterMarkTextView.measure(View.MeasureSpec.makeMeasureSpec(, View.MeasureSpec.EXACTLY), View.MeasureSpec.EXACTLY)
+            val tv1Height = resutWaterMarkTextView.measuredHeight
 
-            val sum = tv1Height + titleTextHeight + notesHeight + dpToPixels(80)
+            val titleText = view.findViewById<TextView>(R.id.titleText)
+            //titleText.measure(View.MeasureSpec.EXACTLY, View.MeasureSpec.EXACTLY)
+            val titleTextHeight = titleText.measuredHeight
+
+            val resultNotesTextView = view.findViewById<TextView>(R.id.resultNotesTextView)
+            //resultNotesTextView.measure(View.MeasureSpec.EXACTLY, View.MeasureSpec.EXACTLY)
+            val notesHeight = resultNotesTextView.measuredHeight
+
+            val sum = tv1Height + titleTextHeight + notesHeight + dpToPixels(50)
 
             view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(gridHeight+sum, View.MeasureSpec.EXACTLY))
@@ -378,7 +383,11 @@ class ResultFragment : Fragment() {
            if( view.background!=null) {
                view.background.draw(canvas)
             }else{
-               canvas.drawColor(ContextCompat.getColor(requireContext(), R.color.design_default_color_surface))
+               val typedValue = TypedValue()
+               val theme = requireContext().theme
+               theme.resolveAttribute(R.attr.colorSurface, typedValue, true)
+               val color = typedValue.data
+               canvas.drawColor(color)
            }
             view.draw(canvas)
 
@@ -431,7 +440,7 @@ class ResultFragment : Fragment() {
             put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
             put(MediaStore.Images.Media.TITLE, imageName)
             put(MediaStore.Images.Media.BUCKET_DISPLAY_NAME, "Timing Trials")
-            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
             put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
             //put(MediaStore.MediaColumns.DATA, filePath.path)
         }
@@ -462,48 +471,44 @@ class ResultFragment : Fragment() {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     fun saveScreenshotN(bitmap: Bitmap, imageName:String){
 
-
-        val filePath = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), imageName)
-        val imageOut = FileOutputStream(filePath)
-        bitmap.compress(Bitmap.CompressFormat.PNG, 80, imageOut)
-
-        Timber.d("Created image Filepath API 21-25 -> $filePath")
+        val cr = requireActivity().contentResolver
 
         val contentVals = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
             put(MediaStore.Images.Media.TITLE, imageName)
-            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
-            put(MediaStore.MediaColumns.DATA, filePath.path)
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
         }
 
-        val screenshotUri = requireActivity().contentResolver.insert(EXTERNAL_CONTENT_URI, contentVals)
+        val data = requireActivity().contentResolver.insert(EXTERNAL_CONTENT_URI, contentVals)
 
-        Timber.d("Inserted image URI API 21-25 -> $screenshotUri")
+        data?.let {
+            cr.openOutputStream(data)?.let {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
 
-        imageOut.flush()
-        imageOut.close()
-        openScreenshot(screenshotUri)
+                Timber.d("Created image Filepath API 21-25 -> ${data.path}")
+
+                it.flush()
+                it.close()
+            }
+
+        }
+        openScreenshot(data)
     }
 
     //API 26-28
     @TargetApi(Build.VERSION_CODES.O)
     fun saveScreenshotO(bitmap: Bitmap, imageName:String){
 
-            //val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-
-
-            //Timber.d("Created image Filepath API 26-28 -> $filePath")
-
         val cr = requireActivity().contentResolver
 
+        //Dont divide milis by 1000!
             val contentVals = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
                 put(MediaStore.Images.Media.TITLE, imageName)
-                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
                 //put(MediaStore.MediaColumns.DATA, filePath.absolutePath)
-                //put(MediaStore.Images.Media.SIZE, filePath.length())
-                //put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+                put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
             }
 
         val data = cr.insert(EXTERNAL_CONTENT_URI, contentVals)
@@ -512,30 +517,25 @@ class ResultFragment : Fragment() {
             cr.openOutputStream(data)?.let {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
 
-                Timber.d("Created image Filepath API 29-30 -> ${data.path}")
+                Timber.d("Created image Filepath API 26 -> ${data.path}")
 
                 it.flush()
                 it.close()
             }
-
+            //refreshGallery(it)
         }
 
-           //requireActivity().contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
 
             Timber.d("Inserted image URI API 26 -> ${data?.path}")
             openScreenshot(data)
-
-
-
-
-
     }
+
 
 
 
     private fun openScreenshot(imageFile: Uri?) {
         val intent = Intent()
-        intent.setDataAndType(imageFile, "image/*")
+        intent.setDataAndType(imageFile, "image/png")
         intent.action = Intent.ACTION_VIEW
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         Timber.d("Request open  ${imageFile?.path}")

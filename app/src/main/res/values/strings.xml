@@ -100,6 +100,8 @@
     <string name="start_in_string">Start in: %1$d minutes</string>
     <string name="start_new_timetrial">Start New Timetrial</string>
     <string name="new_timetrial">New Timetrial!</string>
+    <string name="error_rider_exists_with_name">Error - Rider already exists with that name!</string>
+    <string name="error_course_exists_with_name">Error - Course already exists with that name!</string>
     <string name="start_new">Start New</string>
     <string name="start_time">First rider to start at</string>
     <string name="start_tt">Start TT</string>

@@ -104,6 +104,12 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
                             result.postValue(result.value)
                         }else{
                             result.postValue(currentResVal?.copy(riderId = newRider.id, club = newRider.club, category = newRider.category, gender = newRider.gender)?:TimeTrialRider.fromRiderAndTimeTrial(newRider, resultTimeTrialId))
+                            club.postValue(newRider.club)
+                            category.postValue(newRider.category)
+                            val genInt = Gender.values().indexOf(newRider.gender)
+                            if(genInt != selectedGenderPosition.value){
+                                selectedGenderPosition.postValue(genInt)
+                            }
                             selectRiderVm.close.postValue(Event(true))
                         }
                     }
@@ -127,9 +133,9 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
                 splits.setIfNotEqual(ttResult.splits.map { ConverterUtils.toTenthsDisplayString(it) })
 
                 val genInt = Gender.values().indexOf(ttResult.gender)
-                if(genInt != selectedGenderPosition.value){
-                    selectedGenderPosition.value = genInt
-                }
+
+                selectedGenderPosition.value = genInt
+
 
             }
             result.value = ttResult?.timeTrialData

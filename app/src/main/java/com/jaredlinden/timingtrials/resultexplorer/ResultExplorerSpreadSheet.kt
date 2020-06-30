@@ -81,7 +81,8 @@ class ResultExplorerSpreadSheet(val results: List<IResult>,
     }
 
     override fun onCellLongPress(row: Int, col: Int) {
-        results[row].timeTrial?.id?.let {
+
+        results.filter { res -> columns.all { it.passesFilter(res) } }[row].timeTrial?.id?.let {
             onNavigateToTt(it)
         }
 

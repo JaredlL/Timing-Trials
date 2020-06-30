@@ -54,9 +54,14 @@ class SelectCourseFragment : Fragment() {
         })
         adapter.courseSelected = { blobs ->
 
+            //val origCourse = viewModel.getAllCourses().value?.selectedId
             viewModel.setSelectedCourse(blobs)
             val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToSetupViewPagerFragment()
             findNavController().navigate(action)
+
+
+
+
 
 
         }

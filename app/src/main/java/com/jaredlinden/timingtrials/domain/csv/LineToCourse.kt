@@ -14,7 +14,7 @@ class LineToCourseConverter: ILineToObjectConverter<Course> {
     var cttNameIndex:Int? = 1
     var conversion: Double = defaultConversion
 
-    val conversions = mapOf("km" to 1000.0, "miles" to 1609.34, "mi" to 1609.34, "meters" to 1.0)
+    val conversions = mapOf("km" to 1000.0, "kilometers" to 1000.0, "miles" to 1609.34, "mi" to 1609.34, "meters" to 1.0)
 
 
     override fun setHeading(headingLine: String) {
@@ -31,9 +31,6 @@ class LineToCourseConverter: ILineToObjectConverter<Course> {
         try{
             val dataList = dataLine //CSVUtils.lineToList(dataLine)
             val courseName = nameIndex?.let { dataList.getOrNull(it)}
-            if(courseName == "Lee"){
-                throw Exception("Ug?")
-            }
             val distance = distanceIndex?.let { dataList.getOrNull(it)?.toDoubleOrNull()?.times(conversion)}
             val cctName = cttNameIndex?.let { dataList.getOrNull(it) }
 

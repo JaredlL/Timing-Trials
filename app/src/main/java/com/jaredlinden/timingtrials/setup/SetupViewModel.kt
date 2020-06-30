@@ -33,6 +33,7 @@ class SetupViewModel @Inject constructor(
         it
     }
 
+    var currentPage = 0
 
     private val currentId: MutableLiveData<Long?> = MutableLiveData()
 

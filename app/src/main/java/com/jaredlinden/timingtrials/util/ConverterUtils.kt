@@ -115,6 +115,12 @@ data class LengthConverter(val unitKey: String){
         return "%2.2f".format(length / unitDef.conversion)
     }
 
+    fun lengthToDisplayWithUnits(length: Double): String{
+        return "%2.2f".format(length / unitDef.conversion) + " ${unitDef.key}"
+    }
+
+
+
     fun convert(length: Double): Double{
         return  length / unitDef.conversion
     }
@@ -142,6 +148,20 @@ data class LengthConverter(val unitKey: String){
         )
 
         val default: LengthConverter = LengthConverter("km")
+
+        fun stringToInternalUnits(lengthString: String): Double?{
+            for (ld in unitList){
+                if (lengthString.contains(ld.key, true)){
+                    val firstPart = lengthString.replace(ld.key,"", true).trim()
+                    return firstPart.toDoubleOrNull()?.times(ld.conversion)
+                }
+                if(lengthString.contains(ld.name, true)){
+                    val firstPart = lengthString.replace(ld.name,"", true).trim()
+                    return firstPart.toDoubleOrNull()?.times(ld.conversion)
+                }
+            }
+            return lengthString.toDoubleOrNull()?.times(default.unitDef.conversion)
+        }
     }
 
 }

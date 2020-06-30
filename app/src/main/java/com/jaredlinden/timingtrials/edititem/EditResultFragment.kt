@@ -69,6 +69,8 @@ class EditResultFragment : Fragment() {
             viewModel = resultVm
             lifecycleOwner = this@EditResultFragment
         }
+        //For some reason gender spinner sometimes doesnt update
+        binding.invalidateAll()
 
         return binding.root
 

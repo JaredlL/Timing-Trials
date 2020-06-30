@@ -13,7 +13,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.data.Course
+import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentEditCourseBinding
+import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.getLengthConverter
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
@@ -46,6 +49,23 @@ class EditCourseFragment : Fragment() {
         fabCallback.setImage(R.drawable.ic_done_white_24dp)
         fabCallback.setVisibility(View.VISIBLE)
 
+        courseViewModel.doJumpToCourseResults.observe(viewLifecycleOwner, EventObserver{
+            val action = EditCourseFragmentDirections.actionEditCourseFragmentToSheetFragment(it, Course::class.java.simpleName)
+            findNavController().navigate(action)
+        })
+
+        courseViewModel.updateSuccess.observe(viewLifecycleOwner, EventObserver{
+            if(it){
+                findNavController().popBackStack()
+            }
+        })
+
+        courseViewModel.message.observe(viewLifecycleOwner, EventObserver{
+            Toast.makeText(requireContext(), requireContext().getText(it), Toast.LENGTH_LONG).show()
+        })
+
+
+
         val binding = DataBindingUtil.inflate<FragmentEditCourseBinding>(inflater, R.layout.fragment_edit_course, container, false).apply {
             viewModel = courseViewModel
             lifecycleOwner = (this@EditCourseFragment)
@@ -54,14 +74,14 @@ class EditCourseFragment : Fragment() {
                 if(courseViewModel.courseName.value?.trim().isNullOrBlank()) Toast.makeText(requireContext(), getString(R.string.course_requires_name), Toast.LENGTH_SHORT).show()
                 else{
                     courseViewModel.addOrUpdate()
-                    findNavController().popBackStack()
+                    //findNavController().popBackStack()
                 }
             }
 
             cttNameEdit.setOnEditorActionListener{_, actionId, keyEvent ->
                 if ((keyEvent != null && (keyEvent.keyCode == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     courseViewModel.addOrUpdate()
-                    findNavController().popBackStack()
+                    //findNavController().popBackStack()
                 }
                 return@setOnEditorActionListener false
             }
