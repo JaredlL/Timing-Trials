@@ -26,6 +26,7 @@ import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.jaredlinden.timingtrials.edititem.EditResultFragmentArgs
 import com.jaredlinden.timingtrials.util.*
+import kotlinx.android.synthetic.main.fragment_selectrider_list.*
 
 
 /**
@@ -55,11 +56,7 @@ class SelectRidersFragment : Fragment() {
             //setHasOptionsMenu(true)
         }
 
-        if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI){
-            setHasOptionsMenu(false)
-        }else{
-            setHasOptionsMenu(true)
-        }
+
 
         val viewManager = LinearLayoutManager(context)
         val adapter = SelectableRiderListAdapter(requireContext())
@@ -87,6 +84,12 @@ class SelectRidersFragment : Fragment() {
 //            }
         }
 
+        if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI){
+            setHasOptionsMenu(false)
+        }else{
+            setHasOptionsMenu(true)
+        }
+
         adapter.addRiderToSelection = {
             viewModel.riderSelected(it)
         }
@@ -98,7 +101,18 @@ class SelectRidersFragment : Fragment() {
         viewModel.selectedRidersInformation.observe(viewLifecycleOwner, Observer {result->
             result?.let {
                 adapter.setRiders(it)
+
+                if(args.selectionMode != SELECT_RIDER_FRAGMENT_MULTI){
+                    result.selectedIds.firstOrNull()?.let {fs->
+                        val pos = result.allRiderList.indexOfFirst { it.id == fs }
+                        if(pos >=0) viewManager.scrollToPositionWithOffset(pos, binding.root.height / 2)
+                        //viewManager.scrollToPosition()
+                    }
+
+                }
+
             }
+
         })
 
         viewModel.close.observe(viewLifecycleOwner, EventObserver{

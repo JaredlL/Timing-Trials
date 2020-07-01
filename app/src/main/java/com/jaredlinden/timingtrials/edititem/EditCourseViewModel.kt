@@ -31,7 +31,7 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
     val statsString = Transformations.switchMap(mutableCourse){
         it?.id?.let {
             results.getCourseResults(it)
-        }
+        }?:MutableLiveData(listOf())
     }.map {res->
         if(res!= null && res.isNotEmpty()){
             "Rides: ${res.size}"

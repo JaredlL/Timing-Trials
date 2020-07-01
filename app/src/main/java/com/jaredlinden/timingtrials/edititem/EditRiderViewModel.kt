@@ -34,7 +34,7 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
     val statsString = Transformations.switchMap(mutableRider){
         it?.id?.let {
             results.getRiderResults(it)
-        }
+        }?:MutableLiveData(listOf())
     }.map {res->
         if(res!= null && res.isNotEmpty()){
             "Rides: ${res.size}"

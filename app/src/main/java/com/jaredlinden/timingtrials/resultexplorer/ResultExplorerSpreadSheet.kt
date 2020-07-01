@@ -23,14 +23,18 @@ class ResultExplorerSpreadSheet(val results: List<IResult>,
         }
     }
 
+    private val sortedVisibleResults = if (comp != null) {
+        results.sortedWith(comp).filter { res -> columns.all { it.passesFilter(res) } }
+    } else {
+        results.filter { res -> columns.all { it.passesFilter(res) } }
+    }
 
-
-    override val data: List<List<String>> =
-            if (comp != null) {
-                results.sortedWith(comp).filter { res -> columns.all { it.passesFilter(res) } }.map { res -> visibleCols.map { it.getValue(res) } }
-            } else {
-                results.filter { res -> columns.all { it.passesFilter(res) } }.map { res -> visibleCols.map { it.getValue(res) } }
-            }
+    override val data: List<List<String>> = sortedVisibleResults.map { res -> visibleCols.map { it.getValue(res) } }
+//            if (comp != null) {
+//                results.sortedWith(comp).filter { res -> columns.all { it.passesFilter(res) } }.map { res -> visibleCols.map { it.getValue(res) } }
+//            } else {
+//                results.filter { res -> columns.all { it.passesFilter(res) } }.map { res -> visibleCols.map { it.getValue(res) } }
+//            }
 
 
     private val colWidths: List<Float> = data.fold(visibleCols.map { measureString(it.description) }, { currentLongest, strings -> currentLongest.zip(strings).map { if (it.first >= measureString(it.second)) it.first else measureString(it.second) } })
@@ -82,9 +86,19 @@ class ResultExplorerSpreadSheet(val results: List<IResult>,
 
     override fun onCellLongPress(row: Int, col: Int) {
 
-        results.filter { res -> columns.all { it.passesFilter(res) } }[row].timeTrial?.id?.let {
+        sortedVisibleResults[row].timeTrial?.id?.let {
             onNavigateToTt(it)
         }
+//        if (comp != null) {
+//            results.sortedWith(comp).filter { res -> columns.all { it.passesFilter(res) } }[row].timeTrial?.id?.let {
+//                onNavigateToTt(it)
+//            }
+//        } else {
+//            results.filter { res -> columns.all { it.passesFilter(res) } }[row].timeTrial?.id?.let {
+//                onNavigateToTt(it)
+//            }
+//        }
+
 
     }
 

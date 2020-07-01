@@ -1,4 +1,4 @@
-package com.jaredlinden.timingtrials.settings
+package com.jaredlinden.timingtrials.preferences
 
 
 import android.os.Bundle

@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View"/>
         <variable
             name="viewModel"
             type="com.jaredlinden.timingtrials.edititem.EditCourseViewModel"/>
@@ -125,6 +126,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:visibility="@{viewModel.statsString.empty ? View.GONE : View.VISIBLE}"
                 android:layout_marginEnd="8dp"
                 android:onClick="@{() -> viewModel.jumpToCourseResults()}"
                 android:text="@{viewModel.statsString}"

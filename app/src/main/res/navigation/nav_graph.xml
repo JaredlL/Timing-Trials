@@ -220,7 +220,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.jaredlinden.timingtrials.settings.SettingsFragment"
+        android:name="com.jaredlinden.timingtrials.preferences.SettingsFragment"
         tools:layout="@layout/nav_view_header"
         android:label="Settings" />
     <dialog
