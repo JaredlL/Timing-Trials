@@ -64,13 +64,7 @@ class SelectRidersFragment : Fragment() {
         adapter.setHasStableIds(true)
         adapter.editRider = ::editRider
 
-        (requireActivity() as IFabCallbacks).apply {
-            setVisibility(View.VISIBLE)
-            setImage(R.drawable.ic_add_white_24dp)
-            setAction {
-                editRider(0)
-            }
-        }
+
 
         val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
             lifecycleOwner = (this@SelectRidersFragment)
@@ -86,8 +80,24 @@ class SelectRidersFragment : Fragment() {
 
         if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI){
             setHasOptionsMenu(false)
+            if(requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.currentPage == RIDER_PAGE_INDEX ){
+                (requireActivity() as IFabCallbacks).apply {
+                    setVisibility(View.VISIBLE)
+                    setImage(R.drawable.ic_add_white_24dp)
+                    setAction {
+                        editRider(0)
+                    }
+                }
+            }
         }else{
             setHasOptionsMenu(true)
+            (requireActivity() as IFabCallbacks).apply {
+                setVisibility(View.VISIBLE)
+                setImage(R.drawable.ic_add_white_24dp)
+                setAction {
+                    editRider(0)
+                }
+            }
         }
 
         adapter.addRiderToSelection = {

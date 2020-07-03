@@ -18,6 +18,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.get
+import androidx.core.view.size
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -44,6 +46,7 @@ import kotlin.math.abs
 
 
 interface IFabCallbacks{
+    fun currentVisibility(): Int
     fun setVisibility(visibility: Int)
     fun setAction(action: () -> Unit)
     fun setImage(resourceId: Int)
@@ -177,6 +180,10 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
         })
 
+        if(BuildConfig.DEBUG){
+            nav_view.menu.findItem(R.id.app_bar_test).isVisible = true
+        }
+
         nav_view.setNavigationItemSelectedListener {
             drawButtonPressed = it.itemId
             when(it.itemId){
@@ -188,18 +195,12 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 }
 
                 R.id.app_bar_import -> {
-//                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-//                    intent.type = "*/*"
-//                    startActivityForResult(intent, REQUEST_IMPORT_FILE)
                     importData.launch(arrayOf("*/*"))
                     Toast.makeText(this, "Select CSV or .tt File", Toast.LENGTH_LONG).show()
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
                 }
                 R.id.app_bar_test-> {
-//                    val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToTitleFragment()
-//                    navController.navigate(action)
-
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
                 }
@@ -210,8 +211,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 }
                 R.id.app_bar_onboard -> {
                     drawer_layout.closeDrawer(GravityCompat.START)
-                    //OnboardingFragment().show(supportFragmentManager, "onboard")
-                    showOnboading()
                     true
 
                 }
@@ -277,11 +276,21 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
                     }
 
+                    R.id.app_bar_onboard ->{
+                        if(navController.currentDestination?.id == R.id.dataBaseViewPagerFragment){
+                            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToHelpPrefsFragment()
+                            navController.navigate(action)
+                        }else{
+                            navController.navigate(R.id.helpPrefsFragment)
+                        }
+                    }
+
                     R.id.app_bar_new_timetrial -> {
                         val viewModel = getViewModel { injector.listViewModel() }
                         viewModel.timeTrialInsertedEvent.observe(this@MainActivity, EventObserver {
                             val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
-                            navController.navigate(action)
+                            //navController.navigate(action)
+                            navController.navigate(R.id.selectCourseFragment, action.arguments)
                         })
                         viewModel.insertNewTimeTrial()
                     }
@@ -451,7 +460,10 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     private var fabShouldShow = true
     override fun setVisibility(visibility: Int) {
         fabShouldShow = visibility == View.VISIBLE
-        refreshFab()
+    }
+
+    override fun currentVisibility(): Int {
+        return  mainFab?.visibility?:View.GONE
     }
 
     private fun refreshFab(){

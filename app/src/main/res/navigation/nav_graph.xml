@@ -55,7 +55,7 @@
     <fragment
         android:id="@+id/dataBaseViewPagerFragment"
         android:name="com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragment"
-        android:label="Timing Trials"
+        android:label="@string/timing_trials"
         tools:layout="@layout/fragment_list_generic">
         <action
             android:id="@+id/action_dataBaseViewPagerFragment2_to_editRiderFragment"
@@ -118,6 +118,13 @@
         <deepLink
             android:id="@+id/deepLink2"
             app:uri="timingtrials/home" />
+        <action
+            android:id="@+id/action_dataBaseViewPagerFragment_to_helpPrefsFragment"
+            app:destination="@id/helpPrefsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_open_enter"
+            app:popExitAnim="@anim/fragment_open_exit" />
         />
     </fragment>
     <fragment
@@ -143,7 +150,7 @@
     <fragment
         android:id="@+id/setupViewPagerFragment"
         android:name="com.jaredlinden.timingtrials.setup.SetupViewPagerFragment"
-        android:label="Setup Timetrial"
+        android:label="@string/setup_new_timetrial"
         tools:layout="@layout/fragment_setup_time_trial">
         <action
             android:id="@+id/action_setupViewPagerFragment2_to_editRiderFragment"
@@ -180,7 +187,7 @@
     <fragment
         android:id="@+id/selectCourseFragment"
         android:name="com.jaredlinden.timingtrials.setup.SelectCourseFragment"
-        android:label="Setup Timetrial"
+        android:label="@string/setup_new_timetrial"
         tools:layout="@layout/fragment_course_list">
         <action
             android:id="@+id/action_selectCourseFragment_to_editCourseFragment"
@@ -220,9 +227,16 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.jaredlinden.timingtrials.preferences.SettingsFragment"
-        tools:layout="@layout/nav_view_header"
-        android:label="Settings" />
+        android:name="com.jaredlinden.timingtrials.preferences.MainPrefsFragment"
+        android:label="@string/settings">
+        <action
+            android:id="@+id/action_settingsFragment_to_advancedFragment"
+            app:destination="@id/advancedFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
     <dialog
         android:id="@+id/numberOptionsDialog"
         tools:layout="@layout/fragment_number_options"
@@ -278,4 +292,12 @@
             android:defaultValue="1"
             app:argType="integer" />
     </fragment>
+    <fragment
+        android:id="@+id/advancedFragment"
+        android:name="com.jaredlinden.timingtrials.preferences.AdvancedPrefsFragment"
+        android:label="@string/advanced" />
+    <fragment
+        android:id="@+id/helpPrefsFragment"
+        android:name="com.jaredlinden.timingtrials.preferences.HelpPrefsFragment"
+        android:label="@string/help_about" />
 </navigation>

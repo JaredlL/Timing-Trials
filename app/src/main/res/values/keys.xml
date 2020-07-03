@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="p_advanced_clear">p_advanced_clear</string>
+    <string name="p_mainpref_advanced">advanced</string>
+    <string name="p_helpref_demo">demo</string>
+    <string name="p_helpref_documentation">Documentation</string>
+</resources>

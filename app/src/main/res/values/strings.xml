@@ -14,11 +14,16 @@
     <string name="click_again_to_clear">Click again to clear filter</string>
     <string name="club">Club</string>
     <string name="column_filter">Filter</string>
+    <string name="demo_data">Import demo data</string>
     <string name="column">Column</string>
     <string name="columns">Columns</string>
+    <string name="help_about">Help/About</string>
+    <string name="contact_developer">Contact developer</string>
+    <string name="documentation">Documentation</string>
     <string name="confirm_delete_course_message">Are you sure? ALL results associated with this course will be lost!</string>
     <string name="confirm_delete_rider_message">Are you sure? ALL results associated with this rider will be lost!</string>
     <string name="confirm_delete_setup_timetrial_message">Are you sure? This cannot be undone!</string>
+    <string name="confirm_delete_database_message">Are you sure?  This cannot be undone! It is recommended to export a backup first.</string>
     <string name="confirm_delete_timetrial_message">Are you sure? ALL results associated with this timetrial will be deleted, this cannot be undone!</string>
     <string name="confirm_delete_timetrial_results_message">Are you sure? These results will be deleted, This cannot be undone!</string>
     <string name="course_length">Course Length</string>
@@ -61,6 +66,7 @@
     <string name="missed_start_move_to_back">Missed start, move to back</string>
     <string name="name">Name</string>
     <string name="new_course">New Course</string>
+    <string name="setup_new_timetrial">Setup New Timetrial</string>
     <string name="new_rider">New Rider</string>
     <string name="no_results">No Results</string>
     <string name="now_choose_rider">Now press number</string>
@@ -144,7 +150,6 @@
     <string name="notes">Notes</string>
     <string name="add_result_row">Add Result Row</string>
     <string name="show_help">Help/About</string>
-    <string name="advanced">Advanced</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="add_late_rider">Add Late Rider</string>
@@ -152,4 +157,8 @@
     <string name="dark">Dark</string>
     <string name="system_default">System Default</string>
     <string name="follow_battery_saver_feature">Follow Battery Saver Feature</string>
+    <string name="debug">Debug</string>
+    <string name="advanced">Advanced</string>
+    <string name="database_cleared">Database Cleared</string>
+    <string name="clear_database">Clear Database</string>
 </resources>

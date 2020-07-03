@@ -11,6 +11,7 @@ import com.jaredlinden.timingtrials.timing.TimingViewModel
 import com.jaredlinden.timingtrials.viewdata.ListViewModel
 import com.jaredlinden.timingtrials.TestViewModel
 import com.jaredlinden.timingtrials.edititem.EditResultViewModel
+import com.jaredlinden.timingtrials.preferences.PrefsViewModel
 import com.jaredlinden.timingtrials.viewdata.IOViewModel
 import dagger.BindsInstance
 import dagger.Component
@@ -50,6 +51,8 @@ interface AppComponent{
     fun importViewModel(): IOViewModel
 
     fun editResultViewModel(): EditResultViewModel
+
+    fun prefsViewModel(): PrefsViewModel
 
 }
 

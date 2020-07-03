@@ -57,7 +57,10 @@ class SetupViewPagerFragment: Fragment() {
         val binding = FragmentDatabaseViewPagerBinding.inflate(inflater, container, false)
         val tabLayout = binding.tabs
         viewPager = binding.viewPager2
-        viewPager.adapter = SetupPagerAdapter(this)
+        val pagerAdapter = SetupPagerAdapter(this){
+            setFabStatus(setupViewModel.currentPage)
+        }
+        viewPager.adapter = pagerAdapter
 
 
         setupViewModel.changeTimeTrial(args.timeTrialId)
@@ -97,6 +100,8 @@ class SetupViewPagerFragment: Fragment() {
 
 
         viewPager.setCurrentItem(setupViewModel.currentPage, false)
+        setFabStatus(setupViewModel.currentPage)
+
 
         return binding.root
     }
@@ -224,7 +229,7 @@ const val RIDER_PAGE_INDEX = 0
 const val ORDER_RIDER_INDEX = 1
 
 
-class SetupPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class SetupPagerAdapter(fragment: Fragment, val fragCreated: () -> Unit) : FragmentStateAdapter(fragment) {
 
     /**
      * Mapping of the ViewPager page indexes to their respective Fragments
@@ -239,7 +244,9 @@ class SetupPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount() = tabFragmentsCreators.size
 
     override fun createFragment(position: Int): Fragment {
-        return tabFragmentsCreators[position]?.invoke() ?: throw IndexOutOfBoundsException()
+        val f = tabFragmentsCreators[position]?.invoke() ?: throw IndexOutOfBoundsException()
+        fragCreated()
+        return f
     }
 }
 

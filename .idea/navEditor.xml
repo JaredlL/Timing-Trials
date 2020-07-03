@@ -106,13 +106,25 @@
             <LayoutPositions>
               <option name="myPositions">
                 <map>
+                  <entry key="advancedFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-1693" />
+                            <option name="y" value="2600" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="dataBaseViewPagerFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-1788" />
-                            <option name="y" value="1226" />
+                            <option name="x" value="-2130" />
+                            <option name="y" value="1080" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -123,6 +135,11 @@
                               </value>
                             </entry>
                             <entry key="action_dataBaseViewPagerFragment_to_editCourseFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_dataBaseViewPagerFragment_to_helpPrefsFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -230,6 +247,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="helpPrefsFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-1304" />
+                            <option name="y" value="1806" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="numberOptionsDialog">
                     <value>
                       <LayoutPositions>
@@ -273,8 +302,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-237" />
-                            <option name="y" value="-926" />
+                            <option name="x" value="-310" />
+                            <option name="y" value="-860" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -320,9 +349,18 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-1502" />
-                            <option name="y" value="2240" />
+                            <option name="x" value="-2106" />
+                            <option name="y" value="2105" />
                           </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_settingsFragment_to_advancedFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
                         </option>
                       </LayoutPositions>
                     </value>

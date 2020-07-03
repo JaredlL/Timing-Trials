@@ -129,7 +129,7 @@ class TimingService : Service(){
 
     private fun getNotification():NotificationCompat.Builder{
         val timingIntent = PendingIntent.getActivity(this, 0,Intent(this, TimingActivity::class.java), 0)
-        return NotificationCompat.Builder(this, "timing_service").setSmallIcon(com.jaredlinden.timingtrials.R.drawable.ic_timer_black_24dp)
+        return NotificationCompat.Builder(this, "timing_service").setSmallIcon(com.jaredlinden.timingtrials.R.drawable.tt_logo_foreground)
                 .setTicker("TimingTrials")
                 .setContentText("TimeTrial in progress")
                 .setContentIntent(timingIntent)
