@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.graphics.Paint
+import android.graphics.*
 import android.net.Uri
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -14,15 +14,19 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
-import com.jaredlinden.timingtrials.*
+import com.jaredlinden.timingtrials.IFabCallbacks
+import com.jaredlinden.timingtrials.MainActivity
+import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.FragmentSpreadsheetBinding
 import com.jaredlinden.timingtrials.domain.csv.CsvSheetWriter
 import com.jaredlinden.timingtrials.spreadsheet.SheetAdapter
@@ -119,7 +123,10 @@ class ResultExplorerFragment : Fragment()  {
 
         })
 
-
+       if(!PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(HAS_SHOWN_RESULT_EXPLORER_TIPS, false)){
+           showTipsDialog()
+           PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putBoolean(HAS_SHOWN_RESULT_EXPLORER_TIPS, true).apply()
+       }
 
         return binding.root
     }
@@ -154,8 +161,42 @@ class ResultExplorerFragment : Fragment()  {
                 true
             }
 
+            R.id.resultExplorerTips ->{
+                showTipsDialog()
+                true
+            }
+
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    fun showTipsDialog(){
+
+        val htmlString =
+                """    
+    &#8226; ${getString(R.string.tip_click_cell_add_filter)}<br/><br/>
+    &#8226; ${getString(R.string.tip_click_cell_remove_filter)}<br/><br/>
+    &#8226; ${getString(R.string.tip_click_cell_longpress)}<br/><br/>
+    &#8226; ${getString(R.string.tip_click_cell_sort_header)}
+    
+ """
+
+
+        val html = HtmlCompat.fromHtml(htmlString, HtmlCompat.FROM_HTML_MODE_LEGACY)
+
+        val mColor = ContextCompat.getColor(requireContext(), R.color.secondaryDarkColor)
+        val d = ContextCompat.getDrawable(requireActivity(), R.drawable.ic_baseline_help_outline_24)
+        Utils.colorDrawable(mColor, d)
+
+        AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.tips))
+
+                .setIcon(d)
+                .setMessage(html)
+                .setPositiveButton(R.string.ok){_,_->
+
+                }
+                .show()
     }
 
     private val createCsvFile = registerForActivityResult(ActivityResultContracts.CreateDocument()){

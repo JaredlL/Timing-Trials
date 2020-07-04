@@ -3,27 +3,24 @@ package com.jaredlinden.timingtrials
 import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.text.method.LinkMovementMethod
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.core.view.GravityCompat
-import androidx.core.view.get
-import androidx.core.view.size
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -33,7 +30,6 @@ import com.jaredlinden.timingtrials.timing.TimingActivity
 import com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
-import com.jaredlinden.timingtrials.onboarding.OnboardingFragment
 import com.jaredlinden.timingtrials.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.threeten.bp.LocalDateTime
@@ -77,23 +73,29 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     }
 
     fun showOnboading(){
-        val builder = AlertDialog.Builder(this)
-        val v = layoutInflater.inflate(R.layout.fragment_onboarding, null)
-        builder.setView(v)
-                // Add action buttons
-                .setPositiveButton(R.string.yes) { dialog, id ->
+
+        val htmlString = """<p>Import demo data to explore features of the app?<br /> <br />  
+|You can delete this later in settings.<br /> <br /> 
+|From 5 years of <a href="https://royaldeanforestcc.wixsite.com/website/">Royal Dean Forest Cycling Club</a> time trials, who used development versions of the app.</p>""".trimMargin()
+        val html = HtmlCompat.fromHtml(getString(R.string.demo_data_description_ques), HtmlCompat.FROM_HTML_MODE_LEGACY)
+
+        AlertDialog.Builder(this)
+                .setTitle(getString(R.string.demo_data))
+                .setIcon(R.mipmap.tt_logo_round)
+                .setMessage(html)
+                .setPositiveButton(R.string.yes){_,_->
                     val url = URL("https://bb.githack.com/lindenj/timingtrialsdata/raw/master/Timing Trials Export 20-06-20.tt")
                     val vm = getViewModel { injector.importViewModel()}
                     vm.readUrlInput(url)
-
                     vm.importMessage.observe(this, EventObserver{
                         Toast.makeText(this, it, Toast.LENGTH_LONG).show()
                     })
                 }
-                .setNegativeButton(R.string.no) { dialog, id ->
+                .setNegativeButton(R.string.no) { _, _ ->
 
+                }.show().apply {
+                    findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
                 }
-        builder.create().show()
     }
 
     val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
@@ -109,7 +111,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             // same time, respect the user's decision. Don't link to system
             // settings in an effort to convince the user to change their
             // decision.
-            Toast.makeText(this, "Permission Denied. Allow permissions in android settings.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -209,7 +211,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     true
 
                 }
-                R.id.app_bar_onboard -> {
+                R.id.app_bar_help -> {
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
 
@@ -276,7 +278,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
                     }
 
-                    R.id.app_bar_onboard ->{
+                    R.id.app_bar_help ->{
                         if(navController.currentDestination?.id == R.id.dataBaseViewPagerFragment){
                             val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToHelpPrefsFragment()
                             navController.navigate(action)

@@ -26,4 +26,9 @@
         app:title="@string/advanced"
         />
 
+    <Preference
+        android:key="@string/p_helpref_about"
+        android:icon="@drawable/ic_baseline_help_outline_24"
+        android:title="@string/show_help" />
+
 </PreferenceScreen>

@@ -27,9 +27,10 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
                             "linden.jared@gmail.com",
                             null
                     )
+                    val t = getDebugInfo()
                     val intent = Intent(Intent.ACTION_SENDTO, uri)
-                            .putExtra(Intent.EXTRA_SUBJECT, "Tasks Feedback")
-                            .putExtra(Intent.EXTRA_TEXT, getDebugInfo())
+                            .putExtra(Intent.EXTRA_SUBJECT, "Timing Trials Feedback")
+                            .putExtra(Intent.EXTRA_TEXT, t)
                     startActivity(intent)
                     false
                 }
@@ -40,6 +41,7 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
                     false
                 }
 
+        findPreference(R.string.p_helpref_version).summary = BuildConfig.VERSION_NAME
     }
 
     fun getDebugInfo(): String? {

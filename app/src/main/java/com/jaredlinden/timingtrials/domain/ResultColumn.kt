@@ -60,7 +60,7 @@ data class ColumnData(
                     ColumnData(LapsColumn()),
                     ColumnData(DateColumn()),
                     ColumnData(DistanceColumn(distConverter)),
-                    ColumnData(SpeedColumn(distConverter)))
+                    ColumnData(SpeedColumn(distConverter))).map { if(it.definition.javaClass == TimeColumn::class.java) it.copy(sortType = SortType.DESCENDING) else it }
 
         }
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+
     <Preference
         android:key="@string/p_helpref_documentation"
         android:title="@string/documentation"
@@ -8,12 +9,27 @@
         />
 
     <Preference
-        android:key="@string/contact_developer"
-        android:title="@string/contact_developer"
-        android:icon="@drawable/ic_baseline_mail_outline_24" />
+        android:key="@string/p_helpref_demo"
+        android:title="@string/demo_data"
+        android:icon="@drawable/ic_baseline_add_box_24"
+        android:summary="@string/demo_data_description"/>
 
     <Preference
-        android:key="@string/p_helpref_demo"
-        android:title="@string/demo_data" />
+        android:key="@string/p_helpref_about"
+        android:title="@string/about_timing_trials"
+        android:icon="@drawable/ic_baseline_font_download_24"
+        />
+
+    <Preference
+        android:key="@string/contact_developer"
+        android:title="@string/contact_developer"
+        android:icon="@drawable/ic_baseline_mail_outline_24"
+        android:summary="@string/feedback_suggestions_welcome"/>
+
+
+    <Preference
+        android:key="@string/p_helpref_version"
+        android:title="@string/version"
+        android:icon="@drawable/ic_baseline_system_update_24" />
 
 </PreferenceScreen>

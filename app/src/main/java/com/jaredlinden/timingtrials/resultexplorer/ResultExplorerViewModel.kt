@@ -139,8 +139,9 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
 
     fun clearAllColumnFilters(){
         columns.value?.let { currentCols->
-            val newCols = currentCols.map { it.copy(filterText = "", isVisible = true, isFocused = false, sortType = SortType.NONE) }
-            setNewColumns(newCols)
+            //val newCols = currentCols.map { it.copy(filterText = "", isVisible = true, isFocused = false, sortType = SortType.NONE) }
+            val conv = columnsContext.value?.converter?: LengthConverter.default
+            setNewColumns(ColumnData.getAllColumns(conv))
         }
     }
 

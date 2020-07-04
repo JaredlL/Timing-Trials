@@ -32,6 +32,8 @@ fun Fragment.hideKeyboard(){
     imm.hideSoftInputFromWindow(view!!.windowToken, 0)
 }
 
+
+
 //fun Fragment.haveOrRequestFilePermission(requestCode: Int): Boolean{
 //    return if(ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
 ////            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){

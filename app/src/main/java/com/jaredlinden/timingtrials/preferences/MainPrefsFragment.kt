@@ -25,5 +25,11 @@ class MainPrefsFragment : PreferenceFragmentCompat() {
             true
         }
 
+        findPreference(R.string.p_helpref_about).setOnPreferenceClickListener {
+            val action = MainPrefsFragmentDirections.actionSettingsFragmentToHelpPrefsFragment()
+            findNavController().navigate(action)
+            true
+        }
+
     }
 }
