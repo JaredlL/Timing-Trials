@@ -4,12 +4,14 @@ import android.content.Context
 import com.jaredlinden.timingtrials.TitleViewModel
 import com.jaredlinden.timingtrials.edititem.EditCourseViewModel
 import com.jaredlinden.timingtrials.edititem.EditRiderViewModel
-import com.jaredlinden.timingtrials.resultexplorer.GlobalResultViewModel
+import com.jaredlinden.timingtrials.resultexplorer.ResultExplorerViewModel
 import com.jaredlinden.timingtrials.timetrialresults.ResultViewModel
 import com.jaredlinden.timingtrials.setup.SetupViewModel
 import com.jaredlinden.timingtrials.timing.TimingViewModel
 import com.jaredlinden.timingtrials.viewdata.ListViewModel
 import com.jaredlinden.timingtrials.TestViewModel
+import com.jaredlinden.timingtrials.edititem.EditResultViewModel
+import com.jaredlinden.timingtrials.preferences.PrefsViewModel
 import com.jaredlinden.timingtrials.viewdata.IOViewModel
 import dagger.BindsInstance
 import dagger.Component
@@ -44,9 +46,13 @@ interface AppComponent{
 
     fun resultViewModel(): ResultViewModel
 
-    fun globalResultViewModel(): GlobalResultViewModel
+    fun globalResultViewModel(): ResultExplorerViewModel
 
     fun importViewModel(): IOViewModel
+
+    fun editResultViewModel(): EditResultViewModel
+
+    fun prefsViewModel(): PrefsViewModel
 
 }
 

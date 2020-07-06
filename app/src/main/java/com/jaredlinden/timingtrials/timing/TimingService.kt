@@ -13,8 +13,13 @@ import com.jaredlinden.timingtrials.util.ConverterUtils.toSecondsDisplayString
 import org.threeten.bp.Instant
 import java.util.*
 import android.app.NotificationManager
+import android.media.MediaPlayer
 import androidx.lifecycle.MutableLiveData
+import androidx.preference.PreferenceManager
+import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.data.TimeTrial
 import com.jaredlinden.timingtrials.data.TimeTrialHeader
+import com.jaredlinden.timingtrials.util.Event
 import kotlin.math.abs
 
 
@@ -35,24 +40,59 @@ class TimingService : Service(){
     var timerTick: MutableLiveData<Long> = MutableLiveData()
 
     var prevSecs = 0L
-    inner class TimeTrialTask(val timeTrial: TimeTrialHeader) : TimerTask(){
+    var soundEvent: Int? = null
+
+    inner class TimeTrialTask(val timeTrial: TimeTrial) : TimerTask(){
         override fun run() {
             val now = Instant.now()
-            val millisSinceStart = now.toEpochMilli() - timeTrial.startTimeMilis
+            val millisSinceStart = now.toEpochMilli() - timeTrial.timeTrialHeader.startTimeMilis
             val millis = abs(millisSinceStart)
             val secsLong =  (millis/1000)
             //val secs = toSecondsDisplayString(millisSinceStart)
             if(prevSecs != secsLong){
-                updateNotificationTitle(timeTrial.ttName, toSecondsDisplayString(millisSinceStart))
+                updateNotificationTitle(timeTrial.timeTrialHeader.ttName, toSecondsDisplayString(millisSinceStart))
                 prevSecs = secsLong
             }
+            val sparse = timeTrial.helper.sparseRiderStartTimes
             timerTick.postValue(millisSinceStart)
+
+            val index = sparse.indexOfKey(millisSinceStart)
+            val prevIndex = if(index >= 0){ index }else{ Math.abs(index) - 2 }
+            val currentSoundEventVal = soundEvent
+            if(currentSoundEventVal != null){
+                if(currentSoundEventVal != prevIndex){
+                    soundEvent = prevIndex
+                    playSound()
+                }
+            }else if(prevIndex >= 0){
+                soundEvent = prevIndex
+                playSound()
+            }
         }
     }
 
-    fun startTiming(timeTrial: TimeTrialHeader){
 
-        if(timerTask?.timeTrial?.id != timeTrial.id){
+    var startPlayer: MediaPlayer? = null
+    var playSound :Boolean = true
+    fun playSound(){
+
+        startPlayer?.let {player->
+
+            if(playSound){
+                if (player.isPlaying ) {
+                    player.pause()
+                    player.seekTo(0);
+                }else{
+                    player.start()
+                }
+            }
+        }
+
+    }
+
+    fun startTiming(timeTrial: TimeTrial){
+
+        if(timerTask?.timeTrial?.timeTrialHeader?.id != timeTrial.timeTrialHeader.id){
             timerTask?.cancel()
             timer.cancel()
             println("JAREDMSG -> Timing Service -> Creating New Timer")
@@ -78,8 +118,15 @@ class TimingService : Service(){
 
 
     override fun onCreate() {
+        playSound = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.p_mainpref_sound), true)
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener{prefs,key->
+            if(key == getString(R.string.p_mainpref_sound)){
+                playSound = prefs.getBoolean(key, true)
+            }
+        }
         System.out.println("JAREDMSG -> Timing Service -> Creating Timer")
         setInForeground()
+        startPlayer  = MediaPlayer.create(this, R.raw.start)
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
@@ -129,7 +176,7 @@ class TimingService : Service(){
 
     private fun getNotification():NotificationCompat.Builder{
         val timingIntent = PendingIntent.getActivity(this, 0,Intent(this, TimingActivity::class.java), 0)
-        return NotificationCompat.Builder(this, "timing_service").setSmallIcon(com.jaredlinden.timingtrials.R.drawable.ic_timer_black_24dp)
+        return NotificationCompat.Builder(this, "timing_service").setSmallIcon(com.jaredlinden.timingtrials.R.drawable.tt_logo_foreground)
                 .setTicker("TimingTrials")
                 .setContentText("TimeTrial in progress")
                 .setContentIntent(timingIntent)

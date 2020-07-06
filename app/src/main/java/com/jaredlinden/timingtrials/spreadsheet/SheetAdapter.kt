@@ -27,8 +27,10 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
         private const val CELL = 3
         private const val COLUMN_MARKER = 2
         private const val ROW_MARKER = 1
+        private const val TOP_LEFT = 4
 
         private const val ROW_MARKER_WIDTH = 3
+
         private const val COLUMN_MARKER_HEIGHT = 30
         private const val ROW_HEIGHT = 60
 
@@ -51,8 +53,8 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
 
         var text = ""
         val textView: TextView = view.findViewById(R.id.spreadSheetHeaderTextView)
-        //val imageView: ImageView = view.findViewById(R.id.headerImageView)
         val layout: LinearLayout = view.findViewById(R.id.headerLayout)
+
         fun bind(resultText: String){
             textView.text = resultText
         }
@@ -70,12 +72,19 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
-        if (getItemViewType(position) == CELL) {
-            makeCell(holder as CellViewHolder, position)
-        } else if (getItemViewType(position) == COLUMN_MARKER) {
-            makeColumnMarker(holder as ColumnHeaderViewHolder, position)
-        } else {
-            makeRowMarker(holder as CellViewHolder, position)
+        when(getItemViewType(position)) {
+            CELL -> {
+                makeCell(holder as CellViewHolder, position)
+            }
+            COLUMN_MARKER -> {
+                makeColumnMarker(holder as ColumnHeaderViewHolder, position)
+            }
+           TOP_LEFT -> {
+                makeTopLeft(holder as CellViewHolder, position)
+            }
+            else -> {
+                makeRowMarker(holder as CellViewHolder, position)
+            }
         }
 
     }
@@ -94,6 +103,7 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
            CELL -> createCellVh(parent)
            ROW_MARKER -> createCellVh(parent)
            COLUMN_MARKER -> createColumnVh(parent)
+           TOP_LEFT -> createCellVh(parent)
            else -> createCellVh(parent)
         }
 
@@ -120,7 +130,7 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
 
         return when {
             position == 0 -> {
-                ROW_MARKER
+                TOP_LEFT
             }
             coordinate.r == 0 -> {
                 COLUMN_MARKER
@@ -194,7 +204,7 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
 
 
 
-        viewHolder.textView.height = getRowHeight(r+2)
+        viewHolder.textView.height = getRowHeight(r+4)
         viewHolder.textView.setGravity(Gravity.CENTER)
 
         val alpha = 255
@@ -214,6 +224,29 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
         }
     }
 
+    private fun makeTopLeft(viewHolder: CellViewHolder, position: Int){
+
+        val sdk = android.os.Build.VERSION.SDK_INT
+
+        val mdrawable = context.getDrawable(R.drawable.background_spreadsheet_heading)
+
+        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            //setBackgroundDrawable();
+            viewHolder.textView.setBackgroundDrawable(mdrawable)
+
+        } else {
+            viewHolder.textView.setBackground(mdrawable)
+
+        }
+
+        val width = ROW_MARKER_WIDTH *(widthOfALetter?:10)
+
+        viewHolder.textView.width = width
+        viewHolder.textView.gravity = Gravity.CENTER
+
+        viewHolder.textView.text = " "
+        viewHolder.textView.height = getRowHeight(0)
+    }
 
     val drawable = context.getDrawable(R.drawable.background_spreadsheet_heading)
     private fun makeRowMarker(viewHolder: CellViewHolder, position: Int) {
@@ -245,9 +278,10 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
             viewHolder.textView.height = getRowHeight(0)
 
         }else{
-            viewHolder.textView.height = getRowHeight(8)
+
             val rm = (row + 1).toString()
             viewHolder.textView.text = rm
+            viewHolder.textView.height = getRowHeight(8)
         }
 
 

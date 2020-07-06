@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.ListItemResultBinding
 
-class ResultListAdapter internal constructor(val context: Context): RecyclerView.Adapter<ResultListAdapter.ResultViewHolder>(){
+class ResultListAdapter internal constructor(val context: Context, val editResult: (Long?) -> Unit): RecyclerView.Adapter<ResultListAdapter.ResultViewHolder>(){
 
 
     inner class ResultViewHolder(binding: ListItemResultBinding): RecyclerView.ViewHolder(binding.root){
@@ -24,6 +24,11 @@ class ResultListAdapter internal constructor(val context: Context): RecyclerView
                     resultTextView.typeface = Typeface.DEFAULT_BOLD
                 }else{
                     resultTextView.typeface = Typeface.DEFAULT
+                }
+
+                resultTextView.setOnLongClickListener {
+                    editResult(result.resultId)
+                    true
                 }
                 executePendingBindings()
             }

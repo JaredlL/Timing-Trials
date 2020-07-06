@@ -38,50 +38,42 @@
         <Button
             android:id="@+id/viewDatabaseButton"
             android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="125dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="125dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/manage_riders"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/startTtSetupButton" />
 
         <Button
             android:id="@+id/startTtSetupButton"
             style="@style/Widget.AppCompat.Button"
             android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="125dp"
-            android:layout_marginTop="48dp"
-            android:layout_marginEnd="125dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/start_tt"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trials_gif" />
 
         <Button
             android:id="@+id/testSetupButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="125dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="125dp"
+            android:layout_marginEnd="8dp"
             android:text="Delete All"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/viewDatabaseButton" />
 
         <Button
             android:id="@+id/testTimingButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="125dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="125dp"
+            android:layout_marginEnd="8dp"
             android:text="Test Timing"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/testSetupButton" />
 
         <Button
@@ -113,6 +105,26 @@
             android:text="Test 3"
             app:layout_constraintStart_toEndOf="@+id/testResult2"
             app:layout_constraintTop_toBottomOf="@+id/testTimingButton" />
+
+        <Button
+            android:id="@+id/testPermissionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Test permissions"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/trials_gif" />
+
+        <Button
+            android:id="@+id/testPermissionButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Test permissions 2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/testPermissionButton" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

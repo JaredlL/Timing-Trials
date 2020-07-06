@@ -106,13 +106,37 @@
             <LayoutPositions>
               <option name="myPositions">
                 <map>
+                  <entry key="aboutFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-545" />
+                            <option name="y" value="1912" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="advancedFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-938" />
+                            <option name="y" value="2746" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="dataBaseViewPagerFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-1411" />
-                            <option name="y" value="1295" />
+                            <option name="x" value="-2825" />
+                            <option name="y" value="1128" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -127,7 +151,7 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_dataBaseViewPagerFragment_to_globalResultFragment">
+                            <entry key="action_dataBaseViewPagerFragment_to_helpPrefsFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -152,7 +176,17 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_dataBaseViewPagerFragment_to_sheetFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_dataBaseViewPagerFragment_to_titleFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="deepLink2">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -167,42 +201,13 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="1033" />
-                            <option name="y" value="-201" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
-                  <entry key="editRiderFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="896" />
-                            <option name="y" value="596" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
-                  <entry key="globalResultFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="525" />
-                            <option name="y" value="1989" />
+                            <option name="x" value="1487" />
+                            <option name="y" value="-685" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_globalResultFragment_to_globalResultFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_globalResultFragment_to_resultFragment">
+                            <entry key="action_editCourseFragment_to_sheetFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -212,13 +217,67 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="editResultFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="1332" />
+                            <option name="y" value="1159" />
+                          </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_editResultFragment_to_selectRidersFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="editRiderFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="1772" />
+                            <option name="y" value="176" />
+                          </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_editRiderFragment_to_sheetFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="helpPrefsFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-937" />
+                            <option name="y" value="1975" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="numberOptionsDialog">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="555" />
-                            <option name="y" value="-865" />
+                            <option name="x" value="166" />
+                            <option name="y" value="-433" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -229,12 +288,17 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="817" />
-                            <option name="y" value="1355" />
+                            <option name="x" value="1053" />
+                            <option name="y" value="1475" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
+                            <entry key="action_resultFragment_to_editResultFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="deepLink">
                               <value>
                                 <LayoutPositions />
@@ -250,8 +314,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-237" />
-                            <option name="y" value="-926" />
+                            <option name="x" value="-349" />
+                            <option name="y" value="-713" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -271,14 +335,49 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="selectRidersFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="1748" />
+                            <option name="y" value="834" />
+                          </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_selectRidersFragment_to_editRiderFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="settingsFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-670" />
-                            <option name="y" value="2496" />
+                            <option name="x" value="-2123" />
+                            <option name="y" value="2541" />
                           </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_settingsFragment_to_advancedFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_settingsFragment_to_helpPrefsFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -288,8 +387,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-194" />
-                            <option name="y" value="-16" />
+                            <option name="x" value="-893" />
+                            <option name="y" value="545" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -314,6 +413,11 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="deepLink3">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                           </map>
                         </option>
                       </LayoutPositions>
@@ -324,9 +428,18 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-554" />
-                            <option name="y" value="1867" />
+                            <option name="x" value="978" />
+                            <option name="y" value="816" />
                           </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_sheetFragment_to_resultFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -336,8 +449,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-1616" />
-                            <option name="y" value="151" />
+                            <option name="x" value="-2238" />
+                            <option name="y" value="-843" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -393,6 +506,61 @@
                               </value>
                             </entry>
                           </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </LayoutPositions>
+          </value>
+        </entry>
+        <entry key="timing_nav_graph.xml">
+          <value>
+            <LayoutPositions>
+              <option name="myPositions">
+                <map>
+                  <entry key="selectRidersFragment2">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="396" />
+                            <option name="y" value="74" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="timerFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="32" />
+                            <option name="y" value="258" />
+                          </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_timerFragment_to_selectRidersFragment2">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="timingActivity">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-263" />
+                            <option name="y" value="355" />
+                          </Point>
                         </option>
                       </LayoutPositions>
                     </value>

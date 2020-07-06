@@ -88,7 +88,7 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
     var addRiderToSelection = {_:Rider -> Unit}
 
     fun setRiders(newInfo: SelectedRidersInformation){
-        val newSelected = newInfo.timeTrial.riderList.map { it.riderData }
+        val newSelected = newInfo.allRiderList.filter { newInfo.selectedIds.contains(it.id) }
 
         if(mRiders != newInfo.allRiderList || mSelected != newSelected){
             mRiders = newInfo.allRiderList

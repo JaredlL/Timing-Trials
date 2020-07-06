@@ -2,6 +2,7 @@ package com.jaredlinden.timingtrials.setup
 
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.LayoutInflater
@@ -17,8 +18,12 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.data.TimeTrialStatus
 import com.jaredlinden.timingtrials.databinding.FragmentSetupTimeTrialBinding
+import com.jaredlinden.timingtrials.timing.TimingActivity
+import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import org.threeten.bp.*
@@ -42,6 +47,7 @@ class SetupTimeTrialFragment : Fragment() {
 
         })
 
+
         val mAdapter = ArrayAdapter<String>(requireContext(), R.layout.support_simple_spinner_dropdown_item, listOf("15", "30", "60", "90", "120"))
         val binding = DataBindingUtil.inflate<FragmentSetupTimeTrialBinding>(inflater, R.layout.fragment_setup_time_trial, container, false).apply {
             viewModel = propsViewModel
@@ -56,23 +62,55 @@ class SetupTimeTrialFragment : Fragment() {
             }
 
             startTtButton.setOnClickListener{
-                propsViewModel.timeTrial.value?.let {
-                    if(it.riderList.isEmpty()){
-                        Toast.makeText(requireActivity(), "TT Needs at least 1 rider", Toast.LENGTH_LONG).show()
+                propsViewModel.timeTrial.value?.let {tt->
+                    if(tt.riderList.isEmpty()){
+                        Toast.makeText(requireActivity(), getString(R.string.tt_needs_one_rider), Toast.LENGTH_LONG).show()
                         //container.currentItem = 1
                         return@let
                     }
-                    if(it.timeTrialHeader.startTime.isBefore(OffsetDateTime.now())){
-                        Toast.makeText(requireActivity(), "TT must start in the future, select start time", Toast.LENGTH_LONG).show()
+                    if(tt.timeTrialHeader.startTime.isBefore(OffsetDateTime.now())){
+                        Toast.makeText(requireActivity(), getString(R.string.tt_must_start_in_the_future), Toast.LENGTH_LONG).show()
                         TimePickerFragment2().show(requireActivity().supportFragmentManager, "timePicker")
                         return@let
                     }
-                    val confDialog: SetupConfirmationFragment = requireActivity().supportFragmentManager
-                            .findFragmentByTag("confdialog") as? SetupConfirmationFragment ?: SetupConfirmationFragment()
 
-                    if(confDialog.dialog?.isShowing != true){
-                        confDialog.show(requireActivity().supportFragmentManager, "confdialog")
+                    val courseString = "${tt.timeTrialHeader.laps} laps of ${tt.course?.courseName?:"Unknown Course"}"
+
+                    val riderString  = if(tt.timeTrialHeader.interval == 0){
+                        "${tt.riderList.count()} riders starting at 0 second intervals, mass start!"
+                    }else
+                    {
+                        "${tt.riderList.size} riders starting at ${tt.timeTrialHeader.interval} second intervals"
                     }
+
+                    val startString = "First rider starting at ${tt.let{ ConverterUtils.instantToSecondsDisplayString(tt.timeTrialHeader.startTime.toInstant())}}"
+
+                    AlertDialog.Builder(requireContext())
+                            .setTitle(getString(R.string.starting_tt))
+                            .setMessage(courseString
+                                    + System.lineSeparator()
+                                    + System.lineSeparator()
+                                    + riderString
+                                    + System.lineSeparator()
+                                    + System.lineSeparator()
+                                    + startString
+)
+                            .setPositiveButton(R.string.ok){_,_->
+                                if(tt.timeTrialHeader.startTime.isAfter(OffsetDateTime.now())){
+                                    val newTt = tt.updateHeader(tt.timeTrialHeader.copy(status = TimeTrialStatus.IN_PROGRESS))
+                                    requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.updateTimeTrial(newTt)
+//                                    val intent = Intent(requireActivity(), TimingActivity::class.java)
+//                                    startActivity(intent)
+                                }else{
+                                    Toast.makeText(requireActivity(), getString(R.string.tt_must_start_in_the_future), Toast.LENGTH_LONG).show()
+                                }
+                            }
+                            .setNegativeButton(R.string.dismiss){_,_->
+
+                            }
+                            .create().show()
+
+//                    }
 
                 }
             }
@@ -85,6 +123,10 @@ class SetupTimeTrialFragment : Fragment() {
           tt?.let {
               if (it.timeTrialHeader.ttName == "" && it.course == null) {
                   showCourseFrag()
+              }
+              if(it.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS){
+                  val intent = Intent(requireActivity(), TimingActivity::class.java)
+                  startActivity(intent)
               }
           }
         })
@@ -121,7 +163,7 @@ class  TimePickerFragment2 : DialogFragment(){
         return activity?.let {
             val builder = AlertDialog.Builder(it)
             // Get the layout inflater
-            val inflater = requireActivity().layoutInflater
+            val inflater = it.layoutInflater
 
             val v = inflater.inflate(R.layout.fragment_timepicker, null)
             val currentTp: TimePicker = v.findViewById(R.id.timePicker1)

@@ -1,5 +1,6 @@
 package com.jaredlinden.timingtrials.viewdata.listfragment
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -124,7 +125,10 @@ class TimeTrialViewHolderFactory(val onLongPress: (tt:TimeTrialHeader) -> Unit):
     }
 
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
-        val binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false)
+        val binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false).apply {
+            textView20.typeface = Typeface.DEFAULT_BOLD
+            textView22.typeface = Typeface.DEFAULT_BOLD
+        }
         return binding.root
     }
 

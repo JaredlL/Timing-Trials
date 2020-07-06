@@ -1,62 +1,68 @@
 package com.jaredlinden.timingtrials.domain.csv
 
 import com.jaredlinden.timingtrials.data.TimeTrial
-import com.jaredlinden.timingtrials.spreadsheet.ResultListSpreadSheet
+import com.jaredlinden.timingtrials.resultexplorer.ResultExplorerSpreadSheet
 import com.jaredlinden.timingtrials.timetrialresults.ResultRowViewModel
+import com.jaredlinden.timingtrials.util.LengthConverter
 import com.opencsv.CSVWriter
 import org.threeten.bp.format.DateTimeFormatter
 import java.io.*
 
-class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowViewModel>){
+class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowViewModel>, val lengthConverter: LengthConverter){
 
 
-    fun writeToPath(filePath: OutputStream){
-        val writer = PrintWriter(filePath)
-        writer.appendln(surroundQuotes("Results, Powered by Timing Trials"))
-        writeTimeTrialRow(writer)
-        writeCourseRow(writer)
-        for(r in results.dropLast(1)) writeRowNewLine(r, writer)
-        writeLastRow(results.last(), writer)
-        writer.flush()
-        writer.close()
+    fun writeToPath(outputStream: OutputStream){
+        val lines: MutableList<List<String>> = mutableListOf()
+        lines.add(listOf("Results, Powered by Timing Trials"))
+        addTimeTrialRow(lines)
+        writeCourseRow(lines)
+        for(r in results){
+            lines.add(r.row.map { it.content.value?:"" })
+        }
+
+        val csvWriter =  CSVWriter(outputStream.bufferedWriter())
+        csvWriter.writeAll(lines.map { it.toTypedArray() })
+        csvWriter.flush()
+        csvWriter.close()
     }
 
-    private fun writeTimeTrialRow(writer: PrintWriter){
+    private fun addTimeTrialRow(lines: MutableList<List<String>>){
         val formatter = DateTimeFormatter.ofPattern("d/M/y")
-        writer.appendln("TimeTrial Name,TimeTrial Date,TimeTrial Laps")
-        writer.appendln("${timeTrial.timeTrialHeader.ttName},${timeTrial.timeTrialHeader.startTime.format(formatter)},${timeTrial.timeTrialHeader.laps}")
+
+        lines.add(listOf("TimeTrial Name","TimeTrial Date","TimeTrial Laps","TimeTrial Description"))
+        lines.add(listOf(timeTrial.timeTrialHeader.ttName, timeTrial.timeTrialHeader.startTime.format(formatter),timeTrial.timeTrialHeader.laps.toString(), timeTrial.timeTrialHeader.description))
     }
 
-    private fun writeCourseRow(writer: PrintWriter){
+    private fun writeCourseRow(lines: MutableList<List<String>>){
         val course = timeTrial.course
         if(course != null){
-            writer.appendln("Course Name,Course Length,Course CTT Name")
-            writer.appendln("${course.courseName}.${course.length/1000L},${course.cttName}")
+            lines.add(listOf("Course Name","Course Length (${lengthConverter.unitDef.name})","Course CTT Name"))
+            lines.add(listOf(course.courseName,lengthConverter.lengthToDisplay(course.length),course.cttName))
         }else{
-            writer.appendln(surroundQuotes("Unknown Course"))
+            lines.add(listOf("Unknown Course"))
         }
     }
 
-    private fun writeRowNewLine(row: ResultRowViewModel, writer: PrintWriter){
-        for (v in row.row.dropLast(1)){
-            writer.append("${surroundQuotes(v.content.value)},")
-        }
-        writer.appendln(surroundQuotes(row.row.last().content.value))
-    }
-
-    private fun writeLastRow(row: ResultRowViewModel, writer: PrintWriter){
-        for (v in row.row.dropLast(1)){
-            writer.append("${surroundQuotes(v.content.value)},")
-        }
-        writer.append(surroundQuotes(row.row.last().content.value))
-    }
-
-    private fun surroundQuotes(string: String?): String{
-        return "\"$string\""
-    }
+//    private fun writeRowNewLine(row: ResultRowViewModel, writer: PrintWriter){
+//        for (v in row.row.dropLast(1)){
+//            writer.append("${surroundQuotes(v.content.value)},")
+//        }
+//        writer.appendln(surroundQuotes(row.row.last().content.value))
+//    }
+//
+//    private fun writeLastRow(row: ResultRowViewModel, writer: PrintWriter){
+//        for (v in row.row.dropLast(1)){
+//            writer.append("${surroundQuotes(v.content.value)},")
+//        }
+//        writer.append(surroundQuotes(row.row.last().content.value))
+//    }
+//
+//    private fun surroundQuotes(string: String?): String{
+//        return "\"$string\""
+//    }
 
 }
-class CsvSheetWriter(val sheet: ResultListSpreadSheet){
+class CsvSheetWriter(val sheet: ResultExplorerSpreadSheet){
     fun writeToPath(ouputStream: OutputStream){
 
         val all = listOf(sheet.sheetColumns.map { it.headingText }) + (sheet.data)

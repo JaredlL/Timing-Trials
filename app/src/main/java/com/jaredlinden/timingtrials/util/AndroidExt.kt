@@ -1,7 +1,11 @@
 package com.jaredlinden.timingtrials.util
 
 import android.app.Activity
+import android.content.pm.PackageManager
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
@@ -22,6 +26,27 @@ fun Fragment.getLengthConverter():LengthConverter{
     val unitString = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getString("units", "km")?:"km"
     return LengthConverter(unitString)
 }
+
+fun Fragment.hideKeyboard(){
+    val imm: InputMethodManager = context!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.hideSoftInputFromWindow(view!!.windowToken, 0)
+}
+
+
+
+//fun Fragment.haveOrRequestFilePermission(requestCode: Int): Boolean{
+//    return if(ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+////            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+////                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
+////            }else{
+//        ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), requestCode)
+//        false
+//        // }
+//    }else{
+//        true
+//    }
+//}
+
 
 inline fun <reified T: ViewModel> Fragment.getViewModel(crossinline factory: () -> T): T = T::class.java.let { clazz ->
     ViewModelProvider(this, object: ViewModelProvider.Factory {

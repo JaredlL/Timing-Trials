@@ -3,6 +3,8 @@ package com.jaredlinden.timingtrials.timing
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,8 +15,10 @@ import androidx.lifecycle.Transformations
 import androidx.navigation.NavDeepLinkBuilder
 import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.data.TimeTrial
 import com.jaredlinden.timingtrials.data.TimeTrialHeader
 import com.jaredlinden.timingtrials.data.TimeTrialStatus
+import com.jaredlinden.timingtrials.setup.SetupViewPagerFragmentArgs
 import com.jaredlinden.timingtrials.timetrialresults.ResultFragmentArgs
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.getViewModel
@@ -49,6 +53,8 @@ class TimingActivity : AppCompatActivity() {
         }
     }
 
+
+
     val serviceCreated: MutableLiveData<Boolean> = MutableLiveData(false)
 
     override fun onDestroy() {
@@ -56,17 +62,18 @@ class TimingActivity : AppCompatActivity() {
         System.out.println("JAREDMSG -> Timing Activity -> DESTROY")
     }
 
+    val timeMed = MediatorLiveData<Long>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_timing)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(timingToolBar)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        //supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         viewModel = getViewModel { injector.timingViewModel() }
 
-        supportActionBar?.title = "Timetrial in progress"
+        supportActionBar?.title = getString(R.string.time_trial_in_progress)
 
 
         mBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)
@@ -99,9 +106,28 @@ class TimingActivity : AppCompatActivity() {
             Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
 
-        val initMediator = MediatorLiveData<Long>().apply {
+        viewModel.ttDeleted.observe(this, EventObserver{
+            if(it){
+                if(mBound){
+                    applicationContext.unbindService(connection)
+                    mService.value?.stop()
+                    mBound = false
+
+                }
+                val pendingIntent = NavDeepLinkBuilder(this)
+                        .setGraph(R.navigation.nav_graph)
+                        .setDestination(R.id.dataBaseViewPagerFragment)
+                        .setComponentName(MainActivity::class.java)
+                        .createPendingIntent()
+                pendingIntent.send()
+                finish()
+            }
+        })
+
+
+        timeMed.apply {
             addSource(mService){service->
-                   viewModel.timeTrial.value?.timeTrialHeader?.let{tt->
+                   viewModel.timeTrial.value?.let{tt->
                        service?.let {
                            viewModelChange(tt, it)
                        }
@@ -110,7 +136,7 @@ class TimingActivity : AppCompatActivity() {
             addSource(viewModel.timeTrial){res->
                 res?.let { tt->
                     mService.value?.let {
-                        viewModelChange(tt.timeTrialHeader, it)
+                        viewModelChange(tt, it)
                     }
                 }
             }
@@ -122,7 +148,8 @@ class TimingActivity : AppCompatActivity() {
         })
     }
 
-    fun viewModelChange(timeTrialHeader: TimeTrialHeader, service: TimingService){
+    fun viewModelChange(timeTrial: TimeTrial, service: TimingService){
+        val timeTrialHeader = timeTrial.timeTrialHeader
         when(timeTrialHeader.status){
             TimeTrialStatus.SETTING_UP -> {
                 if(mBound){
@@ -131,10 +158,18 @@ class TimingActivity : AppCompatActivity() {
                     service.stop()
                     mBound = false
                 }
+                val args = SetupViewPagerFragmentArgs(timeTrialHeader.id?:0)
+                val pendingIntent = NavDeepLinkBuilder(this)
+                        .setGraph(R.navigation.nav_graph)
+                        .setArguments(args.toBundle())
+                        .setDestination(R.id.setupViewPagerFragment)
+                        .setComponentName(MainActivity::class.java)
+                        .createPendingIntent()
+                pendingIntent.send()
                 finish()
             }
             TimeTrialStatus.IN_PROGRESS -> {
-                service.startTiming(timeTrialHeader)
+                service.startTiming(timeTrial)
             }
             TimeTrialStatus.FINISHED -> {
                 if(mBound){
@@ -187,9 +222,9 @@ class TimingActivity : AppCompatActivity() {
 
     fun showExitDialogWithSetup(){
         AlertDialog.Builder(this)
-                .setTitle("End Timing")
-                .setMessage("Are you sure you want to end TT?")
-                .setNeutralButton("End and discard TT") { _, _ ->
+                .setTitle(getString(R.string.end_timing))
+                .setMessage(getString(R.string.are_you_sure_you_want_to_end_tt))
+                .setNeutralButton(getString(R.string.end_and_discard_tt)) { _, _ ->
                     if(mBound){
                         applicationContext.unbindService(connection)
                         mService.value?.stop()
@@ -197,9 +232,8 @@ class TimingActivity : AppCompatActivity() {
 
                     }
                     viewModel.discardTt()
-                    finish()
                 }
-                .setPositiveButton("End Timing and return to Setup"){_,_->
+                .setPositiveButton(getString(R.string.end_timing_and_return_to_setup)){ _, _->
 
                     viewModel.timeTrial.value?.let{
                         if(it.timeTrialHeader.startTime.toInstant() > Instant.now()){
@@ -210,20 +244,19 @@ class TimingActivity : AppCompatActivity() {
 
                             }
                             viewModel.backToSetup()
-                            val mIntent = Intent(this@TimingActivity, MainActivity::class.java)
-                            startActivity(mIntent)
                         }else{
-                           Toast.makeText(this, "TT has now started, cannot go back to setup!", Toast.LENGTH_SHORT).show()
+                           Toast.makeText(this, getString(R.string.tt_has_started_cannot_go_back), Toast.LENGTH_SHORT).show()
                         }
                     }
 
-                    finish()
                 }
-                .setNegativeButton("Dismiss"){_,_->
+                .setNegativeButton(getString(R.string.dismiss)){ _, _->
 
                 }
                 .create().show()
     }
+
+
 
     fun showExitDialog(){
         AlertDialog.Builder(this)
@@ -237,12 +270,21 @@ class TimingActivity : AppCompatActivity() {
 
                     }
                     viewModel.discardTt()
-                    finish()
                 }
                 .setNegativeButton("Dismiss"){_,_->
 
                 }
                 .create().show()
     }
+
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.menu_timing, menu)
+//        return true
+//    }
+//
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        Toast.makeText(this, "ToDo...", Toast.LENGTH_SHORT).show()
+//        return true
+//    }
 
 }

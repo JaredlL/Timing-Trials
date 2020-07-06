@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
+import android.widget.ArrayAdapter
 import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
@@ -17,16 +18,21 @@ import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayoutMediator
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.data.NumbersDirection
 import com.jaredlinden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
 import com.jaredlinden.timingtrials.databinding.FragmentNumberOptionsBinding
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
-import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_number_options.*
 
+
+const val SORT_RECENT_ACTIVITY = 0
+const val SORT_ALPHABETICAL = 1
+const val SORT_KEY = "sorting"
 
 class SetupViewPagerFragment: Fragment() {
 
@@ -35,28 +41,36 @@ class SetupViewPagerFragment: Fragment() {
 
     private val args: SetupViewPagerFragmentArgs by navArgs()
 
-    val SORT_RECENT_ACTIVITY = 0
-    val SORT_ALPHABETICAL = 1
-    val SORT_KEY = "sorting"
+
 
     var setupMenu: Menu? = null
 
     lateinit var prefListner : SharedPreferences.OnSharedPreferenceChangeListener
+    lateinit var viewPager : ViewPager2
+
+//    override fun onResume() {
+//        super.onResume()
+//        viewPager.adapter = SetupPagerAdapter(this)
+//    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
+        val setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
         val binding = FragmentDatabaseViewPagerBinding.inflate(inflater, container, false)
         val tabLayout = binding.tabs
-        val viewPager = binding.viewPager2
-        viewPager.adapter = SetupPagerAdapter(this)
+        viewPager = binding.viewPager2
+        val pagerAdapter = SetupPagerAdapter(this){
+            setFabStatus(setupViewModel.currentPage)
+        }
+        viewPager.adapter = pagerAdapter
 
-        val setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
 
         setupViewModel.changeTimeTrial(args.timeTrialId)
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
                 setFabStatus(position)
+                setupViewModel.currentPage = position
             }
         })
 
@@ -87,6 +101,9 @@ class SetupViewPagerFragment: Fragment() {
 
 
 
+        viewPager.setCurrentItem(setupViewModel.currentPage, false)
+        setFabStatus(setupViewModel.currentPage)
+
 
         return binding.root
     }
@@ -105,7 +122,7 @@ class SetupViewPagerFragment: Fragment() {
                 setHasOptionsMenu(true)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = true
-                    it.findItem(R.id.settings_menu_ordering)?.isVisible = true
+                    it.findItem(R.id.settings_menu_sort)?.isVisible = true
                 }
             }
             ORDER_RIDER_INDEX ->  {
@@ -113,7 +130,7 @@ class SetupViewPagerFragment: Fragment() {
                 setHasOptionsMenu(true)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = false
-                    it.findItem(R.id.settings_menu_ordering)?.isVisible = true
+                    it.findItem(R.id.settings_menu_sort)?.isVisible = false
                 }
 
             }
@@ -121,7 +138,7 @@ class SetupViewPagerFragment: Fragment() {
                 act.setVisibility(View.GONE)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = false
-                    it.findItem(R.id.settings_menu_ordering)?.isVisible = false
+                    it.findItem(R.id.settings_menu_sort)?.isVisible = false
                 }
                 //setHasOptionsMenu(false)
 
@@ -129,12 +146,16 @@ class SetupViewPagerFragment: Fragment() {
         }
     }
 
+
+    var searchView: SearchView? = null
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         setupMenu = menu
         inflater.inflate(R.menu.menu_setup, menu)
         menu.findItem(R.id.settings_app_bar_search).isVisible = true
         val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
         (menu.findItem(R.id.settings_app_bar_search).actionView as SearchView).apply {
+            searchView = this
             // Assumes current activity is the searchable activity
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
             isIconified=false // Do not iconify the widget; expand it by default
@@ -157,7 +178,7 @@ class SetupViewPagerFragment: Fragment() {
             })
         }
 
-        menu.findItem(R.id.settings_menu_ordering).setOnMenuItemClickListener {
+        menu.findItem(R.id.settings_menu_sort).setOnMenuItemClickListener {
             val current = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_RECENT_ACTIVITY)
             AlertDialog.Builder(requireContext())
                     .setTitle(resources.getString(R.string.choose_sort))
@@ -180,6 +201,8 @@ class SetupViewPagerFragment: Fragment() {
 
 
     }
+
+
 
 
     private fun getTabIcon(position: Int): Int {
@@ -209,19 +232,19 @@ class SetupViewPagerFragment: Fragment() {
 }
 
 
-const val TIMETRIAL_PAGE_INDEX = 0
-const val RIDER_PAGE_INDEX = 1
-const val ORDER_RIDER_INDEX = 2
+const val TIMETRIAL_PAGE_INDEX = 2
+const val RIDER_PAGE_INDEX = 0
+const val ORDER_RIDER_INDEX = 1
 
 
-class SetupPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class SetupPagerAdapter(fragment: Fragment, val fragCreated: () -> Unit) : FragmentStateAdapter(fragment) {
 
     /**
      * Mapping of the ViewPager page indexes to their respective Fragments
      */
     private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
             TIMETRIAL_PAGE_INDEX to {SetupTimeTrialFragment.newInstance()},
-            RIDER_PAGE_INDEX to { SelectRidersFragment.newInstance()},
+            RIDER_PAGE_INDEX to { SelectRidersFragment.newInstance(SelectRidersFragmentArgs(SelectRidersFragment.SELECT_RIDER_FRAGMENT_MULTI))},
             ORDER_RIDER_INDEX to { OrderRidersFragment.newInstance() }
 
     )
@@ -229,56 +252,9 @@ class SetupPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount() = tabFragmentsCreators.size
 
     override fun createFragment(position: Int): Fragment {
-        return tabFragmentsCreators[position]?.invoke() ?: throw IndexOutOfBoundsException()
+        val f = tabFragmentsCreators[position]?.invoke() ?: throw IndexOutOfBoundsException()
+        fragCreated()
+        return f
     }
 }
 
-class NumberOptionsDialog: DialogFragment(){
-
-
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val mViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.orderRidersViewModel
-
-        setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Theme_AppCompat_Dialog_Alert);
-
-        val binding = DataBindingUtil.inflate<FragmentNumberOptionsBinding>(inflater, R.layout.fragment_number_options, container, false).apply {
-            viewModel = mViewModel
-            radioGroup.setOnCheckedChangeListener { group, checkedId ->
-                when(checkedId){
-                    ascendingRadioButton.id -> mViewModel.numberDirection.value = NumbersDirection.ASCEND
-                    else -> mViewModel.numberDirection.value = NumbersDirection.DESCEND
-                }
-            }
-            button.setOnClickListener {
-                this@NumberOptionsDialog.dismiss()
-            }
-        }
-
-        mViewModel.numberRulesMediator.observe(viewLifecycleOwner, Observer {
-            val n = it
-        })
-        mViewModel.numberDirection.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                when(it){
-                    NumbersDirection.ASCEND -> {
-                        binding.radioGroup.check(ascendingRadioButton.id)
-                    }
-                    else ->{
-                        binding.radioGroup.check(descendingRadioButton.id)
-
-                    }
-
-                }
-
-
-            }
-        })
-
-        return binding.root
-    }
-
-
-
-
-}

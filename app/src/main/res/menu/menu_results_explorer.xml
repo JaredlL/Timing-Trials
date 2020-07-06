@@ -9,9 +9,14 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/resultExplorerExport"
-        android:icon="@drawable/ic_file_upload_black_24dp"
-        android:title="@string/export_csv"
-        app:showAsAction="ifRoom" />
+    android:id="@+id/resultExplorerExport"
+    android:icon="@drawable/ic_file_upload_black_24dp"
+    android:title="@string/export_csv"
+    app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/resultExplorerTips"
+        android:title="@string/tips"
+        app:showAsAction="never" />
 
 </menu>

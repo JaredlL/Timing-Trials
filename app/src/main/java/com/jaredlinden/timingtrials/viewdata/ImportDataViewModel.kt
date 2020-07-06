@@ -24,6 +24,8 @@ import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import java.io.*
+import java.net.URL
+import java.net.URLConnection
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
@@ -55,6 +57,20 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
         }
     }
+    fun readInput(inputStream: InputStream){
+        readInput(null, inputStream)
+    }
+
+    fun readUrlInput(url:URL){
+        viewModelScope.launch(Dispatchers.IO) {
+            val connection: URLConnection = url.openConnection()
+            connection.connect()
+            val input: InputStream = BufferedInputStream(url.openStream(), 8192)
+            readInput(input)
+        }
+
+    }
+
 
     fun readInput(title: String?, inputStream: InputStream){
         viewModelScope.launch(Dispatchers.IO) {
@@ -276,12 +292,12 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                         NumbersDirection.ASCEND
                     }
                 }
-                numberRules = NumberRules(firstBib, true, direction, listOf())
+                numberRules = NumberRules().copy( indexRules =  IndexNumberRules(firstBib,  direction, listOf()))
             }
 
             val headerToInsert = header.copy(
                     ttName = headerName,
-                    notes = header.notes,
+                    description = header.description,
                     courseId = courseInDb?.id,
                     status = status,
                     interval = interval,

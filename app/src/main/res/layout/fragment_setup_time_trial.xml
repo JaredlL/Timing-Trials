@@ -71,16 +71,15 @@
 
             <Button
                 android:id="@+id/coursebutton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_marginEnd="8dp"
                 android:padding="4dp"
                 android:text="@{viewModel.courseName}"
                 android:textAlignment="center"
                 android:textSize="18sp"
-                android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/divider2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -166,19 +165,21 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
-            <Spinner
+            <EditText
                 android:id="@+id/spinner2"
-                android:layout_width="0dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="20dp"
+                android:textAlignment="center"
                 android:layout_marginBottom="20dp"
-                android:entries="@{viewModel.availableLaps}"
-                android:selectedItemPosition="@={viewModel.selectedLapsPosition}"
+                android:inputType="number"
+                android:text="@={viewModel.laps}"
                 app:layout_constraintBottom_toTopOf="@+id/divider3"
                 app:layout_constraintEnd_toEndOf="@+id/autocomplete"
                 app:layout_constraintStart_toStartOf="@+id/guideline2"
-                app:layout_constraintTop_toBottomOf="@+id/divider2" />
+                app:layout_constraintTop_toBottomOf="@+id/divider2"
+                tools:text="1" />
 
             <TextView
                 android:id="@+id/textView10"
@@ -218,31 +219,31 @@
 
             <Button
                 android:id="@+id/startTimeButton2"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                style="@style/Widget.AppCompat.Button.Colored"
                 android:ems="10"
                 android:text="@{viewModel.startTimeString}"
                 android:textSize="18sp"
-                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/guideline2"
                 app:layout_constraintTop_toBottomOf="@+id/divider5"
                 tools:text="19:00" />
 
-            <Button
+            <android.widget.Button
                 android:id="@+id/startTtButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="32dp"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/button_selector"
+                android:background="@drawable/background_rider_status_active"
                 android:padding="8dp"
                 android:text="@string/begin_tt"
+                android:textColor="?attr/colorOnSecondary"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.491"
@@ -267,11 +268,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:text="@={viewModel.firstRiderOffset}"
                 android:ems="10"
                 android:inputType="number"
+                android:text="@={viewModel.firstRiderOffset}"
+                android:textAlignment="center"
                 app:layout_constraintStart_toStartOf="@+id/guideline2"
-                app:layout_constraintTop_toBottomOf="@+id/divider8" />
+                app:layout_constraintTop_toBottomOf="@+id/divider8"
+                tools:text="60" />
 
             <TextView
                 android:id="@+id/textView26"

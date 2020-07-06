@@ -5,9 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View"/>
+        <import type="com.jaredlinden.timingtrials.data.NumbersDirection"/>
         <variable
             name="viewModel"
-            type="com.jaredlinden.timingtrials.setup.IOrderRidersViewModel"/>
+            type="com.jaredlinden.timingtrials.setup.NumberOptionsViewModel"/>
 
     </data>
 
@@ -15,99 +17,123 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-
-        <RadioGroup
-            android:id="@+id/radioGroup"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/autoNumberOptionsLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toEndOf="@+id/editText2"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_marginTop="8dp"
+            android:visibility="@{viewModel.selectedNumberOptionType == 0 ? View.VISIBLE: View.GONE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider7">
 
-            <RadioButton
-                android:id="@+id/ascendingRadioButton"
+            <RadioGroup
+                android:id="@+id/radioGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ascending" />
+                android:layout_marginEnd="8dp"
 
-            <RadioButton
-                android:id="@+id/descendingRadioButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <RadioButton
+                    android:id="@+id/ascendingRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ascending" />
+
+                <RadioButton
+                    android:id="@+id/descendingRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/descending" />
+
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/textView21"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Descending" />
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/first_number"
+                app:layout_constraintBottom_toBottomOf="@+id/editText2"
+                app:layout_constraintEnd_toStartOf="@+id/editText2"
+                app:layout_constraintStart_toStartOf="parent" />
 
-        </RadioGroup>
+            <EditText
+                android:id="@+id/editText2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="4"
+                android:inputType="number"
+                android:text="@={viewModel.startNumber}"
+                app:layout_constraintBottom_toBottomOf="@+id/radioGroup"
+                app:layout_constraintEnd_toStartOf="@+id/radioGroup"
+                app:layout_constraintTop_toTopOf="@+id/radioGroup"
+                tools:text="1" />
 
-        <TextView
-            android:id="@+id/textView21"
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <Button
+            android:id="@+id/button"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="@string/first_number"
-            app:layout_constraintBottom_toBottomOf="@+id/editText2"
-            app:layout_constraintEnd_toStartOf="@+id/editText2" />
-
-        <EditText
-            android:id="@+id/editText2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="48dp"
-            android:ems="5"
-            android:inputType="number"
-            android:text="@={viewModel.startNumber}"
-            app:layout_constraintBottom_toBottomOf="@+id/radioGroup"
+            android:text="@string/ok"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/radioGroup"
-            tools:text="1" />
+            app:layout_constraintTop_toBottomOf="@+id/autoNumberOptionsLayout" />
 
         <View
             android:id="@+id/divider7"
-            android:layout_width="409dp"
+            android:layout_width="296dp"
             android:layout_height="1dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:background="?android:attr/listDivider"
+            android:background="?attr/colorOnPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+            app:layout_constraintTop_toBottomOf="@+id/numberOptionsSpinner" />
 
         <TextView
-            android:id="@+id/textView27"
+            android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Exclusions"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/editText4"
-            app:layout_constraintEnd_toEndOf="@+id/textView21"
-            app:layout_constraintTop_toBottomOf="@+id/divider7" />
-
-        <EditText
-            android:id="@+id/editText4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:digits="0123456789.,"
-            android:ems="6"
-            android:inputType="number"
-            android:text="@={viewModel.exclusions}"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="@+id/radioGroup"
-            app:layout_constraintStart_toEndOf="@+id/textView21"
-            app:layout_constraintTop_toBottomOf="@+id/divider7" />
+            android:text="@string/numbering_options"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/button"
-            style="@android:style/Widget.Material.Button.Borderless.Colored"
+        <Spinner
+            android:id="@+id/numberOptionsSpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:selectedItemPosition="@={viewModel.selectedNumberOptionType}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+        <TextView
+            android:id="@+id/textView17"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:text="@string/ok"
-            app:layout_constraintEnd_toEndOf="@+id/radioGroup"
-            app:layout_constraintTop_toBottomOf="@+id/editText4" />
+            android:text="@string/press_a_number_to_set_it"
+            android:visibility="@{viewModel.selectedNumberOptionType == 1 ? View.VISIBLE: View.GONE}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/autoNumberOptionsLayout" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

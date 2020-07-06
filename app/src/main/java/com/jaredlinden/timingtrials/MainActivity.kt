@@ -1,20 +1,22 @@
 package com.jaredlinden.timingtrials
 
+import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.text.method.LinkMovementMethod
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
@@ -25,26 +27,23 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.jaredlinden.timingtrials.timing.TimingActivity
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
+import com.jaredlinden.timingtrials.data.NumberMode
+import com.jaredlinden.timingtrials.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.io.IOException
+import java.net.URL
 import kotlin.math.abs
 
 
-const val REQUEST_CREATE_FILE_CSV = 1
-const val REQUEST_IMPORT_FILE = 2
-const val REQUEST_CREATE_FILE_SPREADSHEET = 3
-const val REQUEST_CREATE_FILE_JSON = 4
-const val REQUEST_EXPLORER_CREATE_FILE_CSV = 5
+
 
 interface IFabCallbacks{
+    fun currentVisibility(): Int
     fun setVisibility(visibility: Int)
     fun setAction(action: () -> Unit)
     fun setImage(resourceId: Int)
@@ -62,16 +61,62 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     lateinit var rootCoordinator: CoordinatorLayout
 
     var drawButtonPressed = 0
-    private val listner = SharedPreferences.OnSharedPreferenceChangeListener{i,j->
-        val b = i.getString("dayNight", "System Default")
-        when(b){
-            "Light" -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
-            "Dark" -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
-            "System Default" -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
-            "Follow Battery Saver Feature" -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_AUTO_BATTERY)
-            else -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
+    private val listener = SharedPreferences.OnSharedPreferenceChangeListener{ i, _->
+
+        when(i.getString("dayNight", getString(R.string.system_default))){
+            getString(R.string.light) -> setDefaultNightMode(MODE_NIGHT_NO)
+            getString(R.string.dark) -> setDefaultNightMode(MODE_NIGHT_YES)
+            getString(R.string.system_default) -> setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
+            getString(R.string.follow_battery_saver_feature) -> setDefaultNightMode(MODE_NIGHT_AUTO_BATTERY)
+            else -> setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
         }
 
+    }
+
+    fun showDemoDataDialog(){
+
+        val html = HtmlCompat.fromHtml(getString(R.string.demo_data_description_ques), HtmlCompat.FROM_HTML_MODE_LEGACY)
+
+        AlertDialog.Builder(this)
+                .setTitle(getString(R.string.demo_data))
+                .setIcon(R.mipmap.tt_logo_round)
+                .setMessage(html)
+                .setPositiveButton(R.string.yes){_,_->
+                    val url = URL("https://bb.githack.com/lindenj/timingtrialsdata/raw/master/Timing Trials Export 20-06-20.tt")
+                    val vm = getViewModel { injector.importViewModel()}
+                    vm.readUrlInput(url)
+                    vm.importMessage.observe(this, EventObserver{
+                        Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+                    })
+                }
+                .setNegativeButton(R.string.no) { _, _ ->
+
+                }.show().apply {
+                    findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
+                }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            permissionRequiredEvent.getContentIfNotHandled()?.invoke()
+        } else {
+            Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private var permissionRequiredEvent:Event<() -> Unit> = Event{}
+
+    private val writeAllResults = registerForActivityResult(ActivityResultContracts.CreateDocument()){
+        it?.let {
+            writeAllResults(it)
+        }
+    }
+
+    private val importData = registerForActivityResult(ActivityResultContracts.OpenDocument()){
+        it?.let {
+            importData(it)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,8 +146,13 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         })
 
 
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listner)
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener)
 
+        if(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(HAS_SHOWN_ONBOARDING, false)){
+//            OnboardingFragment().show(supportFragmentManager, "onboard")
+            showDemoDataDialog()
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(HAS_SHOWN_ONBOARDING, true).apply()
+        }
 
         mainFab.setOnClickListener {
             fabAction()
@@ -122,27 +172,36 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
         })
 
+        if(BuildConfig.DEBUG){
+            nav_view.menu.findItem(R.id.app_bar_test).isVisible = true
+        }
+
         nav_view.setNavigationItemSelectedListener {
             drawButtonPressed = it.itemId
             when(it.itemId){
 
-                R.id.app_bar_import -> {
-                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                    intent.type = "*/*"
-                    startActivityForResult(intent, REQUEST_IMPORT_FILE)
+                R.id.app_bar_new_timetrial -> {
 
+                    drawer_layout.closeDrawer(GravityCompat.START)
+                    true
+                }
+
+                R.id.app_bar_import -> {
+                    importData.launch(arrayOf("*/*"))
                     Toast.makeText(this, "Select CSV or .tt File", Toast.LENGTH_LONG).show()
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
                 }
                 R.id.app_bar_test-> {
-//                    val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToTitleFragment()
-//                    navController.navigate(action)
-
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
                 }
                 R.id.app_bar_settings -> {
+                    drawer_layout.closeDrawer(GravityCompat.START)
+                    true
+
+                }
+                R.id.app_bar_help -> {
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
 
@@ -156,16 +215,19 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     val date = LocalDateTime.now()
                     val fString = date.format(DateTimeFormatter.ofPattern("dd-MM-yy"))
 
-                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                        addCategory(Intent.CATEGORY_OPENABLE)
-                        putExtra(Intent.EXTRA_TITLE, "Timing Trials Export $fString.tt")
-                        //MIME types
-                        type = "text/*"
-                        // Optionally, specify a URI for the directory that should be opened in
-                        // the system file picker before your app creates the document.
-                        //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
-                    }
-                    startActivityForResult(intent, REQUEST_CREATE_FILE_JSON)
+                    permissionRequiredEvent = Event{ writeAllResults.launch("Timing Trials Export $fString.tt") }
+                    requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+//                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+//                        addCategory(Intent.CATEGORY_OPENABLE)
+//                        putExtra(Intent.EXTRA_TITLE, "Timing Trials Export $fString.tt")
+//                        //MIME types
+//                        type = "text/*"
+//                        // Optionally, specify a URI for the directory that should be opened in
+//                        // the system file picker before your app creates the document.
+//                        //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
+//                    }
+//                    startActivityForResult(intent, REQUEST_MAIN_CREATE_FILE_JSON)
                     true
                 }
                 else->{
@@ -205,6 +267,31 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
 
                     }
+
+                    R.id.app_bar_help ->{
+                        if(navController.currentDestination?.id == R.id.dataBaseViewPagerFragment){
+                            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToHelpPrefsFragment()
+                            navController.navigate(action)
+                        }else{
+                            navController.navigate(R.id.helpPrefsFragment)
+                        }
+                    }
+
+                    R.id.app_bar_new_timetrial -> {
+                        val viewModel = getViewModel { injector.listViewModel() }
+                        viewModel.timeTrialInsertedEvent.observe(this@MainActivity, EventObserver {
+                            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
+                            //navController.navigate(action)
+                            navController.navigate(R.id.selectCourseFragment, action.arguments)
+                        })
+                        val mode = PreferenceManager.getDefaultSharedPreferences(applicationContext).getString(PREF_NUMBERING_MODE, NumberMode.INDEX.name)?.let {
+                            NumberMode.valueOf(it)
+                        } ?:NumberMode.INDEX
+
+                        viewModel.insertNewTimeTrial(mode)
+                    }
+
+
                     R.id.app_bar_spreadsheet->{
                         val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(0,"")
                         navController.navigate(action)
@@ -242,8 +329,12 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             }
         }
 
-       intent?.data?.let {
-            importData(it)
+        intent?.let { intent->
+            val data = intent.data
+            if(!intent.getBooleanExtra(FROM_TIMING_TRIALS, false) && data != null){
+                importData(data)
+            }
+
         }
 
     }
@@ -262,7 +353,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }
     }
 
-    fun getFileName(uri: Uri): String? {
+    private fun getFileName(uri: Uri): String? {
         var result: String? = null
         if (uri.scheme == "content") {
             val mcursor: Cursor? = contentResolver.query(uri, null, null, null, null)
@@ -284,62 +375,91 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         return result
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode){
-            REQUEST_IMPORT_FILE ->{
-                data?.data?.let {uri->
-                    importData(uri)
-                }
-            }
-            REQUEST_CREATE_FILE_JSON->{
-                data?.data?.let {uri->
-                    try {
-                        val outputStream = contentResolver.openOutputStream(uri)
-                        if(haveOrRequestFilePermission() && outputStream != null){
-                            val allTtsVm = getViewModel { injector.importViewModel()}
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        when(requestCode){
+//            REQUEST_IMPORT_FILE ->{
+//                data?.data?.let {uri->
+//                    importData(uri)
+//                }
+//            }
+//            REQUEST_MAIN_CREATE_FILE_JSON->{
+//                data?.data?.let {uri->
+//                    try {
+//                        val outputStream = contentResolver.openOutputStream(uri)
+//                        if(haveOrRequestFilePermission() && outputStream != null){
+//                            val allTtsVm = getViewModel { injector.importViewModel()}
+//
+//                            allTtsVm.writeAllTimeTrialsToPath(outputStream)
+//                            allTtsVm.importMessage.observe(this, EventObserver{
+//                                Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
+//                                val intent = Intent()
+//                                intent.action = Intent.ACTION_VIEW
+//                                intent.setDataAndType(uri, "text/*")
+//                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//                                startActivity(intent)
+//                            })
+//
+//                        }
+//                    }
+//                    catch(e: IOException)
+//                    {
+//                        e.printStackTrace()
+//                        Toast.makeText(this, "Save failed - ${e.message}", Toast.LENGTH_LONG).show()
+//                    }
+//                }
+//
+//            }
+//        }
+//    }
 
-                            allTtsVm.writeAllTimeTrialsToPath(outputStream)
-                            allTtsVm.importMessage.observe(this, EventObserver{
-                                Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
-                                val intent = Intent()
-                                intent.action = Intent.ACTION_VIEW
-                                intent.setDataAndType(uri, "text/*")
-                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                startActivity(intent)
-                            })
+    fun writeAllResults(uri: Uri){
+        try {
+            val outputStream = contentResolver.openOutputStream(uri)
+            if(outputStream != null){
+                val allTtsVm = getViewModel { injector.importViewModel()}
 
-                        }
-                    }
-                    catch(e: IOException)
-                    {
-                        e.printStackTrace()
-                        Toast.makeText(this, "Save failed - ${e.message}", Toast.LENGTH_LONG).show()
-                    }
-                }
+                allTtsVm.writeAllTimeTrialsToPath(outputStream)
+                allTtsVm.importMessage.observe(this, EventObserver{
+                    Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
+                    val intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    intent.setDataAndType(uri, "text/*")
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    intent.putExtra(FROM_TIMING_TRIALS, true)
+                    startActivity(intent)
+                })
 
             }
         }
-    }
-
-    fun haveOrRequestFilePermission(): Boolean{
-        return if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-//            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-//                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
-//            }else{
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
-            false
-            // }
-        }else{
-            true
+        catch(e: IOException)
+        {
+            e.printStackTrace()
+            Toast.makeText(this, "Save failed - ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
+
+//    private fun haveOrRequestFilePermission(): Boolean{
+//        return if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+////            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+////                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
+////            }else{
+//            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
+//            false
+//            // }
+//        }else{
+//            true
+//        }
+//    }
 
     private var toolbarCollapsed = false
     private var fabShouldShow = true
     override fun setVisibility(visibility: Int) {
         fabShouldShow = visibility == View.VISIBLE
-        refreshFab()
+    }
+
+    override fun currentVisibility(): Int {
+        return  mainFab?.visibility?:View.GONE
     }
 
     private fun refreshFab(){
@@ -358,6 +478,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     override fun setImage(resourceId: Int) {
         mainFab.setImageResource(resourceId)
     }
+
 
 
 }

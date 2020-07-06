@@ -1,5 +1,6 @@
 package com.jaredlinden.timingtrials.viewdata.listfragment
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -80,7 +81,11 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, L
 
 class RiderViewHolderFactory: GenericViewHolderFactory<Rider>() {
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
-        val b = DataBindingUtil.inflate<ListItemRiderBinding>(layoutInflator, R.layout.list_item_rider, parent, false)
+        val b = DataBindingUtil.inflate<ListItemRiderBinding>(layoutInflator, R.layout.list_item_rider, parent, false).apply {
+            genericTextView1.typeface = Typeface.DEFAULT_BOLD
+            genericTextView2.typeface = Typeface.DEFAULT_BOLD
+            genericTextView3.typeface = Typeface.DEFAULT_BOLD
+        }
         return b.root
     }
 

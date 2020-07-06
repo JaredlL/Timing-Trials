@@ -6,6 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="courseVm"
             type="com.jaredlinden.timingtrials.ui.SelectableCourseViewModel"/>
@@ -15,7 +16,7 @@
 
 
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/courseLayout"
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -31,7 +32,10 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@{courseVm.nameString ?? @string/course_name}"
+            android:text="@{courseVm.nameString ?? @string/name}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Course Name" />
 
         <TextView
@@ -42,6 +46,11 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:text="@{courseVm.distString ?? @string/distance}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox"
+            app:layout_constraintHorizontal_bias="0.6"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Length" />
 
         <TextView
@@ -49,24 +58,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
-            android:layout_toStartOf="@id/checkBox"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@id/checkBox"
             android:text="@{courseVm.cttNameString ?? @string/cttname}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="CTT Name" />
 
-        <CheckBox
+        <RadioButton
             android:id="@+id/checkBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
 
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </layout>

@@ -15,7 +15,8 @@ data class TimeTrialRider(val riderId: Long,
                           val startTimeOffset: Int = 0,
                           val finishCode: Long? = null,
                           val splits: List<Long> = listOf(),
-                          val partOfTeam: Boolean = false,
+                          val assignedNumber: Int? = null,
+                          val nextInTeam: Long = 0L,
                           val category: String = "",
                           val gender: Gender = Gender.UNKNOWN,
                           val club: String = "",
@@ -38,6 +39,18 @@ data class TimeTrialRider(val riderId: Long,
             null
         }
     }
+
+    companion object {
+        fun fromRiderAndTimeTrial(rider:Rider, ttId: Long): TimeTrialRider{
+            if(rider.id !=null){
+                return TimeTrialRider(rider.id, ttId, null, 1, gender = rider.gender, category = rider.category, club = rider.club)
+            }else{
+                throw Exception("Can't create result, rider id is null")
+            }
+
+        }
+    }
+
 
 }
 
@@ -88,6 +101,16 @@ data class TimeTrialRiderResult(
 
     override val timeTrial: TimeTrialHeader?
         get() = timeTrialHeader
+
+    fun changeRider(newRider: Rider): TimeTrialRiderResult{
+        if(newRider.id != null){
+            return this.copy(riderData = newRider,
+                    timeTrialData = this.timeTrialData.copy(riderId = newRider.id, gender = newRider.gender, category = newRider.category))
+        }else{
+            throw Exception("Rider id is null")
+        }
+
+    }
 
 }
 

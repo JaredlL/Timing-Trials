@@ -1,5 +1,6 @@
 package com.jaredlinden.timingtrials.viewdata.listfragment
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -90,11 +91,14 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Se
 class CourseViewHolderFactory(private val unitString: String): GenericViewHolderFactory<SelectableCourseViewModel>() {
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
         val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply {
-            val cName =layoutInflator.context.resources.getString(R.string.course_name)
+            val cName =layoutInflator.context.resources.getString(R.string.name)
             val dist = "Distance ($unitString)"
             val cttName = layoutInflator.context.resources.getString(R.string.cttname)
             courseVm = SelectableCourseViewModel(cName, dist, cttName)
             checkBox.visibility = View.GONE
+            genericTextView1.typeface = Typeface.DEFAULT_BOLD
+            genericTextView2.typeface = Typeface.DEFAULT_BOLD
+            genericTextView3.typeface = Typeface.DEFAULT_BOLD
 
         }
         return binding.root

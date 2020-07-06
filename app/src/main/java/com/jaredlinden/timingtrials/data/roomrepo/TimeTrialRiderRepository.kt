@@ -10,7 +10,7 @@ import javax.inject.Singleton
 @Singleton
 class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao: TimeTrialRiderDao){
 
-    fun update(timeTrialRider: TimeTrialRider){
+    suspend fun update(timeTrialRider: TimeTrialRider){
         timeTrialRiderDao.update(timeTrialRider)
     }
 
@@ -24,6 +24,10 @@ class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao
 
     fun delete(timeTrialRider: TimeTrialRider) {
         timeTrialRiderDao.delete(timeTrialRider)
+    }
+
+    fun getResultById(resultId: Long): LiveData<TimeTrialRiderResult?>{
+        return timeTrialRiderDao.getResultById(resultId)
     }
 
     fun getRiderResults(riderId: Long): LiveData<List<TimeTrialRiderResult>>{
@@ -46,14 +50,12 @@ class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao
         return timeTrialRiderDao.getRiderIdTimeTrialStartTime()
     }
 
-    fun getRidersForTimeTrial(ttHeader: TimeTrialHeader): LiveData<List<FilledTimeTrialRider>>{
-        val id = ttHeader.id
-        if(id != null){
-           return timeTrialRiderDao.getTimeTrialRiders(ttHeader.id)
-        }else{
-            return MutableLiveData<List<FilledTimeTrialRider>>()
-        }
+    fun getRidersForTimeTrial(ttId: Long): LiveData<List<FilledTimeTrialRider>>{
+        return timeTrialRiderDao.getTimeTrialRiders(ttId)
+    }
 
+    suspend fun getRidersForTimeTrialSuspend(ttId: Long): List<FilledTimeTrialRider>{
+        return timeTrialRiderDao.getTimeTrialRidersSuspend(ttId)
     }
 
 }

@@ -1,62 +1,53 @@
-package com.jaredlinden.timingtrials.spreadsheet
+package com.jaredlinden.timingtrials.resultexplorer
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.graphics.Paint
+import android.graphics.*
 import android.net.Uri
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.text.HtmlCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
-import com.jaredlinden.timingtrials.*
-import com.jaredlinden.timingtrials.data.Rider
+import com.jaredlinden.timingtrials.IFabCallbacks
+import com.jaredlinden.timingtrials.MainActivity
+import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.FragmentSpreadsheetBinding
 import com.jaredlinden.timingtrials.domain.csv.CsvSheetWriter
-import com.jaredlinden.timingtrials.domain.csv.CsvTimeTrialResultWriter
-import com.jaredlinden.timingtrials.resultexplorer.GlobalResultViewModelData
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getLengthConverter
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
-import com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
+import com.jaredlinden.timingtrials.spreadsheet.SheetAdapter
+import com.jaredlinden.timingtrials.spreadsheet.SheetLayoutManager
+import com.jaredlinden.timingtrials.util.*
 import kotlinx.android.synthetic.main.fragment_spreadsheet.*
 import java.io.IOException
 
 
-class SheetFragment : Fragment()  {
+class ResultExplorerFragment : Fragment()  {
 
-    //private val args: SheetFragmentArgs by navArgs()
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        //this.arguments?.clear()
-    }
+    lateinit var viewModel: ResultExplorerViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         val itemTypeId = arguments?.getString("itemTypeId")?:""
         val itemId = arguments?.getLong("itemId")?:0L
 
-        arguments?.remove("itemId")
-        arguments?.remove("itemTypeId")
+//        arguments?.remove("itemId")
+//        arguments?.remove("itemTypeId")
 
         val fabCallback = (requireActivity() as? IFabCallbacks)
         fabCallback?.setVisibility(View.GONE)
@@ -67,7 +58,7 @@ class SheetFragment : Fragment()  {
 
         val binding = DataBindingUtil.inflate<FragmentSpreadsheetBinding>(inflater, R.layout.fragment_spreadsheet, container, false)
 
-        val vm = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }
+        viewModel = requireActivity().getViewModel { injector.globalResultViewModel() }
 
 
         val displayMetrics = DisplayMetrics()
@@ -80,12 +71,12 @@ class SheetFragment : Fragment()  {
             textSize = tv.textSize
         }
 
-        vm.setColumnsContext(GlobalResultViewModelData(itemId, itemTypeId, getLengthConverter()), p)
+        viewModel.setColumnsContext(GlobalResultViewModelData(itemId, itemTypeId, getLengthConverter()), p)
 
         val adapter = SheetAdapter(requireContext(), displayMetrics, p, ::snackBarCallback)
         val recyclerView = binding.recyclerView
 
-        vm.resultSpreadSheet.observe(viewLifecycleOwner, Observer { it?.let {
+        viewModel.resultSpreadSheet.observe(viewLifecycleOwner, Observer { it?.let {
             if(it.isEmpty){
 
                 recyclerView.visibility = View.INVISIBLE
@@ -102,8 +93,8 @@ class SheetFragment : Fragment()  {
         }
         })
 
-        vm.navigateToTTId.observe(viewLifecycleOwner, EventObserver {
-            val action = SheetFragmentDirections.actionSheetFragmentToResultFragment(it)
+        viewModel.navigateToTTId.observe(viewLifecycleOwner, EventObserver {
+            val action = ResultExplorerFragmentDirections.actionSheetFragmentToResultFragment(it)
             findNavController().navigate(action)
         })
 
@@ -132,21 +123,21 @@ class SheetFragment : Fragment()  {
 
         })
 
-
+       if(!PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(HAS_SHOWN_RESULT_EXPLORER_TIPS, false)){
+           showTipsDialog()
+           PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putBoolean(HAS_SHOWN_RESULT_EXPLORER_TIPS, true).apply()
+       }
 
         return binding.root
     }
 
-    var hasShownSnackBar = false
     fun snackBarCallback(){
-        if(!hasShownSnackBar){
+        if(!viewModel.hasShownSnackBar){
             view?.let {
                 Snackbar.make(it, R.string.click_again_to_clear, Snackbar.LENGTH_SHORT).show()
-                hasShownSnackBar = true
+                viewModel.hasShownSnackBar = true
             }
         }
-
-
     }
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
@@ -163,18 +154,15 @@ class SheetFragment : Fragment()  {
                 true
             }
             R.id.resultExplorerExport -> {
-                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    val count = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }.resultSpreadSheet.value?.data?.size?:0
-                    val s = if(count == 0) " " else " $count "
-                    putExtra(Intent.EXTRA_TITLE, "TimingTrials${s}Results Export.csv")
-                    //MIME types
-                    type = "text/csv"
-                    // Optionally, specify a URI for the directory that should be opened in
-                    // the system file picker before your app creates the document.
-                    //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
-                }
-                startActivityForResult(intent, REQUEST_EXPLORER_CREATE_FILE_CSV)
+                val count = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }.resultSpreadSheet.value?.data?.size?:0
+                val s = if(count == 0) " " else " $count "
+                permissionRequiredEvent = Event{ createCsvFile.launch("TimingTrials${s}Results Export.csv") }
+                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                true
+            }
+
+            R.id.resultExplorerTips ->{
+                showTipsDialog()
                 true
             }
 
@@ -182,16 +170,50 @@ class SheetFragment : Fragment()  {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode){
-            REQUEST_EXPLORER_CREATE_FILE_CSV->{
-                data?.data?.let {
-                    writeCsv(it)
+    fun showTipsDialog(){
+
+        val htmlString =
+                """    
+    &#8226; ${getString(R.string.tip_click_cell_add_filter)}<br/><br/>
+    &#8226; ${getString(R.string.tip_click_cell_remove_filter)}<br/><br/>
+    &#8226; ${getString(R.string.tip_click_cell_longpress)}<br/><br/>
+    &#8226; ${getString(R.string.tip_click_cell_sort_header)}
+    
+ """
+
+
+        val html = HtmlCompat.fromHtml(htmlString, HtmlCompat.FROM_HTML_MODE_LEGACY)
+
+        val mColor = ContextCompat.getColor(requireContext(), R.color.secondaryDarkColor)
+        val d = ContextCompat.getDrawable(requireActivity (), R.drawable.ic_baseline_help_outline_24)
+        Utils.colorDrawable(mColor, d)
+
+        AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.tips))
+
+                .setIcon(d)
+                .setMessage(html)
+                .setPositiveButton(R.string.ok){_,_->
+
                 }
-            }
+                .show()
+    }
+
+    private val createCsvFile = registerForActivityResult(ActivityResultContracts.CreateDocument()){
+        it?.let {
+            writeCsv(it)
         }
     }
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            permissionRequiredEvent.getContentIfNotHandled()?.invoke()
+        } else {
+            Toast.makeText(requireContext(), "Permission Denied. Allow permissions in android settings.", Toast.LENGTH_LONG).show()
+        }
+    }
+    private var permissionRequiredEvent:Event<() -> Unit> = Event{}
 
     private fun writeCsv(uri: Uri){
 
@@ -200,7 +222,7 @@ class SheetFragment : Fragment()  {
         vmSheet?.let{sheet->
             try {
                 val outputStream = requireActivity().contentResolver.openOutputStream(uri)
-                if(haveOrRequestFilePermission() && outputStream != null){
+                if(outputStream != null){
                     val trans = CsvSheetWriter(sheet)
                     trans.writeToPath(outputStream)
 
@@ -208,7 +230,6 @@ class SheetFragment : Fragment()  {
                     var intent = Intent()
                     intent.action = Intent.ACTION_VIEW
                     intent.setDataAndType(uri, "text/csv")
-                    //intent.data = uri
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
                     val activities: List<ResolveInfo> = requireActivity().packageManager.queryIntentActivities(
@@ -219,9 +240,10 @@ class SheetFragment : Fragment()  {
                         intent = Intent()
                         intent.action = Intent.ACTION_VIEW
                         intent.setDataAndType(uri, "text/*")
-                        //intent.data = uri
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
                     }
+                    intent.putExtra(FROM_TIMING_TRIALS, true)
 
                     startActivity(intent)
                 }
@@ -234,21 +256,8 @@ class SheetFragment : Fragment()  {
         }
     }
 
-    fun haveOrRequestFilePermission(): Boolean{
-        return if(ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-//            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-//                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
-//            }else{
-            ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
-            false
-            // }
-        }else{
-            true
-        }
-    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        //menu.clear()
         inflater.inflate(R.menu.menu_results_explorer, menu)
     }
 }

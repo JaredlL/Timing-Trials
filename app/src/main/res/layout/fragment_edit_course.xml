@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View"/>
         <variable
             name="viewModel"
             type="com.jaredlinden.timingtrials.edititem.EditCourseViewModel"/>
@@ -12,8 +13,7 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+        android:layout_height="wrap_content">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -111,16 +111,33 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
 
+            <!--Having this here gets desired FAB behaviour-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/splitsRecycler"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="parent" />
+
+            <Button
+                android:id="@+id/courseStatsButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="@{viewModel.statsString.empty ? View.GONE : View.VISIBLE}"
+                android:layout_marginEnd="8dp"
+                android:onClick="@{() -> viewModel.jumpToCourseResults()}"
+                android:text="@{viewModel.statsString}"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cttNameEdit"
+                tools:text="Rides: 20" />
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--        <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--            android:id="@+id/fab"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_gravity="bottom|end"-->
-<!--            android:layout_marginBottom="80dp"-->
-<!--            android:layout_marginEnd="@dimen/fab_margin"-->
-<!--            android:src="@drawable/ic_done_white_24dp" />-->
 
 
 

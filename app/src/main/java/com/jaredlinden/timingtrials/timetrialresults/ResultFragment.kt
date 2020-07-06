@@ -1,53 +1,55 @@
 package com.jaredlinden.timingtrials.timetrialresults
 
+import android.Manifest
 import android.annotation.TargetApi
 import android.content.ContentValues
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Rect
+import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-import android.provider.MediaStore.VOLUME_EXTERNAL
+import android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY
 import android.text.InputType
+import android.text.method.LinkMovementMethod
+import android.util.TypedValue
 import android.view.*
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.jaredlinden.timingtrials.*
+import com.jaredlinden.timingtrials.IFabCallbacks
+import com.jaredlinden.timingtrials.MainActivity
+import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.FragmentTimetrialResultBinding
 import com.jaredlinden.timingtrials.domain.JsonResultsWriter
 import com.jaredlinden.timingtrials.domain.csv.CsvTimeTrialResultWriter
-import com.jaredlinden.timingtrials.util.Utils
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.util.*
 import kotlinx.android.synthetic.main.fragment_timetrial_result.*
 import timber.log.Timber
-import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
+import java.net.URL
 import java.util.*
+
 
 class ResultFragment : Fragment() {
 
@@ -57,11 +59,25 @@ class ResultFragment : Fragment() {
     lateinit var viewManager: GridLayoutManager
     lateinit var resultGridAdapter: ResultListAdapter
 
+
+
+
+
+
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
 
         viewManager = GridLayoutManager(requireActivity(), 2)
-        resultGridAdapter = ResultListAdapter(requireActivity())
+
+
+
+        resultGridAdapter = ResultListAdapter(requireActivity()) { id->
+            id?.let {
+                val action = ResultFragmentDirections.actionResultFragmentToEditResultFragment(id, resultViewModel.timeTrial.value?.timeTrialHeader?.id?:0L)
+                findNavController().navigate(action)
+            }
+        }
         resultGridAdapter.setHasStableIds(true)
 
         setHasOptionsMenu(true)
@@ -84,11 +100,11 @@ class ResultFragment : Fragment() {
         resultViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
             res?.let {
                 binding.titleText.text = it.timeTrialHeader.ttName
-                if(res.timeTrialHeader.notes.isBlank()){
+                if(res.timeTrialHeader.description.isBlank()){
                     binding.resultNotesTextView.visibility = View.GONE
                 }else{
                     binding.resultNotesTextView.visibility = View.VISIBLE
-                    binding.resultNotesTextView.text = res.timeTrialHeader.notes
+                    binding.resultNotesTextView.text = res.timeTrialHeader.description
                 }
             }
         })
@@ -115,46 +131,100 @@ class ResultFragment : Fragment() {
         })
 
 
+        if(!PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(HAS_SHOWN_TIMETRIAL_RESULT_TIPS, false)){
+            showTipsDialog()
+            PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putBoolean(HAS_SHOWN_TIMETRIAL_RESULT_TIPS, true).apply()
+        }
 
         return binding.root
     }
+
+    fun showTipsDialog(){
+
+        val mColor = ContextCompat.getColor(requireContext(), R.color.secondaryDarkColor)
+        val d = ContextCompat.getDrawable(requireActivity(), R.drawable.ic_baseline_help_outline_24)
+        Utils.colorDrawable(mColor, d)
+
+        AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.tips))
+                .setIcon(d)
+                .setMessage(R.string.tip_longpress_row_to_edit)
+                .setPositiveButton(R.string.ok){_,_->
+
+                }
+                .show()
+    }
+
+
+    val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // Permission is granted. Continue the action or workflow in your
+            // app.
+            //Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show()
+            permissionRequiredEvent.getContentIfNotHandled()?.invoke()
+        } else {
+            // Explain to the user that the feature is unavailable because the
+            // features requires a permission that the user has denied. At the
+            // same time, respect the user's decision. Don't link to system
+            // settings in an effort to convince the user to change their
+            // decision.
+            Toast.makeText(requireContext(), "Permission Denied. Allow permissions in android settings.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    var permissionRequiredEvent:Event<() -> Unit> = Event{}
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_results, menu)
     }
 
+    val createCsvFile = registerForActivityResult(ActivityResultContracts.CreateDocument()){
+        it?.let {
+            writeCsv(it)
+        }
+    }
+
+    val createJsonFile = registerForActivityResult(ActivityResultContracts.CreateDocument()){
+        it?.let {
+            writeJson(it)
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.resultScreenshot -> {
-                view?.let {
+                permissionRequiredEvent = Event{view?.let {
                     takeScreenShot(it)
-                }
+                }?:Unit}
+                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
                 true
             }
-            R.id.resultMenuCsv ->{
-                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    putExtra(Intent.EXTRA_TITLE, "${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.csv")
-                    //MIME types
-                    type = "text/csv"
-                    // Optionally, specify a URI for the directory that should be opened in
-                    // the system file picker before your app creates the document.
-                    //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
-                }
-                startActivityForResult(intent, REQUEST_CREATE_FILE_CSV)
+
+            R.id.resultMenuClearNotes ->{
+                resultViewModel.clearNotesColumn()
                 true
             }
+
+//            R.id.resultMenuCsv ->{
+//                permissionRequiredEvent = Event{ createCsvFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.csv") }
+//                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                true
+//            }
             R.id.resultMenuEditDescription ->{
                 val alert = AlertDialog.Builder(requireContext())
                 val edittext = EditText(requireContext())
-                edittext.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-                edittext.setText(resultViewModel.timeTrial.value?.timeTrialHeader?.notes?:"")
-                alert.setTitle(R.string.edit_notes)
+
+                edittext.setText(resultViewModel.timeTrial.value?.timeTrialHeader?.description?:"")
+                alert.setTitle(R.string.edit_description)
 
                 alert.setView(edittext)
-
+                edittext.isSingleLine = false
+                edittext.imeOptions = EditorInfo.IME_FLAG_NO_ENTER_ACTION
+                edittext.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
                 alert.setPositiveButton(R.string.ok) { _, _ ->
-                    resultViewModel.updateNotes(edittext.text.toString())
+                    resultViewModel.updateDescription(edittext.text.toString())
 
                 }
 
@@ -163,19 +233,47 @@ class ResultFragment : Fragment() {
                 alert.show()
                 true
             }
-            R.id.resultMenuJson->{
-                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    putExtra(Intent.EXTRA_TITLE, "${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.tt")
-                    //MIME types
-                    type = "text/*"
-                    // Optionally, specify a URI for the directory that should be opened in
-                    // the system file picker before your app creates the document.
-                    //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
+
+            R.id.resultMenuAddRow ->{
+                resultViewModel.timeTrial.value?.timeTrialHeader?.id?.let {
+                    val action = ResultFragmentDirections.actionResultFragmentToEditResultFragment(0L, it)
+                    findNavController().navigate(action)
                 }
-                startActivityForResult(intent, REQUEST_CREATE_FILE_JSON)
                 true
             }
+
+            R.id.resultMenuExport->{
+
+                AlertDialog.Builder(requireContext())
+                        .setTitle(getString(R.string.choose_export_type))
+                        .setIcon(R.mipmap.tt_logo_round)
+                        //.setMessage(R.string.export_file_description)
+                        .setItems(R.array.exportTypes){_, i ->
+                            when(resources.getStringArray(R.array.exportTypes)[i]){
+                               getString(R.string.tt_file) ->{
+                                   permissionRequiredEvent = Event{ createJsonFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.tt") }
+                                   requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                               }
+                                getString(R.string.csv_file) ->{
+                                    permissionRequiredEvent = Event{ createCsvFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.csv") }
+                                    requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                }
+                            }
+                        }
+
+                        .setNegativeButton(R.string.cancel) { _, _ ->
+
+                        }.show()
+
+
+                true
+            }
+
+//            R.id.resultMenuJson->{
+//                permissionRequiredEvent = Event{ createJsonFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.tt") }
+//                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                true
+//            }
             R.id.resultMenuDelete->{
                 showDeleteDialog()
                 true
@@ -184,25 +282,7 @@ class ResultFragment : Fragment() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode){
-            REQUEST_CREATE_FILE_CSV->{
-                    data?.data?.let {
-                        writeCsv(it)
-                    }
-            }
-            REQUEST_CREATE_FILE_JSON->{
-                data?.data?.let {
-                    writeJson(it)
-                }
-            }
-        }
-    }
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Toast.makeText(requireActivity(), "Permission Request", Toast.LENGTH_SHORT).show()
-    }
+
 
     fun showDeleteDialog(){
         AlertDialog.Builder(requireContext())
@@ -212,7 +292,7 @@ class ResultFragment : Fragment() {
                     resultViewModel.delete()
                     findNavController().popBackStack()
                 }
-                .setNegativeButton("Dismiss"){_,_->
+                .setNegativeButton(resources.getString(R.string.dismiss)){_,_->
 
                 }
                 .create().show()
@@ -226,8 +306,8 @@ class ResultFragment : Fragment() {
         if(tt != null && results != null){
             try {
                 val outputStream = requireActivity().contentResolver.openOutputStream(uri)
-                if(haveOrRequestFilePermission() && outputStream != null){
-                    val trans = CsvTimeTrialResultWriter(tt, results)
+                if(outputStream != null){
+                    val trans = CsvTimeTrialResultWriter(tt, results, getLengthConverter())
                     trans.writeToPath(outputStream)
 
 
@@ -248,7 +328,7 @@ class ResultFragment : Fragment() {
                         //intent.data = uri
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
-
+                    intent.putExtra(FROM_TIMING_TRIALS, true)
                     startActivity(intent)
                 }
             }
@@ -267,7 +347,7 @@ class ResultFragment : Fragment() {
         if(tt != null && results != null){
             try {
                 val outputStream = requireActivity().contentResolver.openOutputStream(uri)
-                if(haveOrRequestFilePermission() && outputStream != null){
+                if(outputStream != null){
 
                     JsonResultsWriter().writeToPath(outputStream, tt)
 
@@ -275,6 +355,7 @@ class ResultFragment : Fragment() {
                     intent.action = Intent.ACTION_VIEW
                     intent.setDataAndType(uri, "text/*")
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    intent.putExtra(FROM_TIMING_TRIALS, true)
                     startActivity(intent)
                 }
             }
@@ -291,6 +372,10 @@ class ResultFragment : Fragment() {
 //        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().displayMetrics).roundToInt()
 //    }
 
+    fun dpToPixels(dip:Int): Int{
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip.toFloat(), resources.displayMetrics).toInt()
+    }
+
     fun takeScreenShot(view: View){
 
         val oldWidth = view.width
@@ -305,7 +390,9 @@ class ResultFragment : Fragment() {
 
             val ttName = resultViewModel.timeTrial.value?.timeTrialHeader?.ttName
             
-            val imgName = "${ttName?:nowChars}.jpeg"
+            val imgName = "${ttName?:nowChars}.png"
+
+
 
             val scrollViewWidth = horizontalScrollView.getChildAt(0).width
             //val scrollViewWidth = 200
@@ -315,10 +402,29 @@ class ResultFragment : Fragment() {
             val gridHeight = if(sr == 0) fragResultRecyclerView.height else sr
 
             //https://dev.to/pranavpandey/android-create-bitmap-from-a-view-3lck
-            view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(gridHeight+300, View.MeasureSpec.EXACTLY))
+            view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(gridHeight+dpToPixels(300), View.MeasureSpec.EXACTLY))
 
             view.layout(0,0, view.measuredWidth, view.measuredHeight)
+
+            val resutWaterMarkTextView = view.findViewById<TextView>(R.id.resutWaterMarkTextView)
+            //resutWaterMarkTextView.measure(View.MeasureSpec.makeMeasureSpec(, View.MeasureSpec.EXACTLY), View.MeasureSpec.EXACTLY)
+            val tv1Height = resutWaterMarkTextView.measuredHeight
+
+            val titleText = view.findViewById<TextView>(R.id.titleText)
+            //titleText.measure(View.MeasureSpec.EXACTLY, View.MeasureSpec.EXACTLY)
+            val titleTextHeight = titleText.measuredHeight
+
+            val resultNotesTextView = view.findViewById<TextView>(R.id.resultNotesTextView)
+            //resultNotesTextView.measure(View.MeasureSpec.EXACTLY, View.MeasureSpec.EXACTLY)
+            val notesHeight = resultNotesTextView.measuredHeight
+
+            val sum = tv1Height + titleTextHeight + notesHeight + dpToPixels(50)
+
+            view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(gridHeight+sum, View.MeasureSpec.EXACTLY))
+
+            view.layout(0,0, view.measuredWidth, view.measuredHeight)
+
             val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
 
             val canvas = Canvas(bitmap)
@@ -326,7 +432,11 @@ class ResultFragment : Fragment() {
            if( view.background!=null) {
                view.background.draw(canvas)
             }else{
-               canvas.drawColor(Color.WHITE)
+               val typedValue = TypedValue()
+               val theme = requireContext().theme
+               theme.resolveAttribute(R.attr.colorSurface, typedValue, true)
+               val color = typedValue.data
+               canvas.drawColor(color)
            }
             view.draw(canvas)
 
@@ -335,10 +445,12 @@ class ResultFragment : Fragment() {
 
             when(Build.VERSION.SDK_INT){
 
-                //29
-                Build.VERSION_CODES.Q -> saveScreenshotQ(bitmap, fileName)
+                //29-30
+                in(Build.VERSION_CODES.Q..Build.VERSION_CODES.R) ->
+                    saveScreenshotQ(bitmap, fileName)
                 //26-28
-                in(Build.VERSION_CODES.O..Build.VERSION_CODES.P) -> saveScreenshotO(bitmap, fileName)
+                in(Build.VERSION_CODES.O..Build.VERSION_CODES.P) ->
+                    saveScreenshotO(bitmap, fileName)
                 //21-25
                 in(Build.VERSION_CODES.LOLLIPOP..Build.VERSION_CODES.N) -> saveScreenshotN(bitmap, fileName)
 
@@ -362,128 +474,117 @@ class ResultFragment : Fragment() {
         }
     }
 
-    //API 29
-    @TargetApi(Build.VERSION_CODES.Q)
+    //API 29-30
+    @TargetApi(Build.VERSION_CODES.R)
     fun saveScreenshotQ(bitmap: Bitmap, imageName:String){
 
-        val filePath = File(MediaStore.VOLUME_EXTERNAL_PRIMARY + imageName)
-        val imageOut = FileOutputStream(filePath)
+//        val filePath = File(requireActivity().getExternalFilesDir(null), imageName)
+//        val imageOut = FileOutputStream(filePath)
 
-        bitmap.compress(Bitmap.CompressFormat.PNG, 80, imageOut)
 
-        Timber.d("Created image Filepath API 29 -> $filePath")
+
+        val cr = requireActivity().contentResolver
 
         val contentVals = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
             put(MediaStore.Images.Media.TITLE, imageName)
             put(MediaStore.Images.Media.BUCKET_DISPLAY_NAME, "Timing Trials")
-            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
             put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
-            put(MediaStore.MediaColumns.DATA, filePath.path)
+            //put(MediaStore.MediaColumns.DATA, filePath.path)
         }
 
 
-        val data = requireActivity().contentResolver.insert(MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL), contentVals)
+        val data = cr.insert(MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL_PRIMARY), contentVals)
 
-        Timber.d("Inserted image URI API 29 -> $data")
+        data?.let {
+            cr.openOutputStream(data)?.let {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
 
-        imageOut.flush()
-        imageOut.close()
+                Timber.d("Created image Filepath API 29-30 -> ${data.path}")
+
+                it.flush()
+                it.close()
+            }
+
+        }
+
+
+
+        Timber.d("Inserted image URI API 29-30 -> $data")
         openScreenshot(data)
     }
 
-    fun haveOrRequestFilePermission(): Boolean{
-       return if(ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-//            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-//                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
-//            }else{
-            ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
-             false
-            // }
-        }else{
-             true
-        }
-    }
 
     //API 21-25
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     fun saveScreenshotN(bitmap: Bitmap, imageName:String){
 
-
-        val filePath = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), imageName)
-        val imageOut = FileOutputStream(filePath)
-        bitmap.compress(Bitmap.CompressFormat.PNG, 80, imageOut)
-
-        Timber.d("Created image Filepath API 21-25 -> $filePath")
+        val cr = requireActivity().contentResolver
 
         val contentVals = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
             put(MediaStore.Images.Media.TITLE, imageName)
-            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
-            put(MediaStore.MediaColumns.DATA, filePath.path)
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
         }
 
-        val screenshotUri = requireActivity().contentResolver.insert(EXTERNAL_CONTENT_URI, contentVals)
+        val data = requireActivity().contentResolver.insert(EXTERNAL_CONTENT_URI, contentVals)
 
-        Timber.d("Inserted image URI API 21-25 -> $screenshotUri")
+        data?.let {
+            cr.openOutputStream(data)?.let {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
 
-        imageOut.flush()
-        imageOut.close()
-        openScreenshot(screenshotUri)
+                Timber.d("Created image Filepath API 21-25 -> ${data.path}")
+
+                it.flush()
+                it.close()
+            }
+
+        }
+        openScreenshot(data)
     }
 
     //API 26-28
     @TargetApi(Build.VERSION_CODES.O)
     fun saveScreenshotO(bitmap: Bitmap, imageName:String){
 
-        if(haveOrRequestFilePermission()) {
-            //val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val cr = requireActivity().contentResolver
 
-            val path = requireActivity().getExternalFilesDir(null)
-            val filePath = File(path, imageName)
-            val imageOut = FileOutputStream(filePath)
-
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, imageOut)
-
-
-            imageOut.flush()
-            imageOut.close()
-
-            Timber.d("Created image Filepath API 26-28 -> $filePath")
-
-
+        //Dont divide milis by 1000!
             val contentVals = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
                 put(MediaStore.Images.Media.TITLE, imageName)
-                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
-                put(MediaStore.MediaColumns.DATA, filePath.absolutePath)
-                put(MediaStore.Images.Media.SIZE, filePath.length())
-                //put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+                put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
+                //put(MediaStore.MediaColumns.DATA, filePath.absolutePath)
+                put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
             }
 
-            val insertedImageString = requireActivity().contentResolver.insert(EXTERNAL_CONTENT_URI, contentVals)
+        val data = cr.insert(EXTERNAL_CONTENT_URI, contentVals)
 
-           //requireActivity().contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        data?.let {
+            cr.openOutputStream(data)?.let {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
 
-            Timber.d("Inserted image URI API 26 -> $insertedImageString")
+                Timber.d("Created image Filepath API 26 -> ${data.path}")
 
-
-
-
-            openScreenshot(insertedImageString)
-
-
-
+                it.flush()
+                it.close()
+            }
+            //refreshGallery(it)
         }
 
+
+            Timber.d("Inserted image URI API 26 -> ${data?.path}")
+            openScreenshot(data)
     }
+
 
 
 
     private fun openScreenshot(imageFile: Uri?) {
         val intent = Intent()
-        intent.setDataAndType(imageFile, "image/*")
+        intent.setDataAndType(imageFile, "image/png")
         intent.action = Intent.ACTION_VIEW
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         Timber.d("Request open  ${imageFile?.path}")

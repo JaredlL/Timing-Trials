@@ -16,7 +16,7 @@ interface ITimeTrialSetupViewModel {
     val selectCourseViewModel: ISelectCourseViewModel
     val selectRidersViewModel: ISelectRidersViewModel
     val timeTrialPropertiesViewModel: ITimeTrialPropertiesViewModel
-    val setupConformationViewModel: ISetupConformationViewModel
+    val numberOptionsViewModel: NumberOptionsViewModel
 }
 
 
@@ -34,6 +34,7 @@ class SetupViewModel @Inject constructor(
         it
     }
 
+    var currentPage = 0
 
     private val currentId: MutableLiveData<Long?> = MutableLiveData()
 
@@ -50,6 +51,7 @@ class SetupViewModel @Inject constructor(
     }
 
 
+    override val numberOptionsViewModel: NumberOptionsViewModel = NumberOptionsViewModel(this)
 
     init {
         _mTimeTrial.addSource(idSwitcher) { res ->
@@ -102,7 +104,6 @@ class SetupViewModel @Inject constructor(
     override val selectCourseViewModel: ISelectCourseViewModel = ISelectCourseViewModel.SelectCourseViewModelImpl(this)
     override val selectRidersViewModel: ISelectRidersViewModel = SelectRidersViewModelImpl(this)
     override val timeTrialPropertiesViewModel: ITimeTrialPropertiesViewModel = TimeTrialPropertiesViewModelImpl(this)
-    override val setupConformationViewModel: ISetupConformationViewModel = SetupConfirmationViewModel(this)
 
 
     @ExperimentalCoroutinesApi

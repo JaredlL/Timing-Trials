@@ -117,11 +117,11 @@ class Converters {
     }
 
 
-    @TypeConverter fun intToGendar(gendarInt: Int): Gender?{
-        return Gender.fromInt(gendarInt)
+    @TypeConverter fun intToGender(genderInt: Int): Gender?{
+        return Gender.fromInt(genderInt)
     }
 
-    @TypeConverter fun gendarToInt(gender: Gender): Int{
+    @TypeConverter fun genderToInt(gender: Gender): Int{
         return gender.ordinal
     }
 

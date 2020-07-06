@@ -1,33 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#508991</color>
-    <color name="colorPrimaryDark">#172A3A</color>
-    <color name="colorAccent">#EE6055</color>
-    <color name="textColorPrimary">#508991</color>
-    <color name="textColor">#ffffff</color>
+<!--    <color name="colorPrimary">#b8e1ff</color>-->
+<!--    <color name="colorPrimaryDark">#87afcc</color>-->
+<!--    <color name="colorAccent">#EE6055</color>-->
+<!--    <color name="textColorPrimary">#508991</color>-->
+<!--    <color name="textColor">#ffffff</color>-->
     <color name="mainBackground">#242933</color>
-    <color name="buttonInactive">#4D27334D</color>
-    <color name="spreadsheetHeader">#A5A8AC</color>
+    <color name="buttonInactive">#9ba0a4</color>
+    <color name="spreadsheetHeader">#6ebfff</color>
     <color name="pressedButtonShadow">#D851552F</color>
     <color name="numberColor">#CDDC39</color>
     <color name="eventButtonColor">#8BF780</color>
     <color name="eventButtonShadow">#BF73B86B</color>
-    <color name="tt_logo_background">#8EE4AF</color>
+    <color name="tt_logo_background">#1FE08D</color>
     <color name="imageColor">#FF000000</color>
-    <color name="blueGray50">#ECEFF1</color>
-    <color name="blueGray100">#CFD8DC</color>
-    <color name="blueGray200">#B0BEC5</color>
-    <color name="blueGray300">#90A4AE</color>
-    <color name="blueGray400">#78909C</color>
-    <color name="blueGray500">#607D8B</color>
-    <color name="blueGray600">#546E7A</color>
-    <color name="blueGray700">#455A64</color>
-    <color name="blueGray800">#37474F</color>
-    <color name="blueGray900">#263238</color>
 
-    <color name="primaryColor">#546e7a</color>
-    <color name="primaryLightColor">#819ca9</color>
-    <color name="primaryDarkColor">#29434e</color>
-    <color name="primaryTextColor">#ffffff</color>
+
+    <color name="primaryCompliment">#dc782b</color>
+    <color name="primaryColor">#2B8FDC</color>
+    <color name="primaryLightColor">#6ebfff</color>
+    <color name="primaryDarkColor">#2B2D42</color>
+    <color name="secondaryColor">#1FE08D</color>
+    <color name="secondaryDarkColor">#00A65F</color>
+    <color name="secondaryLightColor">#74EDB9</color>
+    <color name="primaryTextColor">#000000</color>
+    <color name="secondaryTextColor">#000000</color>
 
 </resources>

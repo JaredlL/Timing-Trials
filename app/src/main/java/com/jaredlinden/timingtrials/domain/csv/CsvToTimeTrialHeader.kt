@@ -85,7 +85,7 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
             val offsetDateTime = date?.let { OffsetDateTime.of(it, LocalTime.of(19,0,0), ZoneId.systemDefault().rules.getOffset(Instant.now()))}
             val laps = lapsIndex?.let { dataList.getOrNull(it)?.toIntOrNull() }?:1
 
-            return TimeTrialHeader(ttName, null, laps,60, offsetDateTime?: OffsetDateTime.MIN, status = status?:TimeTrialStatus.FINISHED, notes = notes)
+            return TimeTrialHeader(ttName, null, laps,60, offsetDateTime?: OffsetDateTime.MIN, status = status?:TimeTrialStatus.FINISHED, description = notes)
 
         }catch (e:Exception){
             throw Exception("Error reading timetrial data", e)

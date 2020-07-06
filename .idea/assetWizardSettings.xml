@@ -165,7 +165,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialicons/speed/baseline_speed_24.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialicons/music_note/baseline_music_note_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -176,7 +176,7 @@
                         <option name="values">
                           <map>
                             <entry key="opacityPercent" value="80" />
-                            <entry key="outputName" value="ic_baseline_speed_24" />
+                            <entry key="outputName" value="ic_baseline_music_note_24" />
                             <entry key="sourceFile" value="C:\Users\LindenJ" />
                           </map>
                         </option>

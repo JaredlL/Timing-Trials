@@ -12,13 +12,13 @@ android {
     }
 
 
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.jaredlinden.timingtrials"
         minSdkVersion 21
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 30
+        versionCode 3
+        versionName "1.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -39,9 +39,19 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    android {
+        lintOptions {
+            //checkReleaseBuilds false
+            // Or, if you prefer, you can continue to check for errors in release builds,
+            // but continue the build even when errors are found:
+            abortOnError false
+        }
+    }
 }
 
 dependencies {
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     //Test
 
@@ -59,6 +69,7 @@ dependencies {
     implementation "androidx.preference:preference-ktx:$rootProject.preferenceVersion"
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation "androidx.recyclerview:recyclerview:$rootProject.recyclerViewVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$rootProject.kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.coroutinesVersion"

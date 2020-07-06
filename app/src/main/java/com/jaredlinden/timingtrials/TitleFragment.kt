@@ -1,16 +1,21 @@
 package com.jaredlinden.timingtrials
 
+import android.Manifest
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -29,12 +34,29 @@ import java.io.File
 import java.io.FileOutputStream
 
 
+
 class TitleFragment : Fragment()
 {
 
     private lateinit var titleViewModel: TitleViewModel
 
     private lateinit var testViewModel: TestViewModel
+
+    val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // Permission is granted. Continue the action or workflow in your
+            // app.
+            Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show()
+        } else {
+            // Explain to the user that the feature is unavailable because the
+            // features requires a permission that the user has denied. At the
+            // same time, respect the user's decision. Don't link to system
+            // settings in an effort to convince the user to change their
+            // decision.
+            Toast.makeText(requireContext(), "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
@@ -80,7 +102,15 @@ class TitleFragment : Fragment()
                 findNavController().popBackStack()
             }
 
+            testPermissionButton.setOnClickListener {
+                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
 
+            testPermissionButton2.setOnClickListener {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    requireActivity().requestPermissions(listOf(Manifest.permission.WRITE_EXTERNAL_STORAGE).toTypedArray(), 1)
+                }
+            }
 
 
             testTimingButton.setOnClickListener {

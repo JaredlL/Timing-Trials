@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -20,7 +22,7 @@
         <activity
             android:name="com.jaredlinden.timingtrials.timing.TimingActivity"
             android:label="@string/title_activity_timing"
-
+            android:theme="@style/AppTheme"
             android:launchMode="singleTop"
             android:parentActivityName="com.jaredlinden.timingtrials.MainActivity">
             <meta-data
@@ -115,9 +117,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/*" />
                 <data android:mimeType="application/json" />
-                <data android:mimeType="application/*xml*" />
-                <data android:mimeType="application/*latex*" />
-                <data android:mimeType="application/javascript" />
             </intent-filter>
         </activity>
 

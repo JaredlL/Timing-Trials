@@ -1,6 +1,8 @@
 package com.jaredlinden.timingtrials.viewdata
 
 import androidx.lifecycle.*
+import com.jaredlinden.timingtrials.data.NumberMode
+import com.jaredlinden.timingtrials.data.NumberRules
 import com.jaredlinden.timingtrials.data.TimeTrialHeader
 import com.jaredlinden.timingtrials.data.roomrepo.ICourseRepository
 import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
@@ -82,8 +84,8 @@ class ListViewModel @Inject constructor(private val courseRepository: ICourseRep
     val timeTrialInsertedEvent: LiveData<Event<Long>> = _mTimeTrialInsertedEvent
 
 
-    fun insertNewTimeTrial(){
-        val newHeader = TimeTrialHeader.createBlank()
+    fun insertNewTimeTrial(numberMode: NumberMode){
+        val newHeader = TimeTrialHeader.createBlank().copy(numberRules = NumberRules(mode = numberMode))
         viewModelScope.launch(Dispatchers.IO) {
             val newId = timeTrialRepository.insertNewHeader(newHeader)
             _mTimeTrialInsertedEvent.postValue(Event(newId))

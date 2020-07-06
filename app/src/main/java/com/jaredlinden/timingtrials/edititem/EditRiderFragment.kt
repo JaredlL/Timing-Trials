@@ -9,13 +9,18 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.jaredlinden.timingtrials.IFabCallbacks
 
 import com.jaredlinden.timingtrials.R
-import com.jaredlinden.timingtrials.databinding.FragmentRiderBinding
+import com.jaredlinden.timingtrials.TitleFragmentDirections
+import com.jaredlinden.timingtrials.data.Rider
+import com.jaredlinden.timingtrials.databinding.FragmentEditRiderBinding
+import com.jaredlinden.timingtrials.util.Event
+import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 
@@ -37,6 +42,7 @@ class EditRiderFragment : Fragment() {
 
 
 
+
         val categoryAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
         riderViewModel.categories.observe(viewLifecycleOwner, Observer{res->
             res?.let {cats->
@@ -55,6 +61,20 @@ class EditRiderFragment : Fragment() {
             }
         })
 
+        riderViewModel.message.observe(viewLifecycleOwner, EventObserver{
+            Toast.makeText(requireContext(), requireContext().getText(it), Toast.LENGTH_LONG).show()
+        })
+
+        riderViewModel.doJumpToRiderResults.observe(viewLifecycleOwner, EventObserver{
+            val action = EditRiderFragmentDirections.actionEditRiderFragmentToSheetFragment(it, Rider::class.java.simpleName)
+            findNavController().navigate(action)
+        })
+
+        riderViewModel.updateSuccess.observe(viewLifecycleOwner, EventObserver{
+            if(it){
+                findNavController().popBackStack()
+            }
+        })
 
 
         //Set title
@@ -65,7 +85,7 @@ class EditRiderFragment : Fragment() {
         fabCallback.setImage(R.drawable.ic_done_white_24dp)
         fabCallback.setVisibility(View.VISIBLE)
 
-        val binding = DataBindingUtil.inflate<FragmentRiderBinding>(inflater, R.layout.fragment_rider, container, false).apply {
+        val binding = DataBindingUtil.inflate<FragmentEditRiderBinding>(inflater, R.layout.fragment_edit_rider, container, false).apply {
             viewModel = riderViewModel
             lifecycleOwner = (this@EditRiderFragment)
             autoCompleteClub.setAdapter(clubAdapter)
@@ -73,7 +93,7 @@ class EditRiderFragment : Fragment() {
             fabCallback.setAction {
                 if(!riderViewModel.mutableRider.value?.firstName?.trim().isNullOrBlank()){
                     riderViewModel.addOrUpdate()
-                    findNavController().popBackStack()
+                    //findNavController().popBackStack()
 
                 }else{
                     Toast.makeText(requireContext(), "Rider must have firstname set", Toast.LENGTH_SHORT).show()
@@ -83,12 +103,14 @@ class EditRiderFragment : Fragment() {
             autoCompleteCategory.setOnEditorActionListener{_, actionId, keyEvent ->
                 if ((keyEvent != null && (keyEvent.keyCode == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     riderViewModel.addOrUpdate()
-                    findNavController().popBackStack()
                 }
                 return@setOnEditorActionListener false
             }
 
         }
+        //For some reason gender spinner sometimes doesnt update
+        binding.invalidateAll()
+
 
 
         return binding.root

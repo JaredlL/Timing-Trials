@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ListPreference
+        app:icon="@drawable/ic_baseline_speed_24"
+        app:key="units"
+        app:title="@string/distance_units"
+        app:summary="@string/units_setting_description"
+        android:entries="@array/unitsArray"
+        android:entryValues="@array/unitsValues"/>
+
+    <ListPreference
+        app:icon="@drawable/ic_baseline_brush_24"
+        app:key="dayNight"
+        app:title="@string/theme"
+        app:summary="@string/choose_theme_summary"
+        android:entries="@array/dayNightArray"
+        android:entryValues="@array/dayNightValues"/>
+
+    <SwitchPreference
+        android:key="@string/p_mainpref_sound"
+        android:title="@string/play_sound_when_rider_starts"
+        android:defaultValue="true"
+        android:icon="@drawable/ic_baseline_music_note_24"/>
+
+    <Preference
+        app:key="@string/p_mainpref_advanced"
+        app:icon="@drawable/ic_baseline_memory_24"
+        app:title="@string/advanced"
+        />
+
+    <Preference
+        android:key="@string/p_helpref_about"
+        android:icon="@drawable/ic_baseline_help_outline_24"
+        android:title="@string/show_help" />
+
+</PreferenceScreen>

@@ -1,6 +1,7 @@
 package com.jaredlinden.timingtrials.timing
 
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,12 +12,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.databinding.library.baseAdapters.BR
+import androidx.preference.PreferenceManager
 
 
 import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.databinding.FragmentTimerBinding
 import com.jaredlinden.timingtrials.domain.ITimelineEvent
 import com.jaredlinden.timingtrials.ui.EventViewWrapper
+import com.jaredlinden.timingtrials.util.EventObserver
+import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_timer.*
@@ -28,6 +33,7 @@ import kotlinx.android.synthetic.main.fragment_timer.*
 class TimerFragment : Fragment() {
 
     private lateinit var timingViewModel: TimingViewModel
+    private lateinit var startPlayer: MediaPlayer
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -82,6 +88,22 @@ class TimerFragment : Fragment() {
         })
 
 
+//        startPlayer  = MediaPlayer.create(requireContext(), R.raw.start)
+//        val playSound = PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(getString(R.string.p_mainpref_sound), true)
+//        timingViewModel.soundEvent.observe(viewLifecycleOwner, EventObserver{
+//            if(playSound){
+//                if (startPlayer.isPlaying ) {
+//                    startPlayer.pause();
+//                    startPlayer.seekTo(0);
+//                }else{
+//                    startPlayer.start()
+//                }
+//            }
+//
+//
+//        })
+
+
 
 
         val binding =  DataBindingUtil.inflate<FragmentTimerBinding>(inflater, R.layout.fragment_timer, container, false).apply{
@@ -94,6 +116,8 @@ class TimerFragment : Fragment() {
 
         return binding.root
     }
+
+
 
     fun showEventDialog(event: ITimelineEvent){
         AlertDialog.Builder(requireActivity())

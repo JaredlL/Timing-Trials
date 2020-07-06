@@ -18,7 +18,7 @@ interface TimeTrialRiderDao {
     fun insertMultiple(timeTrialRiderList: TimeTrialRider)
 
     @Update
-    fun update(timeTrialRider: TimeTrialRider)
+    suspend fun update(timeTrialRider: TimeTrialRider)
 
     @Update
     fun updateMultiple(timeTrialRiderList: List<TimeTrialRider>)
@@ -26,8 +26,14 @@ interface TimeTrialRiderDao {
     @Delete
     fun delete(timeTrialRider: TimeTrialRider)
 
+    @Transaction @Query ("SELECT * FROM timetrial_rider_table WHERE id = :resultId")
+    fun getResultById(resultId: Long): LiveData<TimeTrialRiderResult?>
+
     @Transaction @Query("SELECT * FROM timetrial_rider_table WHERE timeTrialId = :timeTrialId ORDER BY `index`")
     fun getTimeTrialRiders(timeTrialId: Long): LiveData<List<FilledTimeTrialRider>>
+
+    @Transaction @Query("SELECT * FROM timetrial_rider_table WHERE timeTrialId = :timeTrialId ORDER BY `index`")
+    suspend fun getTimeTrialRidersSuspend(timeTrialId: Long): List<FilledTimeTrialRider>
 
     @Transaction @Query ("SELECT * FROM timetrial_rider_table WHERE riderId = :riderId AND finishCode IS NOT NULL ORDER BY finishCode")
     fun getRiderResults(riderId: Long): LiveData<List<TimeTrialRiderResult>>

@@ -30,6 +30,8 @@ class ResultsFilterFragment : BottomSheetDialogFragment(){
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
+        setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.AppTheme)
+
         val vm = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }
 
         val adapter = ResultFilterAdapter(requireContext(), viewLifecycleOwner).apply { setHasStableIds(true)}
@@ -37,11 +39,9 @@ class ResultsFilterFragment : BottomSheetDialogFragment(){
 
         //val cols = ResultFilterViewModel.getAllColumnViewModels(getLengthConverter())
 
-        vm.columnViewModels.observe(viewLifecycleOwner, Observer {it?.let {
-            adapter.setItems(it)
+            adapter.setItems(vm.columnViewModels)
             view?.jumpDrawablesToCurrentState()
-        }
-        })
+
 
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)

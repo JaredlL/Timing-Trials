@@ -327,6 +327,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                     }
                     isCorotineAlive.set(false)
                     deleted = true
+                    ttDeleted.postValue(Event(true))
                 }else{
                     delay(5L)
                 }
@@ -334,21 +335,25 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         }
     }
 
+    val ttDeleted: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val ttConvertedToSetup: MutableLiveData<Event<Boolean>> = MutableLiveData()
+
     fun backToSetup(){
         timeTrial.value?.let {
             val headerCopy = it.timeTrialHeader.copy(status = TimeTrialStatus.SETTING_UP)
-            updateTimeTrial(it.copy(timeTrialHeader = headerCopy))
+            val riderListCopy = it.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(splits = listOf(), finishCode = null)) }
+            updateTimeTrial(it.copy(timeTrialHeader = headerCopy, riderList = riderListCopy))
         }
 
     }
 
-    @ExperimentalCoroutinesApi
     override fun onCleared() {
         super.onCleared()
         viewModelScope.cancel()
     }
 
 
+    //val soundEvent: MutableLiveData<Event<Int>> = MutableLiveData()
 
     private fun getStatusString(millisSinceStart: Long, tte: TimeTrial): String{
 
@@ -357,6 +362,15 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         val prevIndex = if(index >= 0){ index }else{ Math.abs(index) - 2 }
         val nextIndex = prevIndex + 1
         val ttIntervalMilis = (tte.timeTrialHeader.interval * 1000L)
+
+//        val currentSoundEventVal = soundEvent.value?.peekContent()
+//        if(currentSoundEventVal != null){
+//            if(currentSoundEventVal != prevIndex){
+//                soundEvent.value = Event(prevIndex)
+//            }
+//        }else if(prevIndex >= 0){
+//            soundEvent.value = Event(prevIndex)
+//        }
 
         if(nextIndex < tte.helper.sparseRiderStartTimes.size()){
 
@@ -377,7 +391,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                     }
                     return when(millisToNextRider){
 
-                        in 0L..10000 -> {
+                        in 0L..5000 -> {
                             var x = millisToNextRider
                             if(x > 1000){
                                 do{x /= 10} while (x > 9)
@@ -386,15 +400,19 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
                             }
                             "${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName} - ${x+1}!"
                             }
-                        in 5..ttIntervalMilis/4 ->
-                            "$riderString starts in ${ttIntervalMilis/4000} seconds!"
-                        in ttIntervalMilis/4.. ttIntervalMilis/2 ->
-                            "$riderString starts in ${ttIntervalMilis/2000} seconds"
+                        in 5000..10000 ->
+                            "$riderString starts in 10 seconds"//${ttIntervalMilis/4000} seconds!"
+                        in 10000.. 15000 ->
+                            "$riderString starts in 15 seconds"
+                        in 15000.. 30000 ->
+                            "$riderString starts in 30 seconds"
                         in (ttIntervalMilis - 3000)..ttIntervalMilis ->
                         {
                             if(prevIndex >= 0){
+
                                 val prevRider = sparse.valueAt(prevIndex)
                                 "(${prevRider.riderData.firstName} ${prevRider.riderData.lastName}) GO GO GO!!!"
+
                             }else{
                                 "Next rider is $riderString"
                             }

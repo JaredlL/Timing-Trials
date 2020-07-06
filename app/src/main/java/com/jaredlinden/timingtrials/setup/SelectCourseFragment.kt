@@ -54,16 +54,21 @@ class SelectCourseFragment : Fragment() {
         })
         adapter.courseSelected = { blobs ->
 
+            //val origCourse = viewModel.getAllCourses().value?.selectedId
             viewModel.setSelectedCourse(blobs)
             val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToSetupViewPagerFragment()
             findNavController().navigate(action)
+
+
+
+
 
 
         }
 
         adapter.setHasStableIds(true)
 
-        val unitString = getLengthConverter().unitDef.name
+        val unitString = getLengthConverter().unitDef.miniString
 
         val heading: SelectableCourseViewModel = SelectableCourseViewModel("Course Name", "Distance ($unitString)", "CTT Name")
 
