@@ -9,7 +9,7 @@
         android:title="@string/search"
         app:actionViewClass="android.widget.SearchView" />
     <item
-        android:id="@+id/settings_menu_ordering"
+        android:id="@+id/settings_menu_sort"
         android:icon="@drawable/ic_find_replace_black_24dp"
         app:showAsAction="never"
         android:title="@string/sort" />

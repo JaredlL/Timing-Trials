@@ -11,22 +11,17 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
-import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 
 import com.jaredlinden.timingtrials.adapters.SelectableRiderListAdapter
 import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
-import com.jaredlinden.timingtrials.edititem.EditResultFragmentArgs
 import com.jaredlinden.timingtrials.util.*
-import kotlinx.android.synthetic.main.fragment_selectrider_list.*
 
 
 /**
@@ -169,7 +164,7 @@ class SelectRidersFragment : Fragment() {
             })
         }
 
-        menu.findItem(R.id.settings_menu_ordering).setOnMenuItemClickListener {
+        menu.findItem(R.id.settings_menu_sort).setOnMenuItemClickListener {
             val current = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_RECENT_ACTIVITY)
             AlertDialog.Builder(requireContext())
                     .setTitle(resources.getString(R.string.choose_sort))

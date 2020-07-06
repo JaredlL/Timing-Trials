@@ -76,14 +76,15 @@
 
         <TextView
             android:id="@+id/riderStatusTextView"
-            android:maxWidth="64dp"
-            android:minWidth="36dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:background="@drawable/number_back"
+            android:maxWidth="64dp"
+            android:minWidth="40dp"
+            android:minHeight="40dp"
             android:text="@{Integer.toString(number)}"
             android:textAlignment="center"
             android:textColor="@android:color/black"

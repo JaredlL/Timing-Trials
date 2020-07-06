@@ -7,8 +7,7 @@ import java.lang.Exception
 enum class NumbersDirection {ASCEND, DESCEND}
 enum class NumberMode {INDEX, MAP}
 
-data class IndexNumberRules(val terminus: Int = 1,
-                            val isStart: Boolean = true,
+data class IndexNumberRules(val startNumber: Int = 1,
                             val direction: NumbersDirection = NumbersDirection.ASCEND,
                             val exclusions: List<Int> = listOf()){
 
@@ -18,11 +17,10 @@ data class IndexNumberRules(val terminus: Int = 1,
             throw Exception("Error getting rider number - index is equal or greater than count")
         }
 
-        val dxToUse = if(isStart) index else totalCount - index
 
         val dir = if(direction == NumbersDirection.ASCEND) 1 else -1
-        val num = (terminus) + dxToUse * dir
-        val range = terminus..num
+        val num = (startNumber) + index * dir
+        val range = startNumber..num
         val count = exclusions.count { range.contains(it) }
         var retnumnum = num + count
         while (exclusions.contains(retnumnum)){
@@ -42,7 +40,7 @@ data class IndexNumberRules(val terminus: Int = 1,
     }
 
     fun isDefault(): Boolean{
-        return terminus == 1 && direction == NumbersDirection.ASCEND && exclusions.isEmpty() && isStart
+        return startNumber == 1 && direction == NumbersDirection.ASCEND && exclusions.isEmpty()
     }
 
     companion object{
@@ -54,38 +52,37 @@ data class IndexNumberRules(val terminus: Int = 1,
 
 }
 
-data class MapNumberRules(val numbersMap: MutableMap<Int,Int> = mutableMapOf()){
-
-    fun numberFromIndex(index: Int, totalCount: Int): Int{
-        numbersMap[index]?.let {
-            return it
-        }
-        val max = numbersMap.values.max()?:1
-        numbersMap[index] = max
-        return max
-
-    }
-
-    fun trySetNumberAtIndex(index: Int, number: Int){
-
-    }
-
-}
+//data class MapNumberRules(val numbersMap: Map<Int,Int> = mutableMapOf()){
+//
+//    fun numberFromIndex(index: Int, totalCount: Int): Int{
+//        numbersMap[index]?.let {
+//            return it
+//        }
+//        val max = numbersMap.values.max()?:1
+//        numbersMap[index] = max
+//        return max
+//
+//    }
+//
+//    fun trySetNumberAtIndex(index: Int, number: Int){
+//
+//    }
+//
+//}
 
 data class NumberRules(val mode: NumberMode = NumberMode.INDEX,
-                       val indexRules: IndexNumberRules = IndexNumberRules(),
-                       val mapRules: MapNumberRules = MapNumberRules()) {
+                       val indexRules: IndexNumberRules = IndexNumberRules()) {
 
-    fun isDefault(): Boolean{
+    fun isDefault(): Boolean {
         return mode == NumberMode.INDEX && indexRules.isDefault()
     }
 
-    fun numberFromIndex(index: Int, totalCount: Int): Int{
-       return when(mode){
-            NumberMode.INDEX -> indexRules.numberFromIndex(index, totalCount)
-            NumberMode.MAP -> mapRules.numberFromIndex(index, totalCount)
-        }
+    fun numberFromIndex(index: Int, totalCount: Int): Int {
+         return indexRules.numberFromIndex(index, totalCount)
+        //NumberMode.MAP -> mapRules.numberFromIndex(index, totalCount)
+
     }
+
 
 //    fun exlusionsString(): String{
 //        val sb = StringBuilder()
@@ -108,8 +105,6 @@ data class NumberRules(val mode: NumberMode = NumberMode.INDEX,
         fun fromString(str: String): NumberRules?{
             return gson.fromJson<NumberRules>(str, rulesType)
         }
-
-
 
         fun toString(rules: NumberRules): String{
             return gson.toJson(rules)

@@ -110,12 +110,6 @@ class SetupTimeTrialFragment : Fragment() {
                             }
                             .create().show()
 
-
-//                    val confDialog: SetupConfirmationFragment = requireActivity().supportFragmentManager
-//                            .findFragmentByTag("confdialog") as? SetupConfirmationFragment ?: SetupConfirmationFragment()
-//
-//                    if(confDialog.dialog?.isShowing != true){
-//                        confDialog.show(requireActivity().supportFragmentManager, "confdialog")
 //                    }
 
                 }

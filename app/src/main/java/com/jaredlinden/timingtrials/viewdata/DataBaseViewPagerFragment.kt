@@ -7,6 +7,7 @@ import android.view.*
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.jaredlinden.timingtrials.IFabCallbacks
@@ -20,6 +21,8 @@ import com.jaredlinden.timingtrials.viewdata.listfragment.CourseListFragment
 import com.jaredlinden.timingtrials.viewdata.listfragment.RiderListFragment
 import com.jaredlinden.timingtrials.viewdata.listfragment.TimeTrialListFragment
 import com.google.android.material.tabs.TabLayoutMediator
+import com.jaredlinden.timingtrials.data.NumberMode
+import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
 
 
 class DataBaseViewPagerFragment: Fragment() {
@@ -45,6 +48,8 @@ class DataBaseViewPagerFragment: Fragment() {
         })
         val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
         listViewModel.setFilter(Filter(""))
+
+        requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.currentPage = 0
 
         return binding.root
     }
@@ -95,7 +100,10 @@ class DataBaseViewPagerFragment: Fragment() {
                     val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
                     findNavController().navigate(action)
                 })
-                viewModel.insertNewTimeTrial()
+                    val mode = PreferenceManager.getDefaultSharedPreferences(requireContext()).getString(PREF_NUMBERING_MODE, NumberMode.INDEX.name)?.let {
+                        NumberMode.valueOf(it)
+                    } ?: NumberMode.INDEX
+                viewModel.insertNewTimeTrial(mode)
             }
             }
         }

@@ -58,7 +58,7 @@ data class TimeTrialWithCourse(
 }
 
 data class TimeTrial(
-        @Embedded val timeTrialHeader: TimeTrialHeader,
+        @Embedded val timeTrialHeader: TimeTrialHeader = TimeTrialHeader.createBlank(),
 
         @Relation(parentColumn = "courseId", entityColumn = "id", entity = Course::class)
         val course: Course? = null,
@@ -79,9 +79,21 @@ data class TimeTrial(
     }
 
     fun updateRiderList(newRiderList: List<FilledTimeTrialRider>): TimeTrial{
-        val ensureCorrect = newRiderList.mapIndexed {i,r-> r.updateTimeTrialData( r.timeTrialData.copy(timeTrialId = this.timeTrialHeader.id, courseId = this.course?.id, index = i)) }
-        return  this.copy(riderList = ensureCorrect)
+        //val currentMaxNumber = newRiderList.map { it.timeTrialData.assignedNumber?:0 }.max()?:1
+
+        val newMutableRiderList: MutableList<FilledTimeTrialRider> = mutableListOf()
+        for ((i,r) in newRiderList.withIndex()){
+            val availableNumber = (newMutableRiderList.map { it.timeTrialData.assignedNumber?:0 }.max()?:0) + 1
+            newMutableRiderList.add(r.updateTimeTrialData( r.timeTrialData.copy(
+                    timeTrialId = this.timeTrialHeader.id,
+                    courseId = this.course?.id,
+                    index = i,
+                    assignedNumber = r.timeTrialData.assignedNumber?:availableNumber)))
+        }
+
+        return  this.copy(riderList = newMutableRiderList)
     }
+
 
     fun addRider(newRider: Rider): TimeTrial{
         val newTtRider = FilledTimeTrialRider.createFromRiderAndTimeTrial(newRider, this)
@@ -97,7 +109,22 @@ data class TimeTrial(
     }
 
     fun getRiderNumber(index: Int): Int{
-        return timeTrialHeader.numberRules.numberFromIndex(index, riderList.size)
+        return if(timeTrialHeader.numberRules.mode == NumberMode.MAP){
+             riderList[index].timeTrialData.assignedNumber?:0
+        }else{
+            timeTrialHeader.numberRules.numberFromIndex(index, riderList.size)
+        }
+
+    }
+
+    fun getRiderNumber(riderId: Long?): Int{
+        return if(timeTrialHeader.numberRules.mode == NumberMode.MAP){
+            riderList.first { it.riderData.id == riderId }.timeTrialData.assignedNumber?:0
+        }else{
+
+            timeTrialHeader.numberRules.numberFromIndex(riderList.first { it.riderData.id == riderId }.timeTrialData.index, riderList.size)
+        }
+
     }
 
 

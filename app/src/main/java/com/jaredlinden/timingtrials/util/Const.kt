@@ -12,5 +12,6 @@ const val REQUEST_RESULT_CREATE_SCREENSHOT = 7
 const val HAS_SHOWN_ONBOARDING = "hasShownOnboarding"
 const val HAS_SHOWN_RESULT_EXPLORER_TIPS = "hasShownResultTips"
 const val HAS_SHOWN_TIMETRIAL_RESULT_TIPS = "hasShownTtResultTips"
+const val PREF_NUMBERING_MODE = "prefNumberingMode"
 
 const val FROM_TIMING_TRIALS = "fromTimingTrials"

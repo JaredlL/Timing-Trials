@@ -16,6 +16,7 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 import android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY
 import android.text.InputType
+import android.text.method.LinkMovementMethod
 import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -46,6 +47,7 @@ import com.jaredlinden.timingtrials.util.*
 import kotlinx.android.synthetic.main.fragment_timetrial_result.*
 import timber.log.Timber
 import java.io.IOException
+import java.net.URL
 import java.util.*
 
 
@@ -219,7 +221,7 @@ class ResultFragment : Fragment() {
 
                 alert.setView(edittext)
                 edittext.isSingleLine = false
-                edittext.imeOptions = EditorInfo.IME_FLAG_NO_ENTER_ACTION;
+                edittext.imeOptions = EditorInfo.IME_FLAG_NO_ENTER_ACTION
                 edittext.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
                 alert.setPositiveButton(R.string.ok) { _, _ ->
                     resultViewModel.updateDescription(edittext.text.toString())
@@ -241,6 +243,28 @@ class ResultFragment : Fragment() {
             }
 
             R.id.resultMenuExport->{
+
+                AlertDialog.Builder(requireContext())
+                        .setTitle(getString(R.string.choose_export_type))
+                        .setIcon(R.mipmap.tt_logo_round)
+                        //.setMessage(R.string.export_file_description)
+                        .setItems(R.array.exportTypes){_, i ->
+                            when(resources.getStringArray(R.array.exportTypes)[i]){
+                               getString(R.string.tt_file) ->{
+                                   permissionRequiredEvent = Event{ createJsonFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.tt") }
+                                   requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                               }
+                                getString(R.string.csv_file) ->{
+                                    permissionRequiredEvent = Event{ createCsvFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.csv") }
+                                    requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                }
+                            }
+                        }
+
+                        .setNegativeButton(R.string.cancel) { _, _ ->
+
+                        }.show()
+
 
                 true
             }

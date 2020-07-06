@@ -29,38 +29,41 @@ class OrderableRiderListAdapter(val context: Context) : RecyclerView.Adapter<Ord
     override fun getItemId(position: Int): Long {
         // requires static value, it means need to keep the same value
         // even if the item position has been changed.
-        return mRiders[position].riderData.id ?: 0L
+        return mTimeTrial.riderList[position].riderData.id ?: 0L
     }
 
     inner class OrderableRiderViewHolder(val binding: ListItemOrderableRiderBinding): AbstractDraggableItemViewHolder(binding.root){
 
         fun bind(rd:FilledTimeTrialRider){
             binding.apply {
+                riderStatusTextView.setOnClickListener {
+                    onNumberPressed(rd)
+                }
                 rider = rd
-                number = mTimeTrialHeader.numberRules.numberFromIndex(rd.timeTrialData.index, mRiders.count())
-                startTime = ConverterUtils.offsetToHmsDisplayString(mTimeTrialHeader.startTime.plusSeconds((mTimeTrialHeader.firstRiderStartOffset + mTimeTrialHeader.interval * rd.timeTrialData.index).toLong()))
+                number = mTimeTrial.getRiderNumber(rd.timeTrialData.index)
+                startTime = ConverterUtils.offsetToHmsDisplayString(mTimeTrial.timeTrialHeader.startTime.plusSeconds((mTimeTrial.timeTrialHeader.firstRiderStartOffset + mTimeTrial.timeTrialHeader.interval * rd.timeTrialData.index).toLong()))
             }
         }
     }
 
     private val layoutInflater = LayoutInflater.from(context)
-    private var mRiders: List<FilledTimeTrialRider> = listOf()
-    private var mTimeTrialHeader: TimeTrialHeader = TimeTrialHeader.createBlank()
+    private var mTimeTrial: TimeTrial = TimeTrial()
+    var onNumberPressed: (FilledTimeTrialRider)-> Unit = { _ -> Unit}
     var onMove: (from:Int, to:Int) -> Unit = {_,_ -> Unit}
 
-    fun setData(newData: TimeTrial){
-        mRiders = newData.riderList
-        mTimeTrialHeader = newData.timeTrialHeader
+    fun setData(newData: TimeTrial, newOnPressed: (FilledTimeTrialRider)-> Unit){
+        mTimeTrial = newData
+        onNumberPressed = newOnPressed
         notifyDataSetChanged()
     }
 
 
     override fun getItemCount(): Int {
-        return mRiders.count()
+        return mTimeTrial.riderList.count()
     }
 
     override fun onBindViewHolder(holder: OrderableRiderViewHolder, position: Int) {
-        mRiders.get(position).let { rider ->
+        mTimeTrial.riderList.get(position).let { rider ->
             with(holder){
                 itemView.tag = rider
                 bind(rider)

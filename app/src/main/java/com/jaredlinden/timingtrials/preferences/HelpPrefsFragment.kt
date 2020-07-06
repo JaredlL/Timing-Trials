@@ -37,7 +37,7 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
 
         findPreference(R.string.p_helpref_demo)
                 .setOnPreferenceClickListener {
-                    (requireActivity() as MainActivity).showOnboading()
+                    (requireActivity() as MainActivity).showDemoDataDialog()
                     false
                 }
 

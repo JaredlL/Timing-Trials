@@ -30,6 +30,7 @@ import com.jaredlinden.timingtrials.timing.TimingActivity
 import com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
+import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.threeten.bp.LocalDateTime
@@ -72,11 +73,8 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
     }
 
-    fun showOnboading(){
+    fun showDemoDataDialog(){
 
-        val htmlString = """<p>Import demo data to explore features of the app?<br /> <br />  
-|You can delete this later in settings.<br /> <br /> 
-|From 5 years of <a href="https://royaldeanforestcc.wixsite.com/website/">Royal Dean Forest Cycling Club</a> time trials, who used development versions of the app.</p>""".trimMargin()
         val html = HtmlCompat.fromHtml(getString(R.string.demo_data_description_ques), HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         AlertDialog.Builder(this)
@@ -98,32 +96,24 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 }
     }
 
-    val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            // Permission is granted. Continue the action or workflow in your
-            // app.
-            //Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show()
             permissionRequiredEvent.getContentIfNotHandled()?.invoke()
         } else {
-            // Explain to the user that the feature is unavailable because the
-            // features requires a permission that the user has denied. At the
-            // same time, respect the user's decision. Don't link to system
-            // settings in an effort to convince the user to change their
-            // decision.
             Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_LONG).show()
         }
     }
 
-    var permissionRequiredEvent:Event<() -> Unit> = Event{}
+    private var permissionRequiredEvent:Event<() -> Unit> = Event{}
 
-    val writeAllResults = registerForActivityResult(ActivityResultContracts.CreateDocument()){
+    private val writeAllResults = registerForActivityResult(ActivityResultContracts.CreateDocument()){
         it?.let {
             writeAllResults(it)
         }
     }
 
-    val importData = registerForActivityResult(ActivityResultContracts.OpenDocument()){
+    private val importData = registerForActivityResult(ActivityResultContracts.OpenDocument()){
         it?.let {
             importData(it)
         }
@@ -160,7 +150,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
         if(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(HAS_SHOWN_ONBOARDING, false)){
 //            OnboardingFragment().show(supportFragmentManager, "onboard")
-            showOnboading()
+            showDemoDataDialog()
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(HAS_SHOWN_ONBOARDING, true).apply()
         }
 
@@ -294,7 +284,11 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                             //navController.navigate(action)
                             navController.navigate(R.id.selectCourseFragment, action.arguments)
                         })
-                        viewModel.insertNewTimeTrial()
+                        val mode = PreferenceManager.getDefaultSharedPreferences(applicationContext).getString(PREF_NUMBERING_MODE, NumberMode.INDEX.name)?.let {
+                            NumberMode.valueOf(it)
+                        } ?:NumberMode.INDEX
+
+                        viewModel.insertNewTimeTrial(mode)
                     }
 
 
@@ -359,7 +353,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }
     }
 
-    fun getFileName(uri: Uri): String? {
+    private fun getFileName(uri: Uri): String? {
         var result: String? = null
         if (uri.scheme == "content") {
             val mcursor: Cursor? = contentResolver.query(uri, null, null, null, null)
@@ -484,6 +478,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     override fun setImage(resourceId: Int) {
         mainFab.setImageResource(resourceId)
     }
+
 
 
 }

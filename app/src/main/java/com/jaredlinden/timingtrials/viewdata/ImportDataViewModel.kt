@@ -292,7 +292,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                         NumbersDirection.ASCEND
                     }
                 }
-                numberRules = NumberRules().copy( indexRules =  IndexNumberRules(firstBib, true, direction, listOf()))
+                numberRules = NumberRules().copy( indexRules =  IndexNumberRules(firstBib,  direction, listOf()))
             }
 
             val headerToInsert = header.copy(

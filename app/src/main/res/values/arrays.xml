@@ -13,8 +13,8 @@
     </string-array>
 
     <string-array name="sortingArray">
-        <item>Recent Activity</item>
-        <item>Alphabetical</item>
+        <item>@string/recent_activity</item>
+        <item>@string/alphabetical</item>
     </string-array>
 
     <string-array name="dayNightArray">
@@ -29,5 +29,15 @@
         <item>@string/dark</item>
         <item>@string/system_default</item>
         <item>@string/follow_battery_saver_feature</item>
+    </string-array>
+
+    <string-array name="exportTypes">
+        <item>@string/csv_file</item>
+        <item>@string/tt_file</item>
+    </string-array>
+
+    <string-array name="numberOptions">
+        <item>@string/auto</item>
+        <item>@string/manually_assign</item>
     </string-array>
 </resources>

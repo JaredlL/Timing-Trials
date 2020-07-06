@@ -16,6 +16,7 @@ interface ITimeTrialSetupViewModel {
     val selectCourseViewModel: ISelectCourseViewModel
     val selectRidersViewModel: ISelectRidersViewModel
     val timeTrialPropertiesViewModel: ITimeTrialPropertiesViewModel
+    val numberOptionsViewModel: NumberOptionsViewModel
 }
 
 
@@ -50,6 +51,7 @@ class SetupViewModel @Inject constructor(
     }
 
 
+    override val numberOptionsViewModel: NumberOptionsViewModel = NumberOptionsViewModel(this)
 
     init {
         _mTimeTrial.addSource(idSwitcher) { res ->

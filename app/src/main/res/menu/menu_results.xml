@@ -16,14 +16,16 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/resultMenuExport"
+        android:title="@string/export_dot"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/resultMenuAddRow"
         android:title="@string/add_result_row"
         app:showAsAction="never" />
 
-    <item
-            android:id="@+id/resultMenuExport"
-            android:title="@string/export_dot"
-            app:showAsAction="never" />
+
 
 <!--    <item-->
 <!--        android:id="@+id/resultMenuJson"-->
@@ -44,7 +46,7 @@
 
     <item
         android:id="@+id/resultMenuDelete"
-        android:title="@string/delete_results"
+        android:title="@string/delete"
         app:showAsAction="never" />
 
 </menu>

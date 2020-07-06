@@ -9,7 +9,7 @@
     <string name="cancel">Cancel</string>
     <string name="category">Category</string>
     <string name="cati">CATI</string>
-    <string name="choose_sort">Choose Sorting</string>
+    <string name="choose_sort">Available rider sorting</string>
     <string name="clear_notes">Clear note column</string>
     <string name="click_again_to_clear">Click again to clear filter</string>
     <string name="club">Club</string>
@@ -17,7 +17,7 @@
     <string name="about_timing_trials">About Timing Trials</string>
     <string name="demo_data">Demo data</string>
     <string name="demo_data_description">Import demo data to explore the features of the app.</string>
-    <string name="demo_data_description_ques">![CDATA[<p>Import demo data to explore features of the app?<br /> <br />You can delete this later in settings.<br /> <br /> From 5 years of <a href="https://royaldeanforestcc.wixsite.com/website/">Royal Dean Forest Cycling Club</a> time trials, who used development versions of the app.</p>]]</string>
+    <string name="demo_data_description_ques"><![CDATA[<html><div><p>Import demo data to explore features of the app?<br /><br />You can delete this later in settings.<br />Data from 5 years of <a href="https://royaldeanforestcc.wixsite.com/website/">Royal Dean Forest Cycling Club</a> time trials, using development versions of the app.</p></div></html>]]></string>
     <string name="demo_data_delete_later">You can delete this later in settings.</string>
     <string name="column">Column</string>
     <string name="columns">Columns</string>
@@ -37,6 +37,8 @@
     <string name="course">Course</string>
     <string name="courses">Courses</string>
     <string name="ctt_name">CTT Name</string>
+    <string name="recent_activity">Recent Activity</string>
+    <string name="alphabetical">Alphabetical</string>
     <string name="cttname">CTT Name</string>
     <string name="current_category">Current Category</string>
     <string name="current_club">Current Club</string>
@@ -46,14 +48,21 @@
     <string name="export_dot">Export…</string>
     <string name="delete_rider">Delete Rider</string>
     <string name="delete_timetrial">Delete time trial</string>
+    <string name="auto">Auto</string>
+    <string name="manually_assign">Manually Assign</string>
     <string name="delete">Delete</string>
     <string name="distance_units">Distance Units</string>
     <string name="distance">Distance</string>
     <string name="dob">DoB</string>
+    <string name="choose_export_type">Choose export file type</string>
+    <string name="tt_file">.TT (for backup and share with other users of Timing Trials)</string>
+    <string name="csv_file">.CSV (for spreadsheet or text editing app)</string>
     <string name="edit_course">Edit Course</string>
     <string name="edit_description">Edit Description</string>
     <string name="edit_notes">Edit Notes</string>
-    <string name="edit_numbering">Edit Numbering</string>
+    <string name="edit_numbering">Edit numbering</string>
+    <string name="set_number">Set Number</string>
+    <string name="number_already_taken">Number already taken!\nThe numbers will be swapped</string>
     <string name="edit_rider">Edit Rider</string>
     <string name="edit_result">Edit Result</string>
     <string name="explore_results">Explore Results</string>
@@ -73,7 +82,7 @@
     <string name="missed_start_move_to_back">Missed start, move to back</string>
     <string name="name">Name</string>
     <string name="new_course">New Course</string>
-    <string name="setup_new_timetrial">Setup New Time trial</string>
+    <string name="setup_new_timetrial">Setup new time trial</string>
     <string name="new_rider">New Rider</string>
     <string name="version">Version</string>
     <string name="no_results">No Results</string>
@@ -110,7 +119,7 @@
     <string name="setup_tab_text_4">Select Time</string>
     <string name="setup_timetrial">Setup</string>
     <string name="show_column">Show</string>
-    <string name="sort">Sort</string>
+    <string name="sort">Sort available riders</string>
     <string name="start_in_string">Start in: %1$d minutes</string>
     <string name="start_new_timetrial">Start New Time trial</string>
     <string name="new_timetrial">New Time trial!</string>
@@ -175,5 +184,7 @@
     <string name="tip_click_cell_sort_header">Sort a column by pressing header</string>
     <string name="tip_longpress_row_to_edit">Long press a cell to edit</string>
     <string name="permission_denied">Permission Denied. Allow permissions in android settings.</string>
+    <string name="numbering_options">Numbering Mode</string>
+    <string name="press_a_number_to_set_it">Press a number to set it</string>
 
 </resources>

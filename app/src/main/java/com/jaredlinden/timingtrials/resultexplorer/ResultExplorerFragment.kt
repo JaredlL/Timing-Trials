@@ -185,7 +185,7 @@ class ResultExplorerFragment : Fragment()  {
         val html = HtmlCompat.fromHtml(htmlString, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         val mColor = ContextCompat.getColor(requireContext(), R.color.secondaryDarkColor)
-        val d = ContextCompat.getDrawable(requireActivity(), R.drawable.ic_baseline_help_outline_24)
+        val d = ContextCompat.getDrawable(requireActivity (), R.drawable.ic_baseline_help_outline_24)
         Utils.colorDrawable(mColor, d)
 
         AlertDialog.Builder(requireContext())
