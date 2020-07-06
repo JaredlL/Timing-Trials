@@ -15,6 +15,7 @@ import androidx.lifecycle.Transformations
 import androidx.navigation.NavDeepLinkBuilder
 import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.data.TimeTrial
 import com.jaredlinden.timingtrials.data.TimeTrialHeader
 import com.jaredlinden.timingtrials.data.TimeTrialStatus
 import com.jaredlinden.timingtrials.setup.SetupViewPagerFragmentArgs
@@ -72,7 +73,7 @@ class TimingActivity : AppCompatActivity() {
 
         viewModel = getViewModel { injector.timingViewModel() }
 
-        supportActionBar?.title = "Timetrial in progress"
+        supportActionBar?.title = getString(R.string.time_trial_in_progress)
 
 
         mBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)
@@ -126,7 +127,7 @@ class TimingActivity : AppCompatActivity() {
 
         timeMed.apply {
             addSource(mService){service->
-                   viewModel.timeTrial.value?.timeTrialHeader?.let{tt->
+                   viewModel.timeTrial.value?.let{tt->
                        service?.let {
                            viewModelChange(tt, it)
                        }
@@ -135,7 +136,7 @@ class TimingActivity : AppCompatActivity() {
             addSource(viewModel.timeTrial){res->
                 res?.let { tt->
                     mService.value?.let {
-                        viewModelChange(tt.timeTrialHeader, it)
+                        viewModelChange(tt, it)
                     }
                 }
             }
@@ -147,7 +148,8 @@ class TimingActivity : AppCompatActivity() {
         })
     }
 
-    fun viewModelChange(timeTrialHeader: TimeTrialHeader, service: TimingService){
+    fun viewModelChange(timeTrial: TimeTrial, service: TimingService){
+        val timeTrialHeader = timeTrial.timeTrialHeader
         when(timeTrialHeader.status){
             TimeTrialStatus.SETTING_UP -> {
                 if(mBound){
@@ -167,7 +169,7 @@ class TimingActivity : AppCompatActivity() {
                 finish()
             }
             TimeTrialStatus.IN_PROGRESS -> {
-                service.startTiming(timeTrialHeader)
+                service.startTiming(timeTrial)
             }
             TimeTrialStatus.FINISHED -> {
                 if(mBound){
@@ -275,14 +277,14 @@ class TimingActivity : AppCompatActivity() {
                 .create().show()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_timing, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        Toast.makeText(this, "Yo", Toast.LENGTH_SHORT).show()
-        return true
-    }
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.menu_timing, menu)
+//        return true
+//    }
+//
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        Toast.makeText(this, "ToDo...", Toast.LENGTH_SHORT).show()
+//        return true
+//    }
 
 }

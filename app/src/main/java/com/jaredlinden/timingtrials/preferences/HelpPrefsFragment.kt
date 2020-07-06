@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceFragmentCompat
 import com.jaredlinden.timingtrials.BuildConfig
 import com.jaredlinden.timingtrials.IFabCallbacks
@@ -42,6 +43,12 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
                 }
 
         findPreference(R.string.p_helpref_version).summary = BuildConfig.VERSION_NAME
+
+        findPreference(R.string.p_helpref_about).setOnPreferenceClickListener {
+            val action = HelpPrefsFragmentDirections.actionHelpPrefsFragmentToAboutFragment()
+            findNavController().navigate(action)
+            true
+        }
     }
 
     fun getDebugInfo(): String? {

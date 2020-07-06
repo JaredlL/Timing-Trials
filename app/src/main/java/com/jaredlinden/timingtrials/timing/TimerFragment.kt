@@ -12,13 +12,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.databinding.library.baseAdapters.BR
+import androidx.preference.PreferenceManager
 
 
 import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.databinding.FragmentTimerBinding
 import com.jaredlinden.timingtrials.domain.ITimelineEvent
 import com.jaredlinden.timingtrials.ui.EventViewWrapper
 import com.jaredlinden.timingtrials.util.EventObserver
+import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_timer.*
@@ -85,16 +88,20 @@ class TimerFragment : Fragment() {
         })
 
 
-        startPlayer  = MediaPlayer.create(requireContext(), R.raw.start)
-        timingViewModel.soundEvent.observe(viewLifecycleOwner, EventObserver{
-            if (startPlayer.isPlaying) {
-                startPlayer.pause();
-                startPlayer.seekTo(0);
-            }else{
-                startPlayer.start()
-            }
-
-        })
+//        startPlayer  = MediaPlayer.create(requireContext(), R.raw.start)
+//        val playSound = PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(getString(R.string.p_mainpref_sound), true)
+//        timingViewModel.soundEvent.observe(viewLifecycleOwner, EventObserver{
+//            if(playSound){
+//                if (startPlayer.isPlaying ) {
+//                    startPlayer.pause();
+//                    startPlayer.seekTo(0);
+//                }else{
+//                    startPlayer.start()
+//                }
+//            }
+//
+//
+//        })
 
 
 

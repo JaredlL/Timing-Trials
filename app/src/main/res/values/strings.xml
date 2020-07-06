@@ -185,6 +185,17 @@
     <string name="tip_longpress_row_to_edit">Long press a cell to edit</string>
     <string name="permission_denied">Permission Denied. Allow permissions in android settings.</string>
     <string name="numbering_options">Numbering Mode</string>
-    <string name="press_a_number_to_set_it">Press a number to set it</string>
+    <string name="press_a_number_to_set_it">Press a number to change it</string>
+    <string name="play_sound_when_rider_starts">Play sound when rider starts</string>
+    <string name="theme">Theme</string>
+    <string name="choose_theme_summary">Choose dark or light theme</string>
+    <string name="about">About</string>
+    <string name="jared">Jared</string>
+    <string name="about_blurb_1">Hi I\'m Jared, the developer of this app. I was motivated to create this after volunteering to time a time trial for my local club and being horrified when handed a notepad, pen and stopwatch while I had a smartphone in my pocket!</string>
+    <string name="about_blurb_2">I have also found it frustrating going to club events and having to wait a few days, even weeks, for the results to come out. I hope this app helps clubs produce results quicker and more accurately.</string>
+    <string name="about_blurb_3">This app has been developed in my spare time and I have no plans to monetize the current feature set. The only data collected is that you see stored on your device. I may consider premium features such as cloud syncing and store of results, depending on future demand.</string>
+    <string name="about_blurb_4"><![CDATA[<p>Best way to support is <a href="mailto:linden.jared@gmail.com">provide feedback</a>, rate (5 star 😊) on google play and spread the word!</p>]]></string>
+    <string name="about_blurb_5">May the temporary traffic lights forever be in your favour\nJared</string>
+    <string name="time_trial_in_progress">Time trial in progress</string>
 
 </resources>

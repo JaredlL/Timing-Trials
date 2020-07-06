@@ -15,10 +15,16 @@
     <ListPreference
         app:icon="@drawable/ic_baseline_brush_24"
         app:key="dayNight"
-        app:title="Light/Dark theme"
-        app:summary="Light or Dark theme"
+        app:title="@string/theme"
+        app:summary="@string/choose_theme_summary"
         android:entries="@array/dayNightArray"
         android:entryValues="@array/dayNightValues"/>
+
+    <SwitchPreference
+        android:key="@string/p_mainpref_sound"
+        android:title="@string/play_sound_when_rider_starts"
+        android:defaultValue="true"
+        android:icon="@drawable/ic_baseline_music_note_24"/>
 
     <Preference
         app:key="@string/p_mainpref_advanced"

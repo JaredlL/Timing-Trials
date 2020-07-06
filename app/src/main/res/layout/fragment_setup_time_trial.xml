@@ -165,19 +165,21 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
-            <Spinner
+            <EditText
                 android:id="@+id/spinner2"
-                android:layout_width="30dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="20dp"
+                android:textAlignment="center"
                 android:layout_marginBottom="20dp"
-                android:entries="@{viewModel.availableLaps}"
-                android:selectedItemPosition="@={viewModel.selectedLapsPosition}"
+                android:inputType="number"
+                android:text="@={viewModel.laps}"
                 app:layout_constraintBottom_toTopOf="@+id/divider3"
                 app:layout_constraintEnd_toEndOf="@+id/autocomplete"
                 app:layout_constraintStart_toStartOf="@+id/guideline2"
-                app:layout_constraintTop_toBottomOf="@+id/divider2" />
+                app:layout_constraintTop_toBottomOf="@+id/divider2"
+                tools:text="1" />
 
             <TextView
                 android:id="@+id/textView10"
@@ -266,11 +268,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:text="@={viewModel.firstRiderOffset}"
                 android:ems="10"
                 android:inputType="number"
+                android:text="@={viewModel.firstRiderOffset}"
+                android:textAlignment="center"
                 app:layout_constraintStart_toStartOf="@+id/guideline2"
-                app:layout_constraintTop_toBottomOf="@+id/divider8" />
+                app:layout_constraintTop_toBottomOf="@+id/divider8"
+                tools:text="60" />
 
             <TextView
                 android:id="@+id/textView26"

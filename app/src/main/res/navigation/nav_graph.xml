@@ -306,5 +306,17 @@
     <fragment
         android:id="@+id/helpPrefsFragment"
         android:name="com.jaredlinden.timingtrials.preferences.HelpPrefsFragment"
-        android:label="@string/help_about" />
+        android:label="@string/help_about" >
+        <action
+            android:id="@+id/action_helpPrefsFragment_to_aboutFragment"
+            app:destination="@id/aboutFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.jaredlinden.timingtrials.onboarding.AboutFragment"
+        android:label="@string/about" />
 </navigation>

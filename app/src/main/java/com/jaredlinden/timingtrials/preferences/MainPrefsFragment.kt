@@ -1,12 +1,14 @@
 package com.jaredlinden.timingtrials.preferences
 
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 
@@ -28,6 +30,24 @@ class MainPrefsFragment : PreferenceFragmentCompat() {
         findPreference(R.string.p_helpref_about).setOnPreferenceClickListener {
             val action = MainPrefsFragmentDirections.actionSettingsFragmentToHelpPrefsFragment()
             findNavController().navigate(action)
+            true
+        }
+
+        var startPlayer  = MediaPlayer.create(requireContext(), R.raw.start)
+        findPreference(R.string.p_mainpref_sound).setOnPreferenceClickListener {
+            if((it as SwitchPreference).isChecked){
+                if (startPlayer.isPlaying) {
+                    startPlayer.seekTo(0)
+                    startPlayer.start()
+                }else{
+                    startPlayer = MediaPlayer.create(requireContext(), R.raw.start)
+                    startPlayer.start()
+                }
+            }
+            else{
+                startPlayer.pause()
+                startPlayer.seekTo(0)
+            }
             true
         }
 

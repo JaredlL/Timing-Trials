@@ -353,7 +353,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     }
 
 
-    val soundEvent: MutableLiveData<Event<Int>> = MutableLiveData()
+    //val soundEvent: MutableLiveData<Event<Int>> = MutableLiveData()
 
     private fun getStatusString(millisSinceStart: Long, tte: TimeTrial): String{
 
@@ -363,14 +363,14 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         val nextIndex = prevIndex + 1
         val ttIntervalMilis = (tte.timeTrialHeader.interval * 1000L)
 
-        val currentSoundEventVal = soundEvent.value?.peekContent()
-        if(currentSoundEventVal != null){
-            if(currentSoundEventVal != prevIndex){
-                soundEvent.value = Event(prevIndex)
-            }
-        }else if(prevIndex >= 0){
-            soundEvent.value = Event(prevIndex)
-        }
+//        val currentSoundEventVal = soundEvent.value?.peekContent()
+//        if(currentSoundEventVal != null){
+//            if(currentSoundEventVal != prevIndex){
+//                soundEvent.value = Event(prevIndex)
+//            }
+//        }else if(prevIndex >= 0){
+//            soundEvent.value = Event(prevIndex)
+//        }
 
         if(nextIndex < tte.helper.sparseRiderStartTimes.size()){
 
