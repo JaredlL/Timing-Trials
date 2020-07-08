@@ -25,6 +25,8 @@ import kotlin.math.abs
 
 const val NOTIFICATION_ID = 2
 
+const val CHANNEL_ID = "timing_service"
+
 class TimingService : Service(){
 
     private var timer: Timer = Timer()
@@ -39,10 +41,11 @@ class TimingService : Service(){
 
     var timerTick: MutableLiveData<Long> = MutableLiveData()
 
-    var prevSecs = 0L
-    var soundEvent: Int? = null
 
-    inner class TimeTrialTask(val timeTrial: TimeTrial) : TimerTask(){
+
+    inner class TimeTrialTask(var timeTrial: TimeTrial) : TimerTask(){
+        var prevSecs = 0L
+        var soundEvent: Int? = null
         override fun run() {
             val now = Instant.now()
             val millisSinceStart = now.toEpochMilli() - timeTrial.timeTrialHeader.startTimeMilis
@@ -59,15 +62,23 @@ class TimingService : Service(){
             val index = sparse.indexOfKey(millisSinceStart)
             val prevIndex = if(index >= 0){ index }else{ Math.abs(index) - 2 }
             val currentSoundEventVal = soundEvent
+
+            val timeSincePrev = if(prevIndex >=0) millisSinceStart - sparse.keyAt(prevIndex) else Long.MAX_VALUE
+
             if(currentSoundEventVal != null){
-                if(currentSoundEventVal != prevIndex){
+                if(currentSoundEventVal != prevIndex && timeSincePrev < 200){
                     soundEvent = prevIndex
                     playSound()
                 }
-            }else if(prevIndex >= 0){
+            }else if(prevIndex >= 0 && timeSincePrev < 200){
                 soundEvent = prevIndex
                 playSound()
             }
+        }
+
+        fun updateTimeTrial(newTt: TimeTrial){
+            soundEvent = null
+            timeTrial = newTt
         }
     }
 
@@ -90,16 +101,20 @@ class TimingService : Service(){
 
     }
 
-    fun startTiming(timeTrial: TimeTrial){
+    fun startTiming(newTimeTrial: TimeTrial){
 
-        if(timerTask?.timeTrial?.timeTrialHeader?.id != timeTrial.timeTrialHeader.id){
+
+        if(timerTask == null){
             timerTask?.cancel()
             timer.cancel()
             println("JAREDMSG -> Timing Service -> Creating New Timer")
             timer = Timer()
-            timerTask= TimeTrialTask(timeTrial)
+            timerTask= TimeTrialTask(newTimeTrial)
             timer.scheduleAtFixedRate(timerTask, 0L, TIMER_PERIOD_MS)
+        }else{
+            timerTask?.updateTimeTrial(newTimeTrial)
         }
+
 
     }
 
@@ -161,7 +176,7 @@ class TimingService : Service(){
 
         val channelId =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    createNotificationChannel("timing_service", "TimingTrials Service")
+                    createNotificationChannel(CHANNEL_ID, "TimingTrials Service")
                 } else {
                     // If earlier version channel ID is not used
                     // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
@@ -176,11 +191,11 @@ class TimingService : Service(){
 
     private fun getNotification():NotificationCompat.Builder{
         val timingIntent = PendingIntent.getActivity(this, 0,Intent(this, TimingActivity::class.java), 0)
-        return NotificationCompat.Builder(this, "timing_service").setSmallIcon(com.jaredlinden.timingtrials.R.drawable.tt_logo_foreground)
-                .setTicker("TimingTrials")
-                .setContentText("TimeTrial in progress")
+        return NotificationCompat.Builder(this, CHANNEL_ID).setSmallIcon(com.jaredlinden.timingtrials.R.drawable.tt_logo_notification)
+                .setTicker(getString(R.string.timing_trials))
+                .setContentText(getString(R.string.time_trial_in_progress))
                 .setContentIntent(timingIntent)
-                .setContentTitle("TimeTrial in progress")
+                .setContentTitle(getString(R.string.time_trial_in_progress))
 
     }
 

@@ -13,3 +13,4 @@
 *.apk
 *.ap_
 Thumbs.db
+/app/release/app-release.aab

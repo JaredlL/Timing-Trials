@@ -118,7 +118,7 @@ class RiderStatusFragment : Fragment() {
         val milisNow = System.currentTimeMillis()
         val milisTtLast = tt.timeTrialHeader.startTimeMilis + tt.helper.sortedRiderStartTimes.lastKey()
 
-        val dnfDnsstring = if(milisNow > tt.helper.getRiderStartTime(rs.rider) + tt.timeTrialHeader.startTimeMilis){
+        val dnfDnsstring = if(milisNow > tt.helper.getRiderStartTime(rs.timeTrialRider) + tt.timeTrialHeader.startTimeMilis){
             "Did not finish (DNF)"
         }else{
             "Did not start (DNS)"
@@ -144,7 +144,7 @@ class RiderStatusFragment : Fragment() {
 //                "Set custom start time")
 
 
-        val rider = rs.rider
+        val timeTrialRider = rs.timeTrialRider
          AlertDialog.Builder(requireContext()).
                 setTitle("Actions for [${rs.number}] ${rs.filledRider.riderData.fullName()}").
                 setItems(options) { dialog, which ->
@@ -153,16 +153,16 @@ class RiderStatusFragment : Fragment() {
 
                     when(which){
                         0 -> {
-                            if(milisNow > tt.helper.getRiderStartTime(rider) + tt.timeTrialHeader.startTimeMilis){
-                                timingViewModel.riderDnf(rider)
+                            if(milisNow > tt.helper.getRiderStartTime(timeTrialRider) + tt.timeTrialHeader.startTimeMilis){
+                                timingViewModel.riderDnf(timeTrialRider)
                             }else{
-                                timingViewModel.riderDns(rider)
+                                timingViewModel.riderDns(timeTrialRider)
                             }
 
                         }
-                        1 -> timingViewModel.moveRiderToBack(rider)
+                        1 -> timingViewModel.moveRiderToBack(timeTrialRider)
                         2 -> {
-                            TimingTimePickerFragment.newInstance(rider.id?:0, tt.timeTrialHeader.startTimeMilis).show(requireActivity().supportFragmentManager, "tpd")
+                            TimingTimePickerFragment.newInstance(timeTrialRider.riderId?:0, tt.timeTrialHeader.startTimeMilis).show(requireActivity().supportFragmentManager, "tpd")
                         }
 
                     }
@@ -184,7 +184,7 @@ class RiderStatusFragment : Fragment() {
                 .setTitle(title)
                 .setMessage(resources.getString(R.string.undo_dns_description))
                 .setPositiveButton(resources.getString(R.string.undo)) { _, _ ->
-                    timingViewModel.undoDnf(rs.rider)
+                    timingViewModel.undoDnf(rs.timeTrialRider)
                 }
                 .setNegativeButton("Dismiss"){_,_->
 

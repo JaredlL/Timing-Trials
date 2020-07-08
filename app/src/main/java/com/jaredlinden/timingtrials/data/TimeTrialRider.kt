@@ -133,6 +133,8 @@ data class FilledTimeTrialRider(
         return riderData.firstName
     }
 
+    fun riderId(): Long? = riderData.id
+
 
 
     companion object{
