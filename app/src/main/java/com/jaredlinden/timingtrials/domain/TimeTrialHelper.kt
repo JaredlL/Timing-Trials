@@ -137,7 +137,11 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
 
 
     val finishedRiders: List<TimeTrialRider> by lazy {
-        timeTrial.riderList.asSequence().map { it.timeTrialData }.filter { it.splits.size == timeTrial.timeTrialHeader.laps }.toList()
+        timeTrial.riderList.asSequence().map { it.timeTrialData }.filter { it.hasFinished() }.toList()
+    }
+
+    fun ridersOnCourse(timeMilis: Long): List<TimeTrialRider> {
+       return timeTrial.riderList.asSequence().filter { getRiderStartTime(it.timeTrialData) < timeMilis && it.timeTrialData.finishCode == null }.map { it.timeTrialData }.toList()
     }
 
 

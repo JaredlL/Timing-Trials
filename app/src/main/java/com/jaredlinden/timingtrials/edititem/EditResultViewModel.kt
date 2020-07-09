@@ -172,6 +172,16 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
 
     }
 
+
+    val deleted: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    fun delete(){
+        viewModelScope.launch(Dispatchers.IO) {
+            result.value?.let { resultRepository.delete(it) }
+            result.postValue(null)
+            deleted.postValue(Event(true))
+        }
+    }
+
 }
 
 class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,

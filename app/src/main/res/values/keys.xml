@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="help_url">https://sites.google.com/view/timingtrials/home</string>
     <string name="p_advanced_clear">p_advanced_clear</string>
     <string name="p_mainpref_advanced">advanced</string>
     <string name="p_mainpref_sound">sound</string>

@@ -424,7 +424,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
                 //return "NULL"
             }else{
-                return "${tte.helper.finishedRiders.size} riders have finished, ${tte.riderList.size - tte.helper.finishedRiders.size} riders on course"
+                return "${tte.helper.finishedRiders.size} riders have finished, ${tte.helper.ridersOnCourse(millisSinceStart).size} riders on course"
             }
 
     }

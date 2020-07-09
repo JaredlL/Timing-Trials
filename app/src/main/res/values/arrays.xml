@@ -40,4 +40,9 @@
         <item>@string/auto</item>
         <item>@string/manually_assign</item>
     </string-array>
+
+    <string-array name="quotes">
+        <item>It never gets easier, you just get faster</item>
+        <item>Shut up legs</item>
+    </string-array>
 </resources>

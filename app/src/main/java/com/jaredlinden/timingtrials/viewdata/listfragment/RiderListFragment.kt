@@ -63,14 +63,15 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, L
             rider = data
             riderLayout.setOnLongClickListener {
 
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment(data.id ?: 0)
+
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.id?:0, data.javaClass.simpleName)
                 Navigation.findNavController(_binding.root).navigate(action)
                 true
             }
 
             riderLayout.setOnClickListener {
                 //val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.id?:0, data.javaClass.simpleName)
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.id?:0, data.javaClass.simpleName)
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment(data.id ?: 0)
                 Navigation.findNavController(_binding.root).navigate(action)
             }
 

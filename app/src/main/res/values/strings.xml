@@ -1,4 +1,5 @@
 <resources>
+    <string name="email">timingtrials@gmail.com</string>
     <string name="action_settings">Settings</string>
     <string name="add_course">Add Course</string>
     <string name="add_rider">Add Rider</string>
@@ -27,6 +28,7 @@
     <string name="documentation">Documentation</string>
     <string name="confirm_delete_course_message">Are you sure? ALL results associated with this course will be lost!</string>
     <string name="confirm_delete_rider_message">Are you sure? ALL results associated with this rider will be lost!</string>
+    <string name="confirm_delete_result_message">Are you sure? This cannot be undone!</string>
     <string name="confirm_delete_setup_timetrial_message">Are you sure? This cannot be undone!</string>
     <string name="confirm_delete_database_message">Are you sure?  This cannot be undone! It is recommended to export a backup first.</string>
     <string name="confirm_delete_timetrial_message">Are you sure? ALL results associated with this time trial will be deleted, this cannot be undone!</string>
@@ -46,6 +48,7 @@
     <string name="delete_course">Delete Course</string>
     <string name="delete_results">Delete All</string>
     <string name="export_dot">Export…</string>
+    <string name="delete_result">Delete Result</string>
     <string name="delete_rider">Delete Rider</string>
     <string name="delete_timetrial">Delete time trial</string>
     <string name="auto">Auto</string>
@@ -111,7 +114,7 @@
     <string name="select_riders">Riders</string>
     <string name="selected_course">Selected Course</string>
     <string name="senior">Senior</string>
-    <string name="time_00000">hh:mm:ss.S</string>
+    <string name="time_00000">h:mm:ss.S</string>
     <string name="settings">Settings</string>
     <string name="setup_tab_text_1">Setup Time trial</string>
     <string name="setup_tab_text_2">Add Riders</string>
@@ -183,9 +186,14 @@
     <string name="tip_click_cell_longpress">Long press cell to jump to time trial</string>
     <string name="tip_click_cell_sort_header">Sort a column by pressing header</string>
     <string name="tip_longpress_row_to_edit">Long press a cell to edit</string>
+    <string name="tip_timing_press_timer">Press the timing button to create an event</string>
+    <string name="tip_timing_assign_event">Then press a number to assign it to the active event</string>
+    <string name="tip_timing_press_event">Press an event to make it the active event</string>
+    <string name="tip_timing_longpress_number">Long press a number for additional actions</string>
+    <string name="tip_timing_longpress_event">Long press an assigned event to unassign it</string>
     <string name="permission_denied">Permission Denied. Allow permissions in android settings.</string>
     <string name="numbering_options">Numbering Mode</string>
-    <string name="press_a_number_to_set_it">Press a number to change it</string>
+    <string name="press_a_number_to_set_it">Press a number to change it\nIn the order rider list</string>
     <string name="play_sound_when_rider_starts">Play sound when rider starts</string>
     <string name="theme">Theme</string>
     <string name="choose_theme_summary">Choose dark or light theme</string>
@@ -194,7 +202,7 @@
     <string name="about_blurb_1">Hi I\'m Jared, the developer of this app. I was motivated to create this after volunteering to time a time trial for my local club and being horrified when handed a notepad, pen and stopwatch while I had a smartphone in my pocket!</string>
     <string name="about_blurb_2">I have also found it frustrating going to club events and having to wait a few days, even weeks, for the results to come out. I hope this app helps clubs produce results quicker and more accurately.</string>
     <string name="about_blurb_3">This app has been developed in my spare time and I have no plans to monetize the current feature set. The only data collected is that you see stored on your device. I may consider premium features such as cloud syncing and store of results, depending on future demand.</string>
-    <string name="about_blurb_4"><![CDATA[<p>Best way to support is <a href="mailto:linden.jared@gmail.com">provide feedback</a>, rate (5 star 😊) on google play and spread the word!</p>]]></string>
+    <string name="about_blurb_4"><![CDATA[<p>Best way to support is <a href="mailto:timingtrials@gmail.com">provide feedback</a>, rate (5 star 😊) on google play and spread the word!</p>]]></string>
     <string name="about_blurb_5">May the temporary traffic lights forever be in your favour\nJared</string>
     <string name="time_trial_in_progress">Time trial in progress</string>
 

@@ -128,15 +128,20 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
     val READING_RIDER = 2
     val READING_CTT_RIDER = 3
 
-    val importMessage: MutableLiveData<Event<String>> = MutableLiveData<Event<String>>()
+    val importMessage: MutableLiveData<Event<String>> = MutableLiveData()
 
     private suspend fun readJsonInputIntoDb(fileString: String): String{
        return try{
             val result = Gson().fromJson(fileString, TimingTrialsExport::class.java)
-           for(tt in result.timingTrialsData){
-               addImportTtToDb(tt)
+
+           val numAdded = result.timingTrialsData.map { addImportTtToDb(it) }.filter { it }.count()
+
+           if(numAdded > 0){
+               "Imported $numAdded"
+           }else{
+               "Found no new time trials to import"
            }
-           "Imported ${result.timingTrialsData.count()}"
+
 
         }catch (e:Exception){
             "Failed to parse JSON file: ${e.message}"
@@ -198,10 +203,17 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                 }
             }
 
-            timeTrialList.forEach {
-                addImportTtToDb(it)
-            }
-            return "Imported ${timeTrialList.count()} timetrials"
+//            timeTrialList.forEach {
+//                addImportTtToDb(it)
+//            }
+            val numImported = timeTrialList.map {  addImportTtToDb(it) }
+            val num = numImported.filter { it }.count()
+           return if(num > 0){
+               "Imported $num time trials"
+           }else{
+               "Found no new time trials to import"
+           }
+
         }catch (e:Exception){
             return "Failed to import csv data ${e.message}"
         }
@@ -209,10 +221,10 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
     }
 
-    suspend fun  addImportTtToDb(importTt: TimeTrialIO){
+    suspend fun  addImportTtToDb(importTt: TimeTrialIO): Boolean{
         val header = importTt.timeTrialHeader
         val course = importTt.course
-
+        var inserted = false
         var headerInDb: TimeTrialHeader? = null
         var courseInDb: Course? = null
 
@@ -310,6 +322,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             headerInDb = when(headerList.size){
                 0->{
                     val id = timeTrialRepository.insertNewHeader(headerToInsert)
+                    inserted = true
                     headerToInsert.copy(id = id)
                 }
                 1->{
@@ -377,7 +390,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
 
         }
-
+        return inserted
     }
 
     fun transformSplits(splits: List<Long>): List<Long>{

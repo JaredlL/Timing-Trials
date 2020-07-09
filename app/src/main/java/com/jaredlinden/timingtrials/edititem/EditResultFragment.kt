@@ -1,23 +1,17 @@
 package com.jaredlinden.timingtrials.edititem
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
-import com.jaredlinden.timingtrials.adapters.SelectableRiderListAdapter
-import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentEditResultBinding
-import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.jaredlinden.timingtrials.setup.SelectRidersFragment
-import com.jaredlinden.timingtrials.setup.SetupViewPagerFragmentDirections
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.hideKeyboard
@@ -29,11 +23,14 @@ class EditResultFragment : Fragment() {
 
     private val args: EditResultFragmentArgs by navArgs()
 
+    lateinit var resultViewModel : EditResultViewModel
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        val resultVm = requireActivity().getViewModel { requireActivity().injector.editResultViewModel() }
+        resultViewModel = requireActivity().getViewModel { requireActivity().injector.editResultViewModel() }
 
+        setHasOptionsMenu(true)
 
         //Set title
         (requireActivity() as AppCompatActivity).supportActionBar?.title = if(args.resultId == 0L) getString(R.string.add_result) else getString(R.string.edit_result)
@@ -44,29 +41,34 @@ class EditResultFragment : Fragment() {
         fabCallback.setVisibility(View.VISIBLE)
 
         fabCallback.setAction {
-            resultVm.save()
+            resultViewModel.save()
         }
 
-        resultVm.setResult(args.resultId, args.timeTrialId)
+        resultViewModel.setResult(args.resultId, args.timeTrialId)
 
-        resultVm.changeRider.observe(viewLifecycleOwner, EventObserver{
+        resultViewModel.changeRider.observe(viewLifecycleOwner, EventObserver{
             if(it){
                 val action = EditResultFragmentDirections.actionEditResultFragmentToSelectRidersFragment(SelectRidersFragment.SELECT_RIDER_FRAGMENT_SINGLE)
                 findNavController().navigate(action)
             }
         })
 
-        resultVm.resultSaved.observe(viewLifecycleOwner,EventObserver{
+        resultViewModel.resultSaved.observe(viewLifecycleOwner,EventObserver{
             if(it){
                 hideKeyboard()
                 findNavController().popBackStack()
             }
         })
 
+        resultViewModel.deleted.observe(viewLifecycleOwner, EventObserver{
+            if(it){
+                findNavController().popBackStack()
+            }
+        })
 
 
         val binding = DataBindingUtil.inflate<FragmentEditResultBinding>(inflater, R.layout.fragment_edit_result, container, false).apply {
-            viewModel = resultVm
+            viewModel = resultViewModel
             lifecycleOwner = this@EditResultFragment
         }
         //For some reason gender spinner sometimes doesnt update
@@ -74,6 +76,34 @@ class EditResultFragment : Fragment() {
 
         return binding.root
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_delete_deleteitem -> {
+                showDeleteDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun showDeleteDialog(){
+        AlertDialog.Builder(requireContext())
+                .setTitle(resources.getString(R.string.delete_result))
+                .setMessage(resources.getString(R.string.confirm_delete_result_message))
+                .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
+                    resultViewModel.delete()
+                }
+                .setNegativeButton(getString(R.string.dismiss)){_,_->
+
+                }
+                .create().show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        //menu.clear()
+        inflater.inflate(R.menu.menu_delete, menu)
     }
 
 

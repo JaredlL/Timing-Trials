@@ -77,6 +77,11 @@ class TimingService : Service(){
         }
 
         fun updateTimeTrial(newTt: TimeTrial){
+            PreferenceManager.getDefaultSharedPreferences(this@TimingService).registerOnSharedPreferenceChangeListener{prefs,key->
+                if(key == getString(R.string.p_mainpref_sound)){
+                    playSound = prefs.getBoolean(key, true)
+                }
+            }
             soundEvent = null
             timeTrial = newTt
         }

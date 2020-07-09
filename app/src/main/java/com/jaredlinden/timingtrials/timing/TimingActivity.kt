@@ -8,6 +8,8 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -21,6 +23,7 @@ import com.jaredlinden.timingtrials.data.TimeTrialStatus
 import com.jaredlinden.timingtrials.setup.SetupViewPagerFragmentArgs
 import com.jaredlinden.timingtrials.timetrialresults.ResultFragmentArgs
 import com.jaredlinden.timingtrials.util.EventObserver
+import com.jaredlinden.timingtrials.util.Utils
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 
@@ -277,14 +280,54 @@ class TimingActivity : AppCompatActivity() {
                 .create().show()
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.menu_timing, menu)
-//        return true
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_timing, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+       return when(item.itemId){
+
+            R.id.timingMenuTips-> {
+                showTipsDialog()
+                true
+            }
+
+           else -> true
+
+        }
 //        Toast.makeText(this, "ToDo...", Toast.LENGTH_SHORT).show()
 //        return true
-//    }
+    }
+
+    fun showTipsDialog(){
+        val htmlString =
+                """    
+    &#8226; ${getString(R.string.tip_timing_press_timer)}<br/><br/>
+    &#8226; ${getString(R.string.tip_timing_assign_event)}<br/><br/>
+    &#8226; ${getString(R.string.tip_timing_press_event)}<br/><br/>
+    &#8226; ${getString(R.string.tip_timing_longpress_number)}<br/><br/>
+    &#8226; ${getString(R.string.tip_timing_longpress_event)}
+    
+ """
+
+
+        val html = HtmlCompat.fromHtml(htmlString, HtmlCompat.FROM_HTML_MODE_LEGACY)
+
+        val mColor = ContextCompat.getColor(this, R.color.secondaryDarkColor)
+        val d = ContextCompat.getDrawable(this, R.drawable.ic_baseline_help_outline_24)
+        Utils.colorDrawable(mColor, d)
+
+        AlertDialog.Builder(this)
+                .setTitle(getString(R.string.tips))
+
+                .setIcon(d)
+                .setMessage(html)
+                .setPositiveButton(R.string.ok){_,_->
+
+                }
+                .show()
+    }
 
 }

@@ -20,24 +20,29 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
 
         (requireActivity() as? IFabCallbacks)?.setVisibility(View.GONE)
 
+        findPreference(R.string.p_helpref_documentation).setOnPreferenceClickListener {
+            val url = getString(R.string.help_url)
+            val i = Intent(Intent.ACTION_VIEW)
+            i.data = Uri.parse(url)
+            startActivity(i)
+            true
+        }
 
-        findPreference(R.string.contact_developer)
-                .setOnPreferenceClickListener {
-                    val uri = Uri.fromParts(
-                            "mailto",
-                            "linden.jared@gmail.com",
-                            null
-                    )
+        findPreference(R.string.contact_developer).setOnPreferenceClickListener {
                     val t = getDebugInfo()
-                    val intent = Intent(Intent.ACTION_SENDTO, uri)
-                            .putExtra(Intent.EXTRA_SUBJECT, "Timing Trials Feedback")
-                            .putExtra(Intent.EXTRA_TEXT, t)
+                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                        type = "*/*"
+                        data = Uri.parse("mailto:")
+                        putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.email)))
+                        putExtra(Intent.EXTRA_SUBJECT, "Timing Trials Feedback")
+                        putExtra(Intent.EXTRA_TEXT, t)
+                    }
+
                     startActivity(intent)
                     false
                 }
 
-        findPreference(R.string.p_helpref_demo)
-                .setOnPreferenceClickListener {
+        findPreference(R.string.p_helpref_demo).setOnPreferenceClickListener {
                     (requireActivity() as MainActivity).showDemoDataDialog()
                     false
                 }

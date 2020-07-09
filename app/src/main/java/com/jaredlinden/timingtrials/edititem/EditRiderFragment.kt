@@ -34,11 +34,15 @@ class EditRiderFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
 
+        setHasOptionsMenu(true)
+
         riderViewModel = requireActivity().getViewModel { requireActivity().injector.riderViewModel() }
+
+
         riderViewModel.mutableRider.observe(viewLifecycleOwner, Observer {  })
 
         riderViewModel.changeRider(args.riderId)
-        setHasOptionsMenu(true)
+
 
 
 
@@ -134,7 +138,7 @@ class EditRiderFragment : Fragment() {
                     riderViewModel.delete()
                     findNavController().popBackStack()
                 }
-                .setNegativeButton("Dismiss"){_,_->
+                .setNegativeButton(R.string.dismiss){_,_->
 
                 }
                 .create().show()

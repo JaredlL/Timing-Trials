@@ -71,14 +71,15 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Se
             checkBox.visibility = View.GONE
 
             courseLayout.setOnLongClickListener {
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(data.id ?: 0, root.context.getString(R.string.edit_course))
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.id?:0, Course::class.java.simpleName)
                 Navigation.findNavController(_binding.root).navigate(action)
                 true
             }
 
             courseLayout.setOnClickListener {
                 //val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.id?:0, Course::class.java.simpleName)
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.id?:0, Course::class.java.simpleName)
+
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(data.id ?: 0, root.context.getString(R.string.edit_course))
                 Navigation.findNavController(_binding.root).navigate(action)
             }
 
