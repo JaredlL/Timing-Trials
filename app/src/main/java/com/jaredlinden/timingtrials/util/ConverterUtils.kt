@@ -2,6 +2,7 @@ package com.jaredlinden.timingtrials.util
 
 import androidx.databinding.BindingConversion
 import org.threeten.bp.Instant
+import org.threeten.bp.LocalDate
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
@@ -20,15 +21,28 @@ object ConverterUtils{
         return (f.format(instant))
     }
 
-    fun offsetToHmsDisplayString(ofs: OffsetDateTime): String{
-        return ofs.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+    fun offsetToHmsDisplayString(ofs: OffsetDateTime?): String{
+        return ofs?.format(DateTimeFormatter.ofPattern("HH:mm:ss"))?:""
     }
 
     @BindingConversion
     @JvmStatic
-    fun dateToDisplay(dateTime: OffsetDateTime): String{
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-        return dateTime.format(formatter)
+    fun dateToDisplay(dateTime: OffsetDateTime?): String{
+       return dateTime?.let {
+            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            dateTime.format(formatter)
+        }?:""
+
+    }
+
+    @BindingConversion
+    @JvmStatic
+    fun localDateToDisplay(dateTime: LocalDate?): String{
+        return dateTime?.let {
+            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            dateTime.format(formatter)
+        }?:""
+
     }
 
 
@@ -161,6 +175,18 @@ data class LengthConverter(val unitKey: String){
                 }
             }
             return lengthString.toDoubleOrNull()?.times(default.unitDef.conversion)
+        }
+
+        fun findLengthConverterForString(lengthString: String) : LengthConverter?{
+            for (ld in unitList){
+                if (lengthString.contains(ld.key, true)){
+                    return LengthConverter(ld.key)
+                }
+                if(lengthString.contains(ld.name, true)){
+                    return LengthConverter(ld.key)
+                }
+            }
+            return default
         }
     }
 

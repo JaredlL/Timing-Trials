@@ -13,7 +13,7 @@ data class TimeTrialHeader(val ttName: String,
                            val courseId: Long? = null,
                            val laps: Int = 1,
                            val interval:Int = 60,
-                           val startTime: OffsetDateTime,
+                           val startTime: OffsetDateTime?,
                            val firstRiderStartOffset: Int = 60,
                            val status: TimeTrialStatus = TimeTrialStatus.SETTING_UP,
                            val numberRules: NumberRules = NumberRules(),
@@ -25,7 +25,7 @@ data class TimeTrialHeader(val ttName: String,
 
     @delegate: Ignore
     @delegate: Transient
-    val startTimeMilis: Long by lazy { startTime.toInstant().toEpochMilli() }
+    val startTimeMilis: Long by lazy { startTime?.toInstant()?.toEpochMilli()?:0L }
 
     companion object {
         fun createBlank(): TimeTrialHeader {

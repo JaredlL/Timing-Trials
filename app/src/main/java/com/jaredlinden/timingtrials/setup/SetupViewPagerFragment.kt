@@ -130,7 +130,7 @@ class SetupViewPagerFragment: Fragment() {
                 setHasOptionsMenu(true)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = false
-                    it.findItem(R.id.settings_menu_sort)?.isVisible = false
+                    it.findItem(R.id.settings_menu_sort)?.isVisible = true
                 }
 
             }
@@ -138,7 +138,7 @@ class SetupViewPagerFragment: Fragment() {
                 act.setVisibility(View.GONE)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = false
-                    it.findItem(R.id.settings_menu_sort)?.isVisible = false
+                    it.findItem(R.id.settings_menu_sort)?.isVisible = true
                 }
                 //setHasOptionsMenu(false)
 

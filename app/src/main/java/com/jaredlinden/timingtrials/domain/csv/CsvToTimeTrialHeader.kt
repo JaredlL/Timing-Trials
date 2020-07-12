@@ -40,9 +40,10 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
     val STATUS = "status"
     val DESCRIPTION = "description"
     val NOTES = "notes"
+    val ROW_START = ">>time trial"
 
     override fun isHeading(line:String): Boolean{
-        return line.splitToSequence(",", ignoreCase = true).any{it.contains("TimeTrial Name", true)}
+        return line.startsWith(">>time trial", true)
     }
 
     var nameIndex:Int? = null
@@ -71,16 +72,7 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
             val ttName = nameIndex?.let { dataList.getOrNull(it)}?:""
             val dateString = dateindex?.let { dataList.getOrNull(it) }
             val status = statusIndex?.let { if((dataList.getOrNull(it)?:"").contains("setting up", ignoreCase = true)) TimeTrialStatus.SETTING_UP else TimeTrialStatus.FINISHED }
-            var date: LocalDate? = null
-            for(pattern in formatList){
-                try {
-                    val formatter = DateTimeFormatter.ofPattern(pattern)
-                    date = LocalDate.parse(dateString, formatter)
-                    break
-                }catch(e:Exception) {
-                    val b = e
-                }
-            }
+            var date= dateString?.let {  ObjectFromString.date(it)}
             val notes = notesIndex?.let { (dataList.getOrNull(it)) }?:""
             val offsetDateTime = date?.let { OffsetDateTime.of(it, LocalTime.of(19,0,0), ZoneId.systemDefault().rules.getOffset(Instant.now()))}
             val laps = lapsIndex?.let { dataList.getOrNull(it)?.toIntOrNull() }?:1

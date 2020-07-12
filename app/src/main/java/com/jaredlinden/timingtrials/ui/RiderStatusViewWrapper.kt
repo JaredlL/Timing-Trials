@@ -20,7 +20,7 @@ class RiderStatusViewWrapper(val filledRider: FilledTimeTrialRider, val timeLine
 
     val startTimeMilis: Long = timeLine.timeTrial.timeTrialHeader.startTimeMilis + timeLine.timeTrial.helper.getRiderStartTime(timeTrialRider)
     //val startTimeDisplay: String = ConverterUtils.offsetToHmsDisplayString(timeLine.timeTrial.timeTrialHeader.startTime.plusSeconds((timeLine.timeTrial.timeTrialHeader.firstRiderStartOffset + timeLine.timeTrial.timeTrialHeader.interval * filledRider.timeTrialData.index).toLong()))
-    val startTimeDisplay: String = ConverterUtils.offsetToHmsDisplayString(timeLine.timeTrial.timeTrialHeader.startTime.plusSeconds(timeLine.timeTrial.helper.getRiderStartTime(timeTrialRider)/1000))
+    val startTimeDisplay: String = ConverterUtils.offsetToHmsDisplayString(timeLine.timeTrial.timeTrialHeader.startTime?.plusSeconds(timeLine.timeTrial.helper.getRiderStartTime(timeTrialRider)/1000))
     var onPressedCallback: (TimeTrialRider) -> Unit ={}
 
     fun onPressed(){

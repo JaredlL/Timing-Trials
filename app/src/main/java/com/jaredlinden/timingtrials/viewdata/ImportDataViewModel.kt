@@ -17,15 +17,15 @@ import com.jaredlinden.timingtrials.domain.csv.LineToTimeTrialConverter
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.Event
 import com.google.gson.Gson
+import com.jaredlinden.timingtrials.domain.csv.LineToCompleteResult
 import com.opencsv.CSVReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.threeten.bp.Instant
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneId
+import org.threeten.bp.*
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
+import java.security.InvalidParameterException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
@@ -107,7 +107,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                     val msg = if(firstNonWhitespaceChar == "{".first() || firstNonWhitespaceChar == "[".first()){
                         readJsonInputIntoDb(fString)
                     }else{
-                        readCsvInputIntoDb(title?:"TimeTrial", fString)
+                        readCsvInputIntoDb(title?:"Time Trial", fString)
                     }
 
                     importMessage.postValue(Event(msg))
@@ -127,6 +127,8 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
     val READING_COURSE = 1
     val READING_RIDER = 2
     val READING_CTT_RIDER = 3
+    val READING_COMPLETE_RESULT_HEADING = 4
+    val READING_COMPLETE_RESULT = 5
 
     val importMessage: MutableLiveData<Event<String>> = MutableLiveData()
 
@@ -154,8 +156,11 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             val lineToTt = LineToTimeTrialConverter()
             val lineToCourse = LineToCourseConverter()
             val lineToRider = LineToResultRiderConverter()
+            val lineToCompleteResult = LineToCompleteResult()
+
 
             val timeTrialList: MutableList<TimeTrialIO> = mutableListOf()
+            val completeRowlist: MutableList<CompleteInformationRow> = mutableListOf()
             var state = READING_TT
 
             val allLines = CSVReader(StringReader(fileContents)).readAll()
@@ -179,6 +184,10 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                     }
                     state = READING_RIDER
                 }
+                else if(lineToCompleteResult.isHeading(currentLine)){
+                    //lineToCompleteResult.setHeading(currentLine)
+                    state = READING_COMPLETE_RESULT_HEADING
+                }
                 else{
                     when(state){
                         READING_TT->{
@@ -199,6 +208,17 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                                 timeTrialList.lastOrNull()?.timeTrialRiders?.add(it)
                             }
                         }
+                        READING_COMPLETE_RESULT_HEADING->{
+                            lineToCompleteResult.setHeading(currentLine)
+                            state = READING_COMPLETE_RESULT
+
+                        }
+                        READING_COMPLETE_RESULT->{
+                            lineToCompleteResult.importLine(cLineList)?.let {
+                                completeRowlist.add(it)
+                            }
+
+                        }
                     }
                 }
             }
@@ -206,10 +226,14 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 //            timeTrialList.forEach {
 //                addImportTtToDb(it)
 //            }
+
             val numImported = timeTrialList.map {  addImportTtToDb(it) }
+            val rows = addCompleteListToDb(completeRowlist)
             val num = numImported.filter { it }.count()
            return if(num > 0){
                "Imported $num time trials"
+           }else if(rows > 0){
+               "Imported $rows rows"
            }else{
                "Found no new time trials to import"
            }
@@ -219,6 +243,133 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
         }
 
 
+    }
+
+    suspend fun addCompleteListToDb(completeList: List<CompleteInformationRow>): Int{
+        return completeList.filter { addCompleteToDb(it) }.size
+    }
+
+    suspend fun addCompleteToDb(row: CompleteInformationRow): Boolean{
+        val rider = row.rider()
+        val course = row.course()
+        val header = row.timeTrialHeader()
+        if(rider != null && course != null && header != null){
+
+            val dbCourse = getDbCourse(course)
+            val dbRider = getDbRider(rider)
+            val insertHeader = header.copy(courseId = dbCourse.id)
+            val ttId = when{
+                row.timeTrialDate != null ->{
+                    getTimeTrialByCourseDate(dbCourse, row.timeTrialDate)?.id?:timeTrialRepository.insertNewHeader(insertHeader)
+                }
+                row.timeTrialName != null->{
+                    val headerList = timeTrialRepository.getHeadersByName(row.timeTrialName)
+                    when(headerList.size){
+                        0->{
+                            timeTrialRepository.insertNewHeader(insertHeader)
+                        }
+                        1->{
+                            headerList.first().id
+                        }
+                        else->{
+                            val onCourseList = headerList.filter { it.courseId == dbCourse.id }.sortedBy { it.startTimeMilis - insertHeader.startTimeMilis }
+                            onCourseList.firstOrNull()?.id
+                        }
+                    }
+                }
+               else -> null
+            }
+            if(ttId != null && dbRider.id != null && dbCourse.id != null){
+                val fullTimeTrial = timeTrialRepository.getResultTimeTrialByIdSuspend(ttId)
+                if(!fullTimeTrial.riderList.any { it.riderId() == dbRider.id}){
+
+                    val timeTrialRider = TimeTrialRider(
+                            riderId = dbRider.id,
+                            timeTrialId = ttId,
+                            courseId = dbCourse.id,
+                            index = 0,
+                            finishCode = if (fullTimeTrial.timeTrialHeader.status == TimeTrialStatus.FINISHED) row.resultTime else null,
+                            splits = if (fullTimeTrial.timeTrialHeader.status == TimeTrialStatus.FINISHED) transformSplits(row.resultSplits) else listOf(),
+                            category = row.riderCategory,
+                            gender = row.riderGender,
+                            club = row.riderClub,
+                            notes = row.resultNotes
+                    )
+
+                    timeTrialRiderRepository.insert(timeTrialRider)
+                    return true
+                }
+            }
+        }
+        return false
+
+        //var courseInDb: Course? = null
+
+
+    }
+
+    suspend fun getTimeTrialByCourseDate(course: Course, localDate: LocalDate): TimeTrialHeader?{
+        return course.id?.let {
+            val tts = timeTrialRepository.allTimeTrialsOnCourse(course.id)
+            val ds = tts.map { Pair(it.startTime?.dayOfYear, it.startTime?.year) }
+             tts.firstOrNull { it.startTime?.dayOfYear == localDate.dayOfYear && it.startTime.year == localDate.year }
+        }
+    }
+
+    suspend fun getDbCourse(course:Course): Course{
+
+        if(course.courseName.isBlank()){
+            throw InvalidParameterException()
+        }
+
+        val courseInDb: Course
+        val courseList = courseRepository.getCoursesByName(course.courseName)
+
+
+            when(courseList.size){
+                0->{
+                    val id = courseRepository.insert(course)
+                    courseInDb = courseRepository.getCourseSuspend(id)
+                }
+                1->{
+                    courseInDb = courseList.first()
+                }
+                else-> courseInDb = courseList.first()
+            }
+        return courseInDb
+
+        }
+
+
+
+
+    suspend fun getDbRider(importRider:Rider): Rider{
+        val riderInDbId:Rider
+
+            val existingRiders = riderRespository.ridersFromFirstLastName(importRider.firstName, importRider.lastName)
+            //var timeTrialRider:TimeTrialRider? = null
+            riderInDbId = when(existingRiders.size){
+                0->{
+                    val newRider = Rider(importRider.firstName, importRider.lastName, importRider.club, null, importRider.category?:"", importRider.gender)
+                    val id = riderRespository.insert(newRider)
+                    newRider.copy(id = id)
+                }
+                1->{
+                    existingRiders.first()
+                }
+                else->{
+                    val byGender = existingRiders.filter { importRider.gender!= Gender.UNKNOWN && it.gender == importRider.gender }
+                    if(byGender.isEmpty()){
+                        val newRider = Rider(importRider.firstName, importRider.lastName, importRider.club, null, importRider.category, importRider.gender)
+                        val id = riderRespository.insert(newRider)
+                        newRider.copy(id = id)
+                    }else{
+                        byGender.first()
+                    }
+                }
+            }
+
+        return riderInDbId
     }
 
     suspend fun  addImportTtToDb(importTt: TimeTrialIO): Boolean{
@@ -244,7 +395,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                 1->{
                     courseInDb = courseList.first()
                 }
-                else-> courseInDb = courseList.minBy { it.length - course.length }!!
+                else-> courseInDb = courseList.minBy { (it.length?:0.0) - (course.length?:0.0) }!!
             }
 
         }
@@ -280,7 +431,8 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             var startTime = header.startTime
             if(status == TimeTrialStatus.SETTING_UP && firstRider != null) {
                 firstRider.startTime?.let {
-                    startTime = OffsetDateTime.of(header.startTime.year, header.startTime.monthValue, header.startTime.dayOfMonth, it.hour, it.minute - 1, it.second, 0, ZoneId.systemDefault().rules.getOffset(Instant.now()))
+                    val ttSt = header.startTime?: OffsetDateTime.now()
+                    startTime = OffsetDateTime.of(ttSt.year, ttSt.month.value, ttSt.dayOfMonth, it.hour, it.minute - 1, it.second, 0, ZoneId.systemDefault().rules.getOffset(Instant.now()))
                     firstRiderStartOffset = 60
                 }
             }

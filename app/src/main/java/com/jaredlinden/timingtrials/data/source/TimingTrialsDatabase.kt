@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, TimeTrialRider::class], version = 44 , exportSchema = false)
+@Database(entities = [Rider::class, Course::class, TimeTrialHeader::class, TimeTrialRider::class], version = 46 , exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class TimingTrialsDatabase : RoomDatabase() {
 

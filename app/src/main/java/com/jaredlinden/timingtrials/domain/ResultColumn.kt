@@ -278,11 +278,11 @@ class DistanceColumn(private val distConverter: LengthConverter) : IColumnDefini
     override val imageResourceId: Int = com.jaredlinden.timingtrials.R.drawable.ic_baseline_timeline_24
 
     override fun getValue(result: IResult): String {
-        return result.course.length.let { distConverter.lengthToDisplay(it * result.laps) }
+        return result.course.length?.let { distConverter.lengthToDisplay(it * result.laps) }?:""
     }
 
     override fun compare(result1: IResult, result2: IResult): Int {
-        return (result1.course.length * result1.laps).compareTo(result2.course.length * result2.laps)
+        return ((result1.course.length?:0.0) * result1.laps).compareTo((result2.course.length?:0.0) * result2.laps)
     }
     override fun passesFilter(filterText: String, result: IResult): Boolean {
         return getValue(result).contains(filterText, true)
@@ -327,8 +327,9 @@ class SpeedColumn(private val distConverter: LengthConverter) : IColumnDefinitio
     override fun getValue(result: IResult): String {
 
         val rt = result.resultTime
-        return if(rt != null && rt != 0L){
-            val averageSpeedMetersPerMilisecond = distConverter.convert(result.course.length * result.laps) * (3600000.0 / rt.toDouble())
+        val length = result.course.length
+        return if(rt != null && rt != 0L && length != null){
+            val averageSpeedMetersPerMilisecond = distConverter.convert(length * result.laps) * (3600000.0 / rt.toDouble())
             return "%2.2f".format(averageSpeedMetersPerMilisecond)
         }else{
             ""
@@ -338,7 +339,7 @@ class SpeedColumn(private val distConverter: LengthConverter) : IColumnDefinitio
     fun  averageSpeed(result: IResult): Double{
         val rt = result.resultTime
         return if(rt!= null && rt > 0){
-            (result.course.length * result.laps) / rt.toDouble()
+            ((result.course.length?:0.0) * result.laps) / rt.toDouble()
         }
         else{
             Double.MAX_VALUE

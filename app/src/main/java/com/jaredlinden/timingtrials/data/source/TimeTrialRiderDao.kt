@@ -44,13 +44,13 @@ interface TimeTrialRiderDao {
     @Transaction @Query ("SELECT * FROM timetrial_rider_table WHERE courseId = :courseId AND finishCode IS NOT NULL ORDER BY finishCode")
     fun getCourseResultsSuspend(courseId: Long): List<TimeTrialRider>
 
-    @Query("SELECT * FROM timetrial_rider_table WHERE timeTrialId == :timeTrialId AND riderId == :riderId")
+    @Transaction @Query("SELECT * FROM timetrial_rider_table WHERE timeTrialId == :timeTrialId AND riderId == :riderId")
     fun getByRiderTimeTrialIds(riderId: Long, timeTrialId: Long): List<TimeTrialRider>
 
-    @Query("SELECT * FROM timetrial_rider_table WHERE timetrial_rider_table.finishCode > 0 ORDER BY timetrial_rider_table.finishCode")
+    @Transaction @Query("SELECT * FROM timetrial_rider_table WHERE timetrial_rider_table.finishCode > 0 ORDER BY timetrial_rider_table.finishCode")
     fun getAllResults(): LiveData<List<TimeTrialRiderResult>>
 
-    @Query("SELECT riderId, timetrial_table.startTime AS startTime FROM timetrial_rider_table INNER JOIN timetrial_table ON timetrial_table.id = timeTrialId WHERE timetrial_table.status = 2 ORDER BY timetrial_table.startTime")
+    @Transaction @Query("SELECT riderId, timetrial_table.startTime AS startTime FROM timetrial_rider_table INNER JOIN timetrial_table ON timetrial_table.id = timeTrialId WHERE timetrial_table.status = 2 ORDER BY timetrial_table.startTime")
     fun getRiderIdTimeTrialStartTime(): LiveData<List<RiderIdStartTime>>
 
 

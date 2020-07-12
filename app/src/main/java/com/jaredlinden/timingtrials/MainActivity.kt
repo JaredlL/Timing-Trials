@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 .setIcon(R.mipmap.tt_logo_round)
                 .setMessage(html)
                 .setPositiveButton(R.string.yes){_,_->
-                    val url = URL("https://bbcdn.githack.com/lindenj/timingtrialsdata/raw/master/Timing Trials Export.tt")
+                    val url = URL("https://bbcdn.githack.com/lindenj/timingtrialsdata/raw/master/Timing Trials Export V2.tt")
                     val vm = getViewModel { injector.importViewModel()}
                     vm.readUrlInput(url)
                     vm.importMessage.observe(this, EventObserver{

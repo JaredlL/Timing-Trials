@@ -44,14 +44,14 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
     override val interval = MutableLiveData<String>()
 
     override val offsetDescription: LiveData<String> = Transformations.map(timeTrialHeader){tt->
-        tt?.let {
-            val tString = ConverterUtils.instantToSecondsDisplayString(it.startTime.toInstant().plusSeconds(it.firstRiderStartOffset.toLong()))
+        tt?.startTime?.let {
+            val tString = ConverterUtils.instantToSecondsDisplayString(it.toInstant().plusSeconds(tt.firstRiderStartOffset.toLong()))
             "(ie first rider starts at $tString)"
         }
     }
 
     override val startTimeString: LiveData<String>  = Transformations.map(timeTrialHeader){ tt->
-        tt?.let { ConverterUtils.instantToSecondsDisplayString(it.startTime.toInstant())}
+        tt?.startTime?.let { ConverterUtils.instantToSecondsDisplayString(it.toInstant())}
     }
 
     override val availableLaps = 1.rangeTo(99).map { i -> i.toString() }

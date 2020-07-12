@@ -68,7 +68,7 @@ class SetupTimeTrialFragment : Fragment() {
                         //container.currentItem = 1
                         return@let
                     }
-                    if(tt.timeTrialHeader.startTime.isBefore(OffsetDateTime.now())){
+                    if(tt.timeTrialHeader.startTime == null || tt.timeTrialHeader.startTime.isBefore(OffsetDateTime.now())){
                         Toast.makeText(requireActivity(), getString(R.string.tt_must_start_in_the_future), Toast.LENGTH_LONG).show()
                         TimePickerFragment2().show(requireActivity().supportFragmentManager, "timePicker")
                         return@let

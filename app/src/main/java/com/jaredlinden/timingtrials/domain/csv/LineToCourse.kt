@@ -5,7 +5,7 @@ import com.jaredlinden.timingtrials.domain.ILineToObjectConverter
 
 class LineToCourseConverter: ILineToObjectConverter<Course> {
     override fun isHeading(line: String): Boolean {
-        return line.splitToSequence(",", ignoreCase = true).any{it.contains("Course Name", true)}
+        return line.startsWith(">>course", true)
     }
 
     val defaultConversion = 1000.0

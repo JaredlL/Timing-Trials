@@ -29,37 +29,20 @@ class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<Resu
     private fun addTimeTrialRow(lines: MutableList<List<String>>){
         val formatter = DateTimeFormatter.ofPattern("d/M/y")
 
-        lines.add(listOf("TimeTrial Name","TimeTrial Date","TimeTrial Laps","TimeTrial Description"))
-        lines.add(listOf(timeTrial.timeTrialHeader.ttName, timeTrial.timeTrialHeader.startTime.format(formatter),timeTrial.timeTrialHeader.laps.toString(), timeTrial.timeTrialHeader.description))
+        lines.add(listOf("Time Trial Name","Time Trial Date","Time Trial Laps","Time Trial Description"))
+        lines.add(listOf(timeTrial.timeTrialHeader.ttName, timeTrial.timeTrialHeader.startTime?.format(formatter)?:"",timeTrial.timeTrialHeader.laps.toString(), timeTrial.timeTrialHeader.description))
     }
 
     private fun writeCourseRow(lines: MutableList<List<String>>){
         val course = timeTrial.course
         if(course != null){
             lines.add(listOf("Course Name","Course Length (${lengthConverter.unitDef.name})","Course CTT Name"))
-            lines.add(listOf(course.courseName,lengthConverter.lengthToDisplay(course.length),course.cttName))
+            lines.add(listOf(course.courseName, course.length?.let{lengthConverter.lengthToDisplay(it)}?:"",course.cttName))
         }else{
             lines.add(listOf("Unknown Course"))
         }
     }
 
-//    private fun writeRowNewLine(row: ResultRowViewModel, writer: PrintWriter){
-//        for (v in row.row.dropLast(1)){
-//            writer.append("${surroundQuotes(v.content.value)},")
-//        }
-//        writer.appendln(surroundQuotes(row.row.last().content.value))
-//    }
-//
-//    private fun writeLastRow(row: ResultRowViewModel, writer: PrintWriter){
-//        for (v in row.row.dropLast(1)){
-//            writer.append("${surroundQuotes(v.content.value)},")
-//        }
-//        writer.append(surroundQuotes(row.row.last().content.value))
-//    }
-//
-//    private fun surroundQuotes(string: String?): String{
-//        return "\"$string\""
-//    }
 
 }
 class CsvSheetWriter(val sheet: ResultExplorerSpreadSheet){

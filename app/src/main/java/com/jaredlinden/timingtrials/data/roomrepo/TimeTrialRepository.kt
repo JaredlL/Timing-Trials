@@ -20,10 +20,12 @@ interface ITimeTrialRepository{
     suspend fun update(timeTrialHeader: TimeTrialHeader)
     suspend fun updateFull(timeTrial: TimeTrial)
     suspend fun getTimeTrialByName(name: String): TimeTrial?
+    suspend fun getResultTimeTrialByIdSuspend(id: Long): TimeTrial
     suspend fun getHeadersByName(name: String): List<TimeTrialHeader>
 
     suspend fun delete(timeTrial: TimeTrial)
     suspend fun allTimeTrials(): List<TimeTrial>
+    suspend fun allTimeTrialsOnCourse(courseId: Long): List<TimeTrialHeader>
     suspend fun deleteById(ttId: Long)
 
     fun getAllHeaderBasicInfo(): List<TimeTrialBasicInfo>
@@ -46,6 +48,10 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @WorkerThread
     override suspend fun getTimeTrialByName(name: String): TimeTrial? {
         return timeTrialDao.getTimeTrialByName(name)
+    }
+
+    override suspend fun getResultTimeTrialByIdSuspend(id: Long): TimeTrial {
+        return timeTrialDao.getFullTimeTrialSuspend(id)
     }
 
     @Suppress("RedundantSuspendModifier")
@@ -96,6 +102,9 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
         return timeTrialDao.getAllCompleteTimeTrials()
     }
 
+    override suspend fun allTimeTrialsOnCourse(courseId: Long): List<TimeTrialHeader> {
+        return timeTrialDao.getTimeTrialsOnCourse(courseId)
+    }
 
 
     override fun getLiveTimeTrialByName(name:String): LiveData<TimeTrial> {
