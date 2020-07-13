@@ -301,7 +301,8 @@ class ResultFragment : Fragment() {
             try {
                 val outputStream = requireActivity().contentResolver.openOutputStream(uri)
                 if(outputStream != null){
-                    val trans = CsvTimeTrialResultWriter(tt, results, getLengthConverter())
+                    val modified = results.mapIndexed {i,x -> x.row.mapIndexed { j, y -> if(i ==0 && j == 0) ">>" + (y.content.value?:"") else y.content.value?:"" } }
+                    val trans = CsvTimeTrialResultWriter(tt, modified, getLengthConverter())
                     trans.writeToPath(outputStream)
 
 

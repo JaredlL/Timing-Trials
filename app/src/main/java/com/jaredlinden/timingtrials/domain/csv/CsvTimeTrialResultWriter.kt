@@ -8,7 +8,7 @@ import com.opencsv.CSVWriter
 import org.threeten.bp.format.DateTimeFormatter
 import java.io.*
 
-class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<ResultRowViewModel>, val lengthConverter: LengthConverter){
+class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<List<String>>, val lengthConverter: LengthConverter){
 
 
     fun writeToPath(outputStream: OutputStream){
@@ -17,7 +17,7 @@ class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<Resu
         addTimeTrialRow(lines)
         writeCourseRow(lines)
         for(r in results){
-            lines.add(r.row.map { it.content.value?:"" })
+            lines.add(r)
         }
 
         val csvWriter =  CSVWriter(outputStream.bufferedWriter())
@@ -29,14 +29,14 @@ class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<Resu
     private fun addTimeTrialRow(lines: MutableList<List<String>>){
         val formatter = DateTimeFormatter.ofPattern("d/M/y")
 
-        lines.add(listOf("Time Trial Name","Time Trial Date","Time Trial Laps","Time Trial Description"))
+        lines.add(listOf(">>Time Trial Name","Time Trial Date","Time Trial Laps","Time Trial Description"))
         lines.add(listOf(timeTrial.timeTrialHeader.ttName, timeTrial.timeTrialHeader.startTime?.format(formatter)?:"",timeTrial.timeTrialHeader.laps.toString(), timeTrial.timeTrialHeader.description))
     }
 
     private fun writeCourseRow(lines: MutableList<List<String>>){
         val course = timeTrial.course
         if(course != null){
-            lines.add(listOf("Course Name","Course Length (${lengthConverter.unitDef.name})","Course CTT Name"))
+            lines.add(listOf(">>Course Name","Course Length (${lengthConverter.unitDef.name})","Course CTT Name"))
             lines.add(listOf(course.courseName, course.length?.let{lengthConverter.lengthToDisplay(it)}?:"",course.cttName))
         }else{
             lines.add(listOf("Unknown Course"))
@@ -48,7 +48,7 @@ class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<Resu
 class CsvSheetWriter(val sheet: ResultExplorerSpreadSheet){
     fun writeToPath(ouputStream: OutputStream){
 
-        val all = listOf(sheet.sheetColumns.map { it.headingText }) + (sheet.data)
+        val all = listOf(listOf(">>timing trials mixed results")) + listOf( sheet.sheetColumns.map { it.headingText }) + (sheet.data)
 
        val csvWriter =  CSVWriter(ouputStream.bufferedWriter())
         csvWriter.writeAll(all.map { it.toTypedArray() })

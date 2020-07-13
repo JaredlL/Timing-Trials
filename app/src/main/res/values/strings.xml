@@ -58,8 +58,8 @@
     <string name="distance">Distance</string>
     <string name="dob">DoB</string>
     <string name="choose_export_type">Choose export file type</string>
-    <string name="tt_file">.TT (for backup and share with other users of Timing Trials)</string>
-    <string name="csv_file">.CSV (for spreadsheet or text editing app)</string>
+    <string name="tt_file">.TT (for backup )</string>
+    <string name="csv_file">.CSV (for spreadsheet)</string>
     <string name="edit_course">Edit Course</string>
     <string name="edit_description">Edit Description</string>
     <string name="edit_notes">Edit Notes</string>
