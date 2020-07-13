@@ -60,7 +60,7 @@
             android:layout_alignWithParentIfMissing="true"
             android:layout_marginEnd="8dp"
             android:layout_toStartOf="@id/checkBox"
-            android:text="@{courseVm.cttNameString ?? @string/cttname}"
+            android:text="@{courseVm.cttNameString ?? @string/ctt_name}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/checkBox"
             app:layout_constraintTop_toTopOf="parent"

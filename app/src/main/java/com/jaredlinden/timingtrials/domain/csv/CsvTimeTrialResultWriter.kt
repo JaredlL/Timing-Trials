@@ -29,14 +29,14 @@ class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<List
     private fun addTimeTrialRow(lines: MutableList<List<String>>){
         val formatter = DateTimeFormatter.ofPattern("d/M/y")
 
-        lines.add(listOf(">>Time Trial Name","Time Trial Date","Time Trial Laps","Time Trial Description"))
+        lines.add(listOf(">>Time Trial Name","Date","Laps","Description"))
         lines.add(listOf(timeTrial.timeTrialHeader.ttName, timeTrial.timeTrialHeader.startTime?.format(formatter)?:"",timeTrial.timeTrialHeader.laps.toString(), timeTrial.timeTrialHeader.description))
     }
 
     private fun writeCourseRow(lines: MutableList<List<String>>){
         val course = timeTrial.course
         if(course != null){
-            lines.add(listOf(">>Course Name","Course Length (${lengthConverter.unitDef.name})","Course CTT Name"))
+            lines.add(listOf(">>Course Name","Length (${lengthConverter.unitDef.name})","CTT Code"))
             lines.add(listOf(course.courseName, course.length?.let{lengthConverter.lengthToDisplay(it)}?:"",course.cttName))
         }else{
             lines.add(listOf("Unknown Course"))

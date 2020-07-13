@@ -94,7 +94,7 @@ class CourseViewHolderFactory(private val unitString: String): GenericViewHolder
         val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply {
             val cName =layoutInflator.context.resources.getString(R.string.name)
             val dist = "Distance ($unitString)"
-            val cttName = layoutInflator.context.resources.getString(R.string.cttname)
+            val cttName = layoutInflator.context.resources.getString(R.string.ctt_name)
             courseVm = SelectableCourseViewModel(cName, dist, cttName)
             checkBox.visibility = View.GONE
             genericTextView1.typeface = Typeface.DEFAULT_BOLD

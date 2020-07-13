@@ -38,10 +38,9 @@
     <string name="course_requires_name">Course requires a name</string>
     <string name="course">Course</string>
     <string name="courses">Courses</string>
-    <string name="ctt_name">CTT Name</string>
+    <string name="ctt_name">CTT Code</string>
     <string name="recent_activity">Recent Activity</string>
     <string name="alphabetical">Alphabetical</string>
-    <string name="cttname">CTT Name</string>
     <string name="current_category">Current Category</string>
     <string name="current_club">Current Club</string>
     <string name="date">Date</string>
