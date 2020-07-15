@@ -87,13 +87,21 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
 
     fun fromCttTitle(cttTitle: String): TimeTrialHeader{
         val titleString = cttTitle.replace(".csv", "", ignoreCase = true).replace("startsheet-", "", ignoreCase = true).replace("results-", "", ignoreCase = true)
-        val dateList = titleString.split("-").reversed().mapNotNull { it.toIntOrNull() }
-        val date = if(dateList.size > 2){
+//        val dateList = titleString.split("-").reversed().mapNotNull { it.toIntOrNull() }
+//        val date = if(dateList.size > 2){
+//
+//            OffsetDateTime.of(LocalDate.of(2000+dateList[0], dateList[1],dateList[2]), LocalTime.of(1,0,0),ZoneId.systemDefault().rules.getOffset(Instant.now()))
+//        }else{
+//            OffsetDateTime.MIN
+//        }
+        val dateString = Regex("""\d{1,2}[-]\d{1,2}[-]\d{1,2}""").find(titleString)?.value
 
-            OffsetDateTime.of(LocalDate.of(2000+dateList[0], dateList[1],dateList[2]), LocalTime.of(1,0,0),ZoneId.systemDefault().rules.getOffset(Instant.now()))
-        }else{
-            OffsetDateTime.MIN
+        val localDate = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("d-M-y"))
+
+        val date = localDate?.let {
+            OffsetDateTime.of(LocalDate.of(2000 +localDate.year, localDate.month,localDate.dayOfMonth), LocalTime.of(1,0,0),ZoneId.systemDefault().rules.getOffset(Instant.now()))
         }
+
         val datePortion = Regex("""[-]\d{1,2}[-]\d{1,2}[-]\d{1,2}""").find(titleString)?.value
 
         val cleanedTitle = datePortion?.let {

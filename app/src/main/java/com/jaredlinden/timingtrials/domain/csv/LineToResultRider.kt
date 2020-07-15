@@ -1,13 +1,9 @@
 package com.jaredlinden.timingtrials.domain.csv
 
-import com.jaredlinden.timingtrials.data.Gender
 import com.jaredlinden.timingtrials.domain.ILineToObjectConverter
 import com.jaredlinden.timingtrials.domain.TimeTrialRiderIO
 import com.jaredlinden.timingtrials.domain.StringToObjectField
-import com.opencsv.CSVParser
 import com.opencsv.CSVReader
-import com.opencsv.CSVReaderBuilder
-import com.opencsv.bean.util.OpencsvUtils
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeParseException
 import java.io.StringReader
@@ -225,12 +221,16 @@ class LineToResultRiderConverter: ILineToObjectConverter<TimeTrialRiderIO> {
 
     override fun isHeading(line: String): Boolean {
 
-        return line.startsWith(">>Rider") || isCttHeading(line)
+        return line.startsWith(">>Rider") || isCttResultHeading(line) || isCttStartsheettHeading(line)
 
     }
 
-    fun isCttHeading(heading: String): Boolean{
+    fun isCttResultHeading(heading: String): Boolean{
         return heading.contains("position", ignoreCase = true) && heading.contains("tricycle", ignoreCase = true)
+    }
+
+    fun isCttStartsheettHeading(heading: String): Boolean{
+        return heading.contains("start_time", ignoreCase = true) && heading.contains("bib", ignoreCase = true)
     }
 
 

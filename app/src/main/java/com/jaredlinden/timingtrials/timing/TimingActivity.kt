@@ -1,6 +1,7 @@
 package com.jaredlinden.timingtrials.timing
 
 import android.content.*
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
@@ -15,6 +16,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.navigation.NavDeepLinkBuilder
+import com.jaredlinden.timingtrials.BuildConfig
 import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.TimeTrial
@@ -282,6 +284,9 @@ class TimingActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_timing, menu)
+        if(BuildConfig.DEBUG){
+            menu?.findItem(R.id.timingTest)?.isVisible = true
+        }
         return true
     }
 
@@ -293,6 +298,10 @@ class TimingActivity : AppCompatActivity() {
                 showTipsDialog()
                 true
             }
+           R.id.timingTest->{
+               viewModel.testFinishAll()
+               true
+           }
 
            else -> true
 

@@ -54,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@{viewModel.filledRider.riderData.firstName + ' ' + viewModel.filledRider.riderData.lastName.charAt(0)}"
+            android:text="@{viewModel.filledRider.riderData.firstName + ' ' + (viewModel.filledRider.riderData.lastName.empty ? `` : viewModel.filledRider.riderData.lastName.charAt(0))}"
             app:layout_constraintBottom_toTopOf="@+id/riderStatusTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

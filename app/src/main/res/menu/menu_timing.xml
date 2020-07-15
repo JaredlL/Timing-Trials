@@ -12,4 +12,10 @@
         android:title="@string/tips"
         app:showAsAction="never" />
 
+        <item
+            android:id="@+id/timingTest"
+            android:title="Test"
+            android:visible="false"
+            app:showAsAction="never" />
+
 </menu>

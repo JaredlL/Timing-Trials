@@ -57,7 +57,7 @@
             app:layout_constraintTop_toBottomOf="@+id/trials_gif" />
 
         <Button
-            android:id="@+id/testSetupButton"
+            android:id="@+id/testDeleteAllButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -74,7 +74,7 @@
             android:layout_marginEnd="8dp"
             android:text="Test Timing"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/testSetupButton" />
+            app:layout_constraintTop_toBottomOf="@+id/testDeleteAllButton" />
 
         <Button
             android:id="@+id/testResults1"
@@ -97,12 +97,12 @@
             app:layout_constraintTop_toBottomOf="@+id/testTimingButton" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/testSetupButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Test 3"
+            android:text="Test Setup"
             app:layout_constraintStart_toEndOf="@+id/testResult2"
             app:layout_constraintTop_toBottomOf="@+id/testTimingButton" />
 
@@ -112,7 +112,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:text="Test permissions"
+            android:text="Insert1000Riders"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/trials_gif" />
 

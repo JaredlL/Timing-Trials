@@ -25,6 +25,7 @@ import org.threeten.bp.*
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
+import java.net.UnknownHostException
 import java.security.InvalidParameterException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipInputStream
@@ -63,10 +64,18 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
     fun readUrlInput(url:URL){
         viewModelScope.launch(Dispatchers.IO) {
-            val connection: URLConnection = url.openConnection()
-            connection.connect()
-            val input: InputStream = BufferedInputStream(url.openStream(), 8192)
-            readInput(input)
+            try {
+
+                val connection: URLConnection = url.openConnection()
+                connection.connect()
+                val input: InputStream = BufferedInputStream(url.openStream(), 8192)
+                readInput(input)
+            }catch (e:UnknownHostException){
+                importMessage.postValue(Event("Error accessing URL, check network access"))
+            }catch (e:Exception){
+                importMessage.postValue(Event(e.message?:"Error accessing URL, check network access"))
+            }
+
         }
 
     }
@@ -150,6 +159,9 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
         }
     }
 
+    fun isCttStartsheet(fileName:String):Boolean{
+        return fileName.contains("startsheet-")
+    }
 
     private suspend fun readCsvInputIntoDb(fileName: String, fileContents: String): String{
         try{
@@ -164,6 +176,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             var state = READING_TT
 
             val allLines = CSVReader(StringReader(fileContents)).readAll()
+
             for  (fileLine in allLines){
 
                 val currentLine = fileLine.joinToString()

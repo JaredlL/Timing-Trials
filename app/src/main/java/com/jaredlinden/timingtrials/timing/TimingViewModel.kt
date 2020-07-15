@@ -428,4 +428,27 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             }
 
     }
+
+    fun testFinishAll(){
+        timeTrial.value?.let {tt->
+            val now1 = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis
+            val timeLeft = (tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size() - 1)) - now1
+            var c = if(tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size() - 1) > now1){
+                tt.copy(timeTrialHeader = tt.timeTrialHeader.copy(startTime = tt.timeTrialHeader.startTime?.minusSeconds(timeLeft * 1000)))
+            }else{
+                tt
+            }
+
+            tt.riderList.forEach{ttr->
+                val now = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis
+                //eventAwaitingSelection = now
+                    val helper = c.helper
+                    c = helper.assignRiderToEvent(ttr.timeTrialData, now).tt
+
+                }
+            updateTimeTrial(c)
+            }
+
+        }
+
 }

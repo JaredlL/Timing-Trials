@@ -36,6 +36,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.io.IOException
+import java.lang.Exception
 import java.net.URL
 import kotlin.math.abs
 
@@ -82,12 +83,17 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 .setIcon(R.mipmap.tt_logo_round)
                 .setMessage(html)
                 .setPositiveButton(R.string.yes){_,_->
-                    val url = URL("https://bbcdn.githack.com/lindenj/timingtrialsdata/raw/master/Timing Trials Export V2.tt")
-                    val vm = getViewModel { injector.importViewModel()}
-                    vm.readUrlInput(url)
-                    vm.importMessage.observe(this, EventObserver{
-                        Toast.makeText(this, it, Toast.LENGTH_LONG).show()
-                    })
+                    try{
+                        val url = URL("https://bbcdn.githack.com/lindenj/timingtrialsdata/raw/master/Timing Trials Export V2.tt")
+                        val vm = getViewModel { injector.importViewModel()}
+                        vm.readUrlInput(url)
+                        vm.importMessage.observe(this, EventObserver{
+                            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+                        })
+                    }catch (e:Exception){
+                        Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+                    }
+
                 }
                 .setNegativeButton(R.string.no) { _, _ ->
 
@@ -173,7 +179,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         })
 
         if(BuildConfig.DEBUG){
-            nav_view.menu.findItem(R.id.app_bar_test).isVisible = true
+           nav_view.menu.findItem(R.id.app_bar_test).isVisible = true
         }
 
         nav_view.setNavigationItemSelectedListener {
