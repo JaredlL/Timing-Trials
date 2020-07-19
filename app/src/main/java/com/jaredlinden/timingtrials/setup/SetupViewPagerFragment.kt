@@ -25,6 +25,7 @@ import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.data.NumbersDirection
 import com.jaredlinden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
 import com.jaredlinden.timingtrials.databinding.FragmentNumberOptionsBinding
+import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_number_options.*
@@ -100,6 +101,13 @@ class SetupViewPagerFragment: Fragment() {
         }
 
 
+        (activity as? IFabCallbacks)?.fabClickEvent?.observe(viewLifecycleOwner, EventObserver{
+            if(it && viewPager.currentItem == RIDER_PAGE_INDEX){
+                val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(0)
+                findNavController().navigate(action)
+            }
+
+        })
 
         viewPager.setCurrentItem(setupViewModel.currentPage, false)
         setFabStatus(setupViewModel.currentPage)
@@ -115,10 +123,6 @@ class SetupViewPagerFragment: Fragment() {
             RIDER_PAGE_INDEX -> {
                 act.setVisibility(View.VISIBLE)
                 act.setImage(R.drawable.ic_add_white_24dp)
-                act.setAction {
-                    val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(0)
-                    findNavController().navigate(action)
-                }
                 setHasOptionsMenu(true)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = true

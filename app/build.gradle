@@ -98,9 +98,9 @@ dependencies {
 
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.lifecycleExtVersion"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
 
     //Timber logger
     implementation 'com.jakewharton.timber:timber:4.7.1'
@@ -127,6 +127,8 @@ dependencies {
     androidTestImplementation('org.threeten:threetenbp:1.4.4') {
         exclude group: 'com.jakewharton.threetenabp', module: 'threetenabp'
     }
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
 
 
 }

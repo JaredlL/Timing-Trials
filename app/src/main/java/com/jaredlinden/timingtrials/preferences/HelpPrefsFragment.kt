@@ -1,10 +1,13 @@
 package com.jaredlinden.timingtrials.preferences
 
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceFragmentCompat
 import com.jaredlinden.timingtrials.BuildConfig
@@ -29,23 +32,28 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
         }
 
         findPreference(R.string.contact_developer).setOnPreferenceClickListener {
-                    val t = getDebugInfo()
-                    val intent = Intent(Intent.ACTION_SENDTO).apply {
-                        type = "*/*"
-                        data = Uri.parse("mailto:")
-                        putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.email)))
-                        putExtra(Intent.EXTRA_SUBJECT, "Timing Trials Feedback")
-                        putExtra(Intent.EXTRA_TEXT, t)
-                    }
 
-                    startActivity(intent)
-                    false
+            try{
+                val t = getDebugInfo()
+                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                    type = "*/*"
+                    data = Uri.parse("mailto:")
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.email)))
+                    putExtra(Intent.EXTRA_SUBJECT, "Timing Trials Feedback")
+                    putExtra(Intent.EXTRA_TEXT, t)
                 }
+
+            }catch (e:Exception){
+                Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()
+            }
+
+            false
+        }
 
         findPreference(R.string.p_helpref_demo).setOnPreferenceClickListener {
-                    (requireActivity() as MainActivity).showDemoDataDialog()
-                    false
-                }
+            (requireActivity() as MainActivity).showDemoDataDialog()
+            false
+        }
 
         findPreference(R.string.p_helpref_version).summary = BuildConfig.VERSION_NAME
 
@@ -60,23 +68,23 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
         try {
 
             return Arrays.asList("",
-                                    "----------",
-                                    ("Timing Trials: "
-                                            + BuildConfig.VERSION_NAME
-                                            ) + " ("
-                                            .toString() + " build "
-                                            + BuildConfig.VERSION_CODE
-                                            .toString() + ")",
-                                    "Android: " + Build.VERSION.RELEASE + " (" + Build.DISPLAY + ")",
-                                    "Model: " + Build.MANUFACTURER + " " + Build.MODEL,
-                                    "Product: " + Build.PRODUCT + " (" + Build.DEVICE + ")",
-                                    "Kernel: "
-                                            + System.getProperty("os.version")
-                                            + " ("
-                                            + Build.VERSION.INCREMENTAL
-                                            + ")",
-                                    "----------",
-                                    "").joinToString("\n")
+                    "----------",
+                    ("Timing Trials: "
+                            + BuildConfig.VERSION_NAME
+                            ) + " ("
+                            .toString() + " build "
+                            + BuildConfig.VERSION_CODE
+                            .toString() + ")",
+                    "Android: " + Build.VERSION.RELEASE + " (" + Build.DISPLAY + ")",
+                    "Model: " + Build.MANUFACTURER + " " + Build.MODEL,
+                    "Product: " + Build.PRODUCT + " (" + Build.DEVICE + ")",
+                    "Kernel: "
+                            + System.getProperty("os.version")
+                            + " ("
+                            + Build.VERSION.INCREMENTAL
+                            + ")",
+                    "----------",
+                    "").joinToString("\n")
         } catch (e: Exception) {
             Timber.e(e)
         }

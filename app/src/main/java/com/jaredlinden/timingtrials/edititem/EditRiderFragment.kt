@@ -94,16 +94,17 @@ class EditRiderFragment : Fragment() {
             lifecycleOwner = (this@EditRiderFragment)
             autoCompleteClub.setAdapter(clubAdapter)
             autoCompleteCategory.setAdapter(categoryAdapter)
-            fabCallback.setAction {
-                if(!riderViewModel.mutableRider.value?.firstName?.trim().isNullOrBlank()){
-                    riderViewModel.addOrUpdate()
-                    //findNavController().popBackStack()
+            fabCallback.fabClickEvent.observe(viewLifecycleOwner, EventObserver {
+                if(it){
+                    if(!riderViewModel.mutableRider.value?.firstName?.trim().isNullOrBlank()){
+                        riderViewModel.addOrUpdate()
+                        //findNavController().popBackStack()
 
-                }else{
-                    Toast.makeText(requireContext(), "Rider must have firstname set", Toast.LENGTH_SHORT).show()
+                    }else{
+                        Toast.makeText(requireContext(), getString(R.string.rider_must_have_first_name_set), Toast.LENGTH_SHORT).show()
+                    }
                 }
-
-            }
+            })
             autoCompleteCategory.setOnEditorActionListener{_, actionId, keyEvent ->
                 if ((keyEvent != null && (keyEvent.keyCode == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     riderViewModel.addOrUpdate()

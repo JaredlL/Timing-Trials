@@ -10,7 +10,8 @@
         android:fitsSystemWindows="true"
         android:background="?android:attr/colorBackground"
         android:clickable="true"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:focusable="true">
 
         <TextView
             android:id="@+id/filterTextView"

@@ -34,20 +34,6 @@ fun Fragment.hideKeyboard(){
 
 
 
-//fun Fragment.haveOrRequestFilePermission(requestCode: Int): Boolean{
-//    return if(ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-////            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-////                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
-////            }else{
-//        ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), requestCode)
-//        false
-//        // }
-//    }else{
-//        true
-//    }
-//}
-
-
 inline fun <reified T: ViewModel> Fragment.getViewModel(crossinline factory: () -> T): T = T::class.java.let { clazz ->
     ViewModelProvider(this, object: ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {

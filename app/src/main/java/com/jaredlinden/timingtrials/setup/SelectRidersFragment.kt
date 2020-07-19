@@ -79,9 +79,6 @@ class SelectRidersFragment : Fragment() {
                 (requireActivity() as IFabCallbacks).apply {
                     setVisibility(View.VISIBLE)
                     setImage(R.drawable.ic_add_white_24dp)
-                    setAction {
-                        editRider(0)
-                    }
                 }
             }
         }else{
@@ -89,11 +86,16 @@ class SelectRidersFragment : Fragment() {
             (requireActivity() as IFabCallbacks).apply {
                 setVisibility(View.VISIBLE)
                 setImage(R.drawable.ic_add_white_24dp)
-                setAction {
-                    editRider(0)
-                }
+
             }
         }
+
+        (requireActivity() as IFabCallbacks).fabClickEvent.observe(viewLifecycleOwner, EventObserver {
+            if(it){
+                editRider(0)
+            }
+
+        })
 
         adapter.addRiderToSelection = {
             viewModel.riderSelected(it)

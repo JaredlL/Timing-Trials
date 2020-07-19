@@ -35,6 +35,9 @@ class CourseListFragment : Fragment() {
         val converter = getLengthConverter()
         viewFactory = CourseViewHolderFactory(converter.unitDef.key)
         adapter = GenericListAdapter(requireContext(), viewFactory)
+
+
+
         listViewModel.filteredAllCourse.observe(viewLifecycleOwner, Observer{res->
             res?.let {adapter.setItems(it.map {
                 SelectableCourseViewModel(it, converter)
@@ -119,11 +122,4 @@ class CourseViewHolderFactory(private val unitString: String): GenericViewHolder
         return CourseListViewHolder(binding)
     }
 
-    override fun performFabAction(fab: View) {
-        fab.setOnClickListener {
-            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(0, fab.context.getString(R.string.new_course))
-            Navigation.findNavController(fab).navigate(action)
-        }
-
-    }
 }

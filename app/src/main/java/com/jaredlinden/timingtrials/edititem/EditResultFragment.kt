@@ -40,9 +40,12 @@ class EditResultFragment : Fragment() {
         fabCallback.setImage(R.drawable.ic_done_white_24dp)
         fabCallback.setVisibility(View.VISIBLE)
 
-        fabCallback.setAction {
-            resultViewModel.save()
-        }
+        fabCallback.fabClickEvent.observe(viewLifecycleOwner, EventObserver {
+            if(it){
+                resultViewModel.save()
+            }
+
+        })
 
         resultViewModel.setResult(args.resultId, args.timeTrialId)
 

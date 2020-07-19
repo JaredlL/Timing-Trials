@@ -19,6 +19,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.text.HtmlCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -46,8 +48,9 @@ import kotlin.math.abs
 interface IFabCallbacks{
     fun currentVisibility(): Int
     fun setVisibility(visibility: Int)
-    fun setAction(action: () -> Unit)
+    //fun setAction(action: () -> Unit)
     fun setImage(resourceId: Int)
+    val fabClickEvent: MutableLiveData<Event<Boolean>>
 }
 
 
@@ -161,7 +164,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }
 
         mainFab.setOnClickListener {
-            fabAction()
+            fabClickEvent.postValue(Event(true))
         }
 
         setSupportActionBar(toolbar)
@@ -350,7 +353,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         val inputStream = contentResolver.openInputStream(uri)
         val fName = getFileName(uri)
 
-        //Toast.makeText(this, b, Toast.LENGTH_SHORT).show()
         if(inputStream != null){
             importVm.readInput(fName, inputStream)
             importVm.importMessage.observe(this, EventObserver {
@@ -381,43 +383,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         return result
     }
 
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        when(requestCode){
-//            REQUEST_IMPORT_FILE ->{
-//                data?.data?.let {uri->
-//                    importData(uri)
-//                }
-//            }
-//            REQUEST_MAIN_CREATE_FILE_JSON->{
-//                data?.data?.let {uri->
-//                    try {
-//                        val outputStream = contentResolver.openOutputStream(uri)
-//                        if(haveOrRequestFilePermission() && outputStream != null){
-//                            val allTtsVm = getViewModel { injector.importViewModel()}
-//
-//                            allTtsVm.writeAllTimeTrialsToPath(outputStream)
-//                            allTtsVm.importMessage.observe(this, EventObserver{
-//                                Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
-//                                val intent = Intent()
-//                                intent.action = Intent.ACTION_VIEW
-//                                intent.setDataAndType(uri, "text/*")
-//                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//                                startActivity(intent)
-//                            })
-//
-//                        }
-//                    }
-//                    catch(e: IOException)
-//                    {
-//                        e.printStackTrace()
-//                        Toast.makeText(this, "Save failed - ${e.message}", Toast.LENGTH_LONG).show()
-//                    }
-//                }
-//
-//            }
-//        }
-//    }
 
     fun writeAllResults(uri: Uri){
         try {
@@ -445,19 +410,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }
     }
 
-//    private fun haveOrRequestFilePermission(): Boolean{
-//        return if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-////            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-////                Toast.makeText(requireActivity(), "Show Rational", Toast.LENGTH_SHORT).show()
-////            }else{
-//            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 3)
-//            false
-//            // }
-//        }else{
-//            true
-//        }
-//    }
-
     private var toolbarCollapsed = false
     private var fabShouldShow = true
     override fun setVisibility(visibility: Int) {
@@ -476,10 +428,8 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }
     }
 
-    var fabAction: () -> Unit = {}
-    override fun setAction(action: () -> Unit) {
-        fabAction = action
-    }
+
+    override val fabClickEvent: MutableLiveData<Event<Boolean>> = MutableLiveData()
 
     override fun setImage(resourceId: Int) {
         mainFab.setImageResource(resourceId)

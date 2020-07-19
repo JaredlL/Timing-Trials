@@ -120,9 +120,7 @@ data class TimeTrialListItem(val timeTrialHeader: TimeTrialHeader){
 }
 
 class TimeTrialViewHolderFactory(val onLongPress: (tt:TimeTrialHeader) -> Unit): GenericViewHolderFactory<TimeTrialHeader>() {
-    override fun performFabAction(fab: View) {
 
-    }
 
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
         val binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false).apply {
