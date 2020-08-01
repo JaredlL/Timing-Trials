@@ -22,6 +22,7 @@ import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.*
+import timber.log.Timber
 
 class TimeTrialListFragment : Fragment() {
 
@@ -32,6 +33,8 @@ class TimeTrialListFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
+        Timber.d("Create")
         listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
         viewFactory = TimeTrialViewHolderFactory(::longPress)
@@ -52,6 +55,11 @@ class TimeTrialListFragment : Fragment() {
 
         return binding.root
 
+    }
+
+    override fun onDetach() {
+        Timber.d("Detach")
+        super.onDetach()
     }
 
     private fun longPress(header: TimeTrialHeader){

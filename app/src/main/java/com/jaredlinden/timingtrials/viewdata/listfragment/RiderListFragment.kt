@@ -18,6 +18,7 @@ import com.jaredlinden.timingtrials.databinding.ListItemRiderBinding
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.*
+import timber.log.Timber
 
 class RiderListFragment : Fragment() {
 
@@ -28,6 +29,8 @@ class RiderListFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
+        Timber.d("Create")
         listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
         viewFactory = RiderViewHolderFactory()
@@ -49,6 +52,11 @@ class RiderListFragment : Fragment() {
 
         return binding.root
 
+    }
+
+    override fun onDetach() {
+        Timber.d("Detach")
+        super.onDetach()
     }
 
 }

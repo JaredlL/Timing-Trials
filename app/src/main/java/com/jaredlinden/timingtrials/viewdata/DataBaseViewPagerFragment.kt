@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -45,7 +47,7 @@ class DataBaseViewPagerFragment: Fragment() {
         val tabLayout = binding.tabs
         mViewPager = binding.viewPager2
         val viewpager = binding.viewPager2
-        viewpager.adapter = TimeTrialDBPagerAdapter(this)
+        viewpager.adapter = TimeTrialDBPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
         setHasOptionsMenu(true)
 
 
@@ -95,8 +97,10 @@ class DataBaseViewPagerFragment: Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        tabLayoutMediator.detach()
-        mViewPager?.unregisterOnPageChangeCallback(mCallback)
+        //tabLayoutMediator.detach()
+        //mViewPager?.unregisterOnPageChangeCallback(mCallback)
+        //sv?.setOnQueryTextListener(null)
+        //mViewPager?.adapter = null
     }
 
     private fun getTabIcon(position: Int): Int {
@@ -137,6 +141,7 @@ class DataBaseViewPagerFragment: Fragment() {
 
     }
 
+    var sv: SearchView? = null
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_database, menu)
 
@@ -149,6 +154,7 @@ class DataBaseViewPagerFragment: Fragment() {
             this.clearFocus()
             val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
+            sv = menu.findItem(R.id.app_bar_search).actionView as SearchView
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
                     //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
@@ -179,7 +185,7 @@ const val RIDER_PAGE_INDEX = 1
 const val COURSE_PAGE_INDEX = 2
 
 
-class TimeTrialDBPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class TimeTrialDBPagerAdapter(fm: FragmentManager, ls:Lifecycle) : FragmentStateAdapter(fm,ls) {
 
     /**
      * Mapping of the ViewPager page indexes to their respective Fragments

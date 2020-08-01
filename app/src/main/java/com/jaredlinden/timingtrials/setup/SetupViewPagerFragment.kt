@@ -12,6 +12,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -60,7 +62,7 @@ class SetupViewPagerFragment: Fragment() {
         val binding = FragmentDatabaseViewPagerBinding.inflate(inflater, container, false)
         val tabLayout = binding.tabs
         viewPager = binding.viewPager2
-        val pagerAdapter = SetupPagerAdapter(this){
+        val pagerAdapter = SetupPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle){
             setFabStatus(setupViewModel.currentPage)
         }
         viewPager.adapter = pagerAdapter
@@ -241,7 +243,7 @@ const val RIDER_PAGE_INDEX = 0
 const val ORDER_RIDER_INDEX = 1
 
 
-class SetupPagerAdapter(fragment: Fragment, val fragCreated: () -> Unit) : FragmentStateAdapter(fragment) {
+class SetupPagerAdapter(fm: FragmentManager, ls: Lifecycle, val fragCreated: () -> Unit) : FragmentStateAdapter(fm,ls) {
 
     /**
      * Mapping of the ViewPager page indexes to their respective Fragments
