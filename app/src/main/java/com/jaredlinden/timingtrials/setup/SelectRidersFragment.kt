@@ -48,7 +48,6 @@ class SelectRidersFragment : Fragment() {
 
         }else{
             requireActivity().getViewModel { requireActivity().injector.editResultViewModel() }.selectRiderVm
-            //setHasOptionsMenu(true)
         }
 
 
@@ -63,14 +62,11 @@ class SelectRidersFragment : Fragment() {
 
         val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
             lifecycleOwner = (this@SelectRidersFragment)
-            riderHeading.rider =  Rider.createBlank().copy( firstName = "Name", club = "Club")
+            riderHeading.rider =  Rider.createBlank().copy( firstName = getString(R.string.name), club = getString(R.string.club))
             riderHeading.checkBox.visibility =  View.INVISIBLE
             riderRecyclerView.adapter = adapter
             riderRecyclerView.layoutManager = viewManager
 
-//            riderListFab.setOnClickListener {
-//                editRider(0)
-//            }
         }
 
         if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI){
@@ -130,7 +126,6 @@ class SelectRidersFragment : Fragment() {
 
         viewModel.showMessage.observe(viewLifecycleOwner, EventObserver{
             Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
-            //Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
         })
 
 
@@ -150,15 +145,14 @@ class SelectRidersFragment : Fragment() {
             isIconified = false // Do not iconify the widget; expand it by default
             isIconifiedByDefault = false
             setQuery(viewModel.riderFilter.value ?: "", false)
+
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
-                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
                     viewModel.setRiderFilter(searchText ?: "")
                     return true
                 }
 
                 override fun onQueryTextChange(searchText: String?): Boolean {
-                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector. listViewModel() }
                     viewModel.setRiderFilter(searchText ?: "")
                     return true
                 }
@@ -167,10 +161,9 @@ class SelectRidersFragment : Fragment() {
         }
 
         menu.findItem(R.id.settings_menu_sort).setOnMenuItemClickListener {
-            val current = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_RECENT_ACTIVITY)
+            val current = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_DEFAULT)
             AlertDialog.Builder(requireContext())
                     .setTitle(resources.getString(R.string.choose_sort))
-                    //.setMessage("Choose Sorting")
                     .setSingleChoiceItems(R.array.sortingArray, current) { _, j ->
                         PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putInt(SORT_KEY, j).apply()
                         viewModel.setSortMode(j)

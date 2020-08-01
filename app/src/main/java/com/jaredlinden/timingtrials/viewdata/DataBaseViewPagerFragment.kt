@@ -97,10 +97,10 @@ class DataBaseViewPagerFragment: Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        //tabLayoutMediator.detach()
-        //mViewPager?.unregisterOnPageChangeCallback(mCallback)
-        //sv?.setOnQueryTextListener(null)
-        //mViewPager?.adapter = null
+        tabLayoutMediator.detach()
+        mViewPager?.unregisterOnPageChangeCallback(mCallback)
+        sv?.setOnQueryTextListener(null)
+        mViewPager?.adapter = null
     }
 
     private fun getTabIcon(position: Int): Int {

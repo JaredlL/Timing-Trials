@@ -2,14 +2,19 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-<!--    <item-->
-<!--        android:id="@+id/timingMenuAddLateRider"-->
-<!--        android:title="@string/add_late_rider"-->
-<!--        app:showAsAction="never" />-->
+    <item
+        android:id="@+id/timingMenuAddLateRider"
+        android:title="@string/add_late_rider"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/timingMenuTips"
         android:title="@string/tips"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/timingMenuSettings"
+        android:title="@string/settings"
         app:showAsAction="never" />
 
         <item

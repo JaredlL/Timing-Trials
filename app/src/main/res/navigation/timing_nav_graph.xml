@@ -2,19 +2,34 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/timing_nav_graph">
-
+    android:id="@+id/timing_nav_graph"
+    app:startDestination="@id/timerHostFragment">
     <fragment
-        android:id="@+id/selectRidersFragment2"
-        android:name="com.jaredlinden.timingtrials.setup.SelectRidersFragment"
-        android:label="SelectRidersFragment" />
-    <fragment
-        android:id="@+id/timerFragment"
-        android:name="com.jaredlinden.timingtrials.timing.TimerFragment"
-        android:label="fragment_timer"
-        tools:layout="@layout/fragment_timer" >
+        android:id="@+id/timerHostFragment"
+        android:name="com.jaredlinden.timingtrials.timing.TimerHostFragment"
+        android:label="@string/time_trial_in_progress"
+        tools:layout="@layout/fragment_host">
         <action
-            android:id="@+id/action_timerFragment_to_selectRidersFragment2"
-            app:destination="@id/selectRidersFragment2" />
+            android:id="@+id/action_timerHostFragment_to_mainPrefsFragment"
+            app:destination="@id/mainPrefsFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_timerHostFragment_to_selectRiderFragment"
+            app:destination="@id/selectRiderFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
     </fragment>
+    <fragment
+        android:id="@+id/mainPrefsFragment"
+        android:name="com.jaredlinden.timingtrials.preferences.MainPrefsFragment"
+        android:label="@string/settings" />
+    <fragment
+        android:id="@+id/selectRiderFragment"
+        android:name="com.jaredlinden.timingtrials.select.SelectRiderFragment"
+        android:label="SelectRiderFragment" />
 </navigation>

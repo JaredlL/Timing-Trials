@@ -16,6 +16,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.navigation.NavDeepLinkBuilder
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import com.jaredlinden.timingtrials.BuildConfig
 import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
@@ -28,6 +31,7 @@ import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.Utils
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
+import kotlinx.android.synthetic.main.activity_main.*
 
 import kotlinx.android.synthetic.main.activity_timing.*
 import org.threeten.bp.Instant
@@ -41,6 +45,8 @@ class TimingActivity : AppCompatActivity() {
     private val mService: MutableLiveData<TimingService?> = MutableLiveData()
     private lateinit var viewModel: TimingViewModel
     private var mBound: Boolean = false
+
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     private val connection = object : ServiceConnection {
 
@@ -63,6 +69,7 @@ class TimingActivity : AppCompatActivity() {
     val serviceCreated: MutableLiveData<Boolean> = MutableLiveData(false)
 
     override fun onDestroy() {
+
         super.onDestroy()
         System.out.println("JAREDMSG -> Timing Activity -> DESTROY")
     }
@@ -78,30 +85,35 @@ class TimingActivity : AppCompatActivity() {
 
         viewModel = getViewModel { injector.timingViewModel() }
 
-        supportActionBar?.title = getString(R.string.time_trial_in_progress)
-
+        applicationContext.startService(Intent(applicationContext, TimingService::class.java))
 
         mBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)
 
-        /**
-         * Check if the fragemts already exist in child fragment manager
-         * To make sure we do not recreate fragments unnecessarily
-         */
 
+        val navController = findNavController(R.id.nav_host_timer_fragment)
 
-        supportFragmentManager.findFragmentByTag(TIMERTAG)?: TimerFragment.newInstance().also {
-            supportFragmentManager.beginTransaction().apply{
-                add(R.id.higherFrame, it, TIMERTAG)
-                commit()
-            }
-        }
+        appBarConfiguration = AppBarConfiguration(navController.graph)
 
-        supportFragmentManager.findFragmentByTag(STATUSTAG)?: RiderStatusFragment.newInstance().also {
-            supportFragmentManager.beginTransaction().apply{
-                add(R.id.lowerFrame, it, STATUSTAG)
-                commit()
-            }
-        }
+        timingToolBar.setupWithNavController(navController, appBarConfiguration)
+
+//        /**
+//         * Check if the fragemts already exist in child fragment manager
+//         * To make sure we do not recreate fragments unnecessarily
+//         */
+
+//        supportFragmentManager.findFragmentByTag(TIMERTAG)?: TimerFragment.newInstance().also {
+//            supportFragmentManager.beginTransaction().apply{
+//                add(R.id.higherFrame, it, TIMERTAG)
+//                commit()
+//            }
+//        }
+//
+//        supportFragmentManager.findFragmentByTag(STATUSTAG)?: RiderStatusFragment.newInstance().also {
+//            supportFragmentManager.beginTransaction().apply{
+//                add(R.id.lowerFrame, it, STATUSTAG)
+//                commit()
+//            }
+//        }
 
         val liveTick = Transformations.switchMap(mService){result->
             result?.timerTick
@@ -225,6 +237,15 @@ class TimingActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStop() {
+        if(mBound){
+            applicationContext.unbindService(connection)
+            mBound = false
+        }
+
+        super.onStop()
+    }
+
     fun showExitDialogWithSetup(){
         AlertDialog.Builder(this)
                 .setTitle(getString(R.string.end_timing))
@@ -300,6 +321,21 @@ class TimingActivity : AppCompatActivity() {
             }
            R.id.timingTest->{
                viewModel.testFinishAll()
+               true
+           }
+
+           R.id.timingMenuSettings->{
+               val navController = findNavController(R.id.nav_host_timer_fragment)
+               val action = TimerHostFragmentDirections.actionTimerHostFragmentToMainPrefsFragment()
+               navController.navigate(action)
+
+               true
+           }
+
+           R.id.timingMenuAddLateRider->{
+               val navController = findNavController(R.id.nav_host_timer_fragment)
+               val action = TimerHostFragmentDirections.actionTimerHostFragmentToSelectRiderFragment()
+               navController.navigate(action)
                true
            }
 

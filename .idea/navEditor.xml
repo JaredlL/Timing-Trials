@@ -520,47 +520,52 @@
             <LayoutPositions>
               <option name="myPositions">
                 <map>
-                  <entry key="selectRidersFragment2">
+                  <entry key="mainPrefsFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="396" />
-                            <option name="y" value="74" />
+                            <option name="x" value="715" />
+                            <option name="y" value="285" />
                           </Point>
                         </option>
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="timerFragment">
+                  <entry key="selectRiderFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="32" />
-                            <option name="y" value="258" />
+                            <option name="x" value="697" />
+                            <option name="y" value="-140" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="timerHostFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="40" />
+                            <option name="y" value="42" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_timerFragment_to_selectRidersFragment2">
+                            <entry key="action_timerHostFragment_to_mainPrefsFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_timerHostFragment_to_selectRiderFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
                           </map>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
-                  <entry key="timingActivity">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="-263" />
-                            <option name="y" value="355" />
-                          </Point>
                         </option>
                       </LayoutPositions>
                     </value>

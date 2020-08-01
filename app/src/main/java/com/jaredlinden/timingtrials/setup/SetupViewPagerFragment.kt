@@ -35,6 +35,7 @@ import kotlinx.android.synthetic.main.fragment_number_options.*
 
 const val SORT_RECENT_ACTIVITY = 0
 const val SORT_ALPHABETICAL = 1
+const val SORT_DEFAULT = SORT_ALPHABETICAL
 const val SORT_KEY = "sorting"
 
 class SetupViewPagerFragment: Fragment() {
