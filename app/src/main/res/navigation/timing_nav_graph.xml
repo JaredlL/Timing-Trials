@@ -31,5 +31,12 @@
     <fragment
         android:id="@+id/selectRiderFragment"
         android:name="com.jaredlinden.timingtrials.select.SelectRiderFragment"
-        android:label="SelectRiderFragment" />
+        android:label="SelectRiderFragment" >
+        <argument
+            android:name="excludedIds"
+            app:argType="long[]" />
+        <argument
+            android:name="singleSelectionMode"
+            app:argType="boolean" />
+    </fragment>
 </navigation>

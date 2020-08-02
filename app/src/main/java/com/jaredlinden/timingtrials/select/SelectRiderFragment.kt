@@ -9,19 +9,26 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.adapters.SelectableRiderListAdapter
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
+import com.jaredlinden.timingtrials.edititem.EditCourseFragmentArgs
 import com.jaredlinden.timingtrials.setup.SelectRidersFragment
 import com.jaredlinden.timingtrials.setup.SelectRidersFragmentDirections
 import com.jaredlinden.timingtrials.setup.SetupViewPagerFragmentDirections
+import com.jaredlinden.timingtrials.util.Event
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 
+const val SELECTED_RIDERS = "selected_riders"
+
 class SelectRiderFragment : Fragment() {
+
+    private val args: SelectRiderFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -43,6 +50,12 @@ class SelectRiderFragment : Fragment() {
         }
 
         adapter.addRiderToSelection = {
+
+            if(args.singleSelectionMode){
+                findNavController().previousBackStackEntry?.savedStateHandle?.set(SELECTED_RIDERS, listOf(it.id?:0L).toLongArray())
+                findNavController().popBackStack()
+            }
+
             viewModel.riderSelected(it)
         }
 
@@ -51,10 +64,22 @@ class SelectRiderFragment : Fragment() {
         }
 
 
+        viewModel.liveSortMode.observe(viewLifecycleOwner, Observer {
+
+        })
+
+        viewModel.riderFilter.observe(viewLifecycleOwner, Observer {
+
+        })
 
         viewModel.selectedRidersInformation.observe(viewLifecycleOwner, Observer {result->
             result?.let {
-                adapter.setRiders(it)
+                if(args.singleSelectionMode){
+                    adapter.setRiders(it.copy(allRiderList = it.allRiderList.filterNot { args.excludedIds.contains(it.id?:0L) }))
+                }else{
+                    adapter.setRiders(it)
+                }
+
                 result.selectedIds.firstOrNull()?.let {fs->
                     val pos = result.allRiderList.indexOfFirst { it.id == fs }
                     if(pos >=0) {

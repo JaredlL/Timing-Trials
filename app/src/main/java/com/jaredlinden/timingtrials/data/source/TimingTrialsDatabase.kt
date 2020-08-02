@@ -3,6 +3,7 @@ package com.jaredlinden.timingtrials.data.source
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.room.*
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.jaredlinden.timingtrials.data.*
 import kotlinx.coroutines.CoroutineScope
@@ -21,18 +22,23 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
     val mDbIsPopulated = MutableLiveData(false)
 
 
+
     companion object {
         @Volatile private var INSTANCE: TimingTrialsDatabase? = null
+
+        val MIGRATION_46_47 = object : Migration(46,47) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+
+            }
+        }
 
         fun getDatabase(context: Context, scope: CoroutineScope): TimingTrialsDatabase {
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
             return INSTANCE ?: synchronized(this){
                 val instance = Room.databaseBuilder(context,
-                        TimingTrialsDatabase::class.java,
-                        "timingtrials_database")
-                        .fallbackToDestructiveMigration()
-                        //.addCallback(TimingTrialsDatabaseCallback(scope))
+                        TimingTrialsDatabase::class.java, "timingtrials_database")
+                        .addMigrations(MIGRATION_46_47)
                         .build()
 
                 INSTANCE = instance

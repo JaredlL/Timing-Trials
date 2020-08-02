@@ -62,6 +62,7 @@ class  SelectRiderViewModel @Inject constructor (val riderRepository: IRiderRepo
     }
 
     init {
+        selectedRidersInformation.value = SelectedRidersInformation(listOf(), listOf())
         selectedRidersInformation.addSource(liveSortMode){sm->
             updateselectedRiderInfo(groupedAllRiders.value, riderFilter.value, selectedRidersInformation.value, sm?:0)
         }
