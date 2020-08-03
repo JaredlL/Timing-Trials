@@ -59,7 +59,7 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
     }
 
     override fun getItemId(position: Int): Long {
-        return mStatus[position].rider.riderId
+        return mStatus[position].timeTrialRider.riderId
     }
 
 

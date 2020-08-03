@@ -4,54 +4,102 @@ import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayoutMediator
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
 import com.jaredlinden.timingtrials.domain.Filter
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.util.*
 import com.jaredlinden.timingtrials.viewdata.listfragment.CourseListFragment
 import com.jaredlinden.timingtrials.viewdata.listfragment.RiderListFragment
 import com.jaredlinden.timingtrials.viewdata.listfragment.TimeTrialListFragment
-import com.google.android.material.tabs.TabLayoutMediator
-import com.jaredlinden.timingtrials.data.NumberMode
-import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
 
 
 class DataBaseViewPagerFragment: Fragment() {
+
+    var mViewPager: ViewPager2? = null
+
+    lateinit var tabLayoutMediator: TabLayoutMediator
+
+
+    private val mPageChangeCallback = object :ViewPager2.OnPageChangeCallback(){
+        override fun onPageSelected(position: Int) {
+            setFabStatus(position)
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val binding = FragmentDatabaseViewPagerBinding.inflate(inflater, container, false)
         val tabLayout = binding.tabs
-        val viewPager = binding.viewPager2
-        viewPager.adapter = TimeTrialDBPagerAdapter(this)
+        mViewPager = binding.viewPager2
+        val viewpager = binding.viewPager2
+        viewpager.adapter = TimeTrialDBPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
         setHasOptionsMenu(true)
 
+
+
         // Set the icon and text for each tab
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+        tabLayoutMediator = TabLayoutMediator(tabLayout, viewpager) { tab, position ->
             tab.setIcon(getTabIcon(position))
             tab.text = getTabTitle(position)
-        }.attach()
+        }
+        tabLayoutMediator.attach()
 
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
-            override fun onPageSelected(position: Int) {
-                setFabStatus(position)
-            }
-        })
+        viewpager.registerOnPageChangeCallback(mPageChangeCallback)
         val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
         listViewModel.setFilter(Filter(""))
 
         requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.currentPage = 0
 
+        (activity as? IFabCallbacks)?.fabClickEvent?.observe(viewLifecycleOwner, EventObserver{
+            if(it){
+                when(viewpager.currentItem){
+                    RIDER_PAGE_INDEX -> {
+                            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment(0)
+                            findNavController().navigate(action)
+                    }
+                    COURSE_PAGE_INDEX -> {
+                            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(0, requireActivity().getString(R.string.new_course))
+                            findNavController().navigate(action)
+                    }
+                    TIMETRIAL_PAGE_INDEX->{
+
+                            val viewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+                            viewModel.timeTrialInsertedEvent.observe(viewLifecycleOwner, EventObserver {
+                                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
+                                findNavController().navigate(action)
+                            })
+                            val mode = PreferenceManager.getDefaultSharedPreferences(requireContext()).getString(PREF_NUMBERING_MODE, NumberMode.INDEX.name)?.let {
+                                NumberMode.valueOf(it)
+                            } ?: NumberMode.INDEX
+                            viewModel.insertNewTimeTrial(mode)
+                    }
+                }
+            }
+        })
+
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        tabLayoutMediator.detach()
+        mViewPager?.unregisterOnPageChangeCallback(mPageChangeCallback)
+        sv?.setOnQueryTextListener(null)
+        mViewPager?.adapter = null
+        super.onDestroyView()
     }
 
     private fun getTabIcon(position: Int): Int {
@@ -74,72 +122,76 @@ class DataBaseViewPagerFragment: Fragment() {
 
 
     private  fun setFabStatus(position: Int){
-        val act = requireActivity() as IFabCallbacks
-        act.setVisibility(View.VISIBLE)
-        act.setImage(R.drawable.ic_add_white_24dp)
-        when (position) {
-            RIDER_PAGE_INDEX -> {
-                act.setAction {
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment(0)
-                findNavController().navigate(action)
-            }
-                act.setImage(R.drawable.ic_add_white_24dp)
-            }
-            COURSE_PAGE_INDEX -> {
-                act.setImage(R.drawable.ic_add_white_24dp)
-                act.setAction {
-                    val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(0, requireActivity().getString(R.string.new_course))
-                    findNavController().navigate(action)
+        (activity as? IFabCallbacks)?.let { act->
+            act.setVisibility(View.VISIBLE)
+            act.setImage(R.drawable.ic_add_white_24dp)
+            when (position) {
+                RIDER_PAGE_INDEX -> {
+                    act.setImage(R.drawable.ic_add_white_24dp)
+                }
+                COURSE_PAGE_INDEX -> {
+                    act.setImage(R.drawable.ic_add_white_24dp)
+                }
+                TIMETRIAL_PAGE_INDEX->{
+                    act.setImage(R.drawable.ic_timer_white_24dp)
                 }
             }
-            TIMETRIAL_PAGE_INDEX->{
-                act.setImage(R.drawable.ic_timer_white_24dp)
-                act.setAction {
-                val viewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
-                viewModel.timeTrialInsertedEvent.observe(viewLifecycleOwner, EventObserver {
-                    val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
-                    findNavController().navigate(action)
-                })
-                    val mode = PreferenceManager.getDefaultSharedPreferences(requireContext()).getString(PREF_NUMBERING_MODE, NumberMode.INDEX.name)?.let {
-                        NumberMode.valueOf(it)
-                    } ?: NumberMode.INDEX
-                viewModel.insertNewTimeTrial(mode)
-            }
-            }
+        }
+
+    }
+
+
+
+    val expandListener = object : MenuItem.OnActionExpandListener {
+        override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+
+            sv?.clearFocus()
+            return true // Return true to collapse action view
+        }
+
+        override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+            // Do something when expanded
+            sv?.requestFocus()
+            showKeyboard()
+            return true // Return true to expand action view
         }
     }
 
+    var sv: SearchView? = null
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_database, menu)
 
         val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+
+        menu.findItem(R.id.app_bar_search).setOnActionExpandListener(expandListener)
+
         (menu.findItem(R.id.app_bar_search).actionView as SearchView).apply {
-            // Assumes current activity is the searchable activity
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
-            isIconified=false // Do not iconify the widget; expand it by default
-            isIconifiedByDefault = false
-            this.clearFocus()
+           isIconifiedByDefault = false
             val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
+            sv = this
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
-                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
                     listViewModel.setFilter(Filter(searchText?:""))
+                    clearFocus()
                     return true
                 }
 
                 override fun onQueryTextChange(searchText: String?): Boolean {
-                   //val listViewModel = requireActivity().getViewModel { requireActivity().injector. listViewModel() }
                     listViewModel.setFilter(Filter(searchText?:""))
                     return true
                 }
 
             })
+
         }
 
 
 
     }
+
+    
 
 }
 
@@ -149,7 +201,7 @@ const val RIDER_PAGE_INDEX = 1
 const val COURSE_PAGE_INDEX = 2
 
 
-class TimeTrialDBPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class TimeTrialDBPagerAdapter(fm: FragmentManager, ls:Lifecycle) : FragmentStateAdapter(fm,ls) {
 
     /**
      * Mapping of the ViewPager page indexes to their respective Fragments

@@ -17,8 +17,8 @@ android {
         applicationId "com.jaredlinden.timingtrials"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 14
+        versionName "1.1.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -58,10 +58,10 @@ dependencies {
 
     //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test:core:1.3.0-rc01'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2-rc01'
-    androidTestImplementation 'androidx.test:runner:1.3.0-rc01'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-rc01'
+    androidTestImplementation 'androidx.test:core:1.3.0-rc02'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2-rc02'
+    androidTestImplementation 'androidx.test:runner:1.3.0-rc02'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-rc02'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
@@ -98,9 +98,9 @@ dependencies {
 
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.lifecycleExtVersion"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
 
     //Timber logger
     implementation 'com.jakewharton.timber:timber:4.7.1'
@@ -127,6 +127,8 @@ dependencies {
     androidTestImplementation('org.threeten:threetenbp:1.4.4') {
         exclude group: 'com.jakewharton.threetenabp', module: 'threetenabp'
     }
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
 
 
 }

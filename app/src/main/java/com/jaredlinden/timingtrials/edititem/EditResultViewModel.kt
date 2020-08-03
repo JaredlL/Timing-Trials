@@ -5,10 +5,7 @@ import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
-import com.jaredlinden.timingtrials.setup.ISelectRidersViewModel
-import com.jaredlinden.timingtrials.setup.SORT_ALPHABETICAL
-import com.jaredlinden.timingtrials.setup.SORT_RECENT_ACTIVITY
-import com.jaredlinden.timingtrials.setup.SelectedRidersInformation
+import com.jaredlinden.timingtrials.setup.*
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.Event
 import com.jaredlinden.timingtrials.util.Utils
@@ -172,6 +169,16 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
 
     }
 
+
+    val deleted: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    fun delete(){
+        viewModelScope.launch(Dispatchers.IO) {
+            result.value?.let { resultRepository.delete(it) }
+            result.postValue(null)
+            deleted.postValue(Event(true))
+        }
+    }
+
 }
 
 class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
@@ -199,7 +206,7 @@ class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
     }
 
 
-    val liveSortMode : MutableLiveData<Int> = MutableLiveData(SORT_RECENT_ACTIVITY)
+    val liveSortMode : MutableLiveData<Int> = MutableLiveData(SORT_DEFAULT)
     override fun setSortMode(sortMode: Int) {
         liveSortMode.value = sortMode
     }
@@ -223,10 +230,10 @@ class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
 
     init {
         selectedRidersInformation.addSource(ridersOrderedByRecentActivity){res->
-            updateselectedRiderInfo(res, riderFilter.value, selectedRiders.value, liveSortMode.value?:SORT_RECENT_ACTIVITY)
+            updateselectedRiderInfo(res, riderFilter.value, selectedRiders.value, liveSortMode.value?:SORT_DEFAULT)
         }
         selectedRidersInformation.addSource(selectedRiders){
-            updateselectedRiderInfo(ridersOrderedByRecentActivity.value, riderFilter.value, it, liveSortMode.value?:SORT_RECENT_ACTIVITY)
+            updateselectedRiderInfo(ridersOrderedByRecentActivity.value, riderFilter.value, it, liveSortMode.value?:SORT_DEFAULT)
         }
         selectedRidersInformation.addSource(riderFilter){it
             updateselectedRiderInfo(ridersOrderedByRecentActivity.value, it, selectedRiders.value, liveSortMode.value?:0)

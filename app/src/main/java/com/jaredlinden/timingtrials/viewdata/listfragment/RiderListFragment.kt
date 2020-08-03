@@ -18,6 +18,7 @@ import com.jaredlinden.timingtrials.databinding.ListItemRiderBinding
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.*
+import timber.log.Timber
 
 class RiderListFragment : Fragment() {
 
@@ -28,6 +29,8 @@ class RiderListFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
+        Timber.d("Create")
         listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
         viewFactory = RiderViewHolderFactory()
@@ -51,6 +54,11 @@ class RiderListFragment : Fragment() {
 
     }
 
+    override fun onDetach() {
+        Timber.d("Detach")
+        super.onDetach()
+    }
+
 }
 
 class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, ListItemRiderBinding>(binding) {
@@ -63,14 +71,15 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, L
             rider = data
             riderLayout.setOnLongClickListener {
 
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment(data.id ?: 0)
+
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.id?:0, data.javaClass.simpleName)
                 Navigation.findNavController(_binding.root).navigate(action)
                 true
             }
 
             riderLayout.setOnClickListener {
                 //val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.id?:0, data.javaClass.simpleName)
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.id?:0, data.javaClass.simpleName)
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment(data.id ?: 0)
                 Navigation.findNavController(_binding.root).navigate(action)
             }
 
@@ -98,10 +107,4 @@ class RiderViewHolderFactory: GenericViewHolderFactory<Rider>() {
         return binding.root
     }
 
-    override fun performFabAction(fab: View) {
-        fab.setOnClickListener {
-            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment( 0)
-            Navigation.findNavController(fab).navigate(action)
-        }
-    }
 }

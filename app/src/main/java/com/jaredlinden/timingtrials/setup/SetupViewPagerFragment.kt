@@ -6,12 +6,17 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.view.MenuItemCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -25,41 +30,46 @@ import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.data.NumbersDirection
 import com.jaredlinden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
 import com.jaredlinden.timingtrials.databinding.FragmentNumberOptionsBinding
+import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.util.showKeyboard
 import kotlinx.android.synthetic.main.fragment_number_options.*
 
 
 const val SORT_RECENT_ACTIVITY = 0
 const val SORT_ALPHABETICAL = 1
+const val SORT_DEFAULT = SORT_ALPHABETICAL
 const val SORT_KEY = "sorting"
 
 class SetupViewPagerFragment: Fragment() {
 
 
-    //private lateinit var setupViewModel: SetupViewModel
+    private lateinit var setupViewModel: SetupViewModel
 
     private val args: SetupViewPagerFragmentArgs by navArgs()
 
-
+    lateinit var tabLayoutMediator: TabLayoutMediator
 
     var setupMenu: Menu? = null
 
     lateinit var prefListner : SharedPreferences.OnSharedPreferenceChangeListener
     lateinit var viewPager : ViewPager2
 
-//    override fun onResume() {
-//        super.onResume()
-//        viewPager.adapter = SetupPagerAdapter(this)
-//    }
+    private val mPageChangeCallback = object :ViewPager2.OnPageChangeCallback(){
+        override fun onPageSelected(position: Int) {
+            setFabStatus(position)
+            setupViewModel.currentPage = position
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        val setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
+        setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
         val binding = FragmentDatabaseViewPagerBinding.inflate(inflater, container, false)
         val tabLayout = binding.tabs
         viewPager = binding.viewPager2
-        val pagerAdapter = SetupPagerAdapter(this){
+        val pagerAdapter = SetupPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle){
             setFabStatus(setupViewModel.currentPage)
         }
         viewPager.adapter = pagerAdapter
@@ -67,26 +77,19 @@ class SetupViewPagerFragment: Fragment() {
 
         setupViewModel.changeTimeTrial(args.timeTrialId)
 
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
-            override fun onPageSelected(position: Int) {
-                setFabStatus(position)
-                setupViewModel.currentPage = position
-            }
-        })
+        viewPager.registerOnPageChangeCallback(mPageChangeCallback)
 
-//        setupViewModel.orderRidersViewModel.numberRulesMediator.observe(requireActivity(), Observer {
-//
-//        })
 
         setHasOptionsMenu(true)
 
         viewPager.offscreenPageLimit = 2
         // Set the icon and text for each tab
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+        tabLayoutMediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.setIcon(getTabIcon(position))
             tab.text = getTabTitle(position)
             //manageFabVisibility(position)
-        }.attach()
+        }
+        tabLayoutMediator.attach()
 
         prefListner =  object : SharedPreferences.OnSharedPreferenceChangeListener{
             override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
@@ -100,6 +103,13 @@ class SetupViewPagerFragment: Fragment() {
         }
 
 
+        (activity as? IFabCallbacks)?.fabClickEvent?.observe(viewLifecycleOwner, EventObserver{
+            if(it && viewPager.currentItem == RIDER_PAGE_INDEX){
+                val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(0)
+                findNavController().navigate(action)
+            }
+
+        })
 
         viewPager.setCurrentItem(setupViewModel.currentPage, false)
         setFabStatus(setupViewModel.currentPage)
@@ -109,16 +119,12 @@ class SetupViewPagerFragment: Fragment() {
     }
 
     fun setFabStatus(position: Int){
-        val act = requireActivity() as IFabCallbacks
+        val act = requireActivity() as IFabCallbacks?
         when (position) {
 
             RIDER_PAGE_INDEX -> {
-                act.setVisibility(View.VISIBLE)
-                act.setImage(R.drawable.ic_add_white_24dp)
-                act.setAction {
-                    val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(0)
-                    findNavController().navigate(action)
-                }
+                act?.setVisibility(View.VISIBLE)
+                act?.setImage(R.drawable.ic_add_white_24dp)
                 setHasOptionsMenu(true)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = true
@@ -126,19 +132,19 @@ class SetupViewPagerFragment: Fragment() {
                 }
             }
             ORDER_RIDER_INDEX ->  {
-                act.setVisibility(View.GONE)
+                act?.setVisibility(View.GONE)
                 setHasOptionsMenu(true)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = false
-                    it.findItem(R.id.settings_menu_sort)?.isVisible = false
+                    it.findItem(R.id.settings_menu_sort)?.isVisible = true
                 }
 
             }
             TIMETRIAL_PAGE_INDEX-> {
-                act.setVisibility(View.GONE)
+                act?.setVisibility(View.GONE)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = false
-                    it.findItem(R.id.settings_menu_sort)?.isVisible = false
+                    it.findItem(R.id.settings_menu_sort)?.isVisible = true
                 }
                 //setHasOptionsMenu(false)
 
@@ -149,29 +155,58 @@ class SetupViewPagerFragment: Fragment() {
 
     var searchView: SearchView? = null
 
+//
+//    val closeListner = object : SearchView.OnCloseListener{
+//        override fun onClose(): Boolean {
+//            val view = activity?.currentFocus
+//            view?.let { v ->
+//                val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+//                imm?.hideSoftInputFromWindow(v.windowToken, 0)
+//            }
+//            return true
+//        }
+//
+//    }
+
+
+    val expandListener = object : MenuItem.OnActionExpandListener {
+        override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+
+            searchView?.clearFocus()
+            return true // Return true to collapse action view
+        }
+
+        override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+            // Do something when expanded
+            searchView?.requestFocus()
+            showKeyboard()
+            return true // Return true to expand action view
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         setupMenu = menu
         inflater.inflate(R.menu.menu_setup, menu)
+        menu.findItem(R.id.settings_app_bar_search).setOnActionExpandListener(expandListener)
         menu.findItem(R.id.settings_app_bar_search).isVisible = true
         val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
         (menu.findItem(R.id.settings_app_bar_search).actionView as SearchView).apply {
             searchView = this
             // Assumes current activity is the searchable activity
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
-            isIconified=false // Do not iconify the widget; expand it by default
+
             isIconifiedByDefault = false
             val selectRiderVm = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
             setQuery(selectRiderVm.riderFilter.value?:"", false)
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
-                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
-                    selectRiderVm.setRiderFilter(searchText?:"")
+                    setupViewModel.selectRidersViewModel.setRiderFilter(searchText?:"")
+                    clearFocus()
                     return true
                 }
 
                 override fun onQueryTextChange(searchText: String?): Boolean {
-                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector. listViewModel() }
-                    selectRiderVm.setRiderFilter(searchText?:"")
+                    setupViewModel.selectRidersViewModel.setRiderFilter(searchText?:"")
                     return true
                 }
 
@@ -182,6 +217,7 @@ class SetupViewPagerFragment: Fragment() {
             val current = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_RECENT_ACTIVITY)
             AlertDialog.Builder(requireContext())
                     .setTitle(resources.getString(R.string.choose_sort))
+                    .setIcon(R.mipmap.tt_logo_round)
                     //.setMessage("Choose Sorting")
                     .setSingleChoiceItems(R.array.sortingArray, current) { _, j->
                         PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putInt(SORT_KEY, j).apply()
@@ -199,10 +235,29 @@ class SetupViewPagerFragment: Fragment() {
             true
         }
 
+        menu.findItem(R.id.settings_menu_seed_riders).setOnMenuItemClickListener {
+            AlertDialog.Builder(requireContext())
+                    .setTitle(getString(R.string.seed_riders))
+                    .setIcon(R.mipmap.tt_logo_round)
+                    .setMessage(getString(R.string.seed_riders_message))
+                    .setPositiveButton(R.string.ok) { _, _->
+                        (requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }).seedRiders()
+                    }.create().show()
+            true
+        }
+
 
     }
 
 
+    override fun onDestroyView() {
+
+        tabLayoutMediator.detach()
+        viewPager?.unregisterOnPageChangeCallback(mPageChangeCallback)
+        searchView?.setOnQueryTextListener(null)
+        viewPager?.adapter = null
+        super.onDestroyView()
+    }
 
 
     private fun getTabIcon(position: Int): Int {
@@ -237,7 +292,7 @@ const val RIDER_PAGE_INDEX = 0
 const val ORDER_RIDER_INDEX = 1
 
 
-class SetupPagerAdapter(fragment: Fragment, val fragCreated: () -> Unit) : FragmentStateAdapter(fragment) {
+class SetupPagerAdapter(fm: FragmentManager, ls: Lifecycle, val fragCreated: () -> Unit) : FragmentStateAdapter(fm,ls) {
 
     /**
      * Mapping of the ViewPager page indexes to their respective Fragments

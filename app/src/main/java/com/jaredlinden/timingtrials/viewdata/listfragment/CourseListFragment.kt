@@ -20,6 +20,7 @@ import com.jaredlinden.timingtrials.util.getLengthConverter
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.*
+import timber.log.Timber
 
 class CourseListFragment : Fragment() {
 
@@ -30,11 +31,17 @@ class CourseListFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
+        Timber.d("Create")
+
         listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
         val converter = getLengthConverter()
         viewFactory = CourseViewHolderFactory(converter.unitDef.key)
         adapter = GenericListAdapter(requireContext(), viewFactory)
+
+
+
         listViewModel.filteredAllCourse.observe(viewLifecycleOwner, Observer{res->
             res?.let {adapter.setItems(it.map {
                 SelectableCourseViewModel(it, converter)
@@ -57,6 +64,11 @@ class CourseListFragment : Fragment() {
 
     }
 
+    override fun onDetach() {
+        Timber.d("Detach")
+        super.onDetach()
+    }
+
 }
 
 class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<SelectableCourseViewModel, ListItemCourseBinding>(binding) {
@@ -71,14 +83,15 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Se
             checkBox.visibility = View.GONE
 
             courseLayout.setOnLongClickListener {
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(data.id ?: 0, root.context.getString(R.string.edit_course))
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.id?:0, Course::class.java.simpleName)
                 Navigation.findNavController(_binding.root).navigate(action)
                 true
             }
 
             courseLayout.setOnClickListener {
                 //val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.id?:0, Course::class.java.simpleName)
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.id?:0, Course::class.java.simpleName)
+
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(data.id ?: 0, root.context.getString(R.string.edit_course))
                 Navigation.findNavController(_binding.root).navigate(action)
             }
 
@@ -93,7 +106,7 @@ class CourseViewHolderFactory(private val unitString: String): GenericViewHolder
         val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false).apply {
             val cName =layoutInflator.context.resources.getString(R.string.name)
             val dist = "Distance ($unitString)"
-            val cttName = layoutInflator.context.resources.getString(R.string.cttname)
+            val cttName = layoutInflator.context.resources.getString(R.string.ctt_name)
             courseVm = SelectableCourseViewModel(cName, dist, cttName)
             checkBox.visibility = View.GONE
             genericTextView1.typeface = Typeface.DEFAULT_BOLD
@@ -118,11 +131,4 @@ class CourseViewHolderFactory(private val unitString: String): GenericViewHolder
         return CourseListViewHolder(binding)
     }
 
-    override fun performFabAction(fab: View) {
-        fab.setOnClickListener {
-            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(0, fab.context.getString(R.string.new_course))
-            Navigation.findNavController(fab).navigate(action)
-        }
-
-    }
 }

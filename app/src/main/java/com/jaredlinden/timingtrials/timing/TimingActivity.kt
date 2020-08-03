@@ -1,18 +1,27 @@
 package com.jaredlinden.timingtrials.timing
 
 import android.content.*
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.navigation.NavDeepLinkBuilder
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
+import com.jaredlinden.timingtrials.BuildConfig
+import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.TimeTrial
@@ -20,15 +29,20 @@ import com.jaredlinden.timingtrials.data.TimeTrialHeader
 import com.jaredlinden.timingtrials.data.TimeTrialStatus
 import com.jaredlinden.timingtrials.setup.SetupViewPagerFragmentArgs
 import com.jaredlinden.timingtrials.timetrialresults.ResultFragmentArgs
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.util.*
+import kotlinx.android.synthetic.main.activity_main.*
 
 import kotlinx.android.synthetic.main.activity_timing.*
 import org.threeten.bp.Instant
 import timber.log.Timber
 
-class TimingActivity : AppCompatActivity() {
+interface ITimingActivity{
+    fun showExitDialog()
+    fun showExitDialogWithSetup()
+    fun endTiming()
+}
+
+class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
     private val TIMERTAG = "timing_tag"
     private val STATUSTAG = "status_tag"
@@ -36,6 +50,8 @@ class TimingActivity : AppCompatActivity() {
     private val mService: MutableLiveData<TimingService?> = MutableLiveData()
     private lateinit var viewModel: TimingViewModel
     private var mBound: Boolean = false
+
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     private val connection = object : ServiceConnection {
 
@@ -58,8 +74,28 @@ class TimingActivity : AppCompatActivity() {
     val serviceCreated: MutableLiveData<Boolean> = MutableLiveData(false)
 
     override fun onDestroy() {
+
         super.onDestroy()
         System.out.println("JAREDMSG -> Timing Activity -> DESTROY")
+    }
+
+   override fun showExitDialog(){
+        AlertDialog.Builder(this)
+                .setTitle("End Timing")
+                .setMessage("Are you sure you want to end TT? All information will be lost!")
+                .setPositiveButton("End timing and discard") { _, _ ->
+                    if(mBound){
+                        applicationContext.unbindService(connection)
+                        mService.value?.stop()
+                        mBound = false
+
+                    }
+                    viewModel.discardTt()
+                }
+                .setNegativeButton("Dismiss"){_,_->
+
+                }
+                .create().show()
     }
 
     val timeMed = MediatorLiveData<Long>()
@@ -73,30 +109,17 @@ class TimingActivity : AppCompatActivity() {
 
         viewModel = getViewModel { injector.timingViewModel() }
 
-        supportActionBar?.title = getString(R.string.time_trial_in_progress)
-
+        applicationContext.startService(Intent(applicationContext, TimingService::class.java))
 
         mBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)
 
-        /**
-         * Check if the fragemts already exist in child fragment manager
-         * To make sure we do not recreate fragments unnecessarily
-         */
 
+        val navController = findNavController(R.id.nav_host_timer_fragment)
 
-        supportFragmentManager.findFragmentByTag(TIMERTAG)?: TimerFragment.newInstance().also {
-            supportFragmentManager.beginTransaction().apply{
-                add(R.id.higherFrame, it, TIMERTAG)
-                commit()
-            }
-        }
+        appBarConfiguration = AppBarConfiguration(navController.graph)
 
-        supportFragmentManager.findFragmentByTag(STATUSTAG)?: RiderStatusFragment.newInstance().also {
-            supportFragmentManager.beginTransaction().apply{
-                add(R.id.lowerFrame, it, STATUSTAG)
-                commit()
-            }
-        }
+        timingToolBar.setupWithNavController(navController, appBarConfiguration)
+        title = getString(R.string.time_trial_in_progress)
 
         val liveTick = Transformations.switchMap(mService){result->
             result?.timerTick
@@ -105,6 +128,10 @@ class TimingActivity : AppCompatActivity() {
         viewModel.messageData.observe(this, EventObserver{
             Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
+
+        timingFab.setOnClickListener {
+            fabClickEvent.postValue(Event(true))
+        }
 
         viewModel.ttDeleted.observe(this, EventObserver{
             if(it){
@@ -191,36 +218,26 @@ class TimingActivity : AppCompatActivity() {
         }
     }
 
-    var prevBackPress = 0L
-    override fun onBackPressed() {
-        val tt = viewModel.timeTrial.value
 
-        if(tt==null)
-        {
+    override fun endTiming() {
+        if(mBound){
             applicationContext.unbindService(connection)
-            mService.value?.stop()
             mBound = false
-            finish()
         }
-
-        if(System.currentTimeMillis() > prevBackPress + 2000){
-            Toast.makeText(this, "Tap again to end", Toast.LENGTH_SHORT).show()
-            prevBackPress = System.currentTimeMillis()
-        }else{
-
-
-            viewModel.timeTrial.value?.let{
-                if(it.timeTrialHeader.startTime.toInstant() > Instant.now()){
-                    showExitDialogWithSetup()
-                }else{
-                    showExitDialog()
-                }
-            }
-
-        }
+        mService.value?.stop()
+        finish()
     }
 
-    fun showExitDialogWithSetup(){
+    override fun onStop() {
+        if(mBound){
+            applicationContext.unbindService(connection)
+            mBound = false
+        }
+
+        super.onStop()
+    }
+
+    override fun showExitDialogWithSetup(){
         AlertDialog.Builder(this)
                 .setTitle(getString(R.string.end_timing))
                 .setMessage(getString(R.string.are_you_sure_you_want_to_end_tt))
@@ -236,7 +253,7 @@ class TimingActivity : AppCompatActivity() {
                 .setPositiveButton(getString(R.string.end_timing_and_return_to_setup)){ _, _->
 
                     viewModel.timeTrial.value?.let{
-                        if(it.timeTrialHeader.startTime.toInstant() > Instant.now()){
+                        if(it.timeTrialHeader.startTime?.toInstant()?:Instant.MAX > Instant.now()){
                             if(mBound){
                                 applicationContext.unbindService(connection)
                                 mService.value?.stop()
@@ -256,35 +273,27 @@ class TimingActivity : AppCompatActivity() {
                 .create().show()
     }
 
-
-
-    fun showExitDialog(){
-        AlertDialog.Builder(this)
-                .setTitle("End Timing")
-                .setMessage("Are you sure you want to end TT? All information will be lost!")
-                .setPositiveButton("End timing and discard") { _, _ ->
-                    if(mBound){
-                        applicationContext.unbindService(connection)
-                        mService.value?.stop()
-                        mBound = false
-
-                    }
-                    viewModel.discardTt()
-                }
-                .setNegativeButton("Dismiss"){_,_->
-
-                }
-                .create().show()
+    override fun currentVisibility(): Int {
+       return timingFab?.visibility?: View.INVISIBLE
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.menu_timing, menu)
-//        return true
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        Toast.makeText(this, "ToDo...", Toast.LENGTH_SHORT).show()
-//        return true
-//    }
+    override fun setVisibility(visibility: Int) {
+        if(visibility == View.GONE){
+            timingFab?.tag = "hide"
+        }else{
+            timingFab?.tag = "show"
+        }
+        if(visibility == View.VISIBLE){
+            timingFab?.show()
+        }
+        timingFab?.visibility = visibility
+    }
+
+    override fun setImage(resourceId: Int) {
+        timingFab?.setImageResource(resourceId)
+    }
+
+    override val fabClickEvent: MutableLiveData<Event<Boolean>> = MutableLiveData()
+
 
 }

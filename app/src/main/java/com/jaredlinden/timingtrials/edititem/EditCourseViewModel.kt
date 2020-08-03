@@ -88,7 +88,7 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
             res?.let { course->
                 if(mutableCourse.value != course){
                     mutableCourse.value = course
-                    updateLengthString(course.length)
+                    updateLengthString(course.length?:0.0)
                 }
             }
         }

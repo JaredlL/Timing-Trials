@@ -38,11 +38,16 @@ class SelectCourseFragment : Fragment() {
         (requireActivity() as IFabCallbacks).apply {
             setVisibility(View.VISIBLE)
             setImage(R.drawable.ic_add_white_24dp)
-            setAction {
-                val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")
-                findNavController().navigate(action)
-            }
+            fabClickEvent.observe(viewLifecycleOwner, EventObserver {
+                if(it){
+                    val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")
+                    findNavController().navigate(action)
+                }
+
+            })
         }
+
+
 
         viewModel = setupViewModel.selectCourseViewModel
         viewManager = LinearLayoutManager(context)

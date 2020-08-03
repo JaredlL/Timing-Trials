@@ -1,4 +1,5 @@
 <resources>
+    <string name="email">timingtrials@gmail.com</string>
     <string name="action_settings">Settings</string>
     <string name="add_course">Add Course</string>
     <string name="add_rider">Add Rider</string>
@@ -17,7 +18,7 @@
     <string name="about_timing_trials">About Timing Trials</string>
     <string name="demo_data">Demo data</string>
     <string name="demo_data_description">Import demo data to explore the features of the app.</string>
-    <string name="demo_data_description_ques"><![CDATA[<html><div><p>Import demo data to explore features of the app?<br /><br />You can delete this later in settings.<br />Data from 5 years of <a href="https://royaldeanforestcc.wixsite.com/website/">Royal Dean Forest Cycling Club</a> time trials, using development versions of the app.</p></div></html>]]></string>
+    <string name="demo_data_description_ques"><![CDATA[<html><div><p>Import demo data to explore features of the app?<br /><br />You can delete this later in settings.<br /><br />Data from <a href="https://royaldeanforestcc.wixsite.com/website/">Royal Dean Forest Cycling Club</a></p></div></html>]]></string>
     <string name="demo_data_delete_later">You can delete this later in settings.</string>
     <string name="column">Column</string>
     <string name="columns">Columns</string>
@@ -27,6 +28,7 @@
     <string name="documentation">Documentation</string>
     <string name="confirm_delete_course_message">Are you sure? ALL results associated with this course will be lost!</string>
     <string name="confirm_delete_rider_message">Are you sure? ALL results associated with this rider will be lost!</string>
+    <string name="confirm_delete_result_message">Are you sure? This cannot be undone!</string>
     <string name="confirm_delete_setup_timetrial_message">Are you sure? This cannot be undone!</string>
     <string name="confirm_delete_database_message">Are you sure?  This cannot be undone! It is recommended to export a backup first.</string>
     <string name="confirm_delete_timetrial_message">Are you sure? ALL results associated with this time trial will be deleted, this cannot be undone!</string>
@@ -36,16 +38,17 @@
     <string name="course_requires_name">Course requires a name</string>
     <string name="course">Course</string>
     <string name="courses">Courses</string>
-    <string name="ctt_name">CTT Name</string>
+    <string name="ctt_name">CTT Code</string>
     <string name="recent_activity">Recent Activity</string>
     <string name="alphabetical">Alphabetical</string>
-    <string name="cttname">CTT Name</string>
     <string name="current_category">Current Category</string>
+    <string name="remove_from_tt">Remove from TT</string>
     <string name="current_club">Current Club</string>
     <string name="date">Date</string>
     <string name="delete_course">Delete Course</string>
     <string name="delete_results">Delete All</string>
     <string name="export_dot">Export…</string>
+    <string name="delete_result">Delete Result</string>
     <string name="delete_rider">Delete Rider</string>
     <string name="delete_timetrial">Delete time trial</string>
     <string name="auto">Auto</string>
@@ -55,14 +58,18 @@
     <string name="distance">Distance</string>
     <string name="dob">DoB</string>
     <string name="choose_export_type">Choose export file type</string>
-    <string name="tt_file">.TT (for backup and share with other users of Timing Trials)</string>
-    <string name="csv_file">.CSV (for spreadsheet or text editing app)</string>
+    <string name="tt_file">.TT (for backup )</string>
+    <string name="csv_file">.CSV (for spreadsheet)</string>
     <string name="edit_course">Edit Course</string>
     <string name="edit_description">Edit Description</string>
     <string name="edit_notes">Edit Notes</string>
     <string name="edit_numbering">Edit numbering</string>
     <string name="set_number">Set Number</string>
-    <string name="number_already_taken">Number already taken!\nThe numbers will be swapped</string>
+    <string name="seed_riders">Seed Riders</string>
+    <string name="seed_riders_message">Seed riders based on past results, fastest off last?</string>
+    <string name="what_number_will_late_rider_use">What number will the late rider use?</string>
+    <string name="number_already_taken_swap">Number already taken!\nThe numbers will be swapped</string>
+    <string name="number_already_taken">Number already taken!</string>
     <string name="edit_rider">Edit Rider</string>
     <string name="edit_result">Edit Result</string>
     <string name="explore_results">Explore Results</string>
@@ -82,7 +89,7 @@
     <string name="missed_start_move_to_back">Missed start, move to back</string>
     <string name="name">Name</string>
     <string name="new_course">New Course</string>
-    <string name="setup_new_timetrial">Setup new time trial</string>
+    <string name="setup_new_timetrial">Setup new TT</string>
     <string name="new_rider">New Rider</string>
     <string name="version">Version</string>
     <string name="no_results">No Results</string>
@@ -91,6 +98,7 @@
     <string name="number_of_rides">Rides</string>
     <string name="ok">OK</string>
     <string name="order_riders">Order</string>
+    <string name="set_custom_start_time">Set custom start time</string>
     <string name="powered_by_timing_trials">Powered by Timing Trials</string>
     <string name="press_assign_rider">Press to assign number</string>
     <string name="rest_filters">Reset Columns</string>
@@ -99,6 +107,7 @@
     <string name="resume">Resume</string>
     <string name="rider_dnf_did_not_finish">Rider DNF (Did not finish)</string>
     <string name="rider_dns_did_not_start">Rider DNS (did not start)</string>
+    <string name="rider_missed_start_move_to_next_slot">Missed start, move to next start slot</string>
     <string name="rider_passed">Rider Passed!</string>
     <string name="rider_start_offset">First rider start offset</string>
     <string name="rider">Rider</string>
@@ -111,7 +120,7 @@
     <string name="select_riders">Riders</string>
     <string name="selected_course">Selected Course</string>
     <string name="senior">Senior</string>
-    <string name="time_00000">hh:mm:ss.S</string>
+    <string name="time_00000">h:mm:ss.S</string>
     <string name="settings">Settings</string>
     <string name="setup_tab_text_1">Setup Time trial</string>
     <string name="setup_tab_text_2">Add Riders</string>
@@ -123,8 +132,9 @@
     <string name="start_in_string">Start in: %1$d minutes</string>
     <string name="start_new_timetrial">Start New Time trial</string>
     <string name="new_timetrial">New Time trial!</string>
-    <string name="error_rider_exists_with_name">Error - Rider already exists with that name!</string>
-    <string name="error_course_exists_with_name">Error - Course already exists with that name!</string>
+    <string name="rider_must_have_first_name_set">Rider must have first name set</string>
+    <string name="error_rider_exists_with_name">A rider already exists with that name!</string>
+    <string name="error_course_exists_with_name">A course already exists with that name!</string>
     <string name="start_new">Start New</string>
     <string name="start_time">First rider to start at</string>
     <string name="start_tt">Start TT</string>
@@ -169,9 +179,10 @@
     <string name="show_help">Help/About</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="add_late_rider">Add Late Rider</string>
+    <string name="add_late_rider">Add late rider</string>
     <string name="light">Light</string>
     <string name="dark">Dark</string>
+    <string name="no_email_app_found">No email app found</string>
     <string name="system_default">System Default</string>
     <string name="follow_battery_saver_feature">Follow Battery Saver Feature</string>
     <string name="debug">Debug</string>
@@ -183,18 +194,23 @@
     <string name="tip_click_cell_longpress">Long press cell to jump to time trial</string>
     <string name="tip_click_cell_sort_header">Sort a column by pressing header</string>
     <string name="tip_longpress_row_to_edit">Long press a cell to edit</string>
+    <string name="tip_timing_press_timer">Press the timing button to create an event</string>
+    <string name="tip_timing_assign_event">Then press a number to assign it to the active event</string>
+    <string name="tip_timing_press_event">Press an event to make it the active event</string>
+    <string name="tip_timing_longpress_number">Long press a number for additional actions</string>
+    <string name="tip_timing_longpress_event">Long press an assigned event to unassign it</string>
     <string name="permission_denied">Permission Denied. Allow permissions in android settings.</string>
     <string name="numbering_options">Numbering Mode</string>
-    <string name="press_a_number_to_set_it">Press a number to change it</string>
+    <string name="press_a_number_to_set_it">Press a number to change it\nIn the order rider list</string>
     <string name="play_sound_when_rider_starts">Play sound when rider starts</string>
     <string name="theme">Theme</string>
     <string name="choose_theme_summary">Choose dark or light theme</string>
     <string name="about">About</string>
     <string name="jared">Jared</string>
-    <string name="about_blurb_1">Hi I\'m Jared, the developer of this app. I was motivated to create this after volunteering to time a time trial for my local club and being horrified when handed a notepad, pen and stopwatch while I had a smartphone in my pocket!</string>
-    <string name="about_blurb_2">I have also found it frustrating going to club events and having to wait a few days, even weeks, for the results to come out. I hope this app helps clubs produce results quicker and more accurately.</string>
-    <string name="about_blurb_3">This app has been developed in my spare time and I have no plans to monetize the current feature set. The only data collected is that you see stored on your device. I may consider premium features such as cloud syncing and store of results, depending on future demand.</string>
-    <string name="about_blurb_4"><![CDATA[<p>Best way to support is <a href="mailto:linden.jared@gmail.com">provide feedback</a>, rate (5 star 😊) on google play and spread the word!</p>]]></string>
+    <string name="about_blurb_1">Hi I\'m Jared, the developer of this app. I was motivated to create this after volunteering to time a time trial for my local club and being horrified when handed a notepad, pen and stopwatch while I had a smartphone in my pocket.</string>
+    <string name="about_blurb_2">I have also found it frustrating going to club events and having to days for the results to come out. I hope this app helps clubs produce results quicker and more accurately.</string>
+    <string name="about_blurb_3">This app has been developed in my spare time and I have no plans to monetize the current feature set. The only data collected is that you see stored on your device. I may consider premium features such as cloud syncing of results, depending on demand.</string>
+    <string name="about_blurb_4"><![CDATA[<p>Best way to support is <a href="mailto:timingtrials@gmail.com">provide feedback</a>, rate (5 star 😊) on google play and spread the word!</p>]]></string>
     <string name="about_blurb_5">May the temporary traffic lights forever be in your favour\nJared</string>
     <string name="time_trial_in_progress">Time trial in progress</string>
 

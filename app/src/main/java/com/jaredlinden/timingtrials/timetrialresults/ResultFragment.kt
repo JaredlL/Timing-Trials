@@ -206,12 +206,6 @@ class ResultFragment : Fragment() {
                 resultViewModel.clearNotesColumn()
                 true
             }
-
-//            R.id.resultMenuCsv ->{
-//                permissionRequiredEvent = Event{ createCsvFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.csv") }
-//                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                true
-//            }
             R.id.resultMenuEditDescription ->{
                 val alert = AlertDialog.Builder(requireContext())
                 val edittext = EditText(requireContext())
@@ -269,11 +263,11 @@ class ResultFragment : Fragment() {
                 true
             }
 
-//            R.id.resultMenuJson->{
-//                permissionRequiredEvent = Event{ createJsonFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.tt") }
-//                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                true
-//            }
+            R.id.resultMenuTips->{
+                showTipsDialog()
+                true
+            }
+
             R.id.resultMenuDelete->{
                 showDeleteDialog()
                 true
@@ -307,7 +301,8 @@ class ResultFragment : Fragment() {
             try {
                 val outputStream = requireActivity().contentResolver.openOutputStream(uri)
                 if(outputStream != null){
-                    val trans = CsvTimeTrialResultWriter(tt, results, getLengthConverter())
+                    val modified = results.mapIndexed {i,x -> x.row.mapIndexed { j, y -> if(i ==0 && j == 0) ">>" + (y.content.value?:"") else y.content.value?:"" } }
+                    val trans = CsvTimeTrialResultWriter(tt, modified, getLengthConverter())
                     trans.writeToPath(outputStream)
 
 
@@ -367,10 +362,6 @@ class ResultFragment : Fragment() {
         }
     }
 
-
-//   fun convertDpToPixels(dp: Float): Int {
-//        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().displayMetrics).roundToInt()
-//    }
 
     fun dpToPixels(dip:Int): Int{
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip.toFloat(), resources.displayMetrics).toInt()
@@ -478,11 +469,6 @@ class ResultFragment : Fragment() {
     @TargetApi(Build.VERSION_CODES.R)
     fun saveScreenshotQ(bitmap: Bitmap, imageName:String){
 
-//        val filePath = File(requireActivity().getExternalFilesDir(null), imageName)
-//        val imageOut = FileOutputStream(filePath)
-
-
-
         val cr = requireActivity().contentResolver
 
         val contentVals = ContentValues().apply {
@@ -491,7 +477,6 @@ class ResultFragment : Fragment() {
             put(MediaStore.Images.Media.BUCKET_DISPLAY_NAME, "Timing Trials")
             put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
             put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
-            //put(MediaStore.MediaColumns.DATA, filePath.path)
         }
 
 

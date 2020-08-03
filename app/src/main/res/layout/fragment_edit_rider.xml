@@ -127,16 +127,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/autoCompleteClub"
                 tools:text="Gender" />
 
-            <!--            <TextView-->
-            <!--                android:id="@+id/textView25"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_marginStart="8dp"-->
-            <!--                android:layout_marginTop="8dp"-->
-            <!--                android:text="@string/yob"-->
-            <!--                app:layout_constraintStart_toStartOf="parent"-->
-            <!--                app:layout_constraintTop_toBottomOf="@+id/autoCompleteCategory" />-->
-
             <TextView
                 android:id="@+id/textView4"
                 android:layout_width="wrap_content"
@@ -159,17 +149,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/spinner3" />
 
-            <!--            <EditText-->
-            <!--                android:id="@+id/editText2"-->
-            <!--                android:layout_width="200dp"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_marginStart="8dp"-->
-            <!--                android:layout_marginTop="8dp"-->
-            <!--                android:ems="10"-->
-            <!--                android:inputType="number"-->
-            <!--                android:text="@={viewModel.yearOfBirth}"-->
-            <!--                app:layout_constraintStart_toStartOf="parent"-->
-            <!--                app:layout_constraintTop_toBottomOf="@+id/textView25" />-->
 
             <AutoCompleteTextView
                 android:id="@+id/autoCompleteCategory"
@@ -197,15 +176,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-        <!--        <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-        <!--            android:id="@+id/editRiderFab"-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_gravity="bottom|end"-->
-        <!--            android:layout_marginBottom="80dp"-->
-        <!--            android:layout_marginEnd="@dimen/fab_margin"-->
-        <!--            android:src="@drawable/ic_done_white_24dp" />-->
 
 
     </androidx.core.widget.NestedScrollView>

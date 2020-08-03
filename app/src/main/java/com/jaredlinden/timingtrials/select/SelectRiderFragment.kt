@@ -1,56 +1,41 @@
-package com.jaredlinden.timingtrials.setup
-
+package com.jaredlinden.timingtrials.select
 
 import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
-import androidx.fragment.app.Fragment
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
-
 import com.jaredlinden.timingtrials.adapters.SelectableRiderListAdapter
-import com.jaredlinden.timingtrials.data.*
+import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
+import com.jaredlinden.timingtrials.edititem.EditCourseFragmentArgs
+import com.jaredlinden.timingtrials.setup.*
 import com.jaredlinden.timingtrials.util.*
 
+const val SELECTED_RIDERS = "selected_riders"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [SelectRidersFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- */
+class SelectRiderFragment : Fragment() {
 
+    private val args: SelectRiderFragmentArgs by navArgs()
 
-class SelectRidersFragment : Fragment() {
+    private lateinit var viewModel: SelectRiderViewModel
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
+        viewModel = getViewModel { injector.selectRiderViewModel() }
 
-    private val args: SelectRidersFragmentArgs by navArgs()
-
-    private lateinit var viewModel: ISelectRidersViewModel
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-
-        viewModel = if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI) {
-            requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
-
-        }else{
-            requireActivity().getViewModel { requireActivity().injector.editResultViewModel() }.selectRiderVm
-        }
-
-
+        setHasOptionsMenu(true)
 
         val viewManager = LinearLayoutManager(context)
         val adapter = SelectableRiderListAdapter(requireContext())
@@ -58,10 +43,20 @@ class SelectRidersFragment : Fragment() {
         adapter.setHasStableIds(true)
         adapter.editRider = ::editRider
 
+        (activity as? IFabCallbacks)?.apply {
+            setVisibility(View.VISIBLE)
+            setImage(R.drawable.ic_add_white_24dp)
+            fabClickEvent.observe(viewLifecycleOwner, EventObserver{
+                val act = SelectRiderFragmentDirections.actionSelectRiderFragmentToEditRiderFragment2()
+                findNavController().navigate(act)
+            })
+        }
 
+        val currentSortMode = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_DEFAULT)
+        viewModel.setSortMode(currentSortMode)
 
         val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
-            lifecycleOwner = (this@SelectRidersFragment)
+            lifecycleOwner = (this@SelectRiderFragment)
             riderHeading.rider =  Rider.createBlank().copy( firstName = getString(R.string.name), club = getString(R.string.club))
             riderHeading.checkBox.visibility =  View.INVISIBLE
             riderRecyclerView.adapter = adapter
@@ -69,31 +64,13 @@ class SelectRidersFragment : Fragment() {
 
         }
 
-        if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI){
-            setHasOptionsMenu(false)
-            if(requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.currentPage == RIDER_PAGE_INDEX ){
-                (requireActivity() as IFabCallbacks).apply {
-                    setVisibility(View.VISIBLE)
-                    setImage(R.drawable.ic_add_white_24dp)
-                }
-            }
-        }else{
-            setHasOptionsMenu(true)
-            (requireActivity() as IFabCallbacks).apply {
-                setVisibility(View.VISIBLE)
-                setImage(R.drawable.ic_add_white_24dp)
-
-            }
-        }
-
-        (requireActivity() as IFabCallbacks).fabClickEvent.observe(viewLifecycleOwner, EventObserver {
-            if(it){
-                editRider(0)
-            }
-
-        })
-
         adapter.addRiderToSelection = {
+
+            if(args.singleSelectionMode){
+                findNavController().previousBackStackEntry?.savedStateHandle?.set(SELECTED_RIDERS, listOf(it.id?:0L).toLongArray())
+                findNavController().popBackStack()
+            }
+
             viewModel.riderSelected(it)
         }
 
@@ -101,39 +78,46 @@ class SelectRidersFragment : Fragment() {
             viewModel.riderUnselected(it)
         }
 
+        adapter.editRider = {
+            val act = SelectRiderFragmentDirections.actionSelectRiderFragmentToEditRiderFragment2(it)
+            findNavController().navigate(act)
+        }
+
+
+        viewModel.liveSortMode.observe(viewLifecycleOwner, Observer {
+
+        })
+
+        viewModel.riderFilter.observe(viewLifecycleOwner, Observer {
+
+        })
+
         viewModel.selectedRidersInformation.observe(viewLifecycleOwner, Observer {result->
             result?.let {
-                adapter.setRiders(it)
+                if(args.singleSelectionMode){
+                    adapter.setRiders(it.copy(allRiderList = it.allRiderList.filterNot { args.excludedIds.contains(it.id?:0L) }))
+                }else{
+                    adapter.setRiders(it)
+                }
 
-                if(args.selectionMode != SELECT_RIDER_FRAGMENT_MULTI){
-                    result.selectedIds.firstOrNull()?.let {fs->
-                        val pos = result.allRiderList.indexOfFirst { it.id == fs }
-                        if(pos >=0) viewManager.scrollToPositionWithOffset(pos, binding.root.height / 2)
-                        //viewManager.scrollToPosition()
+                result.selectedIds.firstOrNull()?.let {fs->
+                    val pos = result.allRiderList.indexOfFirst { it.id == fs }
+                    if(pos >=0) {
+                        viewManager.scrollToPositionWithOffset(pos, binding.root.height / 2)
                     }
-
                 }
 
             }
 
         })
 
-        viewModel.close.observe(viewLifecycleOwner, EventObserver{
-            if(it){
-                findNavController().popBackStack()
-            }
-        })
-
         viewModel.showMessage.observe(viewLifecycleOwner, EventObserver{
             Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
         })
 
-
-        viewModel.setSortMode(PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_DEFAULT))
-
         return binding.root
-    }
 
+    }
     var sv: SearchView? = null
     val expandListener = object : MenuItem.OnActionExpandListener {
         override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
@@ -151,13 +135,11 @@ class SelectRidersFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_setup, menu)
-        val svMenuItem = menu.findItem(R.id.settings_app_bar_search)
-        svMenuItem.setOnActionExpandListener(expandListener)
-        svMenuItem.isVisible = true
-        menu.findItem(R.id.settings_menu_number_options).isVisible = false
+        inflater.inflate(R.menu.menu_select_riders, menu)
+
         val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        (svMenuItem.actionView as SearchView).apply {
+        menu.findItem(R.id.select_rider_search).setOnActionExpandListener(expandListener)
+        (menu.findItem(R.id.select_rider_search).actionView as SearchView).apply {
             // Assumes current activity is the searchable activity
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
             isIconifiedByDefault = false
@@ -178,7 +160,7 @@ class SelectRidersFragment : Fragment() {
             })
         }
 
-        menu.findItem(R.id.settings_menu_sort).setOnMenuItemClickListener {
+        menu.findItem(R.id.select_rider_sort).setOnMenuItemClickListener {
             val current = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_DEFAULT)
             AlertDialog.Builder(requireContext())
                     .setTitle(resources.getString(R.string.choose_sort))
@@ -192,28 +174,11 @@ class SelectRidersFragment : Fragment() {
                     .create().show()
             true
         }
+
     }
 
     private fun editRider(riderId: Long){
-        if(findNavController().currentDestination?.id == R.id.selectRidersFragment){
-            val action = SelectRidersFragmentDirections.actionSelectRidersFragmentToEditRiderFragment(riderId)
-            findNavController().navigate(action)
-        }else{
-            val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(riderId)
-            findNavController().navigate(action)
-        }
-
+        Toast.makeText(requireContext(), "Edit Rider $riderId", Toast.LENGTH_SHORT).show()
     }
 
-
-    companion object {
-        @JvmStatic
-        val SELECT_RIDER_FRAGMENT_SINGLE = 0
-        val SELECT_RIDER_FRAGMENT_MULTI = 1
-
-        fun newInstance(selectionMode: SelectRidersFragmentArgs) =
-                SelectRidersFragment().apply {
-                    arguments = selectionMode.toBundle()
-                }
-    }
 }

@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "course_table")
 data class Course(
         val courseName: String,
-        val length: Double = 0.0,
+        val length: Double? = null,
         val cttName: String = "",
         @PrimaryKey(autoGenerate = true) override val id: Long? = null
 ) : ITimingTrialsEntity {

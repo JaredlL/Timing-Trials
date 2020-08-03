@@ -9,6 +9,7 @@
         app:key="units"
         app:title="@string/distance_units"
         app:summary="@string/units_setting_description"
+        android:defaultValue="km"
         android:entries="@array/unitsArray"
         android:entryValues="@array/unitsValues"/>
 

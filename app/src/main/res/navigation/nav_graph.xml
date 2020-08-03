@@ -243,6 +243,12 @@
             app:exitAnim="@android:anim/slide_out_right"
             app:popEnterAnim="@android:anim/slide_in_left"
             app:popExitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_settingsFragment_to_helpPrefsFragment2"
+            app:destination="@id/helpPrefsFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_advancedFragment2"
+            app:destination="@id/advancedFragment" />
     </fragment>
     <dialog
         android:id="@+id/numberOptionsDialog"

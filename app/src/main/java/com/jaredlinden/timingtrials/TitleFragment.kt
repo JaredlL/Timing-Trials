@@ -98,18 +98,22 @@ class TitleFragment : Fragment()
             }
 
             testSetupButton.setOnClickListener {
-                testViewModel.delete()
+                testViewModel.testSetup()
                 findNavController().popBackStack()
             }
 
             testPermissionButton.setOnClickListener {
-                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                testViewModel.insert1000()
             }
 
             testPermissionButton2.setOnClickListener {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     requireActivity().requestPermissions(listOf(Manifest.permission.WRITE_EXTERNAL_STORAGE).toTypedArray(), 1)
                 }
+            }
+
+            testSetupButton.setOnClickListener {
+                testViewModel.testSetup()
             }
 
 
@@ -139,15 +143,15 @@ class TitleFragment : Fragment()
                 })
             }
 //
-            button2.setOnClickListener {
-                testViewModel.insertFinishedTt3()
-                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
-                    it?.let {id->
-                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
-                        findNavController().navigate(action)
-                    }
-                })
-            }
+//            button2.setOnClickListener {
+//                testViewModel.insertFinishedTt3()
+//                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
+//                    it?.let {id->
+//                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
+//                        findNavController().navigate(action)
+//                    }
+//                })
+//            }
         }
 
 

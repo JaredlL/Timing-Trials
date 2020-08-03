@@ -26,28 +26,23 @@
         app:showAsAction="never" />
 
 
-
-<!--    <item-->
-<!--        android:id="@+id/resultMenuJson"-->
-<!--        android:title="@string/export_json"-->
-<!--        app:showAsAction="never" />-->
-
-<!--    <item-->
-<!--        android:id="@+id/resultMenuCsv"-->
-<!--        android:title="@string/export_csv"-->
-<!--        app:showAsAction="never" />-->
-
     <item
         android:id="@+id/resultMenuClearNotes"
         android:title="@string/clear_notes"
         app:showAsAction="never" />
 
 
+    <item
+        android:id="@+id/resultMenuTips"
+        android:title="@string/tips"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/resultMenuDelete"
         android:title="@string/delete"
         app:showAsAction="never" />
+
+
 
 </menu>
 

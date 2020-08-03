@@ -3,6 +3,7 @@ package com.jaredlinden.timingtrials.timing
 import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
+import com.jaredlinden.timingtrials.data.roomrepo.RoomRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
 import com.jaredlinden.timingtrials.domain.ITimelineEvent
 import com.jaredlinden.timingtrials.domain.TimeLine
@@ -20,7 +21,7 @@ interface IEventSelectionData{
     var eventAwaitingSelection: Long?
 }
 
-class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val resultRepository: TimeTrialRiderRepository) : ViewModel(), IEventSelectionData {
+class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val resultRepository: TimeTrialRiderRepository, val riderRepository: RoomRiderRepository) : ViewModel(), IEventSelectionData {
 
     val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
     private val liveMilisSinceStart: MutableLiveData<Long> = MutableLiveData()
@@ -191,8 +192,15 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     }
 
     fun moveRiderToBack(rider: TimeTrialRider){
-        timeTrial.value?.let {
-            updateTimeTrial(it.helper.moveRiderToBack(rider))
+        timeTrial.value?.let {tt->
+            tt.riderList.firstOrNull { rider.riderId == it.riderId() }?.let {
+                if(it.timeTrialData.splits.isEmpty()){
+                    updateTimeTrial(tt.helper.moveRiderToBack(rider))
+                }else{
+                    showMessage("This rider has already passed. You must unassign them from any pass events first.")
+                }
+            }
+
         }
     }
 
@@ -209,8 +217,15 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     }
 
     fun setRiderStartTime(riderId: Long, startTime: Long){
-        timeTrial.value?.let {
-            updateTimeTrial(it.helper.setRiderStartTime(riderId, startTime))
+        timeTrial.value?.let {tt->
+            tt.riderList.firstOrNull { it.riderId() == riderId }?.let {
+                if(it.timeTrialData.splits.isEmpty()){
+                    updateTimeTrial(tt.helper.setRiderStartTime(riderId, startTime))
+                }else{
+                    showMessage("This rider has already passed. You must unassign them from any pass events first.")
+                }
+            }
+
         }
     }
 
@@ -424,8 +439,58 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
                 //return "NULL"
             }else{
-                return "${tte.helper.finishedRiders.size} riders have finished, ${tte.riderList.size - tte.helper.finishedRiders.size} riders on course"
+                return "${tte.helper.finishedRiders.size} riders have finished, ${tte.helper.ridersOnCourse(millisSinceStart).size} riders on course"
             }
 
     }
+
+    fun addLateRider(riderId: Long, number:Int?){
+        timeTrial.value?.let { oldTt->
+            viewModelScope.launch(Dispatchers.IO) {
+                riderRepository.ridersFromIds(listOf(riderId)).firstOrNull()?.let { rider->
+                    if(oldTt.riderList.any { it.riderId() == riderId }){
+                        throw Exception("Rider already in TT")
+                    }
+                    val new = oldTt.addRiderWithNumber(rider, number)
+                    val ttr = new.riderList.first { it.riderId() == riderId }
+                    val millisSinceStart = Instant.now().toEpochMilli() - new.timeTrialHeader.startTimeMilis
+                    val newer = if(new.helper.getRiderStartTime(ttr.timeTrialData) < millisSinceStart){
+                        new.helper.moveRiderToBack(ttr.timeTrialData)
+                    }else{
+                        new
+                    }
+
+
+                    backgroundUpdateTt(newer)
+                }
+
+            }
+
+        }
+    }
+
+
+
+    fun testFinishAll(){
+        timeTrial.value?.let {tt->
+            val now1 = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis
+            val timeLeft = (tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size() - 1)) - now1
+            var c = if(tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size() - 1) > now1){
+                tt.copy(timeTrialHeader = tt.timeTrialHeader.copy(startTime = tt.timeTrialHeader.startTime?.minusSeconds(timeLeft * 1000)))
+            }else{
+                tt
+            }
+
+            tt.riderList.forEach{ttr->
+                val now = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis
+                //eventAwaitingSelection = now
+                    val helper = c.helper
+                    c = helper.assignRiderToEvent(ttr.timeTrialData, now).tt
+
+                }
+            updateTimeTrial(c)
+            }
+
+        }
+
 }

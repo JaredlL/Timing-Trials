@@ -175,9 +175,10 @@
                         </option>
                         <option name="values">
                           <map>
+                            <entry key="assetSourceType" value="FILE" />
                             <entry key="opacityPercent" value="80" />
-                            <entry key="outputName" value="ic_baseline_music_note_24" />
-                            <entry key="sourceFile" value="C:\Users\LindenJ" />
+                            <entry key="outputName" value="tt_logo_notification" />
+                            <entry key="sourceFile" value="C:\Users\linde\Documents\Inkscape\LogoForeground.svg" />
                           </map>
                         </option>
                       </PersistentState>

@@ -19,10 +19,7 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.TitleFragmentDirections
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentEditRiderBinding
-import com.jaredlinden.timingtrials.util.Event
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.util.*
 
 class EditRiderFragment : Fragment() {
 
@@ -34,11 +31,15 @@ class EditRiderFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
 
+        setHasOptionsMenu(true)
+
         riderViewModel = requireActivity().getViewModel { requireActivity().injector.riderViewModel() }
+
+
         riderViewModel.mutableRider.observe(viewLifecycleOwner, Observer {  })
 
         riderViewModel.changeRider(args.riderId)
-        setHasOptionsMenu(true)
+
 
 
 
@@ -90,16 +91,17 @@ class EditRiderFragment : Fragment() {
             lifecycleOwner = (this@EditRiderFragment)
             autoCompleteClub.setAdapter(clubAdapter)
             autoCompleteCategory.setAdapter(categoryAdapter)
-            fabCallback.setAction {
-                if(!riderViewModel.mutableRider.value?.firstName?.trim().isNullOrBlank()){
-                    riderViewModel.addOrUpdate()
-                    //findNavController().popBackStack()
+            fabCallback.fabClickEvent.observe(viewLifecycleOwner, EventObserver {
+                if(it){
+                    if(!riderViewModel.mutableRider.value?.firstName?.trim().isNullOrBlank()){
+                        riderViewModel.addOrUpdate()
+                        //findNavController().popBackStack()
 
-                }else{
-                    Toast.makeText(requireContext(), "Rider must have firstname set", Toast.LENGTH_SHORT).show()
+                    }else{
+                        Toast.makeText(requireContext(), getString(R.string.rider_must_have_first_name_set), Toast.LENGTH_SHORT).show()
+                    }
                 }
-
-            }
+            })
             autoCompleteCategory.setOnEditorActionListener{_, actionId, keyEvent ->
                 if ((keyEvent != null && (keyEvent.keyCode == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     riderViewModel.addOrUpdate()
@@ -126,6 +128,11 @@ class EditRiderFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        hideKeyboard()
+        super.onDestroyView()
+    }
+
     fun showDeleteDialog(){
         AlertDialog.Builder(requireContext())
                 .setTitle(resources.getString(R.string.delete_rider))
@@ -134,7 +141,7 @@ class EditRiderFragment : Fragment() {
                     riderViewModel.delete()
                     findNavController().popBackStack()
                 }
-                .setNegativeButton("Dismiss"){_,_->
+                .setNegativeButton(R.string.dismiss){_,_->
 
                 }
                 .create().show()

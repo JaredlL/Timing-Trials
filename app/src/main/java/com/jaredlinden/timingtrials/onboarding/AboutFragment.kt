@@ -1,6 +1,7 @@
 package com.jaredlinden.timingtrials.onboarding
 
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,8 @@ class AboutFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val binding =  DataBindingUtil.inflate<FragmentAboutBinding>(inflater, R.layout.fragment_about, container, false).apply{
-            aboutTextView4.text = HtmlCompat.fromHtml(getString(R.string.about_blurb_4), HtmlCompat.FROM_HTML_MODE_LEGACY)
+            aboutTextView4.text = HtmlCompat.fromHtml(getString(R.string.about_blurb_4), HtmlCompat.FROM_HTML_MODE_LEGACY);
+            aboutTextView4.movementMethod = LinkMovementMethod.getInstance();
         }
         return binding.root
     }

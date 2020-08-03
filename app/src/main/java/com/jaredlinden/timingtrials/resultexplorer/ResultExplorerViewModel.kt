@@ -102,18 +102,15 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
 
         resultSpreadSheet.addSource(allResults){res->
             res?.let {
-                columns.value?.let { cols->
                     resultSpreadSheet.value?.let {
-                        newTransform(res, cols, it)
+                        resultSpreadSheet.value = it.copy(res)
                     }
-                }
-
             }
         }
         resultSpreadSheet.addSource(columns){res->
             res?.let {cols->
                 resultSpreadSheet.value?.let {
-                    newTransform(it.results, cols, it)
+                    resultSpreadSheet.value = it.copy(columns = cols)
                 }
 
             }
@@ -168,19 +165,21 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
     }
 
 
-    private val queue = ConcurrentLinkedQueue<Triple<List<IResult>, List<ColumnData>, ResultExplorerSpreadSheet>>()
+    private val queue = ConcurrentLinkedQueue<Triple<List<IResult>?, List<ColumnData>?, ResultExplorerSpreadSheet>>()
     private var isCarolineAlive = AtomicBoolean()
 
-    fun newTransform(results: List<IResult>, columns: List<ColumnData>, prev: ResultExplorerSpreadSheet){
+    fun newTransform(results: List<IResult>?, columns: List<ColumnData>?, prev: ResultExplorerSpreadSheet){
         if(!isCarolineAlive.get()){
-            queue.add(Triple(results, columns, prev))
+            //queue.add(Triple(results, columns, prev))
             viewModelScope.launch(Dispatchers.Default) {
                 isCarolineAlive.set(true)
                 var mnew: ResultExplorerSpreadSheet? = null
+                var newResults: List<IResult>? = null
+                var newCols : List<ColumnData>? = null
                 while (queue.peek() != null){
-                   queue.poll()?.let { qss->
+                   queue.poll()?.let { currentItem->
                        val n = mnew
-                       mnew = n?.copy(qss.first, qss.second) ?: qss.third.copy(qss.first, qss.second)
+                       mnew = n?.copy(currentItem.first?:n.results, currentItem.second?:n.columns) ?: currentItem.third.copy(currentItem.first?:currentItem.third.results, currentItem.second?:currentItem.third.columns)
                    }
 
                 }

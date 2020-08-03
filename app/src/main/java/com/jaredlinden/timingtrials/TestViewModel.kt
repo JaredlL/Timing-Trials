@@ -26,36 +26,34 @@ class TestViewModel@Inject constructor(
 
     private val inserting = AtomicBoolean()
 
-     val insertedTest = MutableLiveData(false)
+     val insertedTestTiming: MutableLiveData<Event<Boolean>> = MutableLiveData()
 
-    fun insertionActedUpon(){
-        insertedTest.value = false
+
+
+
+    fun testSetup(){
+
+            if(!inserting.get()){// && timeTrial.timeTrialHeader.ttName != "Test Setup Timetrial"){
+                inserting.set(true)
+                viewModelScope.launch(Dispatchers.IO) {
+                    val timeTrial = TimeTrial()
+                    val rList = riderRepository.allRidersLightSuspend()
+                    val courses = courseRepository.getAllCoursesSuspend()
+                    val newTt = timeTrial.copy(timeTrialHeader = timeTrial.timeTrialHeader
+                            .copy(ttName = "Test Setup Timetrial",
+                                    startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
+                                    firstRiderStartOffset = 0,
+                                    interval = 2,
+                                    courseId = courses[3].id,
+                                    laps = 2,
+                                    status = TimeTrialStatus.SETTING_UP))
+                    val copy = newTt.addRiders(rList)
+                    timeTrialRepository.insert(copy)
+                    inserting.set(false)
+                    insertedTestTiming.postValue(Event(true))
+                }
+            }
     }
-
-
-
-//    fun testSetup(timeTrial: TimeTrial){
-//
-//            if(!inserting.get() && timeTrial.timeTrialHeader.ttName != "Test Setup Timetrial"){
-//                inserting.set(true)
-//                viewModelScope.launch(Dispatchers.IO) {
-//                    val rList = riderRepository.allRidersLightSuspend()
-//                    val courses = courseRepository.getAllCoursesSuspend()
-//                    val newTt = timeTrial.copy(timeTrialHeader = timeTrial.timeTrialHeader
-//                            .copy(ttName = "Test Setup Timetrial",
-//                                    startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
-//                                    firstRiderStartOffset = 0,
-//                                    interval = 2,
-//                                    course = courses[3],
-//                                    laps = 2,
-//                                    status = TimeTrialStatus.SETTING_UP))
-//                    val copy = newTt.helper.addRidersAsTimeTrialRiders(rList)
-//                    timeTrialRepository.update(copy)
-//                    inserting.set(false)
-//                    insertedTest.postValue(true)
-//                }
-//            }
-//    }
 
     fun delete(){
         viewModelScope.launch(Dispatchers.IO) {
@@ -157,6 +155,15 @@ class TestViewModel@Inject constructor(
 
     fun updateHeader(timeTrial: TimeTrial, newHeader: TimeTrialHeader):TimeTrial{
         return timeTrial.copy(timeTrialHeader = newHeader)
+    }
+
+    fun insert1000(){
+        viewModelScope.launch(Dispatchers.IO) {
+            for (i in 1..1000){
+                val r = Rider(i.toString(), i.toString())
+                riderRepository.insert(r)
+            }
+        }
     }
 
     fun insertFinishedTt3(){

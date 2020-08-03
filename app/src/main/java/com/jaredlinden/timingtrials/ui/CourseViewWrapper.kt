@@ -10,7 +10,7 @@ open class SelectableCourseViewModel(val nameString: String, val distString: Str
 
     val course: Course = Course(nameString, 0.0, cttNameString, id)
 
-    constructor(course: Course, converter: LengthConverter): this (course.courseName, converter.lengthToDisplay(course.length), course.cttName, course.id)
+    constructor(course: Course, converter: LengthConverter): this (course.courseName, course.length?.let {  converter.lengthToDisplay(course.length)}?:"", course.cttName, course.id)
 
 
 }

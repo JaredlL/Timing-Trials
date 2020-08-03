@@ -40,9 +40,10 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
     val STATUS = "status"
     val DESCRIPTION = "description"
     val NOTES = "notes"
+    val ROW_START = ">>time trial"
 
     override fun isHeading(line:String): Boolean{
-        return line.splitToSequence(",", ignoreCase = true).any{it.contains("TimeTrial Name", true)}
+        return line.startsWith(">>time trial", true)
     }
 
     var nameIndex:Int? = null
@@ -71,16 +72,7 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
             val ttName = nameIndex?.let { dataList.getOrNull(it)}?:""
             val dateString = dateindex?.let { dataList.getOrNull(it) }
             val status = statusIndex?.let { if((dataList.getOrNull(it)?:"").contains("setting up", ignoreCase = true)) TimeTrialStatus.SETTING_UP else TimeTrialStatus.FINISHED }
-            var date: LocalDate? = null
-            for(pattern in formatList){
-                try {
-                    val formatter = DateTimeFormatter.ofPattern(pattern)
-                    date = LocalDate.parse(dateString, formatter)
-                    break
-                }catch(e:Exception) {
-                    val b = e
-                }
-            }
+            var date= dateString?.let {  ObjectFromString.date(it)}
             val notes = notesIndex?.let { (dataList.getOrNull(it)) }?:""
             val offsetDateTime = date?.let { OffsetDateTime.of(it, LocalTime.of(19,0,0), ZoneId.systemDefault().rules.getOffset(Instant.now()))}
             val laps = lapsIndex?.let { dataList.getOrNull(it)?.toIntOrNull() }?:1
@@ -95,13 +87,21 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
 
     fun fromCttTitle(cttTitle: String): TimeTrialHeader{
         val titleString = cttTitle.replace(".csv", "", ignoreCase = true).replace("startsheet-", "", ignoreCase = true).replace("results-", "", ignoreCase = true)
-        val dateList = titleString.split("-").reversed().mapNotNull { it.toIntOrNull() }
-        val date = if(dateList.size > 2){
+//        val dateList = titleString.split("-").reversed().mapNotNull { it.toIntOrNull() }
+//        val date = if(dateList.size > 2){
+//
+//            OffsetDateTime.of(LocalDate.of(2000+dateList[0], dateList[1],dateList[2]), LocalTime.of(1,0,0),ZoneId.systemDefault().rules.getOffset(Instant.now()))
+//        }else{
+//            OffsetDateTime.MIN
+//        }
+        val dateString = Regex("""\d{1,2}[-]\d{1,2}[-]\d{1,2}""").find(titleString)?.value
 
-            OffsetDateTime.of(LocalDate.of(2000+dateList[0], dateList[1],dateList[2]), LocalTime.of(1,0,0),ZoneId.systemDefault().rules.getOffset(Instant.now()))
-        }else{
-            OffsetDateTime.MIN
+        val localDate = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("d-M-y"))
+
+        val date = localDate?.let {
+            OffsetDateTime.of(LocalDate.of(2000 +localDate.year, localDate.month,localDate.dayOfMonth), LocalTime.of(1,0,0),ZoneId.systemDefault().rules.getOffset(Instant.now()))
         }
+
         val datePortion = Regex("""[-]\d{1,2}[-]\d{1,2}[-]\d{1,2}""").find(titleString)?.value
 
         val cleanedTitle = datePortion?.let {

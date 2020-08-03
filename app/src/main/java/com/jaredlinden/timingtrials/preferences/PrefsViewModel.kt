@@ -18,6 +18,7 @@ class PrefsViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepos
 
     fun deleteAll(){
         viewModelScope.launch(Dispatchers.IO) {
+            timingTrialsDatabase.timeTrialDao().deleteAllR()
             timingTrialsDatabase.courseDao().deleteAll()
             timingTrialsDatabase.timeTrialDao().deleteAll()
             timingTrialsDatabase.riderDao().deleteAll()
