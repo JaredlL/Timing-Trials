@@ -6,9 +6,12 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.view.MenuItemCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -30,6 +33,7 @@ import com.jaredlinden.timingtrials.databinding.FragmentNumberOptionsBinding
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.util.showKeyboard
 import kotlinx.android.synthetic.main.fragment_number_options.*
 
 
@@ -151,29 +155,58 @@ class SetupViewPagerFragment: Fragment() {
 
     var searchView: SearchView? = null
 
+//
+//    val closeListner = object : SearchView.OnCloseListener{
+//        override fun onClose(): Boolean {
+//            val view = activity?.currentFocus
+//            view?.let { v ->
+//                val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+//                imm?.hideSoftInputFromWindow(v.windowToken, 0)
+//            }
+//            return true
+//        }
+//
+//    }
+
+
+    val expandListener = object : MenuItem.OnActionExpandListener {
+        override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+
+            searchView?.clearFocus()
+            return true // Return true to collapse action view
+        }
+
+        override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+            // Do something when expanded
+            searchView?.requestFocus()
+            showKeyboard()
+            return true // Return true to expand action view
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         setupMenu = menu
         inflater.inflate(R.menu.menu_setup, menu)
+        menu.findItem(R.id.settings_app_bar_search).setOnActionExpandListener(expandListener)
         menu.findItem(R.id.settings_app_bar_search).isVisible = true
         val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
         (menu.findItem(R.id.settings_app_bar_search).actionView as SearchView).apply {
             searchView = this
             // Assumes current activity is the searchable activity
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
-            isIconified=false // Do not iconify the widget; expand it by default
+
             isIconifiedByDefault = false
             val selectRiderVm = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
             setQuery(selectRiderVm.riderFilter.value?:"", false)
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
-                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
-                    selectRiderVm.setRiderFilter(searchText?:"")
+                    setupViewModel.selectRidersViewModel.setRiderFilter(searchText?:"")
+                    clearFocus()
                     return true
                 }
 
                 override fun onQueryTextChange(searchText: String?): Boolean {
-                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector. listViewModel() }
-                    selectRiderVm.setRiderFilter(searchText?:"")
+                    setupViewModel.selectRidersViewModel.setRiderFilter(searchText?:"")
                     return true
                 }
 

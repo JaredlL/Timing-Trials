@@ -1,11 +1,8 @@
 package com.jaredlinden.timingtrials.util
 
 import android.app.Activity
-import android.content.pm.PackageManager
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
@@ -30,6 +27,11 @@ fun Fragment.getLengthConverter():LengthConverter{
 fun Fragment.hideKeyboard(){
     val imm: InputMethodManager = context!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(view!!.windowToken, 0)
+}
+
+fun Fragment.showKeyboard(){
+    val imm: InputMethodManager = context!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 }
 
 

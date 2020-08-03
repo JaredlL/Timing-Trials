@@ -19,10 +19,7 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.TitleFragmentDirections
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentEditRiderBinding
-import com.jaredlinden.timingtrials.util.Event
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.util.*
 
 class EditRiderFragment : Fragment() {
 
@@ -129,6 +126,11 @@ class EditRiderFragment : Fragment() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onDestroyView() {
+        hideKeyboard()
+        super.onDestroyView()
     }
 
     fun showDeleteDialog(){

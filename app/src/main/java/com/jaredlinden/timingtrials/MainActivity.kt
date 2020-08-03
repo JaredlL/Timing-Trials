@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 .setTitle(getString(R.string.demo_data))
                 .setIcon(R.mipmap.tt_logo_round)
                 .setMessage(html)
-                .setPositiveButton(R.string.yes){_,_->
+                .setPositiveButton(R.string.ok){_,_->
                     try{
                         val url = URL("https://bb.githack.com/lindenj/timingtrialsdata/raw/master/LiveDebugRDFCC.tt")
                         val vm = getViewModel { injector.importViewModel()}
@@ -98,9 +98,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     }
 
                 }
-                .setNegativeButton(R.string.no) { _, _ ->
-
-                }.show().apply {
+                .show().apply {
                     findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
                 }
     }

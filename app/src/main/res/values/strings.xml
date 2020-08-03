@@ -18,7 +18,7 @@
     <string name="about_timing_trials">About Timing Trials</string>
     <string name="demo_data">Demo data</string>
     <string name="demo_data_description">Import demo data to explore the features of the app.</string>
-    <string name="demo_data_description_ques"><![CDATA[<html><div><p>Import demo data to explore features of the app?<br /><br />You can delete this later in settings.<br />Data from 5 years of <a href="https://royaldeanforestcc.wixsite.com/website/">Royal Dean Forest Cycling Club</a> time trials, using development versions of the app.</p></div></html>]]></string>
+    <string name="demo_data_description_ques"><![CDATA[<html><div><p>Import demo data to explore features of the app?<br /><br />You can delete this later in settings.<br /><br />Data from <a href="https://royaldeanforestcc.wixsite.com/website/">Royal Dean Forest Cycling Club</a></p></div></html>]]></string>
     <string name="demo_data_delete_later">You can delete this later in settings.</string>
     <string name="column">Column</string>
     <string name="columns">Columns</string>

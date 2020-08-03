@@ -21,10 +21,7 @@ import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.jaredlinden.timingtrials.edititem.EditCourseFragmentArgs
 import com.jaredlinden.timingtrials.setup.*
-import com.jaredlinden.timingtrials.util.Event
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.util.*
 
 const val SELECTED_RIDERS = "selected_riders"
 
@@ -121,22 +118,37 @@ class SelectRiderFragment : Fragment() {
         return binding.root
 
     }
+    var sv: SearchView? = null
+    val expandListener = object : MenuItem.OnActionExpandListener {
+        override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
 
+            sv?.clearFocus()
+            return true // Return true to collapse action view
+        }
+
+        override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+            // Do something when expanded
+            sv?.requestFocus()
+            showKeyboard()
+            return true // Return true to expand action view
+        }
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_select_riders, menu)
 
         val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        menu.findItem(R.id.select_rider_search).setOnActionExpandListener(expandListener)
         (menu.findItem(R.id.select_rider_search).actionView as SearchView).apply {
             // Assumes current activity is the searchable activity
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
-            isIconified = false // Do not iconify the widget; expand it by default
             isIconifiedByDefault = false
             setQuery(viewModel.riderFilter.value ?: "", false)
-
+            sv = this
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
                     viewModel.setRiderFilter(searchText ?: "")
+                    clearFocus()
                     return true
                 }
 

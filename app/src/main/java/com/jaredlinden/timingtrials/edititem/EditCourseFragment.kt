@@ -16,10 +16,7 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Course
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentEditCourseBinding
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getLengthConverter
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.util.*
 
 
 class EditCourseFragment : Fragment() {
@@ -110,6 +107,11 @@ class EditCourseFragment : Fragment() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+    override fun onDestroyView() {
+        hideKeyboard()
+        super.onDestroyView()
+    }
+
 
     fun showDeleteDialog(){
         AlertDialog.Builder(requireContext())

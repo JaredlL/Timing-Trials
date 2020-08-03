@@ -134,21 +134,39 @@ class SelectRidersFragment : Fragment() {
         return binding.root
     }
 
+    var sv: SearchView? = null
+    val expandListener = object : MenuItem.OnActionExpandListener {
+        override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+
+            sv?.clearFocus()
+            return true // Return true to collapse action view
+        }
+
+        override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+            // Do something when expanded
+            sv?.requestFocus()
+            showKeyboard()
+            return true // Return true to expand action view
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_setup, menu)
-        menu.findItem(R.id.settings_app_bar_search).isVisible = true
+        val svMenuItem = menu.findItem(R.id.settings_app_bar_search)
+        svMenuItem.setOnActionExpandListener(expandListener)
+        svMenuItem.isVisible = true
         menu.findItem(R.id.settings_menu_number_options).isVisible = false
         val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        (menu.findItem(R.id.settings_app_bar_search).actionView as SearchView).apply {
+        (svMenuItem.actionView as SearchView).apply {
             // Assumes current activity is the searchable activity
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
-            isIconified = false // Do not iconify the widget; expand it by default
             isIconifiedByDefault = false
             setQuery(viewModel.riderFilter.value ?: "", false)
-
+            sv = this
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
                     viewModel.setRiderFilter(searchText ?: "")
+                    clearFocus()
                     return true
                 }
 

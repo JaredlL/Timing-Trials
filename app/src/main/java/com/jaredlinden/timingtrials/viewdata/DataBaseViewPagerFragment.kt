@@ -4,6 +4,9 @@ import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -12,20 +15,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayoutMediator
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
 import com.jaredlinden.timingtrials.domain.Filter
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.util.*
 import com.jaredlinden.timingtrials.viewdata.listfragment.CourseListFragment
 import com.jaredlinden.timingtrials.viewdata.listfragment.RiderListFragment
 import com.jaredlinden.timingtrials.viewdata.listfragment.TimeTrialListFragment
-import com.google.android.material.tabs.TabLayoutMediator
-import com.jaredlinden.timingtrials.data.NumberMode
-import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
-
 
 
 class DataBaseViewPagerFragment: Fragment() {
@@ -141,35 +140,52 @@ class DataBaseViewPagerFragment: Fragment() {
 
     }
 
+
+
+    val expandListener = object : MenuItem.OnActionExpandListener {
+        override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+
+            sv?.clearFocus()
+            return true // Return true to collapse action view
+        }
+
+        override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+            // Do something when expanded
+            sv?.requestFocus()
+            showKeyboard()
+            return true // Return true to expand action view
+        }
+    }
+
     var sv: SearchView? = null
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_database, menu)
 
         val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+
+        menu.findItem(R.id.app_bar_search).setOnActionExpandListener(expandListener)
+
         (menu.findItem(R.id.app_bar_search).actionView as SearchView).apply {
-            // Assumes current activity is the searchable activity
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
-            isIconified=false // Do not iconify the widget; expand it by default
-            isIconifiedByDefault = false
-            this.clearFocus()
+           isIconifiedByDefault = false
             val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
             sv = this
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
-                    //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
                     listViewModel.setFilter(Filter(searchText?:""))
+                    clearFocus()
                     return true
                 }
 
                 override fun onQueryTextChange(searchText: String?): Boolean {
-                   //val listViewModel = requireActivity().getViewModel { requireActivity().injector. listViewModel() }
                     listViewModel.setFilter(Filter(searchText?:""))
                     return true
                 }
 
             })
-                    }
+
+        }
 
 
 
