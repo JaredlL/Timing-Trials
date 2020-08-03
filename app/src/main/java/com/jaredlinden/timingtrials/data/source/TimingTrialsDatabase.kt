@@ -38,7 +38,7 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             return INSTANCE ?: synchronized(this){
                 val instance = Room.databaseBuilder(context,
                         TimingTrialsDatabase::class.java, "timingtrials_database")
-                        .addMigrations(MIGRATION_46_47)
+                        .fallbackToDestructiveMigration()
                         .build()
 
                 INSTANCE = instance

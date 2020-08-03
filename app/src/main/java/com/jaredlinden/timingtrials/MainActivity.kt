@@ -432,7 +432,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     override val fabClickEvent: MutableLiveData<Event<Boolean>> = MutableLiveData()
 
     override fun setImage(resourceId: Int) {
-        mainFab.setImageResource(resourceId)
+        mainFab?.setImageResource(resourceId)
     }
 
 

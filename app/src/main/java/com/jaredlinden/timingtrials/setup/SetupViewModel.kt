@@ -153,7 +153,7 @@ class SetupViewModel @Inject constructor(
 
     fun getAverageCourseTime(riderId: Long?, courseLap: CourseLap, allResults: List<TimeTrialRiderResult>):Double?{
         return if(riderId != null){
-            allResults.filter{it.riderData.id == riderId && courseLap == getCourseLap(it)}.mapNotNull { it.resultTime }.average()
+            allResults.asSequence().filter{it.riderData.id == riderId && courseLap == getCourseLap(it) && it.resultTime != null}.sortedByDescending { it.dateSet }.take(5).mapNotNull { it.resultTime }.average()
         }else{
             null
         }

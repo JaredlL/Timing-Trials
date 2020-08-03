@@ -41,25 +41,27 @@ const val SORT_KEY = "sorting"
 class SetupViewPagerFragment: Fragment() {
 
 
-    //private lateinit var setupViewModel: SetupViewModel
+    private lateinit var setupViewModel: SetupViewModel
 
     private val args: SetupViewPagerFragmentArgs by navArgs()
 
-
+    lateinit var tabLayoutMediator: TabLayoutMediator
 
     var setupMenu: Menu? = null
 
     lateinit var prefListner : SharedPreferences.OnSharedPreferenceChangeListener
     lateinit var viewPager : ViewPager2
 
-//    override fun onResume() {
-//        super.onResume()
-//        viewPager.adapter = SetupPagerAdapter(this)
-//    }
+    private val mPageChangeCallback = object :ViewPager2.OnPageChangeCallback(){
+        override fun onPageSelected(position: Int) {
+            setFabStatus(position)
+            setupViewModel.currentPage = position
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        val setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
+        setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
         val binding = FragmentDatabaseViewPagerBinding.inflate(inflater, container, false)
         val tabLayout = binding.tabs
         viewPager = binding.viewPager2
@@ -71,26 +73,19 @@ class SetupViewPagerFragment: Fragment() {
 
         setupViewModel.changeTimeTrial(args.timeTrialId)
 
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
-            override fun onPageSelected(position: Int) {
-                setFabStatus(position)
-                setupViewModel.currentPage = position
-            }
-        })
+        viewPager.registerOnPageChangeCallback(mPageChangeCallback)
 
-//        setupViewModel.orderRidersViewModel.numberRulesMediator.observe(requireActivity(), Observer {
-//
-//        })
 
         setHasOptionsMenu(true)
 
         viewPager.offscreenPageLimit = 2
         // Set the icon and text for each tab
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+        tabLayoutMediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.setIcon(getTabIcon(position))
             tab.text = getTabTitle(position)
             //manageFabVisibility(position)
-        }.attach()
+        }
+        tabLayoutMediator.attach()
 
         prefListner =  object : SharedPreferences.OnSharedPreferenceChangeListener{
             override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
@@ -120,12 +115,12 @@ class SetupViewPagerFragment: Fragment() {
     }
 
     fun setFabStatus(position: Int){
-        val act = requireActivity() as IFabCallbacks
+        val act = requireActivity() as IFabCallbacks?
         when (position) {
 
             RIDER_PAGE_INDEX -> {
-                act.setVisibility(View.VISIBLE)
-                act.setImage(R.drawable.ic_add_white_24dp)
+                act?.setVisibility(View.VISIBLE)
+                act?.setImage(R.drawable.ic_add_white_24dp)
                 setHasOptionsMenu(true)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = true
@@ -133,7 +128,7 @@ class SetupViewPagerFragment: Fragment() {
                 }
             }
             ORDER_RIDER_INDEX ->  {
-                act.setVisibility(View.GONE)
+                act?.setVisibility(View.GONE)
                 setHasOptionsMenu(true)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = false
@@ -142,7 +137,7 @@ class SetupViewPagerFragment: Fragment() {
 
             }
             TIMETRIAL_PAGE_INDEX-> {
-                act.setVisibility(View.GONE)
+                act?.setVisibility(View.GONE)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = false
                     it.findItem(R.id.settings_menu_sort)?.isVisible = true
@@ -222,6 +217,14 @@ class SetupViewPagerFragment: Fragment() {
     }
 
 
+    override fun onDestroyView() {
+
+        tabLayoutMediator.detach()
+        viewPager?.unregisterOnPageChangeCallback(mPageChangeCallback)
+        searchView?.setOnQueryTextListener(null)
+        viewPager?.adapter = null
+        super.onDestroyView()
+    }
 
 
     private fun getTabIcon(position: Int): Int {

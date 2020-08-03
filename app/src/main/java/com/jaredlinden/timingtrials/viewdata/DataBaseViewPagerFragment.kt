@@ -35,7 +35,7 @@ class DataBaseViewPagerFragment: Fragment() {
     lateinit var tabLayoutMediator: TabLayoutMediator
 
 
-    private val mCallback = object :ViewPager2.OnPageChangeCallback(){
+    private val mPageChangeCallback = object :ViewPager2.OnPageChangeCallback(){
         override fun onPageSelected(position: Int) {
             setFabStatus(position)
         }
@@ -59,7 +59,7 @@ class DataBaseViewPagerFragment: Fragment() {
         }
         tabLayoutMediator.attach()
 
-        viewpager.registerOnPageChangeCallback(mCallback)
+        viewpager.registerOnPageChangeCallback(mPageChangeCallback)
         val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
         listViewModel.setFilter(Filter(""))
 
@@ -96,11 +96,11 @@ class DataBaseViewPagerFragment: Fragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         tabLayoutMediator.detach()
-        mViewPager?.unregisterOnPageChangeCallback(mCallback)
+        mViewPager?.unregisterOnPageChangeCallback(mPageChangeCallback)
         sv?.setOnQueryTextListener(null)
         mViewPager?.adapter = null
+        super.onDestroyView()
     }
 
     private fun getTabIcon(position: Int): Int {
@@ -154,7 +154,7 @@ class DataBaseViewPagerFragment: Fragment() {
             this.clearFocus()
             val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
-            sv = menu.findItem(R.id.app_bar_search).actionView as SearchView
+            sv = this
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
                     //val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }

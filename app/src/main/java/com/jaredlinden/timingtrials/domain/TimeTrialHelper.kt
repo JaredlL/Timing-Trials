@@ -15,7 +15,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
         }
 
         val riderStartTime = getRiderStartTime(ttRider)
-        if (riderStartTime > eventTimestamp) return RiderAssignmentResult(false, "Rider must have started", timeTrial)
+        if (riderStartTime > eventTimestamp) return RiderAssignmentResult(false, "Rider had not started at this time", timeTrial)
 
         val newRiderList: List<FilledTimeTrialRider> = timeTrial.riderList.map {ttr->
             if (ttr.riderId() == ttRider.riderId) {

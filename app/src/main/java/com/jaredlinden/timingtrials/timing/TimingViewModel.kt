@@ -192,8 +192,15 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     }
 
     fun moveRiderToBack(rider: TimeTrialRider){
-        timeTrial.value?.let {
-            updateTimeTrial(it.helper.moveRiderToBack(rider))
+        timeTrial.value?.let {tt->
+            tt.riderList.firstOrNull { rider.riderId == it.riderId() }?.let {
+                if(it.timeTrialData.splits.isEmpty()){
+                    updateTimeTrial(tt.helper.moveRiderToBack(rider))
+                }else{
+                    showMessage("This rider has already passed. You must unassign them from any pass events first.")
+                }
+            }
+
         }
     }
 
@@ -210,8 +217,15 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     }
 
     fun setRiderStartTime(riderId: Long, startTime: Long){
-        timeTrial.value?.let {
-            updateTimeTrial(it.helper.setRiderStartTime(riderId, startTime))
+        timeTrial.value?.let {tt->
+            tt.riderList.firstOrNull { it.riderId() == riderId }?.let {
+                if(it.timeTrialData.splits.isEmpty()){
+                    updateTimeTrial(tt.helper.setRiderStartTime(riderId, startTime))
+                }else{
+                    showMessage("This rider has already passed. You must unassign them from any pass events first.")
+                }
+            }
+
         }
     }
 
