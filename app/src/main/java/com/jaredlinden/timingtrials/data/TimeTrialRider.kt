@@ -138,8 +138,32 @@ data class FilledTimeTrialRider(
 
 
     companion object{
+        fun createFromRiderAndTimeTrialAndNumber(rider: Rider, timeTrial: TimeTrial, number: Int?): FilledTimeTrialRider{
+            if(timeTrial.riderList.mapNotNull { it.riderId() }.contains(rider.id)){
+                throw Exception("Rider already in this time trial")
+            }
+            else if(rider.id != null){
+                val ttRider = TimeTrialRider(riderId = rider.id,
+                        timeTrialId = timeTrial.timeTrialHeader.id,
+                        courseId = timeTrial.course?.id,
+                        assignedNumber = number,
+                        index = timeTrial.riderList.size,
+                        category = rider.category,
+                        gender = rider.gender,
+                        club = rider.club)
+                return FilledTimeTrialRider(timeTrialData = ttRider, riderData = rider)
+            }else{
+                throw Exception("Rider ID is null")
+            }
+
+
+        }
+
         fun createFromRiderAndTimeTrial(rider: Rider, timeTrial: TimeTrial): FilledTimeTrialRider{
-            if(rider.id != null){
+            if(timeTrial.riderList.mapNotNull { it.riderId() }.contains(rider.id)){
+                throw Exception("Rider already in this time trial")
+            }
+            else if(rider.id != null){
                 val ttRider = TimeTrialRider(riderId = rider.id,
                         timeTrialId = timeTrial.timeTrialHeader.id,
                         courseId = timeTrial.course?.id,

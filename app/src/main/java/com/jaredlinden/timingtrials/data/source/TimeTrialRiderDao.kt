@@ -53,5 +53,7 @@ interface TimeTrialRiderDao {
     @Transaction @Query("SELECT riderId, timetrial_table.startTime AS startTime FROM timetrial_rider_table INNER JOIN timetrial_table ON timetrial_table.id = timeTrialId WHERE timetrial_table.status = 2 ORDER BY timetrial_table.startTime")
     fun getRiderIdTimeTrialStartTime(): LiveData<List<RiderIdStartTime>>
 
+    @Transaction @Query("SELECT * FROM timetrial_rider_table WHERE timetrial_rider_table.finishCode > 0 ORDER BY timetrial_rider_table.finishCode")
+    fun getAllResultsSuspend(): List<TimeTrialRiderResult>
 
 }

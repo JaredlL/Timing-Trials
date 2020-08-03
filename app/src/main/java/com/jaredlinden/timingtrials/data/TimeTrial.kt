@@ -100,6 +100,11 @@ data class TimeTrial(
         return this.updateRiderList(this.riderList + newTtRider )
     }
 
+    fun addRiderWithNumber(newRider: Rider, number:Int?): TimeTrial{
+        val newTtRider = FilledTimeTrialRider.createFromRiderAndTimeTrialAndNumber(newRider, this, number)
+        return this.updateRiderList(this.riderList + newTtRider )
+    }
+
     fun addRiders(newRiders: List<Rider>): TimeTrial{
        return updateRiderList(newRiders.map { FilledTimeTrialRider.createFromRiderAndTimeTrial(it,this) })
     }

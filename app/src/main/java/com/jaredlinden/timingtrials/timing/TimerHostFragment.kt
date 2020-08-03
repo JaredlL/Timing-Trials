@@ -1,7 +1,12 @@
 package com.jaredlinden.timingtrials.timing
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.InputType
+import android.text.TextWatcher
 import android.view.*
+import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
@@ -9,14 +14,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.jaredlinden.timingtrials.BuildConfig
+import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
+import com.jaredlinden.timingtrials.data.NumberMode
+import com.jaredlinden.timingtrials.data.TimeTrial
 import com.jaredlinden.timingtrials.select.SELECTED_RIDERS
-import com.jaredlinden.timingtrials.select.SelectRiderFragmentArgs
 import com.jaredlinden.timingtrials.util.*
-import kotlinx.android.synthetic.main.fragment_host.*
 import org.threeten.bp.Instant
 
 class TimerHostFragment : Fragment() {
@@ -38,6 +43,10 @@ class TimerHostFragment : Fragment() {
             }
         })
 
+        (activity as IFabCallbacks).apply {
+            setVisibility(View.GONE)
+        }
+
         val v = inflater.inflate(R.layout.fragment_host, container, false)
 
         childFragmentManager.findFragmentByTag(TIMERTAG)?: TimerFragment.newInstance().also {
@@ -58,9 +67,22 @@ class TimerHostFragment : Fragment() {
 
     }
 
+    var selectedNumber : Event<Int?> = Event(null)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<LongArray>(SELECTED_RIDERS)?.observe(viewLifecycleOwner, Observer{
-            Toast.makeText(requireContext(), it.joinToString(), Toast.LENGTH_SHORT).show()
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<LongArray>(SELECTED_RIDERS)?.observe(viewLifecycleOwner, Observer{selectedIds->
+
+            selectedIds?.firstOrNull()?.let {id->
+                viewModel.timeTrial.value?.let {tt->
+                    val numb = selectedNumber.getContentIfNotHandled()
+                    if(tt.timeTrialHeader.numberRules.mode == NumberMode.MAP && numb != null){
+                        viewModel.addLateRider(id, numb)
+                    }else{
+                        viewModel.addLateRider(id, null)
+                    }
+                }
+            }
+
             findNavController().currentBackStackEntry?.savedStateHandle?.remove<LongArray>(SELECTED_RIDERS)
         })
     }
@@ -72,6 +94,7 @@ class TimerHostFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_timing, menu)
         if(BuildConfig.DEBUG){
+            menu.findItem(R.id.timingMenuAddLateRider)?.isVisible = true
             menu.findItem(R.id.timingTest)?.isVisible = true
         }
 
@@ -123,9 +146,19 @@ class TimerHostFragment : Fragment() {
             }
 
             R.id.timingMenuAddLateRider->{
-                val ids = viewModel.timeTrial.value?.riderList?.mapNotNull { it.riderId() }?: listOf()
-                val action = TimerHostFragmentDirections.actionTimerHostFragmentToSelectRiderFragment(ids.toLongArray(), true)
-                findNavController().navigate(action)
+
+                viewModel.timeTrial.value?.let {tt->
+                    if(tt.timeTrialHeader.numberRules.mode == NumberMode.MAP){
+                        showSetNumberDialog(tt)
+                    }else{
+                        val ids = viewModel.timeTrial.value?.riderList?.mapNotNull { it.riderId() }?: listOf()
+                        val action = TimerHostFragmentDirections.actionTimerHostFragmentToSelectRiderFragment(ids.toLongArray(), true)
+                        findNavController().navigate(action)
+                    }
+
+                }
+
+
                 true
             }
 
@@ -134,6 +167,65 @@ class TimerHostFragment : Fragment() {
         }
 //        Toast.makeText(this, "ToDo...", Toast.LENGTH_SHORT).show()
 //        return true
+    }
+
+    fun showSetNumberDialog(tt:TimeTrial){
+        val alert = AlertDialog.Builder(requireContext())
+        val edittext = EditText(requireContext())
+
+        val usedNumbers = tt.riderList.mapNotNull { it.timeTrialData.assignedNumber }
+        val max = if(usedNumbers.any()) usedNumbers.max()?:0 else 0
+
+        edittext.setText((max + 1).toString())
+        alert.setTitle(getString(R.string.what_number_will_late_rider_use))
+
+        alert.setView(edittext)
+
+
+
+        edittext.inputType = InputType.TYPE_CLASS_NUMBER
+
+        edittext.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                edittext.text?.toString()?.toIntOrNull()?.let {newNum->
+                        if(usedNumbers.contains(newNum)){
+                            edittext.error = getString(R.string.number_already_taken)
+                        }else{
+                            edittext.error = null
+                        }
+                }
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+        })
+
+        alert.setPositiveButton(R.string.ok) { _, _ ->
+
+            edittext.text?.toString()?.toIntOrNull()?.let {
+                if(!usedNumbers.contains(it)){
+                    selectedNumber = Event(it)
+                    val ids = viewModel.timeTrial.value?.riderList?.mapNotNull { it.riderId() }?: listOf()
+                    val action = TimerHostFragmentDirections.actionTimerHostFragmentToSelectRiderFragment(ids.toLongArray(), true)
+                    findNavController().navigate(action)
+                }else{
+                    Toast.makeText(requireContext(), getString(R.string.number_already_taken), Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        }
+
+        alert.setNegativeButton(R.string.cancel) { _, _ -> }
+
+        alert.show()
+        edittext.minEms = 3
+        edittext.layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
     }
 
     fun showTipsDialog(){

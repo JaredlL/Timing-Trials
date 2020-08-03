@@ -15,7 +15,11 @@
             app:enterAnim="@android:anim/slide_in_left"
             app:exitAnim="@android:anim/slide_out_right"
             app:popEnterAnim="@android:anim/slide_in_left"
-            app:popExitAnim="@android:anim/slide_out_right" />
+            app:popExitAnim="@android:anim/slide_out_right" >
+            <argument
+                android:name="hideLinks"
+                android:defaultValue="true" />
+        </action>
         <action
             android:id="@+id/action_timerHostFragment_to_selectRiderFragment"
             app:destination="@id/selectRiderFragment"
@@ -27,16 +31,33 @@
     <fragment
         android:id="@+id/mainPrefsFragment"
         android:name="com.jaredlinden.timingtrials.preferences.MainPrefsFragment"
-        android:label="@string/settings" />
+        android:label="@string/settings" >
+        <argument
+            android:name="hideLinks"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
     <fragment
         android:id="@+id/selectRiderFragment"
         android:name="com.jaredlinden.timingtrials.select.SelectRiderFragment"
-        android:label="SelectRiderFragment" >
+        android:label="@string/select_riders">
         <argument
             android:name="excludedIds"
             app:argType="long[]" />
         <argument
             android:name="singleSelectionMode"
             app:argType="boolean" />
+        <action
+            android:id="@+id/action_selectRiderFragment_to_editRiderFragment2"
+            app:destination="@id/editRiderFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/editRiderFragment2"
+        android:name="com.jaredlinden.timingtrials.edititem.EditRiderFragment"
+        android:label="EditRiderFragment" >
+        <argument
+            android:name="riderId"
+            app:argType="long"
+            android:defaultValue="0L" />
     </fragment>
 </navigation>

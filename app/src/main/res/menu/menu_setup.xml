@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.jaredlinden.timingtrials.setup.SetupActivity">
+>
     <item
         android:id="@+id/settings_app_bar_search"
         android:icon="@drawable/ic_search_white_24dp"
@@ -19,5 +19,10 @@
         android:icon="@drawable/ic_find_replace_black_24dp"
         app:showAsAction="never"
         android:title="@string/edit_numbering" />
+
+    <item
+        android:id="@+id/settings_menu_seed_riders"
+        app:showAsAction="never"
+        android:title="@string/seed_riders" />
 
 </menu>

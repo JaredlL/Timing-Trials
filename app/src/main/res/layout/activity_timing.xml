@@ -47,7 +47,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior=".ui.FabAwareScrollingViewBehavior">
 
         <fragment
             android:id="@+id/nav_host_timer_fragment"
@@ -58,6 +58,15 @@
             app:navGraph="@navigation/timing_nav_graph" />
 
     </FrameLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/timingFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:visibility="gone"
+        android:src="@drawable/ic_done_white_24dp" />
 
 <!--    <LinearLayout-->
 <!--        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"-->

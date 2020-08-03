@@ -189,6 +189,7 @@ class SetupViewPagerFragment: Fragment() {
             val current = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_RECENT_ACTIVITY)
             AlertDialog.Builder(requireContext())
                     .setTitle(resources.getString(R.string.choose_sort))
+                    .setIcon(R.mipmap.tt_logo_round)
                     //.setMessage("Choose Sorting")
                     .setSingleChoiceItems(R.array.sortingArray, current) { _, j->
                         PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putInt(SORT_KEY, j).apply()
@@ -203,6 +204,17 @@ class SetupViewPagerFragment: Fragment() {
         menu.findItem(R.id.settings_menu_number_options).setOnMenuItemClickListener {
             val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragmentToNumberOptionsDialog()
             findNavController().navigate(action)
+            true
+        }
+
+        menu.findItem(R.id.settings_menu_seed_riders).setOnMenuItemClickListener {
+            AlertDialog.Builder(requireContext())
+                    .setTitle(getString(R.string.seed_riders))
+                    .setIcon(R.mipmap.tt_logo_round)
+                    .setMessage(getString(R.string.seed_riders_message))
+                    .setPositiveButton(R.string.ok) { _, _->
+                        (requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }).seedRiders()
+                    }.create().show()
             true
         }
 

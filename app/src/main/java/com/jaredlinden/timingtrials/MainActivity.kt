@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 .setMessage(html)
                 .setPositiveButton(R.string.yes){_,_->
                     try{
-                        val url = URL("https://bbcdn.githack.com/lindenj/timingtrialsdata/raw/master/Timing Trials Export V2.tt")
+                        val url = URL("https://bb.githack.com/lindenj/timingtrialsdata/raw/master/LiveDebugRDFCC.tt")
                         val vm = getViewModel { injector.importViewModel()}
                         vm.readUrlInput(url)
                         vm.importMessage.observe(this, EventObserver{

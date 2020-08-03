@@ -119,21 +119,22 @@ class RiderStatusFragment : Fragment() {
         val milisTtLast = tt.timeTrialHeader.startTimeMilis + tt.helper.sortedRiderStartTimes.lastKey()
 
         val dnfDnsstring = if(milisNow > tt.helper.getRiderStartTime(rs.timeTrialRider) + tt.timeTrialHeader.startTimeMilis){
-            "Did not finish (DNF)"
+            getString(R.string.rider_dnf_did_not_finish)
         }else{
-            "Did not start (DNS)"
+            getString(R.string.rider_dns_did_not_start)
         }
 
         val options = if(milisNow > milisTtLast){
             arrayOf(
                     dnfDnsstring,
-                    "Missed start, move to next start slot",
-                    "Set custom start time")
+                    getString(R.string.rider_missed_start_move_to_next_slot),
+                    getString(R.string.set_custom_start_time))
+
         }else{
             arrayOf(
                     dnfDnsstring,
-                    "Missed start, move to back",
-                    "Set custom start time")
+                    getString(R.string.missed_start_move_to_back),
+                    getString(R.string.set_custom_start_time))
         }
 
 
@@ -164,7 +165,6 @@ class RiderStatusFragment : Fragment() {
                         2 -> {
                             TimingTimePickerFragment.newInstance(timeTrialRider.riderId?:0, tt.timeTrialHeader.startTimeMilis).show(requireActivity().supportFragmentManager, "tpd")
                         }
-
                     }
 
                 }.setNegativeButton(resources.getString(R.string.cancel)){_,_ ->}.show()

@@ -129,7 +129,7 @@ class SelectRidersFragment : Fragment() {
         })
 
 
-
+        viewModel.setSortMode(PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_DEFAULT))
 
         return binding.root
     }

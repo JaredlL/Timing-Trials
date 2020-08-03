@@ -3,6 +3,7 @@ package com.jaredlinden.timingtrials.timing
 import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
+import com.jaredlinden.timingtrials.data.roomrepo.RoomRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
 import com.jaredlinden.timingtrials.domain.ITimelineEvent
 import com.jaredlinden.timingtrials.domain.TimeLine
@@ -20,7 +21,7 @@ interface IEventSelectionData{
     var eventAwaitingSelection: Long?
 }
 
-class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val resultRepository: TimeTrialRiderRepository) : ViewModel(), IEventSelectionData {
+class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val resultRepository: TimeTrialRiderRepository, val riderRepository: RoomRiderRepository) : ViewModel(), IEventSelectionData {
 
     val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
     private val liveMilisSinceStart: MutableLiveData<Long> = MutableLiveData()
@@ -428,6 +429,33 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             }
 
     }
+
+    fun addLateRider(riderId: Long, number:Int?){
+        timeTrial.value?.let { oldTt->
+            viewModelScope.launch(Dispatchers.IO) {
+                riderRepository.ridersFromIds(listOf(riderId)).firstOrNull()?.let { rider->
+                    if(oldTt.riderList.any { it.riderId() == riderId }){
+                        throw Exception("Rider already in TT")
+                    }
+                    val new = oldTt.addRiderWithNumber(rider, number)
+                    val ttr = new.riderList.first { it.riderId() == riderId }
+                    val millisSinceStart = Instant.now().toEpochMilli() - new.timeTrialHeader.startTimeMilis
+                    val newer = if(new.helper.getRiderStartTime(ttr.timeTrialData) < millisSinceStart){
+                        new.helper.moveRiderToBack(ttr.timeTrialData)
+                    }else{
+                        new
+                    }
+
+
+                    backgroundUpdateTt(newer)
+                }
+
+            }
+
+        }
+    }
+
+
 
     fun testFinishAll(){
         timeTrial.value?.let {tt->

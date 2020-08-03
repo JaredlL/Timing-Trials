@@ -1,7 +1,6 @@
 package com.jaredlinden.timingtrials.setup
 
 
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
@@ -10,11 +9,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaredlinden.timingtrials.IFabCallbacks
@@ -81,7 +78,7 @@ class OrderRidersFragment : Fragment() {
                 edittext.text?.toString()?.toIntOrNull()?.let {newNum->
                     viewModel.getOrderableRiderData().value?.let { tt->
                         if(tt.riderList.filterNot { it.riderData.id == rd.riderData.id }.any { it.timeTrialData.assignedNumber == newNum }){
-                            edittext.error = getString(R.string.number_already_taken)
+                            edittext.error = getString(R.string.number_already_taken_swap)
                         }else{
                             edittext.error = null
                         }

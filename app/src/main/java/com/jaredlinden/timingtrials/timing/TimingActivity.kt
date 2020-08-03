@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.jaredlinden.timingtrials.BuildConfig
+import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.TimeTrial
@@ -27,10 +29,7 @@ import com.jaredlinden.timingtrials.data.TimeTrialHeader
 import com.jaredlinden.timingtrials.data.TimeTrialStatus
 import com.jaredlinden.timingtrials.setup.SetupViewPagerFragmentArgs
 import com.jaredlinden.timingtrials.timetrialresults.ResultFragmentArgs
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.Utils
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
+import com.jaredlinden.timingtrials.util.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 import kotlinx.android.synthetic.main.activity_timing.*
@@ -43,7 +42,7 @@ interface ITimingActivity{
     fun endTiming()
 }
 
-class TimingActivity : AppCompatActivity(), ITimingActivity {
+class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
     private val TIMERTAG = "timing_tag"
     private val STATUSTAG = "status_tag"
@@ -120,26 +119,7 @@ class TimingActivity : AppCompatActivity(), ITimingActivity {
         appBarConfiguration = AppBarConfiguration(navController.graph)
 
         timingToolBar.setupWithNavController(navController, appBarConfiguration)
-        timingToolBar.title = getString(R.string.time_trial_in_progress)
-
-//        /**
-//         * Check if the fragemts already exist in child fragment manager
-//         * To make sure we do not recreate fragments unnecessarily
-//         */
-
-//        supportFragmentManager.findFragmentByTag(TIMERTAG)?: TimerFragment.newInstance().also {
-//            supportFragmentManager.beginTransaction().apply{
-//                add(R.id.higherFrame, it, TIMERTAG)
-//                commit()
-//            }
-//        }
-//
-//        supportFragmentManager.findFragmentByTag(STATUSTAG)?: RiderStatusFragment.newInstance().also {
-//            supportFragmentManager.beginTransaction().apply{
-//                add(R.id.lowerFrame, it, STATUSTAG)
-//                commit()
-//            }
-//        }
+        title = getString(R.string.time_trial_in_progress)
 
         val liveTick = Transformations.switchMap(mService){result->
             result?.timerTick
@@ -148,6 +128,10 @@ class TimingActivity : AppCompatActivity(), ITimingActivity {
         viewModel.messageData.observe(this, EventObserver{
             Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
+
+        timingFab.setOnClickListener {
+            fabClickEvent.postValue(Event(true))
+        }
 
         viewModel.ttDeleted.observe(this, EventObserver{
             if(it){
@@ -289,8 +273,27 @@ class TimingActivity : AppCompatActivity(), ITimingActivity {
                 .create().show()
     }
 
+    override fun currentVisibility(): Int {
+       return timingFab?.visibility?: View.INVISIBLE
+    }
 
+    override fun setVisibility(visibility: Int) {
+        if(visibility == View.GONE){
+            timingFab?.tag = "hide"
+        }else{
+            timingFab?.tag = "show"
+        }
+        if(visibility == View.VISIBLE){
+            timingFab?.show()
+        }
+        timingFab?.visibility = visibility
+    }
 
+    override fun setImage(resourceId: Int) {
+        timingFab?.setImageResource(resourceId)
+    }
+
+    override val fabClickEvent: MutableLiveData<Event<Boolean>> = MutableLiveData()
 
 
 }

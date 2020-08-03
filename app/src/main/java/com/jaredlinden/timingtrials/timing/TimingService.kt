@@ -13,6 +13,7 @@ import com.jaredlinden.timingtrials.util.ConverterUtils.toSecondsDisplayString
 import org.threeten.bp.Instant
 import java.util.*
 import android.app.NotificationManager
+import android.content.SharedPreferences
 import android.media.MediaPlayer
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
@@ -77,11 +78,11 @@ class TimingService : Service(){
         }
 
         fun updateTimeTrial(newTt: TimeTrial){
-            PreferenceManager.getDefaultSharedPreferences(this@TimingService).registerOnSharedPreferenceChangeListener{prefs,key->
-                if(key == getString(R.string.p_mainpref_sound)){
-                    playSound = prefs.getBoolean(key, true)
-                }
-            }
+//            PreferenceManager.getDefaultSharedPreferences(this@TimingService).registerOnSharedPreferenceChangeListener{prefs,key->
+//                if(key == getString(R.string.p_mainpref_sound)){
+//                    playSound = prefs.getBoolean(key, true)
+//                }
+//            }
             soundEvent = null
             timeTrial = newTt
         }
@@ -137,13 +138,18 @@ class TimingService : Service(){
     }
 
 
-    override fun onCreate() {
-        playSound = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.p_mainpref_sound), true)
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener{prefs,key->
+    val prefListner = object : SharedPreferences.OnSharedPreferenceChangeListener{
+        override fun onSharedPreferenceChanged(prefs: SharedPreferences?, key: String?) {
             if(key == getString(R.string.p_mainpref_sound)){
-                playSound = prefs.getBoolean(key, true)
+                playSound = prefs?.getBoolean(key, true)?:true
             }
         }
+
+    }
+
+    override fun onCreate() {
+        playSound = PreferenceManager.getDefaultSharedPreferences(applicationContext).getBoolean(getString(R.string.p_mainpref_sound), true)
+        PreferenceManager.getDefaultSharedPreferences(applicationContext).registerOnSharedPreferenceChangeListener(prefListner)
         System.out.println("JAREDMSG -> Timing Service -> Creating Timer")
         setInForeground()
         startPlayer  = MediaPlayer.create(this, R.raw.start)

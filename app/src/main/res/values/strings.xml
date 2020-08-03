@@ -42,6 +42,7 @@
     <string name="recent_activity">Recent Activity</string>
     <string name="alphabetical">Alphabetical</string>
     <string name="current_category">Current Category</string>
+    <string name="remove_from_tt">Remove from TT</string>
     <string name="current_club">Current Club</string>
     <string name="date">Date</string>
     <string name="delete_course">Delete Course</string>
@@ -64,7 +65,11 @@
     <string name="edit_notes">Edit Notes</string>
     <string name="edit_numbering">Edit numbering</string>
     <string name="set_number">Set Number</string>
-    <string name="number_already_taken">Number already taken!\nThe numbers will be swapped</string>
+    <string name="seed_riders">Seed Riders</string>
+    <string name="seed_riders_message">Seed riders based on past results, fastest off last?</string>
+    <string name="what_number_will_late_rider_use">What number will the late rider use?</string>
+    <string name="number_already_taken_swap">Number already taken!\nThe numbers will be swapped</string>
+    <string name="number_already_taken">Number already taken!</string>
     <string name="edit_rider">Edit Rider</string>
     <string name="edit_result">Edit Result</string>
     <string name="explore_results">Explore Results</string>
@@ -93,6 +98,7 @@
     <string name="number_of_rides">Rides</string>
     <string name="ok">OK</string>
     <string name="order_riders">Order</string>
+    <string name="set_custom_start_time">Set custom start time</string>
     <string name="powered_by_timing_trials">Powered by Timing Trials</string>
     <string name="press_assign_rider">Press to assign number</string>
     <string name="rest_filters">Reset Columns</string>
@@ -101,6 +107,7 @@
     <string name="resume">Resume</string>
     <string name="rider_dnf_did_not_finish">Rider DNF (Did not finish)</string>
     <string name="rider_dns_did_not_start">Rider DNS (did not start)</string>
+    <string name="rider_missed_start_move_to_next_slot">Missed start, move to next start slot</string>
     <string name="rider_passed">Rider Passed!</string>
     <string name="rider_start_offset">First rider start offset</string>
     <string name="rider">Rider</string>
