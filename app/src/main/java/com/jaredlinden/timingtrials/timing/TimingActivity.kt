@@ -161,10 +161,12 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                    }
             }
             addSource(viewModel.timeTrial){res->
-                res?.let { tt->
+                if(res != null){
                     mService.value?.let {
-                        viewModelChange(tt, it)
+                        viewModelChange(res, it)
                     }
+                }else{
+                    endTiming()
                 }
             }
             addSource(liveTick){
@@ -200,19 +202,29 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
             }
             TimeTrialStatus.FINISHED -> {
                 if(mBound){
-                    Timber.d("Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
-                    applicationContext.unbindService(connection)
-                    service.stop()
-                    mBound = false
-                    val args = ResultFragmentArgs(timeTrialHeader.id?:0)
-                    val pendingIntent = NavDeepLinkBuilder(this)
-                            .setGraph(R.navigation.nav_graph)
-                            .setDestination(R.id.resultFragment)
-                            .setArguments(args.toBundle())
-                            .setComponentName(MainActivity::class.java)
-                            .createPendingIntent()
-                    pendingIntent.send()
+                    try {
+                        Timber.d("Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
+                        applicationContext.unbindService(connection)
+                        service.stop()
+                        mBound = false
+                    }catch (e:Exception){
+                        Timber.e(e)
+                    }
+
+
+
+
                 }
+
+                val args = ResultFragmentArgs(timeTrialHeader.id?:0)
+                val pendingIntent = NavDeepLinkBuilder(this)
+                        .setGraph(R.navigation.nav_graph)
+                        .setDestination(R.id.resultFragment)
+                        .setArguments(args.toBundle())
+                        .setComponentName(MainActivity::class.java)
+                        .createPendingIntent()
+                pendingIntent.send()
+
                 finish()
             }
         }
@@ -220,19 +232,29 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
 
     override fun endTiming() {
-        if(mBound){
-            applicationContext.unbindService(connection)
-            mBound = false
+        try {
+            if(mBound){
+                applicationContext.unbindService(connection)
+                mBound = false
+            }
+            mService.value?.stop()
+        }catch (e:Exception){
+            Timber.e(e)
         }
-        mService.value?.stop()
+
         finish()
     }
 
     override fun onStop() {
-        if(mBound){
-            applicationContext.unbindService(connection)
-            mBound = false
+        try{
+            if(mBound){
+                applicationContext.unbindService(connection)
+                mBound = false
+            }
+        }catch (e:Exception){
+            Timber.e(e)
         }
+
 
         super.onStop()
     }

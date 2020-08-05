@@ -94,8 +94,8 @@ class TimerHostFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_timing, menu)
         if(BuildConfig.DEBUG){
-            menu.findItem(R.id.timingMenuAddLateRider)?.isVisible = true
             menu.findItem(R.id.timingTest)?.isVisible = true
+            menu.findItem(R.id.timingTest2)?.isVisible = true
         }
 
     }
@@ -136,6 +136,11 @@ class TimerHostFragment : Fragment() {
             }
             R.id.timingTest->{
                 viewModel.testFinishAll()
+                true
+            }
+
+            R.id.timingTest2->{
+                viewModel.testFinishTt()
                 true
             }
 

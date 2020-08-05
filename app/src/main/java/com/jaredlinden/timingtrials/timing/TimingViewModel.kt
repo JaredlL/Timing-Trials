@@ -23,7 +23,7 @@ interface IEventSelectionData{
 
 class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val resultRepository: TimeTrialRiderRepository, val riderRepository: RoomRiderRepository) : ViewModel(), IEventSelectionData {
 
-    val timeTrial: MediatorLiveData<TimeTrial> = MediatorLiveData()
+    val timeTrial: MediatorLiveData<TimeTrial?> = MediatorLiveData()
     private val liveMilisSinceStart: MutableLiveData<Long> = MutableLiveData()
 
     val timeLine: MediatorLiveData<TimeLine> = MediatorLiveData()
@@ -51,11 +51,16 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             if(new != null && !isCorotineAlive.get() && !new.equalsOtherExcludingIds(timeTrial.value)) {
                 Timber.d("TimingTt self updating TT, ${new.timeTrialHeader.timeStamps} unassigned")
                 timeTrial.value = new
+            }else if(new == null){
+                timeTrial.value = new
             }
         }
 
         timeLine.addSource(timeTrial){tt->
-            timeLine.value = TimeLine(tt, Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis)
+            tt?.let {
+                timeLine.value = TimeLine(tt, Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis)
+            }
+
         }
         timeLine.addSource(liveMilisSinceStart){millis->
             if(timeLine.value?.isValidForTimeStamp(millis) != true){
@@ -476,7 +481,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             val now1 = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis
             val timeLeft = (tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size() - 1)) - now1
             var c = if(tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size() - 1) > now1){
-                tt.copy(timeTrialHeader = tt.timeTrialHeader.copy(startTime = tt.timeTrialHeader.startTime?.minusSeconds(timeLeft * 1000)))
+                tt.copy(timeTrialHeader = tt.timeTrialHeader.copy(startTime = tt.timeTrialHeader.startTime?.minusSeconds(timeLeft/1000)))
             }else{
                 tt
             }
@@ -492,5 +497,11 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
             }
 
         }
+
+    fun testFinishTt(){
+        timeTrial.value?.let {
+            updateTimeTrial(it.copy(timeTrialHeader = it.timeTrialHeader.copy(status  = TimeTrialStatus.FINISHED)))
+        }
+    }
 
 }

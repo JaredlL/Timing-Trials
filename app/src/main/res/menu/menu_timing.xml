@@ -23,4 +23,10 @@
             android:visible="false"
             app:showAsAction="never" />
 
+    <item
+        android:id="@+id/timingTest2"
+        android:title="Test 2"
+        android:visible="false"
+        app:showAsAction="never" />
+
 </menu>

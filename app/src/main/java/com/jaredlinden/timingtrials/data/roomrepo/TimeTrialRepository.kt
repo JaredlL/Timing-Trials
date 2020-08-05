@@ -134,9 +134,9 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
 
     override fun getTimingTimeTrial(): LiveData<TimeTrial?> {
         return Transformations.map(timeTrialDao.getTimingTimeTrials()){
-            if(it.size > 1){
-                throw Exception("Multiple Timing TimeTrials In DB!!!")
-            }
+//            if(it.size > 1){
+//                throw Exception("Multiple Timing TimeTrials In DB!!!")
+//            }
             it.firstOrNull()
         }
     }
