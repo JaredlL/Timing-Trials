@@ -33,11 +33,9 @@ import kotlinx.android.synthetic.main.fragment_timer.*
 class TimerFragment : Fragment() {
 
     private lateinit var timingViewModel: TimingViewModel
-    private lateinit var startPlayer: MediaPlayer
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout  for this fragment
 
         timingViewModel = requireActivity().getViewModel { requireActivity().injector.timingViewModel() }
 
@@ -64,10 +62,9 @@ class TimerFragment : Fragment() {
 
                         newList.find { it.event.timeStamp == oldTimestamp }?.notifyPropertyChanged(BR.eventSelected)
                     }
-                    //evw.notifyPropertyChanged(BR.eventSelected)
                 }
                 val newcount = adapter.itemCount
-                if(oldCount < newcount) eventRecyclerView?.scrollToPosition(newcount - 1)
+                if(oldCount < adapter.itemCount) eventRecyclerView?.scrollToPosition(newcount - 1)
             }
             if(res == null){
                 textView18.text = "TT is null"
@@ -86,25 +83,6 @@ class TimerFragment : Fragment() {
         timingViewModel.timeString.observe(viewLifecycleOwner, Observer {
 
         })
-
-
-//        startPlayer  = MediaPlayer.create(requireContext(), R.raw.start)
-//        val playSound = PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(getString(R.string.p_mainpref_sound), true)
-//        timingViewModel.soundEvent.observe(viewLifecycleOwner, EventObserver{
-//            if(playSound){
-//                if (startPlayer.isPlaying ) {
-//                    startPlayer.pause();
-//                    startPlayer.seekTo(0);
-//                }else{
-//                    startPlayer.start()
-//                }
-//            }
-//
-//
-//        })
-
-
-
 
         val binding =  DataBindingUtil.inflate<FragmentTimerBinding>(inflater, R.layout.fragment_timer, container, false).apply{
             lifecycleOwner = this@TimerFragment

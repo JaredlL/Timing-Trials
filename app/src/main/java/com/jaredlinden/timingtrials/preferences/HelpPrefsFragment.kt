@@ -42,6 +42,7 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
                     putExtra(Intent.EXTRA_SUBJECT, "Timing Trials Feedback")
                     putExtra(Intent.EXTRA_TEXT, t)
                 }
+                startActivity(intent)
 
             }catch (e:Exception){
                 Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()

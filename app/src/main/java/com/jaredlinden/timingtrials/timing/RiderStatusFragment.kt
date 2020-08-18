@@ -138,12 +138,6 @@ class RiderStatusFragment : Fragment() {
         }
 
 
-//        val options= arrayOf(
-//                "Did not finish (DNF)",
-//                "Did not start (DNS)",
-//                "Missed start, move to back",
-//                "Set custom start time")
-
 
         val timeTrialRider = rs.timeTrialRider
          AlertDialog.Builder(requireContext()).
@@ -238,20 +232,5 @@ class RiderStatusFragment : Fragment() {
 
     }
 
-
-}
-
-
-
-class RiderStatusDialog: DialogFragment(){
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
 
 }

@@ -91,6 +91,11 @@ class EditResultFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        hideKeyboard()
+        super.onDestroyView()
+    }
+
     fun showDeleteDialog(){
         AlertDialog.Builder(requireContext())
                 .setTitle(resources.getString(R.string.delete_result))
@@ -111,63 +116,3 @@ class EditResultFragment : Fragment() {
 
 
 }
-
-//class SelectSingleRiderFragment : Fragment(){
-//
-//    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-//                              savedInstanceState: Bundle?): View? {
-//
-//        viewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
-//
-//        viewManager = LinearLayoutManager(context)
-//        adapter = SelectableRiderListAdapter(requireContext())
-//
-//        adapter.setHasStableIds(true)
-//        adapter.editRider = ::editRider
-//
-//        (requireActivity() as IFabCallbacks).apply {
-//            setVisibility(View.VISIBLE)
-//            setImage(R.drawable.ic_add_white_24dp)
-//            setAction {
-//                editRider(0)
-//            }
-//        }
-//
-//        val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
-//            lifecycleOwner = (this@SelectRidersFragment)
-//            riderHeading.rider =  Rider.createBlank().copy( firstName = "Name", club = "Club")
-//            riderHeading.checkBox.visibility =  View.INVISIBLE
-//            riderRecyclerView.adapter = adapter
-//            riderRecyclerView.layoutManager = viewManager
-//
-////            riderListFab.setOnClickListener {
-////                editRider(0)
-////            }
-//        }
-//
-//        adapter.addRiderToSelection = {
-//            viewModel.riderSelected(it)
-//        }
-//        adapter.removeRiderFromSelection = {
-//            viewModel.riderUnselected(it)
-//        }
-//
-//        viewModel.selectedRidersInformation.observe(viewLifecycleOwner, Observer {result->
-//            result?.let {
-//                adapter.setRiders(it)
-//            }
-//        })
-//
-//
-//
-//
-//
-//        return binding.root
-//    }
-//
-//    private fun editRider(riderId: Long){
-//        val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(riderId)
-//        findNavController().navigate(action)
-//    }
-//
-//}

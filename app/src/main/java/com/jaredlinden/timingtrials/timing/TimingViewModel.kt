@@ -287,6 +287,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         val maleWithCr = maleCr?.let {
             timeTrial.helper.results.filter { it.riderData.gender == Gender.MALE && it.timeTrialData.finishTime()?: Long.MAX_VALUE < maleCr }.minBy { it.timeTrialData.finishTime() ?: Long.MAX_VALUE }
         }?.rider
+
         val femaleWithCr = femaleCr?.let {
             timeTrial.helper.results.filter { it.riderData.gender == Gender.FEMALE && it.timeTrialData.finishTime()?: Long.MAX_VALUE < femaleCr }.minBy { it.timeTrialData.finishTime()  ?: Long.MAX_VALUE }
         }?.rider
@@ -323,21 +324,12 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         }.toList()
 
 
-
-//        val listWithCRsCalculated = listWithPrsCalculated.map {
-//           when (it.riderData.id) {
-//               maleWithCr?.riderData?.id -> it.copy(timeTrialData = it.timeTrialData.copy(notes = CRString))
-//               femaleWithCr?.riderData?.id -> it.copy(timeTrialData = it.timeTrialData.copy(notes = CRString))
-//               else -> it
-//           }
-//       }.toList()
-
         return timeTrial.updateRiderList(listWithPrsCalculated)
     }
 
 
     fun discardTt(){
-        Timber.d("JAREDMSG -> TIMINGVM -> Deleting TT")
+        Timber.d("Deleting TT")
         viewModelScope.launch(Dispatchers.IO) {
             var deleted = false
             while (!deleted){
@@ -356,7 +348,6 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     }
 
     val ttDeleted: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val ttConvertedToSetup: MutableLiveData<Event<Boolean>> = MutableLiveData()
 
     fun backToSetup(){
         timeTrial.value?.let {
@@ -373,8 +364,6 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
     }
 
 
-    //val soundEvent: MutableLiveData<Event<Int>> = MutableLiveData()
-
     private fun getStatusString(millisSinceStart: Long, tte: TimeTrial): String{
 
         val sparse = tte.helper.sparseRiderStartTimes
@@ -382,15 +371,6 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         val prevIndex = if(index >= 0){ index }else{ Math.abs(index) - 2 }
         val nextIndex = prevIndex + 1
         val ttIntervalMilis = (tte.timeTrialHeader.interval * 1000L)
-
-//        val currentSoundEventVal = soundEvent.value?.peekContent()
-//        if(currentSoundEventVal != null){
-//            if(currentSoundEventVal != prevIndex){
-//                soundEvent.value = Event(prevIndex)
-//            }
-//        }else if(prevIndex >= 0){
-//            soundEvent.value = Event(prevIndex)
-//        }
 
         if(nextIndex < tte.helper.sparseRiderStartTimes.size()){
 
@@ -488,7 +468,6 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
             tt.riderList.forEach{ttr->
                 val now = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis
-                //eventAwaitingSelection = now
                     val helper = c.helper
                     c = helper.assignRiderToEvent(ttr.timeTrialData, now).tt
 

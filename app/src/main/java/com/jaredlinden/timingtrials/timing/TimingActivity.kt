@@ -57,14 +57,12 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            System.out.println("JAREDMSG -> Timing Activity -> Service Connectd")
             val binder = service as TimingService.TimingServiceBinder
             mService.value = binder.getService()
             serviceCreated.value = true
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
-            System.out.println("JAREDMSG -> Timing Activity -> Service Disconnected")
             mBound = false
         }
     }
@@ -73,11 +71,6 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
     val serviceCreated: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    override fun onDestroy() {
-
-        super.onDestroy()
-        System.out.println("JAREDMSG -> Timing Activity -> DESTROY")
-    }
 
    override fun showExitDialog(){
         AlertDialog.Builder(this)
@@ -105,7 +98,6 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
         setContentView(R.layout.activity_timing)
         setSupportActionBar(timingToolBar)
 
-        //supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         viewModel = getViewModel { injector.timingViewModel() }
 

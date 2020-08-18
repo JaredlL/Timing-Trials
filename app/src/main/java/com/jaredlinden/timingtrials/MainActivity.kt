@@ -156,7 +156,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener)
 
         if(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(HAS_SHOWN_ONBOARDING, false)){
-//            OnboardingFragment().show(supportFragmentManager, "onboard")
             showDemoDataDialog()
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(HAS_SHOWN_ONBOARDING, true).apply()
         }
@@ -225,16 +224,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     permissionRequiredEvent = Event{ writeAllResults.launch("Timing Trials Export $fString.tt") }
                     requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
-//                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-//                        addCategory(Intent.CATEGORY_OPENABLE)
-//                        putExtra(Intent.EXTRA_TITLE, "Timing Trials Export $fString.tt")
-//                        //MIME types
-//                        type = "text/*"
-//                        // Optionally, specify a URI for the directory that should be opened in
-//                        // the system file picker before your app creates the document.
-//                        //putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
-//                    }
-//                    startActivityForResult(intent, REQUEST_MAIN_CREATE_FILE_JSON)
                     true
                 }
                 else->{
@@ -362,9 +351,8 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     private fun getFileName(uri: Uri): String? {
         var result: String? = null
         if (uri.scheme == "content") {
-            val mcursor: Cursor? = contentResolver.query(uri, null, null, null, null)
-            mcursor.use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
+            contentResolver.query(uri, null, null, null, null)?.let {cursor->
+                if (cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
                 }
             }

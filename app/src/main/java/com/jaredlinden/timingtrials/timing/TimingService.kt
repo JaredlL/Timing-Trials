@@ -21,6 +21,7 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.TimeTrial
 import com.jaredlinden.timingtrials.data.TimeTrialHeader
 import com.jaredlinden.timingtrials.util.Event
+import timber.log.Timber
 import kotlin.math.abs
 
 
@@ -127,14 +128,14 @@ class TimingService : Service(){
 
 
     fun stop(){
-        System.out.println("JAREDMSG -> Timing Service -> Trying to end service")
+        Timber.d("Trying to end service")
         timerTask?.cancel()
         timer.cancel()
         timerTask = null
         notificationManager.cancel(NOTIFICATION_ID)
         stopForeground(true)
         stopSelf()
-        System.out.println("JAREDMSG -> Timing Service -> Service Stopped")
+        Timber.d("Service Stopped")
     }
 
 
@@ -150,7 +151,7 @@ class TimingService : Service(){
     override fun onCreate() {
         playSound = PreferenceManager.getDefaultSharedPreferences(applicationContext).getBoolean(getString(R.string.p_mainpref_sound), true)
         PreferenceManager.getDefaultSharedPreferences(applicationContext).registerOnSharedPreferenceChangeListener(prefListner)
-        System.out.println("JAREDMSG -> Timing Service -> Creating Timer")
+        Timber.d("Creating Timer")
         setInForeground()
         startPlayer  = MediaPlayer.create(this, R.raw.start)
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
