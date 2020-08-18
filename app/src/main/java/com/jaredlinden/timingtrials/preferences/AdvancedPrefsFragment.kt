@@ -24,7 +24,7 @@ class AdvancedPrefsFragment : PreferenceFragmentCompat() {
 
 
 
-        (requireActivity() as? IFabCallbacks)?.setVisibility(View.GONE)
+        (requireActivity() as? IFabCallbacks)?.setFabVisibility(View.GONE)
 
         findPreference(R.string.p_advanced_clear).setOnPreferenceClickListener {
             val builder = AlertDialog.Builder(requireContext()).setTitle(resources.getString(R.string.clear_database))

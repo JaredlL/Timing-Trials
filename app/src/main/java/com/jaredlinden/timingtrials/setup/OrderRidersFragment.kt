@@ -54,7 +54,7 @@ class OrderRidersFragment : Fragment() {
 
             }
         })
-        (requireActivity() as IFabCallbacks).setVisibility(View.GONE)
+        (requireActivity() as IFabCallbacks).setFabVisibility(View.GONE)
 
 
         return inflater.inflate(R.layout.fragment_order_riders, container, false)

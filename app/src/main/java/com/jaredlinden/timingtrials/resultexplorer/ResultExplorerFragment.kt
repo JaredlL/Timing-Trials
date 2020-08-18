@@ -50,7 +50,7 @@ class ResultExplorerFragment : Fragment()  {
 //        arguments?.remove("itemTypeId")
 
         val fabCallback = (requireActivity() as? IFabCallbacks)
-        fabCallback?.setVisibility(View.GONE)
+        fabCallback?.setFabVisibility(View.GONE)
 
         setHasOptionsMenu(true)
 

@@ -1,8 +1,6 @@
 package com.jaredlinden.timingtrials.preferences
 
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -21,7 +19,7 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_help, rootKey)
 
-        (requireActivity() as? IFabCallbacks)?.setVisibility(View.GONE)
+        (requireActivity() as? IFabCallbacks)?.setFabVisibility(View.GONE)
 
         findPreference(R.string.p_helpref_documentation).setOnPreferenceClickListener {
             val url = getString(R.string.help_url)

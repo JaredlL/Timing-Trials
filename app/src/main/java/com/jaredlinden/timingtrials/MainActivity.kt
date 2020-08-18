@@ -46,10 +46,13 @@ import kotlin.math.abs
 
 
 interface IFabCallbacks{
+    
     fun currentVisibility(): Int
-    fun setVisibility(visibility: Int)
-    //fun setAction(action: () -> Unit)
-    fun setImage(resourceId: Int)
+
+    fun setFabVisibility(visibility: Int)
+
+    fun setFabImage(resourceId: Int)
+
     val fabClickEvent: MutableLiveData<Event<Boolean>>
 }
 
@@ -325,9 +328,12 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             }
         }
 
+
         intent?.let { intent->
             val data = intent.data
+
             if(!intent.getBooleanExtra(FROM_TIMING_TRIALS, false) && data != null){
+                //TODO probably shouldnt fire this off every rotation
                 importData(data)
             }
 
@@ -341,7 +347,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         val fName = getFileName(uri)
 
         if(inputStream != null){
-            importVm.readInput(fName, inputStream)
+            importVm.readInput(fName,uri, inputStream)
             importVm.importMessage.observe(this, EventObserver {
                 Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
             })
@@ -398,7 +404,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
     private var toolbarCollapsed = false
     private var fabShouldShow = true
-    override fun setVisibility(visibility: Int) {
+    override fun setFabVisibility(visibility: Int) {
         fabShouldShow = visibility == View.VISIBLE
     }
 
@@ -417,7 +423,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
     override val fabClickEvent: MutableLiveData<Event<Boolean>> = MutableLiveData()
 
-    override fun setImage(resourceId: Int) {
+    override fun setFabImage(resourceId: Int) {
         mainFab?.setImageResource(resourceId)
     }
 

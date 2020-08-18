@@ -6,18 +6,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
-import android.view.inputmethod.InputMethodManager
-import android.widget.ArrayAdapter
 import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.MenuItemCompat
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
@@ -26,15 +19,11 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
-import com.jaredlinden.timingtrials.data.NumberMode
-import com.jaredlinden.timingtrials.data.NumbersDirection
 import com.jaredlinden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
-import com.jaredlinden.timingtrials.databinding.FragmentNumberOptionsBinding
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.util.showKeyboard
-import kotlinx.android.synthetic.main.fragment_number_options.*
 
 
 const val SORT_RECENT_ACTIVITY = 0
@@ -123,8 +112,8 @@ class SetupViewPagerFragment: Fragment() {
         when (position) {
 
             RIDER_PAGE_INDEX -> {
-                act?.setVisibility(View.VISIBLE)
-                act?.setImage(R.drawable.ic_add_white_24dp)
+                act?.setFabVisibility(View.VISIBLE)
+                act?.setFabImage(R.drawable.ic_add_white_24dp)
                 setHasOptionsMenu(true)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = true
@@ -132,7 +121,7 @@ class SetupViewPagerFragment: Fragment() {
                 }
             }
             ORDER_RIDER_INDEX ->  {
-                act?.setVisibility(View.GONE)
+                act?.setFabVisibility(View.GONE)
                 setHasOptionsMenu(true)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = false
@@ -141,7 +130,7 @@ class SetupViewPagerFragment: Fragment() {
 
             }
             TIMETRIAL_PAGE_INDEX-> {
-                act?.setVisibility(View.GONE)
+                act?.setFabVisibility(View.GONE)
                 setupMenu?.let {
                     it.findItem(R.id.settings_app_bar_search)?.isVisible = false
                     it.findItem(R.id.settings_menu_sort)?.isVisible = true

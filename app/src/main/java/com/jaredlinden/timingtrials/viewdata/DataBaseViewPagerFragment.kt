@@ -4,9 +4,6 @@ import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.view.*
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -123,17 +120,17 @@ class DataBaseViewPagerFragment: Fragment() {
 
     private  fun setFabStatus(position: Int){
         (activity as? IFabCallbacks)?.let { act->
-            act.setVisibility(View.VISIBLE)
-            act.setImage(R.drawable.ic_add_white_24dp)
+            act.setFabVisibility(View.VISIBLE)
+            act.setFabImage(R.drawable.ic_add_white_24dp)
             when (position) {
                 RIDER_PAGE_INDEX -> {
-                    act.setImage(R.drawable.ic_add_white_24dp)
+                    act.setFabImage(R.drawable.ic_add_white_24dp)
                 }
                 COURSE_PAGE_INDEX -> {
-                    act.setImage(R.drawable.ic_add_white_24dp)
+                    act.setFabImage(R.drawable.ic_add_white_24dp)
                 }
                 TIMETRIAL_PAGE_INDEX->{
-                    act.setImage(R.drawable.ic_timer_white_24dp)
+                    act.setFabImage(R.drawable.ic_timer_white_24dp)
                 }
             }
         }

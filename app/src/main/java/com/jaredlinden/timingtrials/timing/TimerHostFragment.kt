@@ -44,7 +44,7 @@ class TimerHostFragment : Fragment() {
         })
 
         (activity as IFabCallbacks).apply {
-            setVisibility(View.GONE)
+            setFabVisibility(View.GONE)
         }
 
         val v = inflater.inflate(R.layout.fragment_host, container, false)

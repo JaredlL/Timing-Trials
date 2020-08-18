@@ -16,7 +16,6 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 import android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY
 import android.text.InputType
-import android.text.method.LinkMovementMethod
 import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -26,7 +25,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -47,7 +45,6 @@ import com.jaredlinden.timingtrials.util.*
 import kotlinx.android.synthetic.main.fragment_timetrial_result.*
 import timber.log.Timber
 import java.io.IOException
-import java.net.URL
 import java.util.*
 
 
@@ -82,7 +79,7 @@ class ResultFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
-        (requireActivity() as? IFabCallbacks)?.setVisibility(View.GONE)
+        (requireActivity() as? IFabCallbacks)?.setFabVisibility(View.GONE)
 
         resultViewModel = requireActivity().getViewModel {  requireActivity().injector.resultViewModel() }.apply { changeTimeTrial(args.timeTrialId) }
 

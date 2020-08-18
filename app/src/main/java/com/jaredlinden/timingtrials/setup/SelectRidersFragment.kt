@@ -73,15 +73,15 @@ class SelectRidersFragment : Fragment() {
             setHasOptionsMenu(false)
             if(requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.currentPage == RIDER_PAGE_INDEX ){
                 (requireActivity() as IFabCallbacks).apply {
-                    setVisibility(View.VISIBLE)
-                    setImage(R.drawable.ic_add_white_24dp)
+                    setFabVisibility(View.VISIBLE)
+                    setFabImage(R.drawable.ic_add_white_24dp)
                 }
             }
         }else{
             setHasOptionsMenu(true)
             (requireActivity() as IFabCallbacks).apply {
-                setVisibility(View.VISIBLE)
-                setImage(R.drawable.ic_add_white_24dp)
+                setFabVisibility(View.VISIBLE)
+                setFabImage(R.drawable.ic_add_white_24dp)
 
             }
         }

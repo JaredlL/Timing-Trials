@@ -14,7 +14,6 @@ import androidx.navigation.fragment.navArgs
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Course
-import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentEditCourseBinding
 import com.jaredlinden.timingtrials.util.*
 
@@ -43,8 +42,8 @@ class EditCourseFragment : Fragment() {
 
         val fabCallback = (requireActivity() as IFabCallbacks)
 
-        fabCallback.setImage(R.drawable.ic_done_white_24dp)
-        fabCallback.setVisibility(View.VISIBLE)
+        fabCallback.setFabImage(R.drawable.ic_done_white_24dp)
+        fabCallback.setFabVisibility(View.VISIBLE)
 
         courseViewModel.doJumpToCourseResults.observe(viewLifecycleOwner, EventObserver{
             val action = EditCourseFragmentDirections.actionEditCourseFragmentToSheetFragment(it, Course::class.java.simpleName)

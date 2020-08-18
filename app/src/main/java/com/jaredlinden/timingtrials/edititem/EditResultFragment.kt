@@ -37,8 +37,8 @@ class EditResultFragment : Fragment() {
 
 
         val fabCallback = (requireActivity() as IFabCallbacks)
-        fabCallback.setImage(R.drawable.ic_done_white_24dp)
-        fabCallback.setVisibility(View.VISIBLE)
+        fabCallback.setFabImage(R.drawable.ic_done_white_24dp)
+        fabCallback.setFabVisibility(View.VISIBLE)
 
         fabCallback.fabClickEvent.observe(viewLifecycleOwner, EventObserver {
             if(it){

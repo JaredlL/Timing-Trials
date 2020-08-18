@@ -19,7 +19,6 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.adapters.SelectableRiderListAdapter
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
-import com.jaredlinden.timingtrials.edititem.EditCourseFragmentArgs
 import com.jaredlinden.timingtrials.setup.*
 import com.jaredlinden.timingtrials.util.*
 
@@ -44,8 +43,8 @@ class SelectRiderFragment : Fragment() {
         adapter.editRider = ::editRider
 
         (activity as? IFabCallbacks)?.apply {
-            setVisibility(View.VISIBLE)
-            setImage(R.drawable.ic_add_white_24dp)
+            setFabVisibility(View.VISIBLE)
+            setFabImage(R.drawable.ic_add_white_24dp)
             fabClickEvent.observe(viewLifecycleOwner, EventObserver{
                 val act = SelectRiderFragmentDirections.actionSelectRiderFragmentToEditRiderFragment2()
                 findNavController().navigate(act)

@@ -1,5 +1,6 @@
 package com.jaredlinden.timingtrials.viewdata
 
+import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -59,7 +60,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
         }
     }
     fun readInput(inputStream: InputStream){
-        readInput(null, inputStream)
+        readInput(null,null, inputStream)
     }
 
     fun readUrlInput(url:URL){
@@ -80,56 +81,63 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
     }
 
+    val readList: MutableList<Uri> = mutableListOf()
 
-    fun readInput(title: String?, inputStream: InputStream){
-        viewModelScope.launch(Dispatchers.IO) {
-            if(isIoInProgress.compareAndSet(false, true)){
-                try {
-                    val buf = BufferedInputStream(inputStream)
-                    buf.mark(100)
-                    val zis = ZipInputStream(buf)
-                    val nextZipped = zis.nextEntry
-                    var fString = ""
-                    if(nextZipped!= null){
-                        //val reader2 = BufferedReader(BufferedInputStream(zis))
-                        val sb = StringBuilder()
-                        val buffer = ByteArray(1024)
-                        var read = 0
+    fun readInput(title: String?, uri: Uri?, inputStream: InputStream){
 
-                        while (zis.read(buffer, 0, 1024).also { read = it } >= 0) {
-                            //read = zis.read(buffer, 0, 1024)
-                            sb.append(String(buffer, 0, read))
+        //To prevent reading in the same file multiple times
+        if(uri != null && !readList.contains(uri)){
+
+            viewModelScope.launch(Dispatchers.IO) {
+                if(isIoInProgress.compareAndSet(false, true)){
+                    try {
+                        val buf = BufferedInputStream(inputStream)
+                        buf.mark(100)
+                        val zis = ZipInputStream(buf)
+                        val nextZipped = zis.nextEntry
+                        var fString = ""
+                        if(nextZipped!= null){
+                            //val reader2 = BufferedReader(BufferedInputStream(zis))
+                            val sb = StringBuilder()
+                            val buffer = ByteArray(1024)
+                            var read = 0
+
+                            while (zis.read(buffer, 0, 1024).also { read = it } >= 0) {
+                                //read = zis.read(buffer, 0, 1024)
+                                sb.append(String(buffer, 0, read))
+                            }
+                            fString = sb.toString()
+                            zis.close()
+                        }else{
+                            buf.reset()
+                            val reader = BufferedReader(InputStreamReader(buf))
+                            fString = reader.readText()
+                            reader.close()
                         }
-                        fString = sb.toString()
-                        zis.close()
-                    }else{
-                        buf.reset()
-                        val reader = BufferedReader(InputStreamReader(buf))
-                        fString = reader.readText()
-                        reader.close()
+
+
+                        //reader.close()
+                        val firstNonWhitespaceChar = fString.asSequence().first { !it.isWhitespace() }
+
+                        val msg = if(firstNonWhitespaceChar == "{".first() || firstNonWhitespaceChar == "[".first()){
+                            readJsonInputIntoDb(fString)
+                        }else{
+                            readCsvInputIntoDb(title?:"Time Trial", fString)
+                        }
+
+                        importMessage.postValue(Event(msg))
+                    }catch (e: Exception){
+                        importMessage.postValue(Event(e.message?:"Error reading file: ${e.message}"))
+                    }finally {
+                        isIoInProgress.set(false)
                     }
-
-
-                    //reader.close()
-                    val firstNonWhitespaceChar = fString.asSequence().first { !it.isWhitespace() }
-
-                    val msg = if(firstNonWhitespaceChar == "{".first() || firstNonWhitespaceChar == "[".first()){
-                        readJsonInputIntoDb(fString)
-                    }else{
-                        readCsvInputIntoDb(title?:"Time Trial", fString)
-                    }
-
-                    importMessage.postValue(Event(msg))
-                }catch (e: Exception){
-                    importMessage.postValue(Event(e.message?:"Error reading file: ${e.message}"))
-                }finally {
-                    isIoInProgress.set(false)
                 }
+
+
+                //readCsvInputIntoDb(inputStream)
             }
-
-
-            //readCsvInputIntoDb(inputStream)
         }
+
     }
 
     val READING_TT = 0

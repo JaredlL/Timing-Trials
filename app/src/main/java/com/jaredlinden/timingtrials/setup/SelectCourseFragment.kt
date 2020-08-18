@@ -36,8 +36,8 @@ class SelectCourseFragment : Fragment() {
         }
 
         (requireActivity() as IFabCallbacks).apply {
-            setVisibility(View.VISIBLE)
-            setImage(R.drawable.ic_add_white_24dp)
+            setFabVisibility(View.VISIBLE)
+            setFabImage(R.drawable.ic_add_white_24dp)
             fabClickEvent.observe(viewLifecycleOwner, EventObserver {
                 if(it){
                     val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")

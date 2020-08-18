@@ -291,7 +291,7 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
        return timingFab?.visibility?: View.INVISIBLE
     }
 
-    override fun setVisibility(visibility: Int) {
+    override fun setFabVisibility(visibility: Int) {
         if(visibility == View.GONE){
             timingFab?.tag = "hide"
         }else{
@@ -303,7 +303,7 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
         timingFab?.visibility = visibility
     }
 
-    override fun setImage(resourceId: Int) {
+    override fun setFabImage(resourceId: Int) {
         timingFab?.setImageResource(resourceId)
     }
 

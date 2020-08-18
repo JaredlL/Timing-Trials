@@ -9,14 +9,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.jaredlinden.timingtrials.IFabCallbacks
 
 import com.jaredlinden.timingtrials.R
-import com.jaredlinden.timingtrials.TitleFragmentDirections
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentEditRiderBinding
 import com.jaredlinden.timingtrials.util.*
@@ -83,8 +81,8 @@ class EditRiderFragment : Fragment() {
 
         val fabCallback = (requireActivity() as IFabCallbacks)
 
-        fabCallback.setImage(R.drawable.ic_done_white_24dp)
-        fabCallback.setVisibility(View.VISIBLE)
+        fabCallback.setFabImage(R.drawable.ic_done_white_24dp)
+        fabCallback.setFabVisibility(View.VISIBLE)
 
         val binding = DataBindingUtil.inflate<FragmentEditRiderBinding>(inflater, R.layout.fragment_edit_rider, container, false).apply {
             viewModel = riderViewModel
