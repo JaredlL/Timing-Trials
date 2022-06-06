@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.jaredlinden.timingtrials.BuildConfig
@@ -29,12 +30,11 @@ class TimerHostFragment : Fragment() {
     private val TIMERTAG = "timing_tag"
     private val STATUSTAG = "status_tag"
 
-    private lateinit var viewModel : TimingViewModel
+    private val viewModel : TimingViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        viewModel = requireActivity().getViewModel { injector.timingViewModel() }
         setHasOptionsMenu(true)
 
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
@@ -179,7 +179,7 @@ class TimerHostFragment : Fragment() {
         val edittext = EditText(requireContext())
 
         val usedNumbers = tt.riderList.mapNotNull { it.timeTrialData.assignedNumber }
-        val max = if(usedNumbers.any()) usedNumbers.max()?:0 else 0
+        val max = if(usedNumbers.any()) usedNumbers.maxOrNull()?:0 else 0
 
         edittext.setText((max + 1).toString())
         alert.setTitle(getString(R.string.what_number_will_late_rider_use))

@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.databinding.library.baseAdapters.BR
+import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceManager
 
 
@@ -22,7 +23,6 @@ import com.jaredlinden.timingtrials.domain.ITimelineEvent
 import com.jaredlinden.timingtrials.ui.EventViewWrapper
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
-import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import kotlinx.android.synthetic.main.fragment_timer.*
 
@@ -32,12 +32,10 @@ import kotlinx.android.synthetic.main.fragment_timer.*
  */
 class TimerFragment : Fragment() {
 
-    private lateinit var timingViewModel: TimingViewModel
+    private val timingViewModel: TimingViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
-        timingViewModel = requireActivity().getViewModel { requireActivity().injector.timingViewModel() }
 
         val adapter = EventListAdapter(requireActivity())
         val viewManager = LinearLayoutManager(context)

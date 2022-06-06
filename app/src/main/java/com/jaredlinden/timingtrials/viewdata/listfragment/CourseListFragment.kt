@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,14 +18,12 @@ import com.jaredlinden.timingtrials.databinding.FragmentListGenericBinding
 import com.jaredlinden.timingtrials.databinding.ListItemCourseBinding
 import com.jaredlinden.timingtrials.ui.SelectableCourseViewModel
 import com.jaredlinden.timingtrials.util.getLengthConverter
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.*
 import timber.log.Timber
 
 class CourseListFragment : Fragment() {
 
-    private lateinit var listViewModel: ListViewModel
+    private val listViewModel: ListViewModel by viewModels()
     private lateinit var viewManager: RecyclerView.LayoutManager
     private lateinit var adapter: GenericListAdapter<SelectableCourseViewModel>
     private lateinit var viewFactory: GenericViewHolderFactory<SelectableCourseViewModel>
@@ -33,8 +32,6 @@ class CourseListFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
         Timber.d("Create")
-
-        listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
         val converter = getLengthConverter()
         viewFactory = CourseViewHolderFactory(converter.unitDef.key)
@@ -83,7 +80,7 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Se
             checkBox.visibility = View.GONE
 
             courseLayout.setOnLongClickListener {
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.id?:0, Course::class.java.simpleName)
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(Course::class.java.simpleName, data.id?:0)
                 Navigation.findNavController(_binding.root).navigate(action)
                 true
             }
@@ -91,7 +88,7 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Se
             courseLayout.setOnClickListener {
                 //val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.id?:0, Course::class.java.simpleName)
 
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(data.id ?: 0, root.context.getString(R.string.edit_course))
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment( root.context.getString(R.string.edit_course),data.id ?: 0)
                 Navigation.findNavController(_binding.root).navigate(action)
             }
 

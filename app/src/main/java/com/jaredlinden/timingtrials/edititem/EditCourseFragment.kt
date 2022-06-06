@@ -8,6 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -23,15 +24,12 @@ class EditCourseFragment : Fragment() {
 
 
     private val args: EditCourseFragmentArgs by navArgs()
-    private lateinit var courseViewModel: EditCourseViewModel
+    private val courseViewModel: EditCourseViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
         val courseId = args.courseId
-
-        courseViewModel = requireActivity().getViewModel { requireActivity().injector.courseViewModel() }
-
         setHasOptionsMenu(true)
         courseViewModel.setLengthConverter(getLengthConverter())
         courseViewModel.changeCourse(courseId)
@@ -46,7 +44,7 @@ class EditCourseFragment : Fragment() {
         fabCallback.setFabVisibility(View.VISIBLE)
 
         courseViewModel.doJumpToCourseResults.observe(viewLifecycleOwner, EventObserver{
-            val action = EditCourseFragmentDirections.actionEditCourseFragmentToSheetFragment(it, Course::class.java.simpleName)
+            val action = EditCourseFragmentDirections.actionEditCourseFragmentToSheetFragment(Course::class.java.simpleName, it)
             findNavController().navigate(action)
         })
 

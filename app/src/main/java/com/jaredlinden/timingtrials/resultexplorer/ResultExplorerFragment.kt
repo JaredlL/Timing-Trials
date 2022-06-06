@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
@@ -39,27 +40,19 @@ import java.io.IOException
 class ResultExplorerFragment : Fragment()  {
 
 
-    lateinit var viewModel: ResultExplorerViewModel
+    val viewModel: ResultExplorerViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         val itemTypeId = arguments?.getString("itemTypeId")?:""
         val itemId = arguments?.getLong("itemId")?:0L
 
-//        arguments?.remove("itemId")
-//        arguments?.remove("itemTypeId")
-
         val fabCallback = (requireActivity() as? IFabCallbacks)
         fabCallback?.setFabVisibility(View.GONE)
 
         setHasOptionsMenu(true)
 
-        //val view =  inflater.inflate(R.layout.fragment_spreadsheet, container, false)
-
         val binding = DataBindingUtil.inflate<FragmentSpreadsheetBinding>(inflater, R.layout.fragment_spreadsheet, container, false)
-
-        viewModel = requireActivity().getViewModel { injector.globalResultViewModel() }
-
 
         val displayMetrics = DisplayMetrics()
         activity?.windowManager?.defaultDisplay?.getMetrics(displayMetrics)
@@ -154,7 +147,7 @@ class ResultExplorerFragment : Fragment()  {
                 true
             }
             R.id.resultExplorerExport -> {
-                val count = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }.resultSpreadSheet.value?.data?.size?:0
+                val count = viewModel.resultSpreadSheet.value?.data?.size?:0
                 val s = if(count == 0) " " else " $count "
                 permissionRequiredEvent = Event{ createCsvFile.launch("TimingTrials${s}Results Export.csv") }
                 requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -217,7 +210,7 @@ class ResultExplorerFragment : Fragment()  {
 
     private fun writeCsv(uri: Uri){
 
-        val vmSheet = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }.resultSpreadSheet.value
+        val vmSheet = viewModel.resultSpreadSheet.value
 
         vmSheet?.let{sheet->
             try {

@@ -285,11 +285,11 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
         val femaleCr = courseResults.firstOrNull{it.gender == Gender.FEMALE}?.finishTime()
 
         val maleWithCr = maleCr?.let {
-            timeTrial.helper.results.filter { it.riderData.gender == Gender.MALE && it.timeTrialData.finishTime()?: Long.MAX_VALUE < maleCr }.minBy { it.timeTrialData.finishTime() ?: Long.MAX_VALUE }
+            timeTrial.helper.results.filter { it.riderData.gender == Gender.MALE && it.timeTrialData.finishTime()?: Long.MAX_VALUE < maleCr }.minByOrNull { it.timeTrialData.finishTime() ?: Long.MAX_VALUE }
         }?.rider
 
         val femaleWithCr = femaleCr?.let {
-            timeTrial.helper.results.filter { it.riderData.gender == Gender.FEMALE && it.timeTrialData.finishTime()?: Long.MAX_VALUE < femaleCr }.minBy { it.timeTrialData.finishTime()  ?: Long.MAX_VALUE }
+            timeTrial.helper.results.filter { it.riderData.gender == Gender.FEMALE && it.timeTrialData.finishTime()?: Long.MAX_VALUE < femaleCr }.minByOrNull { it.timeTrialData.finishTime()  ?: Long.MAX_VALUE }
         }?.rider
 
         val listWithPrsCalculated = timeTrial.riderList.asSequence().map { timeTrialRider->
@@ -326,6 +326,7 @@ class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRe
 
         return timeTrial.updateRiderList(listWithPrsCalculated)
     }
+
 
 
     fun discardTt(){

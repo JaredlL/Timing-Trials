@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -28,11 +29,9 @@ class SelectRiderFragment : Fragment() {
 
     private val args: SelectRiderFragmentArgs by navArgs()
 
-    private lateinit var viewModel: SelectRiderViewModel
+    private val viewModel: SelectRiderViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        viewModel = getViewModel { injector.selectRiderViewModel() }
 
         setHasOptionsMenu(true)
 
@@ -118,6 +117,7 @@ class SelectRiderFragment : Fragment() {
 
     }
     var sv: SearchView? = null
+    //Keep listener ref so we can remove it later (possibly prevent mem leak)
     val expandListener = object : MenuItem.OnActionExpandListener {
         override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
 

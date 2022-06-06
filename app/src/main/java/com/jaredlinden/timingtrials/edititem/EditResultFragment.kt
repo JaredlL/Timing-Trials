@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.jaredlinden.timingtrials.IFabCallbacks
@@ -13,7 +14,6 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.FragmentEditResultBinding
 import com.jaredlinden.timingtrials.setup.SelectRidersFragment
 import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.hideKeyboard
 import com.jaredlinden.timingtrials.util.injector
 
@@ -23,12 +23,10 @@ class EditResultFragment : Fragment() {
 
     private val args: EditResultFragmentArgs by navArgs()
 
-    lateinit var resultViewModel : EditResultViewModel
+    val resultViewModel : EditResultViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
-        resultViewModel = requireActivity().getViewModel { requireActivity().injector.editResultViewModel() }
 
         setHasOptionsMenu(true)
 

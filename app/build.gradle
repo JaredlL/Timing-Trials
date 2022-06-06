@@ -1,8 +1,11 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'androidx.navigation.safeargs.kotlin'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-android-extensions'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+}
 
 repositories { mavenCentral() }
 
@@ -12,13 +15,13 @@ android {
     }
 
 
-    compileSdkVersion 30
+    compileSdkVersion 32
     defaultConfig {
         applicationId "com.jaredlinden.timingtrials"
         minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 15
-        versionName "1.1.4"
+        targetSdkVersion 32
+        versionCode 17
+        versionName "1.1.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -34,6 +37,7 @@ android {
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
@@ -57,14 +61,14 @@ dependencies {
 
 
     //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test:core:1.3.0-rc02'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2-rc02'
-    androidTestImplementation 'androidx.test:runner:1.3.0-rc02'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-rc02'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test:core:1.4.1-alpha06'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4-alpha06'
+    androidTestImplementation 'androidx.test:runner:1.5.0-alpha03'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0-alpha06'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation "com.google.android.material:material:$rootProject.materialVersion"
     implementation "androidx.preference:preference-ktx:$rootProject.preferenceVersion"
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
@@ -83,7 +87,7 @@ dependencies {
     //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
 
-    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.20'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.24'
 
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"
@@ -103,32 +107,34 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
 
     //Timber logger
-    implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation 'com.jakewharton.timber:timber:5.0.1'
 
 
     //Advanced Recycler View
     implementation "com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:$rootProject.advRecyclerVersion"
 
     //Dagger
-    implementation "com.google.dagger:dagger:$rootProject.daggerVersion"
-    kapt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
+    kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
+    //implementation "com.google.dagger:dagger:$rootProject.daggerVersion"
+    //kapt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
 
     //GSON
     implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
 
     //CSV
-    implementation 'com.opencsv:opencsv:5.2'
+    implementation 'com.opencsv:opencsv:5.6'
 
     //Threeten Time
-    implementation 'com.jakewharton.threetenabp:threetenabp:1.2.4'
-    testImplementation('org.threeten:threetenbp:1.4.4') {
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.4.0'
+    testImplementation('org.threeten:threetenbp:1.6.0') {
         exclude group: 'com.jakewharton.threetenabp', module: 'threetenabp'
     }
-    androidTestImplementation('org.threeten:threetenbp:1.4.4') {
+    androidTestImplementation('org.threeten:threetenbp:1.6.0') {
         exclude group: 'com.jakewharton.threetenabp', module: 'threetenabp'
     }
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 
 
 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,14 +20,13 @@ import com.jaredlinden.timingtrials.databinding.FragmentListGenericBinding
 import com.jaredlinden.timingtrials.databinding.ListItemTimetrialBinding
 
 import com.jaredlinden.timingtrials.util.ConverterUtils
-import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.*
 import timber.log.Timber
 
 class TimeTrialListFragment : Fragment() {
 
-    private lateinit var listViewModel: ListViewModel
+    private val listViewModel: ListViewModel by viewModels()
     private lateinit var viewManager: RecyclerView.LayoutManager
     private lateinit var adapter: GenericListAdapter<TimeTrialHeader>
     private lateinit var viewFactory: GenericViewHolderFactory<TimeTrialHeader>
@@ -35,7 +35,6 @@ class TimeTrialListFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
         Timber.d("Create")
-        listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
         viewFactory = TimeTrialViewHolderFactory(::longPress)
         adapter = GenericListAdapter(requireContext(), viewFactory)

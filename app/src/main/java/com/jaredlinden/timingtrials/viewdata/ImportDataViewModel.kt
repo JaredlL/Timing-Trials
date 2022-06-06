@@ -416,7 +416,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                 1->{
                     courseInDb = courseList.first()
                 }
-                else-> courseInDb = courseList.minBy { (it.length?:0.0) - (course.length?:0.0) }!!
+                else-> courseInDb = courseList.minByOrNull { (it.length?:0.0) - (course.length?:0.0) }!!
             }
 
         }

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,14 +16,13 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentListGenericBinding
 import com.jaredlinden.timingtrials.databinding.ListItemRiderBinding
-import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.*
 import timber.log.Timber
 
 class RiderListFragment : Fragment() {
 
-    private lateinit var listViewModel: ListViewModel
+    private val listViewModel: ListViewModel by viewModels()
     private lateinit var viewManager: RecyclerView.LayoutManager
     private lateinit var adapter: GenericListAdapter<Rider>
     private lateinit var viewFactory: GenericViewHolderFactory<Rider>
@@ -31,7 +31,6 @@ class RiderListFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
         Timber.d("Create")
-        listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
 
         viewFactory = RiderViewHolderFactory()
         adapter = GenericListAdapter(requireContext(), viewFactory)
@@ -72,7 +71,7 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, L
             riderLayout.setOnLongClickListener {
 
 
-                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.id?:0, data.javaClass.simpleName)
+                val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.javaClass.simpleName,data.id?:0)
                 Navigation.findNavController(_binding.root).navigate(action)
                 true
             }

@@ -10,6 +10,7 @@ import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -21,7 +22,6 @@ import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
 import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.util.showKeyboard
 
@@ -34,7 +34,7 @@ const val SORT_KEY = "sorting"
 class SetupViewPagerFragment: Fragment() {
 
 
-    private lateinit var setupViewModel: SetupViewModel
+    private val setupViewModel: SetupViewModel by viewModels()
 
     private val args: SetupViewPagerFragmentArgs by navArgs()
 
@@ -54,7 +54,6 @@ class SetupViewPagerFragment: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
         val binding = FragmentDatabaseViewPagerBinding.inflate(inflater, container, false)
         val tabLayout = binding.tabs
         viewPager = binding.viewPager2
@@ -185,7 +184,7 @@ class SetupViewPagerFragment: Fragment() {
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
 
             isIconifiedByDefault = false
-            val selectRiderVm = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
+            val selectRiderVm = setupViewModel.selectRidersViewModel
             setQuery(selectRiderVm.riderFilter.value?:"", false)
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
@@ -230,7 +229,7 @@ class SetupViewPagerFragment: Fragment() {
                     .setIcon(R.mipmap.tt_logo_round)
                     .setMessage(getString(R.string.seed_riders_message))
                     .setPositiveButton(R.string.ok) { _, _->
-                        (requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }).seedRiders()
+                        setupViewModel.seedRiders()
                     }.create().show()
             true
         }

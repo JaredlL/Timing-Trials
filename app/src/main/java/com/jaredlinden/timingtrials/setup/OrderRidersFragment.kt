@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaredlinden.timingtrials.IFabCallbacks
@@ -19,7 +20,6 @@ import com.jaredlinden.timingtrials.IFabCallbacks
 
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.adapters.OrderableRiderListAdapter
-import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager
 import com.jaredlinden.timingtrials.data.FilledTimeTrialRider
@@ -29,14 +29,14 @@ import kotlinx.android.synthetic.main.fragment_order_riders.*
 
 class OrderRidersFragment : Fragment() {
 
-    private lateinit var viewModel: IOrderRidersViewModel
+    private val setupVm: SetupViewModel by viewModels()
     private lateinit var mAdapter: OrderableRiderListAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
 
-        viewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.orderRidersViewModel
+        val viewModel = setupVm.orderRidersViewModel
         
         mAdapter = OrderableRiderListAdapter(requireContext()).apply { onMove = {x,y -> viewModel.moveItem(x, y)} }
 
@@ -76,7 +76,7 @@ class OrderRidersFragment : Fragment() {
         edittext.addTextChangedListener(object: TextWatcher{
             override fun afterTextChanged(s: Editable?) {
                 edittext.text?.toString()?.toIntOrNull()?.let {newNum->
-                    viewModel.getOrderableRiderData().value?.let { tt->
+                    setupVm.orderRidersViewModel.getOrderableRiderData().value?.let { tt->
                         if(tt.riderList.filterNot { it.riderData.id == rd.riderData.id }.any { it.timeTrialData.assignedNumber == newNum }){
                             edittext.error = getString(R.string.number_already_taken_swap)
                         }else{
@@ -99,7 +99,7 @@ class OrderRidersFragment : Fragment() {
         alert.setPositiveButton(R.string.ok) { _, _ ->
 
             edittext.text?.toString()?.toIntOrNull()?.let {
-                viewModel.setRiderNumber(it, rd)
+                setupVm.orderRidersViewModel.setRiderNumber(it, rd)
             }
 
         }

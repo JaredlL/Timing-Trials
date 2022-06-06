@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -23,15 +24,13 @@ class EditRiderFragment : Fragment() {
 
 
     private val args: EditRiderFragmentArgs by navArgs()
-    private lateinit var riderViewModel: EditRiderViewModel
+    private val riderViewModel: EditRiderViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
 
         setHasOptionsMenu(true)
-
-        riderViewModel = requireActivity().getViewModel { requireActivity().injector.riderViewModel() }
 
 
         riderViewModel.mutableRider.observe(viewLifecycleOwner, Observer {  })
@@ -65,7 +64,7 @@ class EditRiderFragment : Fragment() {
         })
 
         riderViewModel.doJumpToRiderResults.observe(viewLifecycleOwner, EventObserver{
-            val action = EditRiderFragmentDirections.actionEditRiderFragmentToSheetFragment(it, Rider::class.java.simpleName)
+            val action = EditRiderFragmentDirections.actionEditRiderFragmentToSheetFragment(Rider::class.java.simpleName, it)
             findNavController().navigate(action)
         })
 

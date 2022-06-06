@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
@@ -19,7 +20,7 @@ import com.jaredlinden.timingtrials.util.*
 
 class SelectCourseFragment : Fragment() {
 
-    private lateinit var setupViewModel: SetupViewModel
+    private val setupViewModel: SetupViewModel by viewModels()
     private lateinit var viewModel: ISelectCourseViewModel
     private lateinit var adapter: CourseListAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
@@ -28,8 +29,6 @@ class SelectCourseFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
-        setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
 
         if(args.timeTrialId != -1L){
             setupViewModel.changeTimeTrial(args.timeTrialId)
@@ -40,7 +39,7 @@ class SelectCourseFragment : Fragment() {
             setFabImage(R.drawable.ic_add_white_24dp)
             fabClickEvent.observe(viewLifecycleOwner, EventObserver {
                 if(it){
-                    val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")
+                    val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(context?.getString(R.string.new_course)?:"",0)
                     findNavController().navigate(action)
                 }
 
@@ -115,7 +114,7 @@ class SelectCourseFragment : Fragment() {
 //    }
 
     private fun editCourse(course: Course){
-        val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(course.id?:0, resources.getString(R.string.edit_course))
+        val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(resources.getString(R.string.edit_course), course.id?:0)
         findNavController().navigate(action)
     }
 

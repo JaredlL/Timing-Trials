@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.*
@@ -34,6 +35,8 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.util.*
+import com.jaredlinden.timingtrials.viewdata.IOViewModel
+import com.jaredlinden.timingtrials.viewdata.ListViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -46,7 +49,7 @@ import kotlin.math.abs
 
 
 interface IFabCallbacks{
-    
+
     fun currentVisibility(): Int
 
     fun setFabVisibility(visibility: Int)
@@ -91,7 +94,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 .setPositiveButton(R.string.ok){_,_->
                     try{
                         val url = URL("https://bb.githack.com/lindenj/timingtrialsdata/raw/master/LiveDebugRDFCC.tt")
-                        val vm = getViewModel { injector.importViewModel()}
+                        val vm:IOViewModel by viewModels()
                         vm.readUrlInput(url)
                         vm.importMessage.observe(this, EventObserver{
                             Toast.makeText(this, it, Toast.LENGTH_LONG).show()
@@ -172,7 +175,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         setupActionBarWithNavController(navController, appBarConfiguration)
         rootCoordinator = mainActivityCoordinator
 
-        val vm = getViewModel { injector.mainViewModel()}
+        val vm:TitleViewModel by viewModels ()
         vm.timingTimeTrial.observe(this, Observer {
             it?.let {
                 val intent = Intent(this, TimingActivity::class.java)
@@ -262,9 +265,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                         }else{
                             navController.navigate(R.id.settingsFragment)
                         }
-
-
-
                     }
 
                     R.id.app_bar_help ->{
@@ -277,7 +277,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     }
 
                     R.id.app_bar_new_timetrial -> {
-                        val viewModel = getViewModel { injector.listViewModel() }
+                        val viewModel:ListViewModel by viewModels()
                         viewModel.timeTrialInsertedEvent.observe(this@MainActivity, EventObserver {
                             val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
                             //navController.navigate(action)
@@ -292,7 +292,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
 
                     R.id.app_bar_spreadsheet->{
-                        val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(0,"")
+                        val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment("",0)
                         navController.navigate(action)
                         drawer_layout.closeDrawer(GravityCompat.START)
 
@@ -342,7 +342,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     }
 
     private fun importData(uri: Uri){
-        val importVm = getViewModel { injector.importViewModel()}
+        val importVm:IOViewModel by viewModels()
         val inputStream = contentResolver.openInputStream(uri)
         val fName = getFileName(uri)
 
@@ -359,7 +359,13 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         if (uri.scheme == "content") {
             contentResolver.query(uri, null, null, null, null)?.let {cursor->
                 if (cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                    val index = if (cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME) < 0)
+                    {
+                        0
+                    }else{
+                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    }
+                    result = cursor.getString(index)
                 }
             }
         }
@@ -380,7 +386,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         try {
             val outputStream = contentResolver.openOutputStream(uri)
             if(outputStream != null){
-                val allTtsVm = getViewModel { injector.importViewModel()}
+                val allTtsVm:IOViewModel by viewModels()
 
                 allTtsVm.writeAllTimeTrialsToPath(outputStream)
                 allTtsVm.importMessage.observe(this, EventObserver{

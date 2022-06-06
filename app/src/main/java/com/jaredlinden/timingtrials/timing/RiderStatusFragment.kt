@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 
@@ -33,13 +34,10 @@ import org.threeten.bp.*
  */
 class RiderStatusFragment : Fragment() {
 
-    private lateinit var timingViewModel: TimingViewModel
+    private val timingViewModel: TimingViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
-
-        timingViewModel = requireActivity().getViewModel { requireActivity().injector.timingViewModel() }
 
         val adapter = RiderStatusAdapter(requireActivity())
         val viewManager = GridLayoutManager(context, 4)
@@ -211,7 +209,7 @@ class RiderStatusFragment : Fragment() {
             if(selectedMillis < ttStartTime){
                 Toast.makeText(requireContext(), "Cannot set start time before TT start", Toast.LENGTH_SHORT).show()
             }else{
-                val vm = requireActivity().getViewModel { requireActivity().injector.timingViewModel() }
+                val vm:TimingViewModel by viewModels()
                 vm.setRiderStartTime(riderId, selectedMillis)
             }
 

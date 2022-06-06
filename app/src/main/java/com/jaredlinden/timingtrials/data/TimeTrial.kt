@@ -83,7 +83,7 @@ data class TimeTrial(
 
         val newMutableRiderList: MutableList<FilledTimeTrialRider> = mutableListOf()
         for ((i,r) in newRiderList.withIndex()){
-            val availableNumber = (newMutableRiderList.map { it.timeTrialData.assignedNumber?:0 }.max()?:0) + 1
+            val availableNumber = (newMutableRiderList.map { it.timeTrialData.assignedNumber?:0 }.maxOrNull()?:0) + 1
             newMutableRiderList.add(r.updateTimeTrialData( r.timeTrialData.copy(
                     timeTrialId = this.timeTrialHeader.id,
                     courseId = this.course?.id,

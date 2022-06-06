@@ -7,6 +7,7 @@ import android.view.*
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
@@ -18,6 +19,7 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
 import com.jaredlinden.timingtrials.domain.Filter
+import com.jaredlinden.timingtrials.setup.SetupViewModel
 import com.jaredlinden.timingtrials.util.*
 import com.jaredlinden.timingtrials.viewdata.listfragment.CourseListFragment
 import com.jaredlinden.timingtrials.viewdata.listfragment.RiderListFragment
@@ -56,10 +58,11 @@ class DataBaseViewPagerFragment: Fragment() {
         tabLayoutMediator.attach()
 
         viewpager.registerOnPageChangeCallback(mPageChangeCallback)
-        val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+        val listViewModel:ListViewModel by viewModels()
         listViewModel.setFilter(Filter(""))
 
-        requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.currentPage = 0
+        val setupViewModel:SetupViewModel by viewModels()
+        setupViewModel.currentPage = 0
 
         (activity as? IFabCallbacks)?.fabClickEvent?.observe(viewLifecycleOwner, EventObserver{
             if(it){
@@ -69,20 +72,19 @@ class DataBaseViewPagerFragment: Fragment() {
                             findNavController().navigate(action)
                     }
                     COURSE_PAGE_INDEX -> {
-                            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(0, requireActivity().getString(R.string.new_course))
+                            val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment(requireActivity().getString(R.string.new_course), 0)
                             findNavController().navigate(action)
                     }
                     TIMETRIAL_PAGE_INDEX->{
 
-                            val viewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
-                            viewModel.timeTrialInsertedEvent.observe(viewLifecycleOwner, EventObserver {
+                        listViewModel.timeTrialInsertedEvent.observe(viewLifecycleOwner, EventObserver {
                                 val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
                                 findNavController().navigate(action)
                             })
                             val mode = PreferenceManager.getDefaultSharedPreferences(requireContext()).getString(PREF_NUMBERING_MODE, NumberMode.INDEX.name)?.let {
                                 NumberMode.valueOf(it)
                             } ?: NumberMode.INDEX
-                            viewModel.insertNewTimeTrial(mode)
+                        listViewModel.insertNewTimeTrial(mode)
                     }
                 }
             }
@@ -165,7 +167,7 @@ class DataBaseViewPagerFragment: Fragment() {
         (menu.findItem(R.id.app_bar_search).actionView as SearchView).apply {
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
            isIconifiedByDefault = false
-            val listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
+            val listViewModel:ListViewModel by viewModels()
 
             sv = this
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{

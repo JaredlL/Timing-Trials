@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat
@@ -42,13 +43,14 @@ interface ITimingActivity{
     fun endTiming()
 }
 
+@AndroidEntryPoint
 class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
     private val TIMERTAG = "timing_tag"
     private val STATUSTAG = "status_tag"
 
     private val mService: MutableLiveData<TimingService?> = MutableLiveData()
-    private lateinit var viewModel: TimingViewModel
+    private val viewModel: TimingViewModel by viewModels()
     private var mBound: Boolean = false
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -97,9 +99,6 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_timing)
         setSupportActionBar(timingToolBar)
-
-
-        viewModel = getViewModel { injector.timingViewModel() }
 
         applicationContext.startService(Intent(applicationContext, TimingService::class.java))
 

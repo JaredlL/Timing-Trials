@@ -9,16 +9,14 @@ import android.view.WindowManager
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.FragmentResultFilterBinding
 import com.jaredlinden.timingtrials.databinding.ListItemResultFilterBinding
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
 
 
 @BindingAdapter("android:src")
@@ -32,12 +30,11 @@ class ResultsFilterFragment : BottomSheetDialogFragment(){
 
         setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.AppTheme)
 
-        val vm = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }
+        val vm:ResultExplorerViewModel by viewModels()
 
         val adapter = ResultFilterAdapter(requireContext(), viewLifecycleOwner).apply { setHasStableIds(true)}
         val layoutManger = LinearLayoutManager(requireContext())
 
-        //val cols = ResultFilterViewModel.getAllColumnViewModels(getLengthConverter())
 
             adapter.setItems(vm.columnViewModels)
             view?.jumpDrawablesToCurrentState()

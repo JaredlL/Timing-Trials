@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -21,6 +22,7 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.adapters.SelectableRiderListAdapter
 import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
+import com.jaredlinden.timingtrials.edititem.EditResultViewModel
 import com.jaredlinden.timingtrials.util.*
 
 
@@ -38,16 +40,17 @@ class SelectRidersFragment : Fragment() {
 
     private val args: SelectRidersFragmentArgs by navArgs()
 
+    private val setupViewModel: SetupViewModel by viewModels()
+    private val singleRiderVm: EditResultViewModel by viewModels()
     private lateinit var viewModel: ISelectRidersViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
 
         viewModel = if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI) {
-            requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
-
+            setupViewModel.selectRidersViewModel
         }else{
-            requireActivity().getViewModel { requireActivity().injector.editResultViewModel() }.selectRiderVm
+            singleRiderVm.selectRiderVm
         }
 
 
@@ -71,7 +74,7 @@ class SelectRidersFragment : Fragment() {
 
         if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI){
             setHasOptionsMenu(false)
-            if(requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.currentPage == RIDER_PAGE_INDEX ){
+            if(setupViewModel.currentPage == RIDER_PAGE_INDEX ){
                 (requireActivity() as IFabCallbacks).apply {
                     setFabVisibility(View.VISIBLE)
                     setFabImage(R.drawable.ic_add_white_24dp)

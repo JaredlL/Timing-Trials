@@ -5,13 +5,14 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import com.jaredlinden.timingtrials.di.AppComponent
 import com.jaredlinden.timingtrials.di.DaggerAppComponent
+import dagger.hilt.android.HiltAndroidApp
 import com.jakewharton.threetenabp.AndroidThreeTen
 import timber.log.Timber
 
+@HiltAndroidApp
+class TimingTrialsApplication: Application() {
 
-class TimingTrialsApplication: Application(), DaggerComponentProvider {
-
-    override val component: AppComponent by lazy { DaggerAppComponent.builder().applicationContext(applicationContext).build() }
+    //override val component: AppComponent by lazy { DaggerAppComponent.builder().applicationContext(applicationContext).build() }
     //override val component: AppComponent = DaggerAppComponent.builder().applicationContext(applicationContext).build()
 
     override fun onCreate() {

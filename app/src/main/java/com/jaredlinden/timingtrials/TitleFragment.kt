@@ -15,9 +15,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
@@ -27,7 +27,6 @@ import com.jaredlinden.timingtrials.databinding.FragmentTitleBinding
 import com.jaredlinden.timingtrials.timing.TimingActivity
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.Utils
-import com.jaredlinden.timingtrials.util.getViewModel
 import com.jaredlinden.timingtrials.util.injector
 import timber.log.Timber
 import java.io.File
@@ -38,9 +37,8 @@ import java.io.FileOutputStream
 class TitleFragment : Fragment()
 {
 
-    private lateinit var titleViewModel: TitleViewModel
-
-    private lateinit var testViewModel: TestViewModel
+    private val titleViewModel: TitleViewModel by viewModels()
+    private val testViewModel: TestViewModel by viewModels()
 
     val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -60,8 +58,6 @@ class TitleFragment : Fragment()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
-        titleViewModel = requireActivity().getViewModel {  requireActivity().injector.mainViewModel() }
-        testViewModel =  requireActivity().getViewModel {  requireActivity().injector.testViewModel() }
 
 //        (requireActivity() as MainActivity).mMainFab.setOnClickListener {
 //            Toast.makeText(it.context, "i", Toast.LENGTH_SHORT).show()
