@@ -434,7 +434,7 @@ class ResultFragment : Fragment() {
             when(Build.VERSION.SDK_INT){
 
                 //29-30
-                in(Build.VERSION_CODES.Q..Build.VERSION_CODES.R) ->
+                in(Build.VERSION_CODES.Q..Int.MAX_VALUE) ->
                     saveScreenshotQ(bitmap, fileName)
                 //26-28
                 in(Build.VERSION_CODES.O..Build.VERSION_CODES.P) ->
