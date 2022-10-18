@@ -11,15 +11,15 @@ repositories { mavenCentral() }
 
 android {
     buildFeatures {
-        dataBinding true
+        dataBinding = true
     }
 
 
-    compileSdkVersion 32
+    compileSdkVersion 33
     defaultConfig {
         applicationId "com.jaredlinden.timingtrials"
         minSdkVersion 21
-        targetSdkVersion 32
+        targetSdkVersion 33
         versionCode 17
         versionName "1.1.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -52,6 +52,7 @@ android {
             abortOnError false
         }
     }
+    namespace 'com.jaredlinden.timingtrials'
 }
 
 dependencies {
@@ -68,7 +69,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0-alpha06'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation "com.google.android.material:material:$rootProject.materialVersion"
     implementation "androidx.preference:preference-ktx:$rootProject.preferenceVersion"
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
@@ -102,7 +103,7 @@ dependencies {
 
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.lifecycleExtVersion"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
     implementation "androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
 
