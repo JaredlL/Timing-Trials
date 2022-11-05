@@ -27,14 +27,6 @@ import com.jaredlinden.timingtrials.edititem.EditResultViewModel
 import com.jaredlinden.timingtrials.util.*
 import dagger.hilt.android.AndroidEntryPoint
 
-
-/**
- * A simple [Fragment] subclass.
- * Use the [SelectRidersFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- */
-
 @AndroidEntryPoint
 class SelectRidersFragment : Fragment() {
 
@@ -46,13 +38,24 @@ class SelectRidersFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
-        val singleRiderVm: EditResultViewModel by activityViewModels()
-        val setupViewModel: SetupViewModel by activityViewModels()
-
-        viewModel = if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI) {
-            setupViewModel.selectRidersViewModel
+        if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI) {
+            setHasOptionsMenu(false)
+            val setupViewModel: SetupViewModel by activityViewModels()
+            if(setupViewModel.currentPage == RIDER_PAGE_INDEX ){
+                (requireActivity() as IFabCallbacks).apply {
+                    setFabVisibility(View.VISIBLE)
+                    setFabImage(R.drawable.ic_add_white_24dp)
+                }
+                viewModel = setupViewModel.selectRidersViewModel
+            }
         }else{
-            singleRiderVm.selectRiderVm
+            setHasOptionsMenu(true)
+            val singleRiderVm: EditResultViewModel by activityViewModels()
+            viewModel = singleRiderVm.selectRiderVm
+            (requireActivity() as IFabCallbacks).apply {
+                setFabVisibility(View.VISIBLE)
+                setFabImage(R.drawable.ic_add_white_24dp)
+            }
         }
 
         val viewManager = LinearLayoutManager(context)
@@ -61,36 +64,10 @@ class SelectRidersFragment : Fragment() {
         adapter.setHasStableIds(true)
         adapter.editRider = ::editRider
 
-        val binding = FragmentSelectriderListBinding.inflate(inflater, container, false).apply {
-            lifecycleOwner = viewLifecycleOwner
-            riderHeading.rider =  Rider.createBlank().copy( firstName = getString(R.string.name), club = getString(R.string.club))
-            riderHeading.checkBox.visibility =  View.INVISIBLE
-            riderRecyclerView.adapter = adapter
-            riderRecyclerView.layoutManager = viewManager
-        }
-
-        if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI){
-            setHasOptionsMenu(false)
-            if(setupViewModel.currentPage == RIDER_PAGE_INDEX ){
-                (requireActivity() as IFabCallbacks).apply {
-                    setFabVisibility(View.VISIBLE)
-                    setFabImage(R.drawable.ic_add_white_24dp)
-                }
-            }
-        }else{
-            setHasOptionsMenu(true)
-            (requireActivity() as IFabCallbacks).apply {
-                setFabVisibility(View.VISIBLE)
-                setFabImage(R.drawable.ic_add_white_24dp)
-
-            }
-        }
-
-        (requireActivity() as IFabCallbacks).fabClickEvent.observe(viewLifecycleOwner, EventObserver {
+        (requireActivity() as? IFabCallbacks)?.fabClickEvent?.observe(viewLifecycleOwner, EventObserver {
             if(it){
                 editRider(0)
             }
-
         })
 
         adapter.addRiderToSelection = {
@@ -101,22 +78,27 @@ class SelectRidersFragment : Fragment() {
             viewModel.riderUnselected(it)
         }
 
-        viewModel.selectedRidersInformation.observe(viewLifecycleOwner, Observer {result->
+        val binding = FragmentSelectriderListBinding.inflate(inflater, container, false).apply {
+            lifecycleOwner = viewLifecycleOwner
+            riderHeading.rider =  Rider.createBlank().copy( firstName = getString(R.string.name), club = getString(R.string.club))
+            riderHeading.checkBox.visibility =  View.INVISIBLE
+            riderRecyclerView.adapter = adapter
+            riderRecyclerView.layoutManager = viewManager
+        }
+
+        val height = binding.root.height
+
+        viewModel.selectedRidersInformation.observe(viewLifecycleOwner) {result->
             result?.let {
                 adapter.setRiders(it)
-
                 if(args.selectionMode != SELECT_RIDER_FRAGMENT_MULTI){
                     result.selectedIds.firstOrNull()?.let {fs->
                         val pos = result.allRiderList.indexOfFirst { it.id == fs }
-                        if(pos >=0) viewManager.scrollToPositionWithOffset(pos, binding.root.height / 2)
-                        //viewManager.scrollToPosition()
+                        if(pos >=0) viewManager.scrollToPositionWithOffset(pos, height / 2)
                     }
-
                 }
-
             }
-
-        })
+        }
 
         viewModel.close.observe(viewLifecycleOwner, EventObserver{
             if(it){
@@ -127,7 +109,6 @@ class SelectRidersFragment : Fragment() {
         viewModel.showMessage.observe(viewLifecycleOwner, EventObserver{
             Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
         })
-
 
         viewModel.setSortMode(PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_DEFAULT))
 
@@ -169,27 +150,25 @@ class SelectRidersFragment : Fragment() {
                     clearFocus()
                     return true
                 }
-
                 override fun onQueryTextChange(searchText: String?): Boolean {
                     viewModel.setRiderFilter(searchText ?: "")
                     return true
                 }
-
             })
         }
 
         menu.findItem(R.id.settings_menu_sort).setOnMenuItemClickListener {
             val current = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_DEFAULT)
             AlertDialog.Builder(requireContext())
-                    .setTitle(resources.getString(R.string.choose_sort))
-                    .setSingleChoiceItems(R.array.sortingArray, current) { _, j ->
-                        PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putInt(SORT_KEY, j).apply()
-                        viewModel.setSortMode(j)
-                    }
-                    .setPositiveButton(R.string.ok) { _, _ ->
+                .setTitle(resources.getString(R.string.choose_sort))
+                .setSingleChoiceItems(R.array.sortingArray, current) { _, j ->
+                    PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putInt(SORT_KEY, j).apply()
+                    viewModel.setSortMode(j)
+                }
+                .setPositiveButton(R.string.ok) { _, _ ->
 
-                    }
-                    .create().show()
+                }
+                .create().show()
             true
         }
     }
@@ -205,15 +184,14 @@ class SelectRidersFragment : Fragment() {
 
     }
 
-
     companion object {
         @JvmStatic
         val SELECT_RIDER_FRAGMENT_SINGLE = 0
         val SELECT_RIDER_FRAGMENT_MULTI = 1
 
         fun newInstance(selectionMode: SelectRidersFragmentArgs) =
-                SelectRidersFragment().apply {
-                    arguments = selectionMode.toBundle()
-                }
+            SelectRidersFragment().apply {
+                arguments = selectionMode.toBundle()
+            }
     }
 }

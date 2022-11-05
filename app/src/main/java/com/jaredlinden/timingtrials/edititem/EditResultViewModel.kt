@@ -18,7 +18,8 @@ import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 @HiltViewModel
-class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRiderRepository, val riderRepository: IRiderRepository) : ViewModel(){
+class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRiderRepository, val riderRepository: IRiderRepository)
+    : ViewModel(){
 
     private val resultId: MutableLiveData<Long> = MutableLiveData()
     private val timeTrialId: MutableLiveData<Long> = MutableLiveData()
@@ -107,10 +108,6 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
                 }
             }
         }
-
-
-
-
 
     init {
         result.addSource(Transformations.switchMap(resultId){it?.let { resultRepository.getResultById(it) }}){ttResult->

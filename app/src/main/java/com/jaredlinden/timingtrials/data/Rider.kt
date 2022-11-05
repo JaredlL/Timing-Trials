@@ -16,16 +16,12 @@ data class Rider(
         @PrimaryKey(autoGenerate = true) override val id: Long? = null
 ) : ITimingTrialsEntity  {
 
-
-
     fun fullName(): String{
         return "$firstName $lastName"
     }
 
     companion object {
-
         fun createBlank() = Rider("", "")
-
     }
 }
 

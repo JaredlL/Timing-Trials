@@ -27,6 +27,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -53,7 +54,7 @@ class ResultFragment : Fragment() {
 
     private val args: ResultFragmentArgs by navArgs()
 
-    val resultViewModel: ResultViewModel by viewModels()
+    val resultViewModel: ResultViewModel by activityViewModels()
     var mBinding: FragmentTimetrialResultBinding? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
@@ -97,7 +98,7 @@ class ResultFragment : Fragment() {
             }
         })
 
-        resultViewModel.results.observe(viewLifecycleOwner, Observer {res->
+        resultViewModel.results.observe(viewLifecycleOwner){res->
             res?.let {newRes->
                 if(newRes.isNotEmpty()){
                     val rowLength = newRes.first().row.size
@@ -114,8 +115,7 @@ class ResultFragment : Fragment() {
                     resultGridAdapter.setResults(newRes)
                 }
             }
-        })
-
+        }
 
         if(!PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(HAS_SHOWN_TIMETRIAL_RESULT_TIPS, false)){
             showTipsDialog()
@@ -190,10 +190,8 @@ class ResultFragment : Fragment() {
                     takeScreenShot(it)
                 }?:Unit}
                 requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
                 true
             }
-
             R.id.resultMenuClearNotes ->{
                 resultViewModel.clearNotesColumn()
                 true

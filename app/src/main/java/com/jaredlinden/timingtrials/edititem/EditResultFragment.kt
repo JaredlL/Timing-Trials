@@ -21,11 +21,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class EditResultFragment : Fragment() {
 
-
-
     private val args: EditResultFragmentArgs by navArgs()
-
-    val resultViewModel : EditResultViewModel by viewModels()
+    private val resultViewModel : EditResultViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -71,7 +68,7 @@ class EditResultFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
         }
 
-        //For some reason gender spinner sometimes doesnt update
+        //For some reason gender spinner sometimes doesn't update
         binding.invalidateAll()
 
         return binding.root
@@ -110,6 +107,4 @@ class EditResultFragment : Fragment() {
         //menu.clear()
         inflater.inflate(R.menu.menu_delete, menu)
     }
-
-
 }

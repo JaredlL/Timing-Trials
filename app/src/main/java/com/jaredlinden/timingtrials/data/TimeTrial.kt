@@ -22,7 +22,6 @@ data class TimeTrialHeader(val ttName: String,
                            val guid:String = UUID.randomUUID().toString(),
                            @PrimaryKey(autoGenerate = true) override val id: Long? = null) : ITimingTrialsEntity {
 
-
     @delegate: Ignore
     @delegate: Transient
     val startTimeMilis: Long by lazy { startTime?.toInstant()?.toEpochMilli()?:0L }
@@ -32,10 +31,7 @@ data class TimeTrialHeader(val ttName: String,
             val instant = Instant.now().truncatedTo(ChronoUnit.MINUTES).plus(15, ChronoUnit.MINUTES)
             return TimeTrialHeader(ttName = "", courseId = null, startTime = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault()))
         }
-
-
     }
-
 }
 
 data class TimeTrialBasicInfo(
@@ -129,10 +125,7 @@ data class TimeTrial(
 
             timeTrialHeader.numberRules.numberFromIndex(riderList.first { it.riderData.id == riderId }.timeTrialData.index, riderList.size)
         }
-
     }
-
-
 
     @Ignore @Transient
      val helper = TimeTrialHelper(this)
