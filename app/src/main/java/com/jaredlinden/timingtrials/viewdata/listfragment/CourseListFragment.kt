@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
@@ -25,40 +27,35 @@ import timber.log.Timber
 @AndroidEntryPoint
 class CourseListFragment : Fragment() {
 
-    private val listViewModel: ListViewModel by viewModels()
-    private lateinit var viewManager: RecyclerView.LayoutManager
-    private lateinit var adapter: GenericListAdapter<SelectableCourseViewModel>
-    private lateinit var viewFactory: GenericViewHolderFactory<SelectableCourseViewModel>
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
         Timber.d("Create")
+        val listViewModel: ListViewModel by activityViewModels()
 
         val converter = getLengthConverter()
-        viewFactory = CourseViewHolderFactory(converter.unitDef.key)
-        adapter = GenericListAdapter(requireContext(), viewFactory)
+        val viewFactory = CourseViewHolderFactory(converter.unitDef.key)
+        val adapter = GenericListAdapter(requireContext(), viewFactory)
+        val viewManager = LinearLayoutManager(context)
 
-        viewManager = LinearLayoutManager(context)
-
-        val binding = DataBindingUtil.inflate<FragmentListGenericBinding>(inflater, R.layout.fragment_list_generic, container, false).apply{
-            lifecycleOwner = (this@CourseListFragment)
-            listHeading.addView(
-                viewFactory.createTitle(inflater, container),
-                0, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT))
+        val binding = FragmentListGenericBinding.inflate(inflater, container, false).apply{
+            viewFactory.let {
+                listHeading.addView(
+                    it.createTitle(inflater, container),
+                    0, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT))
+            }
             genericRecyclerView.adapter = adapter
             genericRecyclerView.layoutManager = viewManager
-
         }
 
-        listViewModel.filteredAllCourse.observe(viewLifecycleOwner, Observer{res->
-            res?.let {adapter.setItems(it.map {
+        listViewModel.filteredAllCourse.observe(viewLifecycleOwner){res->
+            res?.let {adapter?.setItems(it.map {
                 SelectableCourseViewModel(it, converter)
             }.filter {cvm->
                 cvm.distString.contains(listViewModel.liveFilter.value?.filterString?:"", ignoreCase = true)
             })}
-        })
+        }
 
         return binding.root
 
@@ -68,7 +65,6 @@ class CourseListFragment : Fragment() {
         Timber.d("Detach")
         super.onDetach()
     }
-
 }
 
 class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<SelectableCourseViewModel, ListItemCourseBinding>(binding) {
@@ -90,8 +86,6 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Se
                 val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment( root.context.getString(R.string.edit_course),data.id ?: 0)
                 Navigation.findNavController(_binding.root).navigate(action)
             }
-
-
             executePendingBindings()
         }
     }

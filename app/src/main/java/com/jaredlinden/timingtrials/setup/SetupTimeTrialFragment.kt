@@ -16,10 +16,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.TimeTrialStatus
 import com.jaredlinden.timingtrials.databinding.FragmentSetupTimeTrialBinding
@@ -31,12 +31,14 @@ import org.threeten.bp.*
 @AndroidEntryPoint
 class SetupTimeTrialFragment : Fragment() {
 
-    private val setupVm:SetupViewModel by viewModels()
-    private val propsViewModel = setupVm.timeTrialPropertiesViewModel
+
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
+        val setupVm:SetupViewModel by activityViewModels()
+        val propsViewModel = setupVm.timeTrialPropertiesViewModel
 
         //Order is important
         propsViewModel.setupMediator.observe(viewLifecycleOwner, object : Observer<Any> {
@@ -46,11 +48,10 @@ class SetupTimeTrialFragment : Fragment() {
 
         })
 
-
         val mAdapter = ArrayAdapter<String>(requireContext(), R.layout.support_simple_spinner_dropdown_item, listOf("15", "30", "60", "90", "120"))
         val binding = DataBindingUtil.inflate<FragmentSetupTimeTrialBinding>(inflater, R.layout.fragment_setup_time_trial, container, false).apply {
             viewModel = propsViewModel
-            lifecycleOwner = (this@SetupTimeTrialFragment)
+            lifecycleOwner = (viewLifecycleOwner)
             autocomplete.threshold = 1
             autocomplete.setAdapter(mAdapter)
             coursebutton.setOnClickListener {

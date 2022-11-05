@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.jaredlinden.timingtrials.R
@@ -21,7 +21,7 @@ class NumberOptionsDialog: DialogFragment(){
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        val setupVm:SetupViewModel by viewModels()
+        val setupVm:SetupViewModel by activityViewModels()
         val mViewModel = setupVm.numberOptionsViewModel
 
         setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_AppCompat_Dialog_Alert)

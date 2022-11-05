@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
@@ -59,10 +60,10 @@ class DataBaseViewPagerFragment: Fragment() {
         tabLayoutMediator.attach()
 
         viewpager.registerOnPageChangeCallback(mPageChangeCallback)
-        val listViewModel:ListViewModel by viewModels()
+        val listViewModel:ListViewModel by requireActivity().viewModels()
         listViewModel.setFilter(Filter(""))
 
-        val setupViewModel:SetupViewModel by viewModels()
+        val setupViewModel:SetupViewModel by requireActivity().viewModels()
         setupViewModel.currentPage = 0
 
         (activity as? IFabCallbacks)?.fabClickEvent?.observe(viewLifecycleOwner, EventObserver{

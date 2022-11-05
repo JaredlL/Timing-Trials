@@ -113,10 +113,8 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
                 resultSpreadSheet.value?.let {
                     resultSpreadSheet.value = it.copy(columns = cols)
                 }
-
             }
         }
-
     }
 
 
@@ -182,7 +180,6 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
                        val n = mnew
                        mnew = n?.copy(currentItem.first?:n.results, currentItem.second?:n.columns) ?: currentItem.third.copy(currentItem.first?:currentItem.third.results, currentItem.second?:currentItem.third.columns)
                    }
-
                 }
                 mnew?.let { resultSpreadSheet.postValue(it) }
                 isCarolineAlive.set(false)

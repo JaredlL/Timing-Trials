@@ -9,6 +9,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,16 +33,12 @@ class ResultsFilterFragment : BottomSheetDialogFragment(){
 
         setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.AppTheme)
 
-        val vm:ResultExplorerViewModel by viewModels()
+        val vm:ResultExplorerViewModel by activityViewModels()
 
         val adapter = ResultFilterAdapter(requireContext(), viewLifecycleOwner).apply { setHasStableIds(true)}
         val layoutManger = LinearLayoutManager(requireContext())
-
-
-            adapter.setItems(vm.columnViewModels)
-            view?.jumpDrawablesToCurrentState()
-
-
+        adapter.setItems(vm.columnViewModels)
+        view?.jumpDrawablesToCurrentState()
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
 

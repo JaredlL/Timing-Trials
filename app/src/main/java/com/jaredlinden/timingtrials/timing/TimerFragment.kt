@@ -1,7 +1,6 @@
 package com.jaredlinden.timingtrials.timing
 
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,26 +11,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.databinding.library.baseAdapters.BR
-import androidx.fragment.app.viewModels
-import androidx.preference.PreferenceManager
-
-
+import androidx.fragment.app.activityViewModels
 import com.jaredlinden.timingtrials.R
-import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.databinding.FragmentTimerBinding
 import com.jaredlinden.timingtrials.domain.ITimelineEvent
 import com.jaredlinden.timingtrials.ui.EventViewWrapper
-import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
+import dagger.hilt.android.AndroidEntryPoint
 
-
-/**
- * A simple [Fragment] subclass.
- *
- */
+@AndroidEntryPoint
 class TimerFragment : Fragment() {
 
-    private val timingViewModel: TimingViewModel by viewModels()
+    private val timingViewModel: TimingViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -90,8 +80,6 @@ class TimerFragment : Fragment() {
 
         return binding.root
     }
-
-
 
     fun showEventDialog(event: ITimelineEvent){
         AlertDialog.Builder(requireActivity())

@@ -55,6 +55,7 @@ class TimeTrialViewModel @Inject constructor (val timeTrialRepository: ITimeTria
     }
 }
 
+@HiltViewModel
 class ResultViewModel @Inject constructor(
     val timeTrialRepository: ITimeTrialRepository,
     val riderRepository: IRiderRepository,

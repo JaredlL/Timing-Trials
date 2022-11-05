@@ -12,9 +12,12 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator
 import com.jaredlinden.timingtrials.IFabCallbacks
 
 
@@ -23,43 +26,54 @@ import com.jaredlinden.timingtrials.adapters.OrderableRiderListAdapter
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager
 import com.jaredlinden.timingtrials.data.FilledTimeTrialRider
 import com.jaredlinden.timingtrials.data.NumberMode
+import com.jaredlinden.timingtrials.databinding.FragmentOrderRidersBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class OrderRidersFragment : Fragment() {
 
-    private val setupVm: SetupViewModel by viewModels()
-    private lateinit var mAdapter: OrderableRiderListAdapter
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-
+        val setupVm: SetupViewModel by activityViewModels()
         val viewModel = setupVm.orderRidersViewModel
         
-        mAdapter = OrderableRiderListAdapter(requireContext()).apply { onMove = {x,y -> viewModel.moveItem(x, y)} }
+        val mAdapter = OrderableRiderListAdapter(requireContext()).apply { onMove = {x,y -> viewModel.moveItem(x, y)} }
 
-        viewModel.getOrderableRiderData().observe(viewLifecycleOwner, Observer { ttData ->
+        viewModel.getOrderableRiderData().observe(viewLifecycleOwner) { ttData ->
             ttData?.let{
                 if(ttData.timeTrialHeader.numberRules.mode == NumberMode.MAP){
                     mAdapter.setData(ttData){
-                        showSetNumberDialog(it)
+                        showSetNumberDialog(it, setupVm)
                     }
                 }else{
                     mAdapter.setData(ttData){
-
                     }
                 }
+            }
+        }
+
+        val binding = FragmentOrderRidersBinding.inflate(inflater, container, false).apply {
+            val dragDropManager = RecyclerViewDragDropManager().apply {
+                setInitiateOnMove(false)
+                setInitiateOnLongPress(true)
+                setLongPressTimeout(300)
+            }
+            val wrappedAdapter = dragDropManager.createWrappedAdapter(mAdapter)
+            sortableRecyclerView.apply {
+                adapter = wrappedAdapter
+                layoutManager = LinearLayoutManager(requireContext())
+                itemAnimator = DraggableItemAnimator()
 
             }
-        })
+            dragDropManager.attachRecyclerView(sortableRecyclerView)
+        }
+
         (requireActivity() as IFabCallbacks).setFabVisibility(View.GONE)
-
-
-        return inflater.inflate(R.layout.fragment_order_riders, container, false)
+        return binding.root
     }
 
-    fun showSetNumberDialog(rd: FilledTimeTrialRider){
+    private fun showSetNumberDialog(rd: FilledTimeTrialRider, setupVm: SetupViewModel){
         val alert = AlertDialog.Builder(requireContext())
         val edittext = EditText(requireContext())
 
@@ -67,8 +81,6 @@ class OrderRidersFragment : Fragment() {
         alert.setTitle("${getString(R.string.set_number)} (${rd.riderData.fullName()})")
 
         alert.setView(edittext)
-
-
 
         edittext.inputType = InputType.TYPE_CLASS_NUMBER
 
@@ -100,7 +112,6 @@ class OrderRidersFragment : Fragment() {
             edittext.text?.toString()?.toIntOrNull()?.let {
                 setupVm.orderRidersViewModel.setRiderNumber(it, rd)
             }
-
         }
 
         alert.setNegativeButton(R.string.cancel) { _, _ -> }
@@ -110,28 +121,9 @@ class OrderRidersFragment : Fragment() {
         edittext.layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
     }
 
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//
-//        val dragDropManager = RecyclerViewDragDropManager().apply {
-//            setInitiateOnMove(false)
-//            setInitiateOnLongPress(true)
-//            setLongPressTimeout(300)
-//        }
-//
-//        val wrappedAdapter = dragDropManager.createWrappedAdapter(mAdapter)
-//        val mSortableRecyclerView = sortableRecyclerView
-//        mSortableRecyclerView.adapter = wrappedAdapter
-//        mSortableRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-//        //mSortableRecyclerView.itemAnimator = DraggableItemAnimator()
-//        dragDropManager.attachRecyclerView(sortableRecyclerView)
-//    }
-
-
     companion object {
         @JvmStatic
         fun newInstance() =
-                OrderRidersFragment()
+            OrderRidersFragment()
     }
-
 }

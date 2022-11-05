@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -23,14 +24,16 @@ import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.data.TimeTrial
 import com.jaredlinden.timingtrials.select.SELECTED_RIDERS
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.Instant
 
+@AndroidEntryPoint
 class TimerHostFragment : Fragment() {
 
     private val TIMERTAG = "timing_tag"
     private val STATUSTAG = "status_tag"
 
-    private val viewModel : TimingViewModel by viewModels()
+    private val viewModel : TimingViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {

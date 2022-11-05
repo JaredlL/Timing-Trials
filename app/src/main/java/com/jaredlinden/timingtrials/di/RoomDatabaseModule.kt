@@ -60,8 +60,4 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun timeTrialRepository(timeTrialDao: RoomTimeTrialRepository): ITimeTrialRepository
-
-    //@Binds
-    //abstract fun timeTrialRiderRepository(timeTrialRiderDao: TimeTrialRiderRepository): TimeTrialRiderRepository
-
 }

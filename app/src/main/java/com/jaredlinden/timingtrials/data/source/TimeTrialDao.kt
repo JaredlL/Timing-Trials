@@ -12,7 +12,7 @@ import timber.log.Timber
 abstract class TimeTrialDao(db: RoomDatabase) {
 
     init{
-        System.out.println("JAREDMSG -> Init DAO ${db.javaClass.canonicalName} ")
+        Timber.d("DB init")
     }
 
     @Insert
@@ -40,7 +40,7 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     open suspend fun insertFull(timeTrial: TimeTrial): Long
     {
         val id = insert(timeTrial.timeTrialHeader)
-        Timber.d("JAREDMSG -> Insert New TT $id + ${timeTrial.timeTrialHeader.ttName} FROM TRANSACTON, ${timeTrial.riderList.count()} riders into DB")
+        Timber.d("Insert New TT $id + ${timeTrial.timeTrialHeader.ttName}, ${timeTrial.riderList.count()} riders into DB")
 
         val newRiderList = timeTrial.riderList.map { it.timeTrialData.copy(timeTrialId = id) }
 
@@ -92,6 +92,7 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     @Query("DELETE FROM timetrial_table WHERE id = :ttId") abstract fun deleteTimeTrialById(ttId: Long)
 
     @Query("DELETE FROM timetrial_table") abstract fun deleteAll()
+
     @Query("DELETE FROM timetrial_rider_table") abstract fun deleteAllR()
 
     @Query("SELECT courseId, laps, interval, id FROM timetrial_table") abstract fun getAllHeaderBasicInfo(): List<TimeTrialBasicInfo>
@@ -117,15 +118,12 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     //SQLite does not have a boolean data type. Room maps it to an INTEGER column, mapping true to 1 and false to 0.
 
     @Transaction @Query("SELECT * FROM timetrial_table WHERE id = :timeTrialId LIMIT 1") abstract fun getFullTimeTrial(timeTrialId: Long): LiveData<TimeTrial>
+
     @Transaction @Query("SELECT * FROM timetrial_table WHERE id = :timeTrialId LIMIT 1") abstract fun getFullTimeTrialSuspend(timeTrialId: Long): TimeTrial
-
-
-
 
     @Query("DELETE  FROM timetrial_rider_table WHERE timeTrialId = :ttId") abstract fun _deleteTtRiders(ttId: Long)
 
     @Query("SELECT * from timetrial_rider_table") abstract fun _allTtRiders(): List<TimeTrialRider>
-
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) abstract fun _insertAllTimeTrialRiders(riders: List<TimeTrialRider>)
 

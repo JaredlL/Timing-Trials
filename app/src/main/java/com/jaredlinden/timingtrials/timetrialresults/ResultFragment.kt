@@ -54,20 +54,14 @@ class ResultFragment : Fragment() {
     private val args: ResultFragmentArgs by navArgs()
 
     val resultViewModel: ResultViewModel by viewModels()
-    lateinit var viewManager: GridLayoutManager
-    lateinit var resultGridAdapter: ResultListAdapter
-
-
-    private lateinit var binding: FragmentTimetrialResultBinding
+    var mBinding: FragmentTimetrialResultBinding? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
 
-        viewManager = GridLayoutManager(requireActivity(), 2)
+        val viewManager = GridLayoutManager(requireActivity(), 2)
 
-
-
-        resultGridAdapter = ResultListAdapter(requireActivity()) { id->
+        val resultGridAdapter = ResultListAdapter(requireActivity()) { id->
             id?.let {
                 val action = ResultFragmentDirections.actionResultFragmentToEditResultFragment(id, resultViewModel.timeTrial.value?.timeTrialHeader?.id?:0L)
                 findNavController().navigate(action)
@@ -81,7 +75,7 @@ class ResultFragment : Fragment() {
 
         resultViewModel.changeTimeTrial(args.timeTrialId)
 
-        binding = DataBindingUtil.inflate<FragmentTimetrialResultBinding>(inflater, R.layout.fragment_timetrial_result, container, false).apply {
+        val binding = FragmentTimetrialResultBinding.inflate(inflater, container, false).apply {
 
             fragResultRecyclerView.setHasFixedSize(true)
             fragResultRecyclerView.isNestedScrollingEnabled = false
@@ -90,7 +84,6 @@ class ResultFragment : Fragment() {
             fragResultRecyclerView.addItemDecoration(DividerItemDecoration(requireActivity(), LinearLayoutManager.VERTICAL))
 
         }
-
 
         resultViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
             res?.let {
@@ -103,7 +96,6 @@ class ResultFragment : Fragment() {
                 }
             }
         })
-
 
         resultViewModel.results.observe(viewLifecycleOwner, Observer {res->
             res?.let {newRes->
@@ -121,7 +113,6 @@ class ResultFragment : Fragment() {
                     })
                     resultGridAdapter.setResults(newRes)
                 }
-
             }
         })
 
@@ -131,7 +122,13 @@ class ResultFragment : Fragment() {
             PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putBoolean(HAS_SHOWN_TIMETRIAL_RESULT_TIPS, true).apply()
         }
 
+        mBinding = binding
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mBinding = null
     }
 
     fun showTipsDialog(){
@@ -253,8 +250,6 @@ class ResultFragment : Fragment() {
                         .setNegativeButton(R.string.cancel) { _, _ ->
 
                         }.show()
-
-
                 true
             }
 
@@ -367,9 +362,9 @@ class ResultFragment : Fragment() {
         val oldWidth = view.width
         val oldHeight =  view.height
         try {
+            val binding = mBinding ?: throw Exception("Binding null")
 
-
-           // val sv = horizontalScrollView
+            // val sv = horizontalScrollView
            // val view = sv.getChildAt(0)
             val now = Date()
             val nowChars = android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
@@ -486,10 +481,7 @@ class ResultFragment : Fragment() {
                 it.flush()
                 it.close()
             }
-
         }
-
-
 
         Timber.d("Inserted image URI API 29-30 -> $data")
         openScreenshot(data)
@@ -553,7 +545,6 @@ class ResultFragment : Fragment() {
             }
             //refreshGallery(it)
         }
-
 
             Timber.d("Inserted image URI API 26 -> ${data?.path}")
             openScreenshot(data)

@@ -30,7 +30,6 @@ const val SELECTED_RIDERS = "selected_riders"
 class SelectRiderFragment : Fragment() {
 
     private val args: SelectRiderFragmentArgs by navArgs()
-
     private val viewModel: SelectRiderViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,8 +54,8 @@ class SelectRiderFragment : Fragment() {
         val currentSortMode = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_DEFAULT)
         viewModel.setSortMode(currentSortMode)
 
-        val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
-            lifecycleOwner = (this@SelectRiderFragment)
+        val binding = FragmentSelectriderListBinding.inflate(inflater, container, false).apply {
+            lifecycleOwner = viewLifecycleOwner
             riderHeading.rider =  Rider.createBlank().copy( firstName = getString(R.string.name), club = getString(R.string.club))
             riderHeading.checkBox.visibility =  View.INVISIBLE
             riderRecyclerView.adapter = adapter
@@ -84,13 +83,8 @@ class SelectRiderFragment : Fragment() {
         }
 
 
-        viewModel.liveSortMode.observe(viewLifecycleOwner, Observer {
-
-        })
-
-        viewModel.riderFilter.observe(viewLifecycleOwner, Observer {
-
-        })
+        viewModel.liveSortMode.observe(viewLifecycleOwner) {}
+        viewModel.riderFilter.observe(viewLifecycleOwner) {}
 
         viewModel.selectedRidersInformation.observe(viewLifecycleOwner, Observer {result->
             result?.let {
@@ -106,9 +100,7 @@ class SelectRiderFragment : Fragment() {
                         viewManager.scrollToPositionWithOffset(pos, binding.root.height / 2)
                     }
                 }
-
             }
-
         })
 
         viewModel.showMessage.observe(viewLifecycleOwner, EventObserver{
@@ -119,6 +111,7 @@ class SelectRiderFragment : Fragment() {
 
     }
     var sv: SearchView? = null
+
     //Keep listener ref so we can remove it later (possibly prevent mem leak)
     val expandListener = object : MenuItem.OnActionExpandListener {
         override fun onMenuItemActionCollapse(item: MenuItem): Boolean {

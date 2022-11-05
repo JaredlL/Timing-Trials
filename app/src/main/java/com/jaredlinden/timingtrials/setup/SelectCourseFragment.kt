@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,10 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SelectCourseFragment : Fragment() {
 
-    private val setupViewModel: SetupViewModel by viewModels()
-    private lateinit var viewModel: ISelectCourseViewModel
-    private lateinit var adapter: CourseListAdapter
-    private lateinit var viewManager: RecyclerView.LayoutManager
+    private val setupViewModel: SetupViewModel by activityViewModels()
 
     private val args: SelectCourseFragmentArgs by navArgs()
 
@@ -48,11 +46,9 @@ class SelectCourseFragment : Fragment() {
             })
         }
 
-
-
-        viewModel = setupViewModel.selectCourseViewModel
-        viewManager = LinearLayoutManager(context)
-        adapter = CourseListAdapter(requireContext())
+        val viewModel = setupViewModel.selectCourseViewModel
+        val viewManager = LinearLayoutManager(context)
+        val adapter = CourseListAdapter(requireContext())
         adapter.editCourse = ::editCourse
 
         viewModel.getAllCourses().observe(viewLifecycleOwner, Observer { courses ->

@@ -17,10 +17,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -39,9 +37,7 @@ import java.io.IOException
 @AndroidEntryPoint
 class ResultExplorerFragment : Fragment()  {
 
-
-    val viewModel: ResultExplorerViewModel by viewModels()
-
+    val viewModel: ResultExplorerViewModel by activityViewModels()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         val itemTypeId = arguments?.getString("itemTypeId")?:""
@@ -52,7 +48,7 @@ class ResultExplorerFragment : Fragment()  {
 
         setHasOptionsMenu(true)
 
-        val binding = DataBindingUtil.inflate<FragmentSpreadsheetBinding>(inflater, R.layout.fragment_spreadsheet, container, false)
+        val binding = FragmentSpreadsheetBinding.inflate(inflater, container, false)
 
         val displayMetrics = DisplayMetrics()
         activity?.windowManager?.defaultDisplay?.getMetrics(displayMetrics)
@@ -69,7 +65,7 @@ class ResultExplorerFragment : Fragment()  {
         val adapter = SheetAdapter(requireContext(), displayMetrics, p, ::snackBarCallback)
         val recyclerView = binding.recyclerView
 
-        viewModel.resultSpreadSheet.observe(viewLifecycleOwner, Observer { it?.let {
+        viewModel.resultSpreadSheet.observe(viewLifecycleOwner) { it?.let {
             if(it.isEmpty){
 
                 recyclerView.visibility = View.INVISIBLE
@@ -82,9 +78,7 @@ class ResultExplorerFragment : Fragment()  {
                 adapter.setNewItems(it)
                 recyclerView.layoutManager = SheetLayoutManager(it)
             }
-
-        }
-        })
+        } }
 
         viewModel.navigateToTTId.observe(viewLifecycleOwner, EventObserver {
             val action = ResultExplorerFragmentDirections.actionSheetFragmentToResultFragment(it)
@@ -113,7 +107,6 @@ class ResultExplorerFragment : Fragment()  {
                     }
                 }
             }
-
         })
 
        if(!PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(HAS_SHOWN_RESULT_EXPLORER_TIPS, false)){
@@ -173,7 +166,6 @@ class ResultExplorerFragment : Fragment()  {
     &#8226; ${getString(R.string.tip_click_cell_sort_header)}
     
  """
-
 
         val html = HtmlCompat.fromHtml(htmlString, HtmlCompat.FROM_HTML_MODE_LEGACY)
 

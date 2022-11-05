@@ -46,7 +46,7 @@ class TestViewModel@Inject constructor(
                                     startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
                                     firstRiderStartOffset = 0,
                                     interval = 2,
-                                    courseId = courses[3].id,
+                                    courseId = courses[1].id,
                                     laps = 2,
                                     status = TimeTrialStatus.SETTING_UP))
                     val copy = newTt.addRiders(rList)
@@ -229,9 +229,9 @@ class TestViewModel@Inject constructor(
                                 startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
                                 firstRiderStartOffset = 0,
                                 interval = 2,
-                                courseId = courses[3].id,
+                                courseId = courses[1].id,
                                 laps = 1,
-                                status = TimeTrialStatus.FINISHED)).updateCourse(courses[3])
+                                status = TimeTrialStatus.FINISHED)).updateCourse(courses[1])
 
 
 

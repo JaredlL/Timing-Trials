@@ -56,7 +56,6 @@ class ListViewModel @Inject constructor(
                 res?.filter { riderVm->
                     filterVal.passes(riderVm)
                 } ?: res
-
             }
         }
     }
@@ -78,7 +77,6 @@ class ListViewModel @Inject constructor(
     fun deleteTimeTrial(ttId: Long){
             viewModelScope.launch(Dispatchers.IO) {
                 timeTrialRepository.deleteById(ttId)
-
         }
     }
 

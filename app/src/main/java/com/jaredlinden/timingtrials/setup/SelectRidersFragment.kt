@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.lifecycle.Observer
@@ -40,13 +41,13 @@ class SelectRidersFragment : Fragment() {
 
 
     private val args: SelectRidersFragmentArgs by navArgs()
-
-    private val setupViewModel: SetupViewModel by viewModels()
-    private val singleRiderVm: EditResultViewModel by viewModels()
     private lateinit var viewModel: ISelectRidersViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
+
+        val singleRiderVm: EditResultViewModel by activityViewModels()
+        val setupViewModel: SetupViewModel by activityViewModels()
 
         viewModel = if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI) {
             setupViewModel.selectRidersViewModel
@@ -54,23 +55,18 @@ class SelectRidersFragment : Fragment() {
             singleRiderVm.selectRiderVm
         }
 
-
-
         val viewManager = LinearLayoutManager(context)
         val adapter = SelectableRiderListAdapter(requireContext())
 
         adapter.setHasStableIds(true)
         adapter.editRider = ::editRider
 
-
-
-        val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
-            lifecycleOwner = (this@SelectRidersFragment)
+        val binding = FragmentSelectriderListBinding.inflate(inflater, container, false).apply {
+            lifecycleOwner = viewLifecycleOwner
             riderHeading.rider =  Rider.createBlank().copy( firstName = getString(R.string.name), club = getString(R.string.club))
             riderHeading.checkBox.visibility =  View.INVISIBLE
             riderRecyclerView.adapter = adapter
             riderRecyclerView.layoutManager = viewManager
-
         }
 
         if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI){

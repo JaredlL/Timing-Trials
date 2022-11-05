@@ -16,7 +16,6 @@ data class TimeTrialIO(var timeTrialHeader: TimeTrialHeader? = null, var course:
     )
 }
 
-
 data class TimeTrialRiderIO(
         val firstName:String = "",
         val lastName:String = "",
@@ -48,8 +47,6 @@ interface ILineToObjectConverter<T>{
     fun importLine(dataLine: List<String>): T?
 }
 
-
-
 abstract class StringToObjectField<T>
 {
     abstract val fieldIndex: Int?
@@ -61,7 +58,6 @@ abstract class StringToObjectField<T>
                 if(it.isNotBlank()){
                     return applyFieldFromString(it, target)
                 }
-
             }
         }
         return target

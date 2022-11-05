@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -34,7 +35,6 @@ class EditResultFragment : Fragment() {
         //Set title
         (requireActivity() as AppCompatActivity).supportActionBar?.title = if(args.resultId == 0L) getString(R.string.add_result) else getString(R.string.edit_result)
 
-
         val fabCallback = (requireActivity() as IFabCallbacks)
         fabCallback.setFabImage(R.drawable.ic_done_white_24dp)
         fabCallback.setFabVisibility(View.VISIBLE)
@@ -43,11 +43,9 @@ class EditResultFragment : Fragment() {
             if(it){
                 resultViewModel.save()
             }
-
         })
 
         resultViewModel.setResult(args.resultId, args.timeTrialId)
-
         resultViewModel.changeRider.observe(viewLifecycleOwner, EventObserver{
             if(it){
                 val action = EditResultFragmentDirections.actionEditResultFragmentToSelectRidersFragment(SelectRidersFragment.SELECT_RIDER_FRAGMENT_SINGLE)
@@ -68,11 +66,11 @@ class EditResultFragment : Fragment() {
             }
         })
 
-
-        val binding = DataBindingUtil.inflate<FragmentEditResultBinding>(inflater, R.layout.fragment_edit_result, container, false).apply {
+        val binding = FragmentEditResultBinding.inflate(inflater, container, false).apply {
             viewModel = resultViewModel
-            lifecycleOwner = this@EditResultFragment
+            lifecycleOwner = viewLifecycleOwner
         }
+
         //For some reason gender spinner sometimes doesnt update
         binding.invalidateAll()
 

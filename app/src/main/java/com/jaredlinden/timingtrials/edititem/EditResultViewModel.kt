@@ -20,12 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRiderRepository, val riderRepository: IRiderRepository) : ViewModel(){
 
-
-
-
     private val resultId: MutableLiveData<Long> = MutableLiveData()
     private val timeTrialId: MutableLiveData<Long> = MutableLiveData()
-
 
     var originalRiderId: Long? = null
     val result: MediatorLiveData<TimeTrialRider?> = MediatorLiveData()
@@ -40,7 +36,6 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
         it?.riderId?.let {
            Transformations.map(riderRepository.getRider(it)){it?.fullName()}
         }?:MutableLiveData("Select Rider...")
-        //it?.rider?.fullName()?:"Select Rider..."
     }
 
     //val gender: MutableLiveData<Gender> = MutableLiveData()
@@ -49,12 +44,9 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
     val note = MutableLiveData("")
     val splits: MutableLiveData<List<String>> = MutableLiveData(listOf())
     val resultTime = MutableLiveData("")
-
     val selectedGenderPosition = MutableLiveData(2)
     val genders = Gender.values().map { it.fullString() }
-
     val resultSaved: MutableLiveData<Event<Boolean>> = MutableLiveData()
-
     val changeRider: MutableLiveData<Event<Boolean>> = MutableLiveData()
 
     fun changeRider(){

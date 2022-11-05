@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -26,31 +27,21 @@ class EditRiderFragment : Fragment() {
 
 
     private val args: EditRiderFragmentArgs by navArgs()
-    private val riderViewModel: EditRiderViewModel by viewModels()
+    private val riderViewModel: EditRiderViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
-
         setHasOptionsMenu(true)
-
-
-        riderViewModel.mutableRider.observe(viewLifecycleOwner, Observer {  })
-
+        riderViewModel.mutableRider.observe(viewLifecycleOwner){ }
         riderViewModel.changeRider(args.riderId)
-
-
-
-
-
         val categoryAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
-        riderViewModel.categories.observe(viewLifecycleOwner, Observer{res->
+        riderViewModel.categories.observe(viewLifecycleOwner) {res->
             res?.let {cats->
                 categoryAdapter.clear()
                 cats.filterNot { it.isBlank() }.forEachIndexed { index, s -> categoryAdapter.insert(s, index)  }
                 categoryAdapter.notifyDataSetChanged()
             }
-        })
+        }
 
         val clubAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
         riderViewModel.clubs.observe(viewLifecycleOwner, Observer{res->
@@ -75,7 +66,6 @@ class EditRiderFragment : Fragment() {
                 findNavController().popBackStack()
             }
         })
-
 
         //Set title
         (requireActivity() as AppCompatActivity).supportActionBar?.title = if(args.riderId == 0L) getString(R.string.add_rider) else getString(R.string.edit_rider)
@@ -109,11 +99,9 @@ class EditRiderFragment : Fragment() {
             }
 
         }
-        //For some reason gender spinner sometimes doesnt update
+
+        //For some reason gender spinner sometimes doesn't update
         binding.invalidateAll()
-
-
-
         return binding.root
     }
 
@@ -150,6 +138,4 @@ class EditRiderFragment : Fragment() {
         //menu.clear()
         inflater.inflate(R.menu.menu_delete, menu)
     }
-
-
 }

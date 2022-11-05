@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -24,16 +25,13 @@ import com.jaredlinden.timingtrials.databinding.FragmentTimerRiderStatusBinding
 import com.jaredlinden.timingtrials.ui.RiderStatus
 import com.jaredlinden.timingtrials.ui.RiderStatusViewWrapper
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.*
 
-
-/**
- * A simple [Fragment] subclass.
- *
- */
+@AndroidEntryPoint
 class RiderStatusFragment : Fragment() {
 
-    private val timingViewModel: TimingViewModel by viewModels()
+    private val timingViewModel: TimingViewModel by activityViewModels()
 
     private lateinit var binding: FragmentTimerRiderStatusBinding
 
