@@ -15,8 +15,9 @@ import com.jaredlinden.timingtrials.databinding.FragmentEditResultBinding
 import com.jaredlinden.timingtrials.setup.SelectRidersFragment
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.hideKeyboard
-import com.jaredlinden.timingtrials.util.injector
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class EditResultFragment : Fragment() {
 
 

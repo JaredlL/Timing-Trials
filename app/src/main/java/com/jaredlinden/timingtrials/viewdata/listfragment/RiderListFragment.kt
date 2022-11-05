@@ -16,10 +16,11 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentListGenericBinding
 import com.jaredlinden.timingtrials.databinding.ListItemRiderBinding
-import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.*
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
+@AndroidEntryPoint
 class RiderListFragment : Fragment() {
 
     private val listViewModel: ListViewModel by viewModels()

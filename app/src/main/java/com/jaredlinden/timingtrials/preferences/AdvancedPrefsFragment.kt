@@ -11,7 +11,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.util.EventObserver
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AdvancedPrefsFragment : PreferenceFragmentCompat() {
 
     val viewModel: PrefsViewModel by viewModels ()

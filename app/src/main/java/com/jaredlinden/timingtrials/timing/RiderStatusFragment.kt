@@ -24,7 +24,6 @@ import com.jaredlinden.timingtrials.databinding.FragmentTimerRiderStatusBinding
 import com.jaredlinden.timingtrials.ui.RiderStatus
 import com.jaredlinden.timingtrials.ui.RiderStatusViewWrapper
 import com.jaredlinden.timingtrials.util.*
-import kotlinx.android.synthetic.main.fragment_timer_rider_status.*
 import org.threeten.bp.*
 
 
@@ -36,9 +35,12 @@ class RiderStatusFragment : Fragment() {
 
     private val timingViewModel: TimingViewModel by viewModels()
 
+    private lateinit var binding: FragmentTimerRiderStatusBinding
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
+        binding = FragmentTimerRiderStatusBinding.inflate(layoutInflater)
         val adapter = RiderStatusAdapter(requireActivity())
         val viewManager = GridLayoutManager(context, 4)
 
@@ -52,9 +54,9 @@ class RiderStatusFragment : Fragment() {
 
 
             if (newList.isEmpty() || newList.all { it.status == RiderStatus.DNF || it.status == RiderStatus.DNS }){
-                viewResultsButton.visibility = View.VISIBLE
+                binding.viewResultsButton.visibility = View.VISIBLE
             }else{
-                viewResultsButton.visibility = View.GONE
+                binding.viewResultsButton.visibility = View.GONE
             }
             adapter.setRiderStatus(newList)
         })

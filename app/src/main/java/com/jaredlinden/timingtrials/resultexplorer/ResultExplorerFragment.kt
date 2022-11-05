@@ -33,10 +33,10 @@ import com.jaredlinden.timingtrials.domain.csv.CsvSheetWriter
 import com.jaredlinden.timingtrials.spreadsheet.SheetAdapter
 import com.jaredlinden.timingtrials.spreadsheet.SheetLayoutManager
 import com.jaredlinden.timingtrials.util.*
-import kotlinx.android.synthetic.main.fragment_spreadsheet.*
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
 
-
+@AndroidEntryPoint
 class ResultExplorerFragment : Fragment()  {
 
 
@@ -77,7 +77,7 @@ class ResultExplorerFragment : Fragment()  {
                 recyclerView.layoutManager = SheetLayoutManager(it)
 
             }else{
-                emptyTextView.visibility = View.GONE
+                binding.emptyTextView.visibility = View.GONE
                 recyclerView.visibility = View.VISIBLE
                 adapter.setNewItems(it)
                 recyclerView.layoutManager = SheetLayoutManager(it)

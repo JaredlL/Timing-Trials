@@ -22,9 +22,11 @@ import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.jaredlinden.timingtrials.setup.*
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 
 const val SELECTED_RIDERS = "selected_riders"
 
+@AndroidEntryPoint
 class SelectRiderFragment : Fragment() {
 
     private val args: SelectRiderFragmentArgs by navArgs()

@@ -11,17 +11,17 @@ buildscript {
         lifecycleVersion = '2.4.1'
         lifecycleExtVersion = '2.2.0'
         recyclerViewVersion = '1.2.1'
-        coroutinesVersion = '1.6.1-native-mt'
+        coroutinesVersion = '1.6.4'
         ktxVersion = '1.0.1'
-        materialVersion = '1.6.1'
-        fragmentVersion = '1.5.3'
+        materialVersion = '1.7.0'
+        fragmentVersion = '1.5.4'
         coreVersion = '1.9.0'
-        navigationVersion = '2.5.2'
-        activityVersion = '1.6.0'
+        navigationVersion = '2.5.3'
+        activityVersion = '1.6.1'
         advRecyclerVersion='1.0.0'
         gsonVersion= '2.9.0'
         daggerVersion = '2.42'
-        hiltVersion = '2.40'
+        hiltVersion = '2.44'
     }
 
 
@@ -32,8 +32,8 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:7.3.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
-        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.40.1'
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.5.3"
+        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.44'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

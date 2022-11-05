@@ -27,13 +27,13 @@ import com.jaredlinden.timingtrials.databinding.FragmentTitleBinding
 import com.jaredlinden.timingtrials.timing.TimingActivity
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.Utils
-import com.jaredlinden.timingtrials.util.injector
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 
 
-
+@AndroidEntryPoint
 class TitleFragment : Fragment()
 {
 

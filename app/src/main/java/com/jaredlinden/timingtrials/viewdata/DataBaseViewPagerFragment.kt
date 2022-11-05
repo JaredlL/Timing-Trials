@@ -24,8 +24,9 @@ import com.jaredlinden.timingtrials.util.*
 import com.jaredlinden.timingtrials.viewdata.listfragment.CourseListFragment
 import com.jaredlinden.timingtrials.viewdata.listfragment.RiderListFragment
 import com.jaredlinden.timingtrials.viewdata.listfragment.TimeTrialListFragment
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class DataBaseViewPagerFragment: Fragment() {
 
     var mViewPager: ViewPager2? = null
@@ -181,17 +182,9 @@ class DataBaseViewPagerFragment: Fragment() {
                     listViewModel.setFilter(Filter(searchText?:""))
                     return true
                 }
-
             })
-
         }
-
-
-
     }
-
-    
-
 }
 
 

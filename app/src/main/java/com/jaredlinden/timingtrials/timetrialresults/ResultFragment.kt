@@ -43,12 +43,12 @@ import com.jaredlinden.timingtrials.databinding.FragmentTimetrialResultBinding
 import com.jaredlinden.timingtrials.domain.JsonResultsWriter
 import com.jaredlinden.timingtrials.domain.csv.CsvTimeTrialResultWriter
 import com.jaredlinden.timingtrials.util.*
-import kotlinx.android.synthetic.main.fragment_timetrial_result.*
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.IOException
 import java.util.*
 
-
+@AndroidEntryPoint
 class ResultFragment : Fragment() {
 
     private val args: ResultFragmentArgs by navArgs()
@@ -58,10 +58,7 @@ class ResultFragment : Fragment() {
     lateinit var resultGridAdapter: ResultListAdapter
 
 
-
-
-
-
+    private lateinit var binding: FragmentTimetrialResultBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
@@ -84,7 +81,7 @@ class ResultFragment : Fragment() {
 
         resultViewModel.changeTimeTrial(args.timeTrialId)
 
-        val binding = DataBindingUtil.inflate<FragmentTimetrialResultBinding>(inflater, R.layout.fragment_timetrial_result, container, false).apply {
+        binding = DataBindingUtil.inflate<FragmentTimetrialResultBinding>(inflater, R.layout.fragment_timetrial_result, container, false).apply {
 
             fragResultRecyclerView.setHasFixedSize(true)
             fragResultRecyclerView.isNestedScrollingEnabled = false
@@ -383,12 +380,12 @@ class ResultFragment : Fragment() {
 
 
 
-            val scrollViewWidth = horizontalScrollView.getChildAt(0).width
+            val scrollViewWidth = binding.horizontalScrollView.getChildAt(0).width
             //val scrollViewWidth = 200
 
-            val sr = fragResultRecyclerView.computeVerticalScrollRange()
+            val sr = binding.fragResultRecyclerView.computeVerticalScrollRange()
 
-            val gridHeight = if(sr == 0) fragResultRecyclerView.height else sr
+            val gridHeight = if(sr == 0) binding.fragResultRecyclerView.height else sr
 
             //https://dev.to/pranavpandey/android-create-bitmap-from-a-view-3lck
             view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(gridHeight+dpToPixels(300), View.MeasureSpec.EXACTLY))

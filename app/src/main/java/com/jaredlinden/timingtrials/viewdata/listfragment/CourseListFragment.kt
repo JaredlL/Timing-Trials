@@ -19,8 +19,10 @@ import com.jaredlinden.timingtrials.databinding.ListItemCourseBinding
 import com.jaredlinden.timingtrials.ui.SelectableCourseViewModel
 import com.jaredlinden.timingtrials.util.getLengthConverter
 import com.jaredlinden.timingtrials.viewdata.*
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
+@AndroidEntryPoint
 class CourseListFragment : Fragment() {
 
     private val listViewModel: ListViewModel by viewModels()
@@ -37,7 +39,18 @@ class CourseListFragment : Fragment() {
         viewFactory = CourseViewHolderFactory(converter.unitDef.key)
         adapter = GenericListAdapter(requireContext(), viewFactory)
 
+        viewManager = LinearLayoutManager(context)
 
+        val binding = DataBindingUtil.inflate<FragmentListGenericBinding>(inflater, R.layout.fragment_list_generic, container, false).apply{
+            lifecycleOwner = (this@CourseListFragment)
+            listHeading.addView(
+                viewFactory.createTitle(inflater, container),
+                0, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT))
+            genericRecyclerView.adapter = adapter
+            genericRecyclerView.layoutManager = viewManager
+
+        }
 
         listViewModel.filteredAllCourse.observe(viewLifecycleOwner, Observer{res->
             res?.let {adapter.setItems(it.map {
@@ -46,16 +59,6 @@ class CourseListFragment : Fragment() {
                 cvm.distString.contains(listViewModel.liveFilter.value?.filterString?:"", ignoreCase = true)
             })}
         })
-
-        viewManager = LinearLayoutManager(context)
-
-        val binding = DataBindingUtil.inflate<FragmentListGenericBinding>(inflater, R.layout.fragment_list_generic, container, false).apply{
-            lifecycleOwner = (this@CourseListFragment)
-            listHeading.addView(viewFactory.createTitle(inflater, container), 0, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-            genericRecyclerView.adapter = adapter
-            genericRecyclerView.layoutManager = viewManager
-
-        }
 
         return binding.root
 
@@ -71,8 +74,6 @@ class CourseListFragment : Fragment() {
 class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<SelectableCourseViewModel, ListItemCourseBinding>(binding) {
     private val _binding = binding
 
-    //override var onLongPress = {course: CourseListViewWrapper -> Unit}
-
     override fun bind(data: SelectableCourseViewModel){
 
         _binding.apply{
@@ -86,8 +87,6 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Se
             }
 
             courseLayout.setOnClickListener {
-                //val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.id?:0, Course::class.java.simpleName)
-
                 val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment( root.context.getString(R.string.edit_course),data.id ?: 0)
                 Navigation.findNavController(_binding.root).navigate(action)
             }

@@ -17,8 +17,9 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Course
 import com.jaredlinden.timingtrials.databinding.FragmentEditCourseBinding
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class EditCourseFragment : Fragment() {
 
 

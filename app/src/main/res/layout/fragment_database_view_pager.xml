@@ -26,7 +26,8 @@
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize" />
+                android:layout_height="?attr/actionBarSize"
+                android:contentDescription="@string/tabs" />
 
         </com.google.android.material.appbar.AppBarLayout>
 

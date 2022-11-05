@@ -32,12 +32,14 @@ import androidx.preference.PreferenceManager
 import com.jaredlinden.timingtrials.timing.TimingActivity
 import com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.data.NumberMode
+import com.jaredlinden.timingtrials.databinding.ActivityMainBinding
 import com.jaredlinden.timingtrials.util.*
 import com.jaredlinden.timingtrials.viewdata.IOViewModel
 import com.jaredlinden.timingtrials.viewdata.ListViewModel
-import kotlinx.android.synthetic.main.activity_main.*
+import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.io.IOException
@@ -59,7 +61,7 @@ interface IFabCallbacks{
     val fabClickEvent: MutableLiveData<Event<Boolean>>
 }
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), IFabCallbacks {
 
 
@@ -132,20 +134,24 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }
     }
 
+    private lateinit var binding: ActivityMainBinding
+
+    var mainFab : FloatingActionButton? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
 
-
-
-        val collapsingToolbar = collapsing_toolbar_layout
+        val collapsingToolbar = binding.collapsingToolbarLayout
         val navController = findNavController(R.id.nav_host_fragment)
 
-        appBarConfiguration = AppBarConfiguration(navController.graph, drawer_layout)
-        collapsingToolbar.setupWithNavController(toolbar, navController, appBarConfiguration)
+        appBarConfiguration = AppBarConfiguration(navController.graph, binding.drawerLayout)
+        collapsingToolbar.setupWithNavController(binding.toolbar, navController, appBarConfiguration)
 
-        main_app_bar_layout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+        binding.mainAppBarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
             if (abs(verticalOffset)-(appBarLayout?.totalScrollRange?:0) == 0) {
                 //  Collapsed
                 toolbarCollapsed = true
@@ -158,6 +164,10 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             }
         })
 
+        mainFab = binding.mainFab
+        val drawer_layout = binding.drawerLayout
+        val nav_view = binding.navView
+        val main_app_bar_layout = binding.mainAppBarLayout
 
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener)
 
@@ -166,14 +176,14 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(HAS_SHOWN_ONBOARDING, true).apply()
         }
 
-        mainFab.setOnClickListener {
+        binding.mainFab.setOnClickListener {
             fabClickEvent.postValue(Event(true))
         }
 
-        setSupportActionBar(toolbar)
-        nav_view.setupWithNavController(navController)
+        setSupportActionBar(binding.toolbar)
+        binding.navView.setupWithNavController(navController)
         setupActionBarWithNavController(navController, appBarConfiguration)
-        rootCoordinator = mainActivityCoordinator
+        rootCoordinator = binding.mainActivityCoordinator
 
         val vm:TitleViewModel by viewModels ()
         vm.timingTimeTrial.observe(this, Observer {

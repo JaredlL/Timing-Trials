@@ -10,9 +10,11 @@ import com.jaredlinden.timingtrials.setup.SORT_ALPHABETICAL
 import com.jaredlinden.timingtrials.setup.SORT_RECENT_ACTIVITY
 import com.jaredlinden.timingtrials.setup.SelectedRidersInformation
 import com.jaredlinden.timingtrials.util.Event
+import dagger.hilt.android.lifecycle.HiltViewModel
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
+@HiltViewModel
 class  SelectRiderViewModel @Inject constructor (val riderRepository: IRiderRepository, val timeTrialRiderRepository: TimeTrialRiderRepository): ISelectRidersViewModel, ViewModel()
 {
 

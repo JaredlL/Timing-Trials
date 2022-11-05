@@ -7,13 +7,14 @@ import com.jaredlinden.timingtrials.data.roomrepo.ICourseRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
 import com.jaredlinden.timingtrials.util.Event
 import com.jaredlinden.timingtrials.util.LengthConverter
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
+@HiltViewModel
 class EditCourseViewModel @Inject constructor(private val repository: ICourseRepository, private val results: TimeTrialRiderRepository) :ViewModel() {
 
     val mutableCourse: MediatorLiveData<Course> = MediatorLiveData()

@@ -14,8 +14,6 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.NumbersDirection
 import com.jaredlinden.timingtrials.databinding.FragmentNumberOptionsBinding
 import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
-import com.jaredlinden.timingtrials.util.injector
-import kotlinx.android.synthetic.main.fragment_number_options.*
 
 class NumberOptionsDialog: DialogFragment(){
 
@@ -69,10 +67,10 @@ class NumberOptionsDialog: DialogFragment(){
             it?.let {
                 when(it){
                     NumbersDirection.ASCEND -> {
-                        binding.radioGroup.check(ascendingRadioButton.id)
+                        binding.radioGroup.check(binding.ascendingRadioButton.id)
                     }
                     else ->{
-                        binding.radioGroup.check(descendingRadioButton.id)
+                        binding.radioGroup.check(binding.ascendingRadioButton.id)
 
                     }
 

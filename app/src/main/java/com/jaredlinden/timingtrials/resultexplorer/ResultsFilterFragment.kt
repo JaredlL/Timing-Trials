@@ -17,6 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.FragmentResultFilterBinding
 import com.jaredlinden.timingtrials.databinding.ListItemResultFilterBinding
+import dagger.hilt.android.AndroidEntryPoint
 
 
 @BindingAdapter("android:src")
@@ -24,6 +25,7 @@ fun setImageViewResource(imageView: ImageView, resource: Int) {
     imageView.setImageResource(resource)
 }
 
+@AndroidEntryPoint
 class ResultsFilterFragment : BottomSheetDialogFragment(){
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

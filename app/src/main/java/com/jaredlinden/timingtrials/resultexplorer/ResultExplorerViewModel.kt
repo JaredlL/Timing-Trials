@@ -7,6 +7,7 @@ import com.jaredlinden.timingtrials.data.roomrepo.*
 import com.jaredlinden.timingtrials.domain.*
 import com.jaredlinden.timingtrials.util.Event
 import com.jaredlinden.timingtrials.util.LengthConverter
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -21,7 +22,7 @@ interface ISheetViewModel{
 
 data class GlobalResultViewModelData(val itemId: Long, val  itemType: String, val converter: LengthConverter)
 
-
+@HiltViewModel
 class ResultExplorerViewModel @Inject constructor(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository, private val courseRepository: ICourseRepository, private val timeTrialRiderRepository: TimeTrialRiderRepository) : ViewModel(), ISheetViewModel {
 
 

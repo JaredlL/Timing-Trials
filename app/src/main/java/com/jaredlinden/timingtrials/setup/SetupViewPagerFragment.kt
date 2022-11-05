@@ -22,8 +22,8 @@ import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
 import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.util.showKeyboard
+import dagger.hilt.android.AndroidEntryPoint
 
 
 const val SORT_RECENT_ACTIVITY = 0
@@ -31,6 +31,7 @@ const val SORT_ALPHABETICAL = 1
 const val SORT_DEFAULT = SORT_ALPHABETICAL
 const val SORT_KEY = "sorting"
 
+@AndroidEntryPoint
 class SetupViewPagerFragment: Fragment() {
 
 
@@ -279,7 +280,6 @@ const val TIMETRIAL_PAGE_INDEX = 2
 const val RIDER_PAGE_INDEX = 0
 const val ORDER_RIDER_INDEX = 1
 
-
 class SetupPagerAdapter(fm: FragmentManager, ls: Lifecycle, val fragCreated: () -> Unit) : FragmentStateAdapter(fm,ls) {
 
     /**
@@ -296,7 +296,7 @@ class SetupPagerAdapter(fm: FragmentManager, ls: Lifecycle, val fragCreated: () 
 
     override fun createFragment(position: Int): Fragment {
         val f = tabFragmentsCreators[position]?.invoke() ?: throw IndexOutOfBoundsException()
-        fragCreated()
+        //fragCreated()
         return f
     }
 }

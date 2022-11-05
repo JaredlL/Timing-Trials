@@ -20,10 +20,11 @@ import com.jaredlinden.timingtrials.databinding.FragmentListGenericBinding
 import com.jaredlinden.timingtrials.databinding.ListItemTimetrialBinding
 
 import com.jaredlinden.timingtrials.util.ConverterUtils
-import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.*
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
+@AndroidEntryPoint
 class TimeTrialListFragment : Fragment() {
 
     private val listViewModel: ListViewModel by viewModels()

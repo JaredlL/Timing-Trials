@@ -78,6 +78,3 @@ fun <T,U> MediatorLiveData<T>.changeValIfNotEqual(obs: LiveData<U>, getVal: (T) 
         }
     }
 }
-
-val Activity.injector get() = (application as TimingTrialsApplication).component
-val Fragment.injector get() = (requireActivity().application as TimingTrialsApplication).component

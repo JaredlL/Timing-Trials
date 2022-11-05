@@ -20,6 +20,7 @@ import com.jaredlinden.timingtrials.util.Event
 import com.google.gson.Gson
 import com.jaredlinden.timingtrials.domain.csv.LineToCompleteResult
 import com.opencsv.CSVReader
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.threeten.bp.*
@@ -32,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
-
+@HiltViewModel
 class IOViewModel @Inject constructor(private val riderRespository: IRiderRepository,
                                       private val courseRepository: ICourseRepository,
                                       private val timeTrialRepository: ITimeTrialRepository,

@@ -10,6 +10,7 @@ import com.jaredlinden.timingtrials.domain.TimeLine
 import com.jaredlinden.timingtrials.domain.TimeTrialHelper
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.Event
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 import timber.log.Timber
@@ -20,7 +21,7 @@ import javax.inject.Inject
 interface IEventSelectionData{
     var eventAwaitingSelection: Long?
 }
-
+@HiltViewModel
 class TimingViewModel  @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val resultRepository: TimeTrialRiderRepository, val riderRepository: RoomRiderRepository) : ViewModel(), IEventSelectionData {
 
     val timeTrial: MediatorLiveData<TimeTrial?> = MediatorLiveData()

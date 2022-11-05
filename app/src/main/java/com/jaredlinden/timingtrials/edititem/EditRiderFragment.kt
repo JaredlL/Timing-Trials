@@ -19,7 +19,9 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentEditRiderBinding
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class EditRiderFragment : Fragment() {
 
 

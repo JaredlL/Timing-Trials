@@ -14,50 +14,50 @@ import com.jaredlinden.timingtrials.edititem.EditResultViewModel
 import com.jaredlinden.timingtrials.preferences.PrefsViewModel
 import com.jaredlinden.timingtrials.select.SelectRiderViewModel
 import com.jaredlinden.timingtrials.viewdata.IOViewModel
-import dagger.BindsInstance
-import dagger.Component
-import javax.inject.Singleton
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
-@InstallIn(SingletonComponent::class)
-@Module(includes = [
-    RoomDatabaseModule::class,
-    RepositoryModule::class])
-interface AppComponent{
-
-    @Component.Builder
-    interface Builder {
-        @BindsInstance
-        fun applicationContext(applicationContext: Context): Builder
-        fun build(): AppComponent
-    }
-
-    fun listViewModel(): ListViewModel
-
-    fun riderViewModel(): EditRiderViewModel
-
-    fun courseViewModel(): EditCourseViewModel
-
-    fun timeTrialSetupViewModel(): SetupViewModel
-
-    fun timingViewModel(): TimingViewModel
-
-    fun mainViewModel(): TitleViewModel
-
-    fun testViewModel(): TestViewModel
-
-    fun resultViewModel(): ResultViewModel
-
-    fun globalResultViewModel(): ResultExplorerViewModel
-
-    fun importViewModel(): IOViewModel
-
-    fun editResultViewModel(): EditResultViewModel
-
-    fun prefsViewModel(): PrefsViewModel
-
-    fun selectRiderViewModel(): SelectRiderViewModel
-
-}
+//@InstallIn(SingletonComponent::class)
+//@Module(subcomponents  =  [
+//    RoomDatabaseModule::class,
+//    RepositoryModule::class])
+//interface AppComponent{
+//
+////    @Component.Builder
+////    interface Builder {
+////        @BindsInstance
+////        fun applicationContext(applicationContext: Context): Builder
+////        fun build(): AppComponent
+////    }
+//
+//    fun listViewModel(): ListViewModel
+//
+//    fun riderViewModel(): EditRiderViewModel
+//
+//    fun courseViewModel(): EditCourseViewModel
+//
+//    fun timeTrialSetupViewModel(): SetupViewModel
+//
+//    fun timingViewModel(): TimingViewModel
+//
+//    fun mainViewModel(): TitleViewModel
+//
+//    fun testViewModel(): TestViewModel
+//
+//    fun resultViewModel(): ResultViewModel
+//
+//    fun globalResultViewModel(): ResultExplorerViewModel
+//
+//    fun importViewModel(): IOViewModel
+//
+//    fun editResultViewModel(): EditResultViewModel
+//
+//    fun prefsViewModel(): PrefsViewModel
+//
+//    fun selectRiderViewModel(): SelectRiderViewModel
+//
+//}
 
 //@Singleton
 //@Subcomponent(modules = [PrefsModule::class])

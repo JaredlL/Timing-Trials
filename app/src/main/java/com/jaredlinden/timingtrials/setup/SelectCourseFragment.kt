@@ -17,7 +17,9 @@ import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.databinding.FragmentCourseListBinding
 import com.jaredlinden.timingtrials.ui.SelectableCourseViewModel
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SelectCourseFragment : Fragment() {
 
     private val setupViewModel: SetupViewModel by viewModels()
@@ -62,12 +64,6 @@ class SelectCourseFragment : Fragment() {
             viewModel.setSelectedCourse(blobs)
             val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToSetupViewPagerFragment()
             findNavController().navigate(action)
-
-
-
-
-
-
         }
 
         adapter.setHasStableIds(true)

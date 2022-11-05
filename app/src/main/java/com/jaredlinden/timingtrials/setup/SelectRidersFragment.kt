@@ -24,6 +24,7 @@ import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.jaredlinden.timingtrials.edititem.EditResultViewModel
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 
 
 /**
@@ -33,7 +34,7 @@ import com.jaredlinden.timingtrials.util.*
  *
  */
 
-
+@AndroidEntryPoint
 class SelectRidersFragment : Fragment() {
 
 

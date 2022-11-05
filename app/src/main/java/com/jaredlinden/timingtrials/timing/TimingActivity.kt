@@ -21,6 +21,7 @@ import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jaredlinden.timingtrials.BuildConfig
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.MainActivity
@@ -28,12 +29,10 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.TimeTrial
 import com.jaredlinden.timingtrials.data.TimeTrialHeader
 import com.jaredlinden.timingtrials.data.TimeTrialStatus
+import com.jaredlinden.timingtrials.databinding.ActivityTimingBinding
 import com.jaredlinden.timingtrials.setup.SetupViewPagerFragmentArgs
 import com.jaredlinden.timingtrials.timetrialresults.ResultFragmentArgs
 import com.jaredlinden.timingtrials.util.*
-import kotlinx.android.synthetic.main.activity_main.*
-
-import kotlinx.android.synthetic.main.activity_timing.*
 import org.threeten.bp.Instant
 import timber.log.Timber
 
@@ -43,7 +42,6 @@ interface ITimingActivity{
     fun endTiming()
 }
 
-@AndroidEntryPoint
 class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
     private val TIMERTAG = "timing_tag"
@@ -52,9 +50,9 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
     private val mService: MutableLiveData<TimingService?> = MutableLiveData()
     private val viewModel: TimingViewModel by viewModels()
     private var mBound: Boolean = false
-
     private lateinit var appBarConfiguration: AppBarConfiguration
-
+    private lateinit var binding: ActivityTimingBinding
+    private var timingFab: FloatingActionButton? = null
     private val connection = object : ServiceConnection {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
@@ -68,8 +66,6 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
             mBound = false
         }
     }
-
-
 
     val serviceCreated: MutableLiveData<Boolean> = MutableLiveData(false)
 
@@ -97,8 +93,12 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_timing)
-        setSupportActionBar(timingToolBar)
+
+        binding = ActivityTimingBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        timingFab = binding.timingFab
+        setSupportActionBar(binding.timingToolBar)
 
         applicationContext.startService(Intent(applicationContext, TimingService::class.java))
 
@@ -109,7 +109,7 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
         appBarConfiguration = AppBarConfiguration(navController.graph)
 
-        timingToolBar.setupWithNavController(navController, appBarConfiguration)
+        binding.timingToolBar.setupWithNavController(navController, appBarConfiguration)
         title = getString(R.string.time_trial_in_progress)
 
         val liveTick = Transformations.switchMap(mService){result->
@@ -120,7 +120,7 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
             Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
 
-        timingFab.setOnClickListener {
+        binding.timingFab.setOnClickListener {
             fabClickEvent.postValue(Event(true))
         }
 

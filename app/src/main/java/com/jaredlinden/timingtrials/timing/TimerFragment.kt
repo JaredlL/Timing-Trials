@@ -23,8 +23,7 @@ import com.jaredlinden.timingtrials.domain.ITimelineEvent
 import com.jaredlinden.timingtrials.ui.EventViewWrapper
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
-import com.jaredlinden.timingtrials.util.injector
-import kotlinx.android.synthetic.main.fragment_timer.*
+
 
 /**
  * A simple [Fragment] subclass.
@@ -39,6 +38,14 @@ class TimerFragment : Fragment() {
 
         val adapter = EventListAdapter(requireActivity())
         val viewManager = LinearLayoutManager(context)
+
+        val binding =  DataBindingUtil.inflate<FragmentTimerBinding>(inflater, R.layout.fragment_timer, container, false).apply{
+            lifecycleOwner = this@TimerFragment
+            viewModel = timingViewModel
+            eventRecyclerView.layoutManager = viewManager
+            eventRecyclerView.adapter = adapter
+
+        }
 
         timingViewModel.timeLine.observe(viewLifecycleOwner, Observer { res->
             res?.let {tl->
@@ -62,10 +69,10 @@ class TimerFragment : Fragment() {
                     }
                 }
                 val newcount = adapter.itemCount
-                if(oldCount < adapter.itemCount) eventRecyclerView?.scrollToPosition(newcount - 1)
+                if(oldCount < adapter.itemCount) binding.eventRecyclerView?.scrollToPosition(newcount - 1)
             }
             if(res == null){
-                textView18.text = "TT is null"
+                binding.textView18.text = "TT is null"
             }
         })
 
@@ -74,21 +81,12 @@ class TimerFragment : Fragment() {
         adapter.longClick = {
 
                 showEventDialog(it)
-
-
         }
 
         timingViewModel.timeString.observe(viewLifecycleOwner, Observer {
 
         })
 
-        val binding =  DataBindingUtil.inflate<FragmentTimerBinding>(inflater, R.layout.fragment_timer, container, false).apply{
-            lifecycleOwner = this@TimerFragment
-            viewModel = timingViewModel
-            eventRecyclerView.layoutManager = viewManager
-            eventRecyclerView.adapter = adapter
-
-        }
 
         return binding.root
     }

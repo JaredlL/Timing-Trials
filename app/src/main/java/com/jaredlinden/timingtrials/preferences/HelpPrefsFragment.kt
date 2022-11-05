@@ -15,6 +15,7 @@ import com.jaredlinden.timingtrials.R
 import timber.log.Timber
 import java.util.*
 
+
 class HelpPrefsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_help, rootKey)

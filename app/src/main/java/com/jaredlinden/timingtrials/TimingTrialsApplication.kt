@@ -3,8 +3,6 @@ package com.jaredlinden.timingtrials
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
-import com.jaredlinden.timingtrials.di.AppComponent
-import com.jaredlinden.timingtrials.di.DaggerAppComponent
 import dagger.hilt.android.HiltAndroidApp
 import com.jakewharton.threetenabp.AndroidThreeTen
 import timber.log.Timber
@@ -20,9 +18,9 @@ class TimingTrialsApplication: Application() {
         AndroidThreeTen.init(this)
 
 
-        if(BuildConfig.DEBUG){
-            Timber.plant(Timber.DebugTree())
-        }
+        //if(BuildConfig.DEBUG){
+       //     Timber.plant(Timber.DebugTree())
+       // }
 
         when(PreferenceManager.getDefaultSharedPreferences(this).getString("dayNight", "System Default")){
             "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -39,9 +37,5 @@ class TimingTrialsApplication: Application() {
 
 }
 
-interface DaggerComponentProvider {
-
-    val component: AppComponent
-}
 
 

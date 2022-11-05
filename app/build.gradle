@@ -1,9 +1,8 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-android-extensions'
-    id 'androidx.navigation.safeargs.kotlin'
     id 'kotlin-kapt'
+    id 'kotlin-android'
+    id 'androidx.navigation.safeargs.kotlin'
     id 'dagger.hilt.android.plugin'
 }
 
@@ -11,9 +10,8 @@ repositories { mavenCentral() }
 
 android {
     buildFeatures {
-        dataBinding = true
+        dataBinding true
     }
-
 
     compileSdkVersion 33
     defaultConfig {
@@ -29,9 +27,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-    androidExtensions {
-        experimental = true
     }
 
     compileOptions {
@@ -55,11 +50,13 @@ android {
     namespace 'com.jaredlinden.timingtrials'
 }
 
+kapt {
+    correctErrorTypes true
+}
+
 dependencies {
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     //Test
-
 
     //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.13.2'
@@ -79,9 +76,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$rootProject.kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.coroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$rootProject.coroutinesVersion"
-    implementation "androidx.fragment:fragment:$rootProject.fragmentVersion"
     implementation "androidx.fragment:fragment-ktx:$rootProject.fragmentVersion"
-    implementation "androidx.activity:activity:$rootProject.activityVersion"
     implementation "androidx.activity:activity-ktx:$rootProject.activityVersion"
 
     implementation "androidx.core:core-ktx:$rootProject.coreVersion"
@@ -115,8 +110,9 @@ dependencies {
     implementation "com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:$rootProject.advRecyclerVersion"
 
     //Dagger
-    implementation "com.google.dagger:hilt-android:$hiltVersion"
+    implementation "com.google.dagger:hilt-android:2.44"
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
+
     //implementation "com.google.dagger:dagger:$rootProject.daggerVersion"
     //kapt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
 

@@ -25,10 +25,10 @@ import com.jaredlinden.timingtrials.data.TimeTrialStatus
 import com.jaredlinden.timingtrials.databinding.FragmentSetupTimeTrialBinding
 import com.jaredlinden.timingtrials.timing.TimingActivity
 import com.jaredlinden.timingtrials.util.ConverterUtils
-import com.jaredlinden.timingtrials.util.injector
+import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.*
 
-
+@AndroidEntryPoint
 class SetupTimeTrialFragment : Fragment() {
 
     private val setupVm:SetupViewModel by viewModels()
@@ -153,6 +153,7 @@ class SetupTimeTrialFragment : Fragment() {
     }
 }
 
+@AndroidEntryPoint
 class  TimePickerFragment2 : DialogFragment(){
 
 

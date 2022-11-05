@@ -8,11 +8,16 @@ import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.data.source.TimingTrialsDatabase
 import com.jaredlinden.timingtrials.util.Event
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class PrefsViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepository, val riderRepository: IRiderRepository, val courseRepository: ICourseRepository, val timingTrialsDatabase: TimingTrialsDatabase) : ViewModel(){
+@HiltViewModel
+class PrefsViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepository,
+                                        val riderRepository: IRiderRepository,
+                                        val courseRepository: ICourseRepository,
+                                        val timingTrialsDatabase: TimingTrialsDatabase) : ViewModel(){
 
     val allDeleted: MutableLiveData<Event<Boolean>> = MutableLiveData()
 
