@@ -27,24 +27,16 @@
                 android:layout_gravity="end"
                 android:gravity="end">
 
-
                 <TextClock
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:format12Hour="hh:mm:ss"
                 android:format24Hour="hh:mm:ss"
                 tools:text="11:23:21">
-
                 </TextClock>
 
-
-
             </androidx.appcompat.widget.LinearLayoutCompat>
-
-
         </androidx.appcompat.widget.Toolbar>
-
-
     </com.google.android.material.appbar.AppBarLayout>
 
 

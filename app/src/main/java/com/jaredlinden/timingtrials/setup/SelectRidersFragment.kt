@@ -41,12 +41,12 @@ class SelectRidersFragment : Fragment() {
         if(args.selectionMode == SELECT_RIDER_FRAGMENT_MULTI) {
             setHasOptionsMenu(false)
             val setupViewModel: SetupViewModel by activityViewModels()
+            viewModel = setupViewModel.selectRidersViewModel
             if(setupViewModel.currentPage == RIDER_PAGE_INDEX ){
                 (requireActivity() as IFabCallbacks).apply {
                     setFabVisibility(View.VISIBLE)
                     setFabImage(R.drawable.ic_add_white_24dp)
                 }
-                viewModel = setupViewModel.selectRidersViewModel
             }
         }else{
             setHasOptionsMenu(true)

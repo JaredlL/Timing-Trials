@@ -42,7 +42,6 @@ class SelectCourseFragment : Fragment() {
                     val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(context?.getString(R.string.new_course)?:"",0)
                     findNavController().navigate(action)
                 }
-
             })
         }
 
@@ -51,12 +50,11 @@ class SelectCourseFragment : Fragment() {
         val adapter = CourseListAdapter(requireContext())
         adapter.editCourse = ::editCourse
 
-        viewModel.getAllCourses().observe(viewLifecycleOwner, Observer { courses ->
+        viewModel.getAllCourses().observe(viewLifecycleOwner) { courses ->
             courses?.let{adapter.setCourses(it, getLengthConverter())}
-        })
-        adapter.courseSelected = { blobs ->
+        }
 
-            //val origCourse = viewModel.getAllCourses().value?.selectedId
+        adapter.courseSelected = { blobs ->
             viewModel.setSelectedCourse(blobs)
             val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToSetupViewPagerFragment()
             findNavController().navigate(action)
@@ -66,10 +64,10 @@ class SelectCourseFragment : Fragment() {
 
         val unitString = getLengthConverter().unitDef.miniString
 
-        val heading: SelectableCourseViewModel = SelectableCourseViewModel("Course Name", "Distance ($unitString)", "CTT Name")
+        val heading = SelectableCourseViewModel("Course Name", "Distance ($unitString)", "CTT Name")
 
-        val binding = DataBindingUtil.inflate<FragmentCourseListBinding>(inflater, R.layout.fragment_course_list, container, false).apply{
-            lifecycleOwner = (this@SelectCourseFragment)
+        val binding = FragmentCourseListBinding.inflate(inflater, container, false).apply{
+            lifecycleOwner = viewLifecycleOwner
             courseHeading.courseVm = heading
             courseHeading.checkBox.visibility = View.INVISIBLE
             courseRecyclerView.adapter = adapter

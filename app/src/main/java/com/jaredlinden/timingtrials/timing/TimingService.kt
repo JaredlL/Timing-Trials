@@ -13,6 +13,7 @@ import com.jaredlinden.timingtrials.util.ConverterUtils.toSecondsDisplayString
 import org.threeten.bp.Instant
 import java.util.*
 import android.app.NotificationManager
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.SharedPreferences
 import android.media.MediaPlayer
 import androidx.lifecycle.MutableLiveData
@@ -42,7 +43,6 @@ class TimingService : Service(){
     }
 
     var timerTick: MutableLiveData<Long> = MutableLiveData()
-
 
 
     inner class TimeTrialTask(var timeTrial: TimeTrial) : TimerTask(){
@@ -105,7 +105,6 @@ class TimingService : Service(){
                 }
             }
         }
-
     }
 
     fun startTiming(newTimeTrial: TimeTrial){
@@ -202,7 +201,7 @@ class TimingService : Service(){
     }
 
     private fun getNotification():NotificationCompat.Builder{
-        val timingIntent = PendingIntent.getActivity(this, 0,Intent(this, TimingActivity::class.java), 0)
+        val timingIntent = PendingIntent.getActivity(this, 0,Intent(this, TimingActivity::class.java), FLAG_IMMUTABLE)
         return NotificationCompat.Builder(this, CHANNEL_ID).setSmallIcon(com.jaredlinden.timingtrials.R.drawable.tt_logo_notification)
                 .setTicker(getString(R.string.timing_trials))
                 .setContentText(getString(R.string.time_trial_in_progress))

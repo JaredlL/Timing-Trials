@@ -45,13 +45,12 @@ class SetupTimeTrialFragment : Fragment() {
             override fun onChanged(t: Any?) {
 
             }
-
         })
 
-        val mAdapter = ArrayAdapter<String>(requireContext(), R.layout.support_simple_spinner_dropdown_item, listOf("15", "30", "60", "90", "120"))
-        val binding = DataBindingUtil.inflate<FragmentSetupTimeTrialBinding>(inflater, R.layout.fragment_setup_time_trial, container, false).apply {
+        val mAdapter = ArrayAdapter(requireContext(), R.layout.support_simple_spinner_dropdown_item, listOf("15", "30", "60", "90", "120"))
+        val binding = FragmentSetupTimeTrialBinding.inflate(inflater, container, false).apply {
             viewModel = propsViewModel
-            lifecycleOwner = (viewLifecycleOwner)
+            lifecycleOwner = viewLifecycleOwner
             autocomplete.threshold = 1
             autocomplete.setAdapter(mAdapter)
             coursebutton.setOnClickListener {
@@ -119,7 +118,7 @@ class SetupTimeTrialFragment : Fragment() {
 
         }
 
-        propsViewModel.timeTrial.observe(viewLifecycleOwner, Observer {tt->
+        propsViewModel.timeTrial.observe(viewLifecycleOwner)  {tt->
           tt?.let {
               if (it.timeTrialHeader.ttName == "" && it.course == null) {
                   showCourseFrag()
@@ -129,12 +128,7 @@ class SetupTimeTrialFragment : Fragment() {
                   startActivity(intent)
               }
           }
-        })
-
-
-
-
-
+        }
         return binding.root
     }
 
@@ -143,9 +137,6 @@ class SetupTimeTrialFragment : Fragment() {
         val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragmentToSelectCourseFragment()
         findNavController().navigate(action)
     }
-
-
-
 
     companion object {
 
@@ -158,7 +149,7 @@ class SetupTimeTrialFragment : Fragment() {
 class  TimePickerFragment2 : DialogFragment(){
 
 
-    private val setupVm:SetupViewModel by viewModels()
+    private val setupVm:SetupViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {

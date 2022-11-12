@@ -33,6 +33,7 @@ import com.jaredlinden.timingtrials.databinding.ActivityTimingBinding
 import com.jaredlinden.timingtrials.setup.SetupViewPagerFragmentArgs
 import com.jaredlinden.timingtrials.timetrialresults.ResultFragmentArgs
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.Instant
 import timber.log.Timber
 
@@ -42,6 +43,7 @@ interface ITimingActivity{
     fun endTiming()
 }
 
+@AndroidEntryPoint
 class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
     private val TIMERTAG = "timing_tag"
@@ -101,10 +103,7 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
         setSupportActionBar(binding.timingToolBar)
 
         applicationContext.startService(Intent(applicationContext, TimingService::class.java))
-
         mBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)
-
-
         val navController = findNavController(R.id.nav_host_timer_fragment)
 
         appBarConfiguration = AppBarConfiguration(navController.graph)
@@ -201,10 +200,6 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                     }catch (e:Exception){
                         Timber.e(e)
                     }
-
-
-
-
                 }
 
                 val args = ResultFragmentArgs(timeTrialHeader.id?:0)

@@ -14,7 +14,9 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.NumbersDirection
 import com.jaredlinden.timingtrials.databinding.FragmentNumberOptionsBinding
 import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class NumberOptionsDialog: DialogFragment(){
 
 
@@ -50,11 +52,7 @@ class NumberOptionsDialog: DialogFragment(){
             mode?.let {
                 PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putString(PREF_NUMBERING_MODE, mode.name).apply()
             }
-
         })
-
-
-
 
 //        mViewModel.selectedNumberOptionType.observe(viewLifecycleOwner, Observer {
 ////            if(it == 1){
@@ -71,12 +69,8 @@ class NumberOptionsDialog: DialogFragment(){
                     }
                     else ->{
                         binding.radioGroup.check(binding.ascendingRadioButton.id)
-
                     }
-
                 }
-
-
             }
         })
 

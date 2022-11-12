@@ -144,14 +144,13 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         val collapsingToolbar = binding.collapsingToolbarLayout
         val navController = findNavController(R.id.nav_host_fragment)
 
         appBarConfiguration = AppBarConfiguration(navController.graph, binding.drawerLayout)
         collapsingToolbar.setupWithNavController(binding.toolbar, navController, appBarConfiguration)
 
-        binding.mainAppBarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+        binding.mainAppBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             if (abs(verticalOffset)-(appBarLayout?.totalScrollRange?:0) == 0) {
                 //  Collapsed
                 toolbarCollapsed = true
@@ -162,7 +161,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 refreshFab()
 
             }
-        })
+        }
 
         mainFab = binding.mainFab
         val drawer_layout = binding.drawerLayout
