@@ -51,7 +51,6 @@ import kotlin.math.abs
 
 
 interface IFabCallbacks{
-
     fun currentVisibility(): Int
 
     fun setFabVisibility(visibility: Int)
@@ -90,25 +89,24 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         val html = HtmlCompat.fromHtml(getString(R.string.demo_data_description_ques), HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         AlertDialog.Builder(this)
-                .setTitle(getString(R.string.demo_data))
-                .setIcon(R.mipmap.tt_logo_round)
-                .setMessage(html)
-                .setPositiveButton(R.string.ok){_,_->
-                    try{
-                        val url = URL("https://bb.githack.com/lindenj/timingtrialsdata/raw/master/LiveDebugRDFCC.tt")
-                        val vm:IOViewModel by viewModels()
-                        vm.readUrlInput(url)
-                        vm.importMessage.observe(this, EventObserver{
-                            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
-                        })
-                    }catch (e:Exception){
-                        Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
-                    }
-
+            .setTitle(getString(R.string.demo_data))
+            .setIcon(R.mipmap.tt_logo_round)
+            .setMessage(html)
+            .setPositiveButton(R.string.ok){_,_->
+                try{
+                    val url = URL("https://bb.githack.com/lindenj/timingtrialsdata/raw/master/LiveDebugRDFCC.tt")
+                    val vm:IOViewModel by viewModels()
+                    vm.readUrlInput(url)
+                    vm.importMessage.observe(this, EventObserver{
+                        Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+                    })
+                }catch (e:Exception){
+                    Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
                 }
-                .show().apply {
-                    findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
-                }
+            }
+            .show().apply {
+                findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
+            }
     }
 
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
@@ -159,7 +157,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 //Expanded
                 toolbarCollapsed = false
                 refreshFab()
-
             }
         }
 
@@ -190,7 +187,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 val intent = Intent(this, TimingActivity::class.java)
                 startActivity(intent)
             }
-
         })
 
         if(BuildConfig.DEBUG){
@@ -247,8 +243,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             }
         }
 
-
-
         drawer_layout.addDrawerListener(object : DrawerLayout.DrawerListener{
             override fun onDrawerStateChanged(newState: Int) {
 
@@ -265,7 +259,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                         val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToTitleFragment()
                         navController.navigate(action)
                         drawer_layout.closeDrawer(GravityCompat.START)
-
                     }
                     R.id.app_bar_settings -> {
                         if(navController.currentDestination?.id == R.id.dataBaseViewPagerFragment){
@@ -275,7 +268,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                             navController.navigate(R.id.settingsFragment)
                         }
                     }
-
                     R.id.app_bar_help ->{
                         if(navController.currentDestination?.id == R.id.dataBaseViewPagerFragment){
                             val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToHelpPrefsFragment()
@@ -284,7 +276,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                             navController.navigate(R.id.helpPrefsFragment)
                         }
                     }
-
                     R.id.app_bar_new_timetrial -> {
                         val viewModel:ListViewModel by viewModels()
                         viewModel.timeTrialInsertedEvent.observe(this@MainActivity, EventObserver {
@@ -298,8 +289,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
                         viewModel.insertNewTimeTrial(mode)
                     }
-
-
                     R.id.app_bar_spreadsheet->{
                         val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment("",0)
                         navController.navigate(action)
@@ -307,17 +296,13 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
                     }
                     else->{
-
                     }
                 }
                 drawButtonPressed = 0
-
             }
 
             override fun onDrawerOpened(drawerView: View) {
-
             }
-
         })
 
         navController.addOnDestinationChangedListener{_,dest,_->
@@ -336,7 +321,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 }
             }
         }
-
 
         intent?.let { intent->
             val data = intent.data
@@ -390,7 +374,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         return result
     }
 
-
     fun writeAllResults(uri: Uri){
         try {
             val outputStream = contentResolver.openOutputStream(uri)
@@ -435,15 +418,10 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }
     }
 
-
     override val fabClickEvent: MutableLiveData<Event<Boolean>> = MutableLiveData()
-
     override fun setFabImage(resourceId: Int) {
         mainFab?.setImageResource(resourceId)
     }
-
-
-
 }
 
 

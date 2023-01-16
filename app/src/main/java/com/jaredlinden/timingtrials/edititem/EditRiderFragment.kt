@@ -77,7 +77,7 @@ class EditRiderFragment : Fragment() {
 
         val binding = DataBindingUtil.inflate<FragmentEditRiderBinding>(inflater, R.layout.fragment_edit_rider, container, false).apply {
             viewModel = riderViewModel
-            lifecycleOwner = (this@EditRiderFragment)
+            lifecycleOwner = viewLifecycleOwner
             autoCompleteClub.setAdapter(clubAdapter)
             autoCompleteCategory.setAdapter(categoryAdapter)
             fabCallback.fabClickEvent.observe(viewLifecycleOwner, EventObserver {

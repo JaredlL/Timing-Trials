@@ -32,7 +32,7 @@ class DataBaseViewPagerFragment: Fragment() {
 
     var mViewPager: ViewPager2? = null
 
-    lateinit var tabLayoutMediator: TabLayoutMediator
+    var tabLayoutMediator: TabLayoutMediator? = null
 
 
     private val mPageChangeCallback = object :ViewPager2.OnPageChangeCallback(){
@@ -50,14 +50,12 @@ class DataBaseViewPagerFragment: Fragment() {
         viewpager.adapter = TimeTrialDBPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
         setHasOptionsMenu(true)
 
-
-
         // Set the icon and text for each tab
         tabLayoutMediator = TabLayoutMediator(tabLayout, viewpager) { tab, position ->
             tab.setIcon(getTabIcon(position))
             tab.text = getTabTitle(position)
         }
-        tabLayoutMediator.attach()
+        tabLayoutMediator?.attach()
 
         viewpager.registerOnPageChangeCallback(mPageChangeCallback)
         val listViewModel:ListViewModel by requireActivity().viewModels()
@@ -96,10 +94,12 @@ class DataBaseViewPagerFragment: Fragment() {
     }
 
     override fun onDestroyView() {
-        tabLayoutMediator.detach()
+        tabLayoutMediator?.detach()
         mViewPager?.unregisterOnPageChangeCallback(mPageChangeCallback)
         sv?.setOnQueryTextListener(null)
         mViewPager?.adapter = null
+        mViewPager = null
+        tabLayoutMediator = null
         super.onDestroyView()
     }
 
@@ -138,10 +138,7 @@ class DataBaseViewPagerFragment: Fragment() {
                 }
             }
         }
-
     }
-
-
 
     val expandListener = object : MenuItem.OnActionExpandListener {
         override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
@@ -166,7 +163,7 @@ class DataBaseViewPagerFragment: Fragment() {
 
         menu.findItem(R.id.app_bar_search).setOnActionExpandListener(expandListener)
 
-        (menu.findItem(R.id.app_bar_search).actionView as SearchView).apply {
+        (menu.findItem(R.id.app_bar_search)?.actionView as? SearchView)?.apply {
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
            isIconifiedByDefault = false
             val listViewModel:ListViewModel by viewModels()

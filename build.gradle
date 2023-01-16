@@ -4,9 +4,9 @@ buildscript {
 
 
     ext {
-        kotlinVersion = '1.7.20'
+        kotlinVersion = '1.7.21'
         constraintLayoutVersion = '2.1.4'
-        roomVersion = '2.4.3'
+        roomVersion = '2.5.0'
         preferenceVersion = '1.2.0'
         lifecycleVersion = '2.4.1'
         lifecycleExtVersion = '2.2.0'
@@ -14,7 +14,7 @@ buildscript {
         coroutinesVersion = '1.6.4'
         ktxVersion = '1.0.1'
         materialVersion = '1.7.0'
-        fragmentVersion = '1.5.4'
+        fragmentVersion = '1.5.5'
         coreVersion = '1.9.0'
         navigationVersion = '2.5.3'
         activityVersion = '1.6.1'
@@ -30,7 +30,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath 'com.android.tools.build:gradle:7.4.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.5.3"
         classpath 'com.google.dagger:hilt-android-gradle-plugin:2.44'

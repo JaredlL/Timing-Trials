@@ -35,8 +35,12 @@ class ResultsFilterFragment : BottomSheetDialogFragment(){
 
         val vm:ResultExplorerViewModel by activityViewModels()
 
-        val adapter = ResultFilterAdapter(requireContext(), viewLifecycleOwner).apply { setHasStableIds(true)}
+        val adapter = ResultFilterAdapter(requireContext(), viewLifecycleOwner)
+            .apply {
+                setHasStableIds(true)
+            }
         val layoutManger = LinearLayoutManager(requireContext())
+
         adapter.setItems(vm.columnViewModels)
         view?.jumpDrawablesToCurrentState()
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
@@ -46,17 +50,13 @@ class ResultsFilterFragment : BottomSheetDialogFragment(){
 
         val binding = DataBindingUtil.inflate<FragmentResultFilterBinding>(inflater, R.layout.fragment_result_filter, container, false).apply {
 
-            filterRecycler.adapter  =adapter
-
+            filterRecycler.adapter = adapter
             filterRecycler.layoutManager = layoutManger
             clearAllFiltersButton.setOnClickListener {
                 vm.clearAllColumnFilters()
             }
-            //filterRecycler.invalidate()
         }
-
         return binding.root
-
     }
 
 }
@@ -95,6 +95,4 @@ class ResultFilterAdapter internal constructor(val context: Context, val vlo: Li
         mItems = newItems
         notifyDataSetChanged()
     }
-
-
 }

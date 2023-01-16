@@ -41,7 +41,6 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
     override val columns: MutableLiveData<List<ColumnData>> = MutableLiveData(cols)
 
     val columnViewModels = cols.map { ResultFilterViewModel(it, this) }
-
     val resultSpreadSheet: MediatorLiveData<ResultExplorerSpreadSheet> = MediatorLiveData()
 
 

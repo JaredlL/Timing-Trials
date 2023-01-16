@@ -40,7 +40,7 @@ class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
     }
 
     init {
-        mutableColumn.addSource(Transformations.map(sheetVm.columns){it.firstOrNull{it.key == columnKey}}){res->
+        mutableColumn.addSource(Transformations.map(sheetVm.columns){ it.firstOrNull{it.key == columnKey}}){res->
             res?.let { col->
                 isVisible.setIfNotEqual(col.isVisible)
                 filterText.setIfNotEqual(col.filterText)
@@ -62,7 +62,6 @@ class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
                 }
             }
         }
-
     }
 
 

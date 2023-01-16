@@ -66,7 +66,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0-alpha06'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation "com.google.android.material:material:$rootProject.materialVersion"
     implementation "androidx.preference:preference-ktx:$rootProject.preferenceVersion"
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
@@ -128,7 +128,7 @@ dependencies {
         exclude group: 'com.jakewharton.threetenabp', module: 'threetenabp'
     }
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
 
 
 }

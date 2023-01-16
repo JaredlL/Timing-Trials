@@ -62,7 +62,7 @@ class EditCourseFragment : Fragment() {
 
         val binding = FragmentEditCourseBinding.inflate(inflater,container, false).apply {
             viewModel = courseViewModel
-            lifecycleOwner = (viewLifecycleOwner)
+            lifecycleOwner = viewLifecycleOwner
             fabCallback.fabClickEvent.observe(viewLifecycleOwner, EventObserver {
                 if(it){
                     if(courseViewModel.courseName.value?.trim().isNullOrBlank()) Toast.makeText(requireContext(), getString(R.string.course_requires_name), Toast.LENGTH_SHORT).show()

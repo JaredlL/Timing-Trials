@@ -61,7 +61,6 @@ class ResultExplorerFragment : Fragment()  {
         }
 
         viewModel.setColumnsContext(GlobalResultViewModelData(itemId, itemTypeId, getLengthConverter()), p)
-
         val adapter = SheetAdapter(requireContext(), displayMetrics, p, ::snackBarCallback)
         val recyclerView = binding.recyclerView
 
@@ -89,9 +88,8 @@ class ResultExplorerFragment : Fragment()  {
         recyclerView.adapter = adapter
 
         bottomSheetBehavior = BottomSheetBehavior.from(binding.filterSheet)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
+        bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheetBehavior?.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
 
             }
@@ -126,15 +124,15 @@ class ResultExplorerFragment : Fragment()  {
         }
     }
 
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
+    private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.resultExplorerFilters -> {
-                if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED || bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN){
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                }else if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED){
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                if(bottomSheetBehavior?.state == BottomSheetBehavior.STATE_COLLAPSED || bottomSheetBehavior?.state == BottomSheetBehavior.STATE_HIDDEN){
+                    bottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
+                }else if(bottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED){
+                    bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
                 }
 
                 true
@@ -154,6 +152,11 @@ class ResultExplorerFragment : Fragment()  {
 
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        bottomSheetBehavior = null
     }
 
     fun showTipsDialog(){
