@@ -28,11 +28,6 @@ import timber.log.Timber
 @AndroidEntryPoint
 class TimeTrialListFragment : Fragment() {
 
-    //private val listViewModel: ListViewModel by activityViewModels()
-    //private lateinit var viewManager: RecyclerView.LayoutManager
-    //private lateinit var adapter: GenericListAdapter<TimeTrialHeader>
-    //private lateinit var viewFactory: GenericViewHolderFactory<TimeTrialHeader>
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 

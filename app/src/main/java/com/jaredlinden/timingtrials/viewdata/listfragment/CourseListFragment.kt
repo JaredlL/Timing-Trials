@@ -50,7 +50,7 @@ class CourseListFragment : Fragment() {
         }
 
         listViewModel.filteredAllCourse.observe(viewLifecycleOwner){res->
-            res?.let {adapter?.setItems(it.map {
+            res?.let {adapter.setItems(it.map {
                 SelectableCourseViewModel(it, converter)
             }.filter {cvm->
                 cvm.distString.contains(listViewModel.liveFilter.value?.filterString?:"", ignoreCase = true)

@@ -5,9 +5,9 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
-import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
@@ -58,10 +58,10 @@ class DataBaseViewPagerFragment: Fragment() {
         tabLayoutMediator?.attach()
 
         viewpager.registerOnPageChangeCallback(mPageChangeCallback)
-        val listViewModel:ListViewModel by requireActivity().viewModels()
+        val listViewModel:ListViewModel by activityViewModels()
         listViewModel.setFilter(Filter(""))
 
-        val setupViewModel:SetupViewModel by requireActivity().viewModels()
+        val setupViewModel:SetupViewModel by activityViewModels()
         setupViewModel.currentPage = 0
 
         (activity as? IFabCallbacks)?.fabClickEvent?.observe(viewLifecycleOwner, EventObserver{
@@ -96,7 +96,7 @@ class DataBaseViewPagerFragment: Fragment() {
     override fun onDestroyView() {
         tabLayoutMediator?.detach()
         mViewPager?.unregisterOnPageChangeCallback(mPageChangeCallback)
-        sv?.setOnQueryTextListener(null)
+        searchView?.setOnQueryTextListener(null)
         mViewPager?.adapter = null
         mViewPager = null
         tabLayoutMediator = null
@@ -143,19 +143,19 @@ class DataBaseViewPagerFragment: Fragment() {
     val expandListener = object : MenuItem.OnActionExpandListener {
         override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
 
-            sv?.clearFocus()
+            searchView?.clearFocus()
             return true // Return true to collapse action view
         }
 
         override fun onMenuItemActionExpand(item: MenuItem): Boolean {
             // Do something when expanded
-            sv?.requestFocus()
+            searchView?.requestFocus()
             showKeyboard()
             return true // Return true to expand action view
         }
     }
 
-    var sv: SearchView? = null
+    var searchView: SearchView? = null
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_database, menu)
 
@@ -164,12 +164,15 @@ class DataBaseViewPagerFragment: Fragment() {
         menu.findItem(R.id.app_bar_search).setOnActionExpandListener(expandListener)
 
         (menu.findItem(R.id.app_bar_search)?.actionView as? SearchView)?.apply {
+            searchView = this
+            val listViewModel:ListViewModel by activityViewModels()
+            listViewModel.liveFilter.value?.filterString?.let {
+                setQuery(it, true)
+            }
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
-           isIconifiedByDefault = false
-            val listViewModel:ListViewModel by viewModels()
-
-            sv = this
+            isIconifiedByDefault = false
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
                     listViewModel.setFilter(Filter(searchText?:""))
                     clearFocus()

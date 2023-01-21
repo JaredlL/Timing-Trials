@@ -53,7 +53,6 @@ class TimingService : Service(){
             val millisSinceStart = now.toEpochMilli() - timeTrial.timeTrialHeader.startTimeMilis
             val millis = abs(millisSinceStart)
             val secsLong =  (millis/1000)
-            //val secs = toSecondsDisplayString(millisSinceStart)
             if(prevSecs != secsLong){
                 updateNotificationTitle(timeTrial.timeTrialHeader.ttName, toSecondsDisplayString(millisSinceStart))
                 prevSecs = secsLong
@@ -182,8 +181,6 @@ class TimingService : Service(){
 
        val notification = getNotification().build()
         startForeground(NOTIFICATION_ID, notification)
-
-
     }
 
     private fun getNotification():NotificationCompat.Builder{
@@ -206,6 +203,4 @@ class TimingService : Service(){
         service.createNotificationChannel(chan)
         return channelId
     }
-
-
 }

@@ -44,13 +44,13 @@ class EditRiderFragment : Fragment() {
         }
 
         val clubAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
-        riderViewModel.clubs.observe(viewLifecycleOwner, Observer{res->
+        riderViewModel.clubs.observe(viewLifecycleOwner) {res->
             res?.let {clubs->
                 clubAdapter.clear()
                 clubs.filterNot { it.isBlank() }.forEachIndexed { index, s -> clubAdapter.insert(s, index)  }
                 clubAdapter.notifyDataSetChanged()
             }
-        })
+        }
 
         riderViewModel.message.observe(viewLifecycleOwner, EventObserver{
             Toast.makeText(requireContext(), requireContext().getText(it), Toast.LENGTH_LONG).show()

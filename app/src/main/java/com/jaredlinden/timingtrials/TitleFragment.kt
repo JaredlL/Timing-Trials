@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
@@ -37,8 +38,8 @@ import java.io.FileOutputStream
 class TitleFragment : Fragment()
 {
 
-    private val titleViewModel: TitleViewModel by viewModels()
-    private val testViewModel: TestViewModel by viewModels()
+    private val titleViewModel: TitleViewModel by activityViewModels ()
+    private val testViewModel: TestViewModel by activityViewModels()
 
     val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->

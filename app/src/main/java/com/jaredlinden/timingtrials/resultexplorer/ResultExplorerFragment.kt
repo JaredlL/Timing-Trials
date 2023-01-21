@@ -178,11 +178,9 @@ class ResultExplorerFragment : Fragment()  {
 
         AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.tips))
-
                 .setIcon(d)
                 .setMessage(html)
                 .setPositiveButton(R.string.ok){_,_->
-
                 }
                 .show()
     }

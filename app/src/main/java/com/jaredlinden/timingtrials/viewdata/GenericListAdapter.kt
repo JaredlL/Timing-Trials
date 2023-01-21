@@ -50,5 +50,4 @@ abstract class GenericViewHolderFactory<T>{
     abstract fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?) : BaseHolder<T>
     abstract fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data:T) : View
     abstract fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?) : View
-    //abstract fun performFabAction(fab:View)
 }

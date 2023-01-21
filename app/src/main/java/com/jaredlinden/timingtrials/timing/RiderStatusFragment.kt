@@ -205,7 +205,7 @@ class RiderStatusFragment : Fragment() {
             if(selectedMillis < ttStartTime){
                 Toast.makeText(requireContext(), "Cannot set start time before TT start", Toast.LENGTH_SHORT).show()
             }else{
-                val vm:TimingViewModel by viewModels()
+                val vm:TimingViewModel by activityViewModels()
                 vm.setRiderStartTime(riderId, selectedMillis)
             }
         }

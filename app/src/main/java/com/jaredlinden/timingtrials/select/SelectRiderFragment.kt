@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -30,7 +31,7 @@ const val SELECTED_RIDERS = "selected_riders"
 class SelectRiderFragment : Fragment() {
 
     private val args: SelectRiderFragmentArgs by navArgs()
-    private val viewModel: SelectRiderViewModel by viewModels()
+    private val viewModel: SelectRiderViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 

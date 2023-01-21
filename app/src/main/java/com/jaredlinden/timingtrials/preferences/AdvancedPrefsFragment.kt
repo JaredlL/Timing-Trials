@@ -21,7 +21,6 @@ class AdvancedPrefsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_advanced, rootKey)
 
-
         (requireActivity() as? IFabCallbacks)?.setFabVisibility(View.GONE)
 
         findPreference(R.string.p_advanced_clear).setOnPreferenceClickListener {
@@ -36,7 +35,6 @@ class AdvancedPrefsFragment : PreferenceFragmentCompat() {
                     .create().show()
             true
         }
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

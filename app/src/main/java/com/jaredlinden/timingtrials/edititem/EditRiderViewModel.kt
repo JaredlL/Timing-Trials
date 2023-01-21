@@ -153,8 +153,6 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
         }
     }
 
-
-
     fun addOrUpdate(){
         viewModelScope.launch(Dispatchers.IO) {
             mutableRider.value?.let { rider->
@@ -175,17 +173,13 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
                     }
                     updateSuccess.postValue(Event(true))
                 }
-
             }
             //mutableRider.postValue(Rider.createBlank())
         }
-
     }
 
     val message : MutableLiveData<Event<Int>> = MutableLiveData()
     val updateSuccess : MutableLiveData<Event<Boolean>> = MutableLiveData()
-
-
 
     fun delete(){
         viewModelScope.launch(Dispatchers.IO) {
