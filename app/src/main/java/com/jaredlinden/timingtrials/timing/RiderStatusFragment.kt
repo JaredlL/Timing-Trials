@@ -32,9 +32,6 @@ import org.threeten.bp.*
 class RiderStatusFragment : Fragment() {
 
     private val timingViewModel: TimingViewModel by activityViewModels()
-
-    private lateinit var binding: FragmentTimerRiderStatusBinding
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
@@ -52,7 +49,7 @@ class RiderStatusFragment : Fragment() {
         }
 
         val viewManager = GridLayoutManager(context, 4)
-        binding = FragmentTimerRiderStatusBinding.inflate(inflater, container, false).apply {
+        val binding = FragmentTimerRiderStatusBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
             viewResultsButton.visibility = View.GONE
             riderStatuses.adapter = adapter

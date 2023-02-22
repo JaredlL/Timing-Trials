@@ -182,12 +182,12 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         rootCoordinator = binding.mainActivityCoordinator
 
         val vm:TitleViewModel by viewModels ()
-        vm.timingTimeTrial.observe(this, Observer {
+        vm.timingTimeTrial.observe(this) {
             it?.let {
                 val intent = Intent(this, TimingActivity::class.java)
                 startActivity(intent)
             }
-        })
+        }
 
         if(BuildConfig.DEBUG){
            nav_view.menu.findItem(R.id.app_bar_test).isVisible = true

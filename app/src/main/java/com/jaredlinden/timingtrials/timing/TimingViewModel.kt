@@ -256,7 +256,7 @@ class TimingViewModel  @Inject constructor(
                                 val allRes = resultRepository.getCourseResultsSuspend(courseId).filter { courseResult ->
                                     courseResult.timeTrialId?.let { ttsOnTheCourse.contains(it) } ?: false
                                 }
-                                writeRecordsToNotes(tt, allRes).copy(timeTrialHeader = tt.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED))
+                                writeRecordsToNotes(tt, allRes)
                             }?:tt
                         }
                         catch (e: Exception){
@@ -264,7 +264,7 @@ class TimingViewModel  @Inject constructor(
                             tt
                         }
                         try {
-                            backgroundUpdateTt(ttToInsert)
+                            backgroundUpdateTt(ttToInsert.copy(timeTrialHeader = tt.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED)))
                         }finally {
                             calcPbsCorotineAlive.set(false)
                         }

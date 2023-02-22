@@ -31,9 +31,6 @@ import org.threeten.bp.*
 @AndroidEntryPoint
 class SetupTimeTrialFragment : Fragment() {
 
-
-
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
@@ -85,47 +82,37 @@ class SetupTimeTrialFragment : Fragment() {
                     val startString = "First rider starting at ${tt.let{ ConverterUtils.instantToSecondsDisplayString(tt.timeTrialHeader.startTime.toInstant())}}"
 
                     AlertDialog.Builder(requireContext())
-                            .setTitle(getString(R.string.starting_tt))
-                            .setMessage(courseString
-                                    + System.lineSeparator()
-                                    + System.lineSeparator()
-                                    + riderString
-                                    + System.lineSeparator()
-                                    + System.lineSeparator()
-                                    + startString
-)
-                            .setPositiveButton(R.string.ok){_,_->
-                                if(tt.timeTrialHeader.startTime.isAfter(OffsetDateTime.now())){
-                                    val newTt = tt.updateHeader(tt.timeTrialHeader.copy(status = TimeTrialStatus.IN_PROGRESS))
-                                    setupVm.updateTimeTrial(newTt)
-//                                    val intent = Intent(requireActivity(), TimingActivity::class.java)
-//                                    startActivity(intent)
-                                }else{
-                                    Toast.makeText(requireActivity(), getString(R.string.tt_must_start_in_the_future), Toast.LENGTH_LONG).show()
-                                }
+                        .setTitle(getString(R.string.starting_tt))
+                        .setMessage(courseString
+                                + System.lineSeparator()
+                                + System.lineSeparator()
+                                + riderString
+                                + System.lineSeparator()
+                                + System.lineSeparator()
+                                + startString)
+                        .setPositiveButton(R.string.ok){_,_->
+                            if(tt.timeTrialHeader.startTime.isAfter(OffsetDateTime.now())){
+                                val newTt = tt.updateHeader(tt.timeTrialHeader.copy(status = TimeTrialStatus.IN_PROGRESS))
+                                setupVm.updateTimeTrial(newTt)
+                            }else{
+                                Toast.makeText(requireActivity(), getString(R.string.tt_must_start_in_the_future), Toast.LENGTH_LONG).show()
                             }
-                            .setNegativeButton(R.string.dismiss){_,_->
-
-                            }
-                            .create().show()
-
-//                    }
-
+                        }
+                        .setNegativeButton(R.string.dismiss){_,_-> }
+                        .create()
+                        .show()
                 }
             }
-
-
-
         }
 
         propsViewModel.timeTrial.observe(viewLifecycleOwner)  {tt->
           tt?.let {
               if (it.timeTrialHeader.ttName == "" && it.course == null) {
-                  showCourseFrag()
+                  // showCourseFrag()
               }
               if(it.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS){
-                  val intent = Intent(requireActivity(), TimingActivity::class.java)
-                  startActivity(intent)
+                  //val intent = Intent(requireActivity(), TimingActivity::class.java)
+                  //startActivity(intent)
               }
           }
         }
@@ -148,12 +135,10 @@ class SetupTimeTrialFragment : Fragment() {
 @AndroidEntryPoint
 class  TimePickerFragment2 : DialogFragment(){
 
-
-    private val setupVm:SetupViewModel by activityViewModels()
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
+            val setupVm:SetupViewModel by activityViewModels()
             // Get the layout inflater
             val inflater = it.layoutInflater
 

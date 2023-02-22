@@ -235,15 +235,18 @@ class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
     }
 
     fun updateselectedRiderInfo(allRiders: List<Rider>?, filterString: String?, selectedIds: List<Long>?, sortMode: Int){
-        if(allRiders != null && selectedIds != null){
-            val filteredRiders = if(filterString.isNullOrBlank()){
+        if(allRiders != null && selectedIds != null)
+        {
+            val filteredRiders = if(filterString.isNullOrBlank())
+            {
                 if(sortMode == SORT_ALPHABETICAL){
                     allRiders.sortedBy { it.fullName() }
                 }else{
                     allRiders
                 }
-
-            }else{
+            }
+            else
+            {
                 if(sortMode == SORT_ALPHABETICAL){
                     allRiders.asSequence().filter { it.fullName().contains(filterString, ignoreCase = true) }.sortedBy { it.fullName() }.toList()
                 }else{
