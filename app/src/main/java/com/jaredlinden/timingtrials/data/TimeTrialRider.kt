@@ -66,11 +66,8 @@ data class TimeTrialRider(val riderId: Long,
             }else{
                 throw Exception("Can't create result, rider id is null")
             }
-
         }
     }
-
-
 }
 
 data class RiderIdStartTime(val riderId: Long, val startTime: OffsetDateTime)

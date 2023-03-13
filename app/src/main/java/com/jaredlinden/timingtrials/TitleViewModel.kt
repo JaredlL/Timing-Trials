@@ -24,8 +24,6 @@ class TitleViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepos
         }
     }
 
-    //val resumeOldViewModel: ResumeOldConfirmationViewModel = ResumeOldConfirmationViewModel(this)
-
     fun deleteTimeTrial(tt: TimeTrialHeader){
         viewModelScope.launch(Dispatchers.IO) {
             timeTrialRepository.deleteHeader(tt)

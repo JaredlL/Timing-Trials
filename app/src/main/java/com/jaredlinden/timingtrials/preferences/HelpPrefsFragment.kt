@@ -35,8 +35,7 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
             try{
                 val t = getDebugInfo()
                 val intent = Intent(Intent.ACTION_SENDTO).apply {
-                    type = "*/*"
-                    data = Uri.parse("mailto:")
+                    setDataAndType(Uri.parse("mailto:"), "*/*")
                     putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.email)))
                     putExtra(Intent.EXTRA_SUBJECT, "Timing Trials Feedback")
                     putExtra(Intent.EXTRA_TEXT, t)
