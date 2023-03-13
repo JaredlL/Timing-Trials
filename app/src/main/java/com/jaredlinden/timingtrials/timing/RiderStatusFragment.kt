@@ -14,6 +14,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 
@@ -23,53 +25,32 @@ import com.jaredlinden.timingtrials.databinding.FragmentTimerRiderStatusBinding
 import com.jaredlinden.timingtrials.ui.RiderStatus
 import com.jaredlinden.timingtrials.ui.RiderStatusViewWrapper
 import com.jaredlinden.timingtrials.util.*
-import kotlinx.android.synthetic.main.fragment_timer_rider_status.*
+import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.*
 
-
-/**
- * A simple [Fragment] subclass.
- *
- */
+@AndroidEntryPoint
 class RiderStatusFragment : Fragment() {
 
-    private lateinit var timingViewModel: TimingViewModel
-
+    private val timingViewModel: TimingViewModel by activityViewModels()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-
-        timingViewModel = requireActivity().getViewModel { requireActivity().injector.timingViewModel() }
-
-        val adapter = RiderStatusAdapter(requireActivity())
-        val viewManager = GridLayoutManager(context, 4)
-
-        timingViewModel.timeLine.observe(viewLifecycleOwner, Observer {tt->
-            val newList = tt.timeTrial.riderList.asSequence().filter { tt.getRiderStatus(it.timeTrialData) != RiderStatus.FINISHED }.map { r -> RiderStatusViewWrapper(r, tt ).apply {
-                onPressedCallback = {
-                    timingViewModel.tryAssignRider(it)
+        val adapter = RiderStatusAdapter(requireActivity()).apply {
+            setHasStableIds(true)
+            onLongClick = { riderStatus ->
+                when (riderStatus.status) {
+                    RiderStatus.NOT_STARTED -> createRiderActionsDialog(riderStatus)
+                    RiderStatus.RIDING -> createRiderActionsDialog(riderStatus)
+                    RiderStatus.FINISHED -> createRiderActionsDialog(riderStatus)
+                    RiderStatus.DNF -> createDnfRiderDialog(riderStatus)
+                    RiderStatus.DNS -> createDnfRiderDialog(riderStatus)
                 }
             }
-            }.sortedBy { it.startTimeMilis }.sortedBy { statusSorter(it.status) }.toList()
+        }
 
-
-            if (newList.isEmpty() || newList.all { it.status == RiderStatus.DNF || it.status == RiderStatus.DNS }){
-                viewResultsButton.visibility = View.VISIBLE
-            }else{
-                viewResultsButton.visibility = View.GONE
-            }
-            adapter.setRiderStatus(newList)
-        })
-
-
-
-        adapter.onLongClick = ::chooseRiderOptions
-
-        adapter.setHasStableIds(true)
-
-
-        val binding = DataBindingUtil.inflate<FragmentTimerRiderStatusBinding>(inflater, R.layout.fragment_timer_rider_status, container, false).apply {
-            lifecycleOwner=this@RiderStatusFragment
+        val viewManager = GridLayoutManager(context, 4)
+        val binding = FragmentTimerRiderStatusBinding.inflate(inflater, container, false).apply {
+            lifecycleOwner = viewLifecycleOwner
             viewResultsButton.visibility = View.GONE
             riderStatuses.adapter = adapter
             riderStatuses.layoutManager = viewManager
@@ -78,7 +59,25 @@ class RiderStatusFragment : Fragment() {
             }
         }
 
+        timingViewModel.timeLine.observe(viewLifecycleOwner) {tt->
+            val newList = tt.timeTrial.riderList.asSequence()
+                .filter { tt.getRiderStatus(it.timeTrialData) != RiderStatus.FINISHED }
+                .map { r -> RiderStatusViewWrapper(r, tt )
+                    .apply {
+                        onPressedCallback = { timingViewModel.tryAssignRider(it) }
+                    }
+                }
+                .sortedBy { it.startTimeMilis }
+                .sortedBy { statusSorter(it.status) }
+                .toList()
 
+            if (newList.isEmpty() || newList.all { it.status == RiderStatus.DNF || it.status == RiderStatus.DNS }){
+                binding.viewResultsButton.visibility = View.VISIBLE
+            }else{
+                binding.viewResultsButton.visibility = View.GONE
+            }
+            adapter.setRiderStatus(newList)
+        }
         return binding.root
     }
 
@@ -98,17 +97,6 @@ class RiderStatusFragment : Fragment() {
         }
     }
 
-    fun chooseRiderOptions(riderStatus: RiderStatusViewWrapper){
-
-        when(riderStatus.status){
-            RiderStatus.NOT_STARTED -> createRiderActionsDialog(riderStatus)
-            RiderStatus.RIDING -> createRiderActionsDialog(riderStatus)
-            RiderStatus.FINISHED -> createRiderActionsDialog(riderStatus)
-            RiderStatus.DNF -> createDnfRiderDialog(riderStatus)
-            RiderStatus.DNS -> createDnfRiderDialog(riderStatus)
-        }
-
-    }
 
     private fun createRiderActionsDialog(rs: RiderStatusViewWrapper){
 
@@ -142,7 +130,7 @@ class RiderStatusFragment : Fragment() {
         val timeTrialRider = rs.timeTrialRider
          AlertDialog.Builder(requireContext()).
                 setTitle("Actions for [${rs.number}] ${rs.filledRider.riderData.fullName()}").
-                setItems(options) { dialog, which ->
+                setItems(options) { _, which ->
                     // The 'which' argument contains the index position
                     // of the selected item
 
@@ -157,7 +145,10 @@ class RiderStatusFragment : Fragment() {
                         }
                         1 -> timingViewModel.moveRiderToBack(timeTrialRider)
                         2 -> {
-                            TimingTimePickerFragment.newInstance(timeTrialRider.riderId?:0, tt.timeTrialHeader.startTimeMilis).show(requireActivity().supportFragmentManager, "tpd")
+                            TimingTimePickerFragment.newInstance(
+                                timeTrialRider.riderId,
+                                tt.timeTrialHeader.startTimeMilis
+                            ).show(requireActivity().supportFragmentManager, "tpd")
                         }
                     }
 
@@ -211,11 +202,9 @@ class RiderStatusFragment : Fragment() {
             if(selectedMillis < ttStartTime){
                 Toast.makeText(requireContext(), "Cannot set start time before TT start", Toast.LENGTH_SHORT).show()
             }else{
-                val vm = requireActivity().getViewModel { requireActivity().injector.timingViewModel() }
+                val vm:TimingViewModel by activityViewModels()
                 vm.setRiderStartTime(riderId, selectedMillis)
             }
-
-
         }
 
         companion object {
@@ -229,8 +218,5 @@ class RiderStatusFragment : Fragment() {
                 return new
             }
         }
-
     }
-
-
 }

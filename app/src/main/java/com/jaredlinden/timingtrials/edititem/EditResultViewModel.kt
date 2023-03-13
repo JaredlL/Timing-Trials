@@ -10,20 +10,19 @@ import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.Event
 import com.jaredlinden.timingtrials.util.Utils
 import com.jaredlinden.timingtrials.util.setIfNotEqual
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
-class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRiderRepository, val riderRepository: IRiderRepository) : ViewModel(){
-
-
-
+@HiltViewModel
+class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRiderRepository, val riderRepository: IRiderRepository)
+    : ViewModel(){
 
     private val resultId: MutableLiveData<Long> = MutableLiveData()
     private val timeTrialId: MutableLiveData<Long> = MutableLiveData()
-
 
     var originalRiderId: Long? = null
     val result: MediatorLiveData<TimeTrialRider?> = MediatorLiveData()
@@ -38,7 +37,6 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
         it?.riderId?.let {
            Transformations.map(riderRepository.getRider(it)){it?.fullName()}
         }?:MutableLiveData("Select Rider...")
-        //it?.rider?.fullName()?:"Select Rider..."
     }
 
     //val gender: MutableLiveData<Gender> = MutableLiveData()
@@ -47,12 +45,9 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
     val note = MutableLiveData("")
     val splits: MutableLiveData<List<String>> = MutableLiveData(listOf())
     val resultTime = MutableLiveData("")
-
     val selectedGenderPosition = MutableLiveData(2)
     val genders = Gender.values().map { it.fullString() }
-
     val resultSaved: MutableLiveData<Event<Boolean>> = MutableLiveData()
-
     val changeRider: MutableLiveData<Event<Boolean>> = MutableLiveData()
 
     fun changeRider(){
@@ -113,10 +108,6 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
                 }
             }
         }
-
-
-
-
 
     init {
         result.addSource(Transformations.switchMap(resultId){it?.let { resultRepository.getResultById(it) }}){ttResult->
@@ -244,15 +235,18 @@ class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
     }
 
     fun updateselectedRiderInfo(allRiders: List<Rider>?, filterString: String?, selectedIds: List<Long>?, sortMode: Int){
-        if(allRiders != null && selectedIds != null){
-            val filteredRiders = if(filterString.isNullOrBlank()){
+        if(allRiders != null && selectedIds != null)
+        {
+            val filteredRiders = if(filterString.isNullOrBlank())
+            {
                 if(sortMode == SORT_ALPHABETICAL){
                     allRiders.sortedBy { it.fullName() }
                 }else{
                     allRiders
                 }
-
-            }else{
+            }
+            else
+            {
                 if(sortMode == SORT_ALPHABETICAL){
                     allRiders.asSequence().filter { it.fullName().contains(filterString, ignoreCase = true) }.sortedBy { it.fullName() }.toList()
                 }else{

@@ -86,19 +86,13 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
                 makeRowMarker(holder as CellViewHolder, position)
             }
         }
-
     }
 
     fun totalColumns(): Int = mOptions.sheetColumns.size + 1
     fun totalRows(): Int = mOptions.numberOfRows + 1
 
 
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-
-
-
        return when(viewType){
            CELL -> createCellVh(parent)
            ROW_MARKER -> createCellVh(parent)
@@ -106,8 +100,6 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
            TOP_LEFT -> createCellVh(parent)
            else -> createCellVh(parent)
         }
-
-
     }
 
     fun createCellVh(parent: ViewGroup): CellViewHolder{
@@ -142,7 +134,6 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
                 CELL
             }
         }
-
     }
 
     private fun getColumnWidthInPixels(column:Int):Int{
@@ -173,12 +164,9 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
         }
     }
 
-
     private fun makeCell(viewHolder: CellViewHolder, position: Int) {
 
-
         val numColumns = totalColumns()
-
         val coordinate = posToMarkers(position)
         var r = coordinate.r
         var c = coordinate.c
@@ -207,17 +195,12 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
         viewHolder.textView.height = getRowHeight(r+4)
         viewHolder.textView.setGravity(Gravity.CENTER)
 
-        val alpha = 255
-
-
         viewHolder.textView.setOnClickListener {
-            //Toast.makeText(context, "$r,$c", Toast.LENGTH_SHORT).show()
             mOptions.onCellClick(r,c)
             snackBarCallback()
 
         }
         viewHolder.textView.setOnLongClickListener {
-            //Toast.makeText(context, "$r,$c", Toast.LENGTH_SHORT).show()
             mOptions.onCellLongPress(r,c)
             true
 
@@ -262,13 +245,11 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
 
         val sdk = android.os.Build.VERSION.SDK_INT
 
-                if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
             //setBackgroundDrawable();
             viewHolder.textView.setBackgroundDrawable(drawable)
-
         } else {
             viewHolder.textView.setBackground(drawable)
-
         }
 
 
@@ -331,23 +312,12 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
             }
 
         }
-
-
         viewHolder.textView.text = colData.headingText
-
-
-
-            viewHolder.layout.setOnClickListener {
+        viewHolder.layout.setOnClickListener {
                 colData.onClick()
-            }
-
+        }
         viewHolder.textView.setGravity(Gravity.CENTER)
-
-
-
         //setBackground(viewHolder)
-
-
     }
 
 

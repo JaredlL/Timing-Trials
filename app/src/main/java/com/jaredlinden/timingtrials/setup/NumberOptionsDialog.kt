@@ -7,23 +7,24 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.NumbersDirection
 import com.jaredlinden.timingtrials.databinding.FragmentNumberOptionsBinding
 import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
-import kotlinx.android.synthetic.main.fragment_number_options.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class NumberOptionsDialog: DialogFragment(){
 
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        val mViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.numberOptionsViewModel
+        val setupVm:SetupViewModel by activityViewModels()
+        val mViewModel = setupVm.numberOptionsViewModel
 
         setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_AppCompat_Dialog_Alert)
 
@@ -51,11 +52,7 @@ class NumberOptionsDialog: DialogFragment(){
             mode?.let {
                 PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putString(PREF_NUMBERING_MODE, mode.name).apply()
             }
-
         })
-
-
-
 
 //        mViewModel.selectedNumberOptionType.observe(viewLifecycleOwner, Observer {
 ////            if(it == 1){
@@ -68,16 +65,12 @@ class NumberOptionsDialog: DialogFragment(){
             it?.let {
                 when(it){
                     NumbersDirection.ASCEND -> {
-                        binding.radioGroup.check(ascendingRadioButton.id)
+                        binding.radioGroup.check(binding.ascendingRadioButton.id)
                     }
                     else ->{
-                        binding.radioGroup.check(descendingRadioButton.id)
-
+                        binding.radioGroup.check(binding.ascendingRadioButton.id)
                     }
-
                 }
-
-
             }
         })
 

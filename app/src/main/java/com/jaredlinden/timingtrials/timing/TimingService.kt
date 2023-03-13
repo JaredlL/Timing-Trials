@@ -13,6 +13,7 @@ import com.jaredlinden.timingtrials.util.ConverterUtils.toSecondsDisplayString
 import org.threeten.bp.Instant
 import java.util.*
 import android.app.NotificationManager
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.SharedPreferences
 import android.media.MediaPlayer
 import androidx.lifecycle.MutableLiveData
@@ -31,19 +32,18 @@ const val CHANNEL_ID = "timing_service"
 
 class TimingService : Service(){
 
-    private var timer: Timer = Timer()
+    private var timer: Timer? = Timer()
     private var timerTask: TimeTrialTask? = null
-    private val TIMER_PERIOD_MS = 33L
-    private lateinit var notificationManager: NotificationManager
+    private var TIMER_PERIOD_MS = 33L
+    private var notificationManager: NotificationManager? = null
+    private var startPlayer: MediaPlayer? = null
+    private var playSound :Boolean = true
 
     override fun onBind(intent: Intent?): IBinder? {
-
         return binder
     }
 
     var timerTick: MutableLiveData<Long> = MutableLiveData()
-
-
 
     inner class TimeTrialTask(var timeTrial: TimeTrial) : TimerTask(){
         var prevSecs = 0L
@@ -53,7 +53,6 @@ class TimingService : Service(){
             val millisSinceStart = now.toEpochMilli() - timeTrial.timeTrialHeader.startTimeMilis
             val millis = abs(millisSinceStart)
             val secsLong =  (millis/1000)
-            //val secs = toSecondsDisplayString(millisSinceStart)
             if(prevSecs != secsLong){
                 updateNotificationTitle(timeTrial.timeTrialHeader.ttName, toSecondsDisplayString(millisSinceStart))
                 prevSecs = secsLong
@@ -79,19 +78,10 @@ class TimingService : Service(){
         }
 
         fun updateTimeTrial(newTt: TimeTrial){
-//            PreferenceManager.getDefaultSharedPreferences(this@TimingService).registerOnSharedPreferenceChangeListener{prefs,key->
-//                if(key == getString(R.string.p_mainpref_sound)){
-//                    playSound = prefs.getBoolean(key, true)
-//                }
-//            }
             soundEvent = null
             timeTrial = newTt
         }
     }
-
-
-    var startPlayer: MediaPlayer? = null
-    var playSound :Boolean = true
     fun playSound(){
 
         startPlayer?.let {player->
@@ -105,24 +95,19 @@ class TimingService : Service(){
                 }
             }
         }
-
     }
 
     fun startTiming(newTimeTrial: TimeTrial){
-
-
         if(timerTask == null){
             timerTask?.cancel()
-            timer.cancel()
+            timer?.cancel()
             println("JAREDMSG -> Timing Service -> Creating New Timer")
             timer = Timer()
             timerTask= TimeTrialTask(newTimeTrial)
-            timer.scheduleAtFixedRate(timerTask, 0L, TIMER_PERIOD_MS)
+            timer?.scheduleAtFixedRate(timerTask, 0L, TIMER_PERIOD_MS)
         }else{
             timerTask?.updateTimeTrial(newTimeTrial)
         }
-
-
     }
 
 
@@ -130,11 +115,12 @@ class TimingService : Service(){
     fun stop(){
         Timber.d("Trying to end service")
         timerTask?.cancel()
-        timer.cancel()
+        timer?.cancel()
         timerTask = null
-        notificationManager.cancel(NOTIFICATION_ID)
+        notificationManager?.cancel(NOTIFICATION_ID)
         stopForeground(true)
         stopSelf()
+        startPlayer = null
         Timber.d("Service Stopped")
     }
 
@@ -145,7 +131,6 @@ class TimingService : Service(){
                 playSound = prefs?.getBoolean(key, true)?:true
             }
         }
-
     }
 
     override fun onCreate() {
@@ -157,11 +142,7 @@ class TimingService : Service(){
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
-
-
     private val binder: IBinder = TimingServiceBinder()
-
-
 
     inner class TimingServiceBinder: Binder(){
         fun getService(): TimingService{
@@ -170,17 +151,20 @@ class TimingService : Service(){
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         timerTask?.cancel()
         timerTask = null
-        timer.cancel()
+        timer?.cancel()
+        timer = null
+        notificationManager = null
+        startPlayer = null
+        super.onDestroy()
     }
 
 
     fun updateNotificationTitle(newTitle:String, newContentText:String){
 
         val not = getNotification().setContentTitle(newTitle).setContentText(newContentText).build()
-        notificationManager.notify(NOTIFICATION_ID, not)
+        notificationManager?.notify(NOTIFICATION_ID, not)
     }
 
 
@@ -197,30 +181,26 @@ class TimingService : Service(){
 
        val notification = getNotification().build()
         startForeground(NOTIFICATION_ID, notification)
-
-
     }
 
     private fun getNotification():NotificationCompat.Builder{
-        val timingIntent = PendingIntent.getActivity(this, 0,Intent(this, TimingActivity::class.java), 0)
-        return NotificationCompat.Builder(this, CHANNEL_ID).setSmallIcon(com.jaredlinden.timingtrials.R.drawable.tt_logo_notification)
-                .setTicker(getString(R.string.timing_trials))
-                .setContentText(getString(R.string.time_trial_in_progress))
-                .setContentIntent(timingIntent)
-                .setContentTitle(getString(R.string.time_trial_in_progress))
+        val timingIntent = PendingIntent.getActivity(this, 0,Intent(this, TimingActivity::class.java), FLAG_IMMUTABLE)
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(com.jaredlinden.timingtrials.R.drawable.tt_logo_notification)
+            .setTicker(getString(R.string.timing_trials))
+            .setContentText(getString(R.string.time_trial_in_progress))
+            .setContentIntent(timingIntent)
+            .setContentTitle(getString(R.string.time_trial_in_progress))
 
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(channelId: String, channelName: String): String{
-        val chan = NotificationChannel(channelId,
-                channelName, NotificationManager.IMPORTANCE_NONE)
+        val chan = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_NONE)
         chan.lightColor = Color.BLUE
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         service.createNotificationChannel(chan)
         return channelId
     }
-
-
 }

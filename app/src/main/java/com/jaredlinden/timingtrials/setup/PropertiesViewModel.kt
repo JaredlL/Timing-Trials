@@ -79,7 +79,7 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
                     firstRiderOffset.value = it.firstRiderStartOffset.toString()
                 }
                 if (startTime.value != it.startTime) {
-                    startTime.value = it.startTime
+                    startTime.value = it.startTime ?: OffsetDateTime.now()
                 }
                 if (interval.value != it.interval.toString()) {
                     interval.value = it.interval.toString()

@@ -8,6 +8,7 @@ import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.data.NumberRules
 import com.jaredlinden.timingtrials.data.NumbersDirection
 import com.jaredlinden.timingtrials.util.setIfNotEqual
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 class NumberOptionsViewModel(val setupViewModel: SetupViewModel) {
 

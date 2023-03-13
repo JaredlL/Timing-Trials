@@ -61,6 +61,5 @@ class MainPrefsFragment : PreferenceFragmentCompat() {
             }
             true
         }
-
     }
 }

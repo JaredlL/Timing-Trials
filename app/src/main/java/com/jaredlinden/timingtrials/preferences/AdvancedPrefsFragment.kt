@@ -5,24 +5,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AdvancedPrefsFragment : PreferenceFragmentCompat() {
 
-    lateinit var viewModel: PrefsViewModel
+    val viewModel: PrefsViewModel by viewModels ()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_advanced, rootKey)
-
-        viewModel = requireActivity().getViewModel { injector.prefsViewModel() }
-
-
 
         (requireActivity() as? IFabCallbacks)?.setFabVisibility(View.GONE)
 
@@ -38,10 +35,9 @@ class AdvancedPrefsFragment : PreferenceFragmentCompat() {
                     .create().show()
             true
         }
-
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val v =super.onCreateView(inflater, container, savedInstanceState)
 
         viewModel.allDeleted.observe(viewLifecycleOwner, EventObserver{

@@ -20,45 +20,44 @@ import com.jaredlinden.timingtrials.util.Event
 import com.google.gson.Gson
 import com.jaredlinden.timingtrials.domain.csv.LineToCompleteResult
 import com.opencsv.CSVReader
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.threeten.bp.*
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
 import java.net.UnknownHostException
 import java.security.InvalidParameterException
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
-
+@HiltViewModel
 class IOViewModel @Inject constructor(private val riderRespository: IRiderRepository,
                                       private val courseRepository: ICourseRepository,
                                       private val timeTrialRepository: ITimeTrialRepository,
                                       private val  timeTrialRiderRepository: TimeTrialRiderRepository): ViewModel() {
 
 
-    val writeAllResult: MutableLiveData<Event<String>> = MutableLiveData()
-
-    val isIoInProgress = AtomicBoolean()
+    private val writeAllResult: MutableLiveData<Event<String>> = MutableLiveData()
+    private val ioLock = Mutex()
 
     fun writeAllTimeTrialsToPath(outputStream: OutputStream){
         viewModelScope.launch(Dispatchers.IO) {
-            if(isIoInProgress.compareAndSet(false, true)){
+            ioLock.withLock {
                 try {
                     val allTts = timeTrialRepository.allTimeTrials()
                     JsonResultsWriter().writeToPath(outputStream, allTts)
                     writeAllResult.postValue(Event("Success"))
-                }catch (e:Exception){
-                    writeAllResult.postValue(Event(e.message?:"Error"))
-                }finally {
-                    isIoInProgress.set(false)
+                } catch (e: Exception) {
+                    writeAllResult.postValue(Event(e.message ?: "Error"))
                 }
             }
-
         }
     }
+
     fun readInput(inputStream: InputStream){
         readInput(null,null, inputStream)
     }
@@ -66,7 +65,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
     fun readUrlInput(url:URL){
         viewModelScope.launch(Dispatchers.IO) {
             try {
-
                 val connection: URLConnection = url.openConnection()
                 connection.connect()
                 val input: InputStream = BufferedInputStream(url.openStream(), 8192)
@@ -76,9 +74,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             }catch (e:Exception){
                 importMessage.postValue(Event(e.message?:"Error accessing URL, check network access"))
             }
-
         }
-
     }
 
     val readList: MutableList<Uri> = mutableListOf()
@@ -86,37 +82,33 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
     fun readInput(title: String?, uri: Uri?, inputStream: InputStream){
 
         //To prevent reading in the same file multiple times
-        if(uri != null && !readList.contains(uri)){
-
+        if(!readList.contains(uri)){
             viewModelScope.launch(Dispatchers.IO) {
-                if(isIoInProgress.compareAndSet(false, true)){
+                ioLock.withLock{
                     try {
-                        val buf = BufferedInputStream(inputStream)
-                        buf.mark(100)
-                        val zis = ZipInputStream(buf)
-                        val nextZipped = zis.nextEntry
+                        val bufferedInputStream = BufferedInputStream(inputStream)
+                        bufferedInputStream.mark(100)
+                        val zipInputStream = ZipInputStream(bufferedInputStream)
+                        val nextZipped = zipInputStream.nextEntry
                         var fString = ""
                         if(nextZipped!= null){
-                            //val reader2 = BufferedReader(BufferedInputStream(zis))
                             val sb = StringBuilder()
                             val buffer = ByteArray(1024)
                             var read = 0
 
-                            while (zis.read(buffer, 0, 1024).also { read = it } >= 0) {
-                                //read = zis.read(buffer, 0, 1024)
+                            while (zipInputStream.read(buffer, 0, 1024).also { read = it } >= 0)
+                            {
                                 sb.append(String(buffer, 0, read))
                             }
                             fString = sb.toString()
-                            zis.close()
+                            zipInputStream.close()
                         }else{
-                            buf.reset()
-                            val reader = BufferedReader(InputStreamReader(buf))
+                            bufferedInputStream.reset()
+                            val reader = BufferedReader(InputStreamReader(bufferedInputStream))
                             fString = reader.readText()
                             reader.close()
                         }
 
-
-                        //reader.close()
                         val firstNonWhitespaceChar = fString.asSequence().first { !it.isWhitespace() }
 
                         val msg = if(firstNonWhitespaceChar == "{".first() || firstNonWhitespaceChar == "[".first()){
@@ -126,18 +118,14 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                         }
 
                         importMessage.postValue(Event(msg))
-                    }catch (e: Exception){
+                    }
+                    catch (e: Exception)
+                    {
                         importMessage.postValue(Event(e.message?:"Error reading file: ${e.message}"))
-                    }finally {
-                        isIoInProgress.set(false)
                     }
                 }
-
-
-                //readCsvInputIntoDb(inputStream)
             }
         }
-
     }
 
     val READING_TT = 0
@@ -244,10 +232,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                 }
             }
 
-//            timeTrialList.forEach {
-//                addImportTtToDb(it)
-//            }
-
             val numImported = timeTrialList.map {  addImportTtToDb(it) }
             val rows = addCompleteListToDb(completeRowlist)
             val num = numImported.filter { it }.count()
@@ -262,8 +246,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
         }catch (e:Exception){
             return "Failed to import csv data ${e.message}"
         }
-
-
     }
 
     suspend fun addCompleteListToDb(completeList: List<CompleteInformationRow>): Int{
@@ -416,7 +398,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                 1->{
                     courseInDb = courseList.first()
                 }
-                else-> courseInDb = courseList.minBy { (it.length?:0.0) - (course.length?:0.0) }!!
+                else-> courseInDb = courseList.minByOrNull { (it.length?:0.0) - (course.length?:0.0) }!!
             }
 
         }
@@ -556,12 +538,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                             notes = importRider.notes
                     )
                     insertTimeTrialRider(timeTrialRider)
-
-
             }
-
-
-
         }
         return inserted
     }
@@ -599,11 +576,8 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                 }
                 else -> throw Exception("Multi Riders")
             }
-
         }
-
     }
-
 }
 
 

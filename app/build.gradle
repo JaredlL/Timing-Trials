@@ -1,8 +1,10 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'androidx.navigation.safeargs.kotlin'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-kapt'
+    id 'kotlin-android'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'dagger.hilt.android.plugin'
+}
 
 repositories { mavenCentral() }
 
@@ -11,14 +13,13 @@ android {
         dataBinding true
     }
 
-
-    compileSdkVersion 30
+    compileSdkVersion 33
     defaultConfig {
         applicationId "com.jaredlinden.timingtrials"
         minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 20
-        versionName "1.1.8"
+        targetSdkVersion 33
+        versionCode 17
+        versionName "1.1.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -27,13 +28,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    androidExtensions {
-        experimental = true
-    }
 
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
@@ -48,23 +47,26 @@ android {
             abortOnError false
         }
     }
+    namespace 'com.jaredlinden.timingtrials'
+}
+
+kapt {
+    correctErrorTypes true
 }
 
 dependencies {
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     //Test
 
-
     //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test:core:1.3.0-rc02'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2-rc02'
-    androidTestImplementation 'androidx.test:runner:1.3.0-rc02'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-rc02'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test:core:1.4.1-alpha06'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4-alpha06'
+    androidTestImplementation 'androidx.test:runner:1.5.0-alpha03'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0-alpha06'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation "com.google.android.material:material:$rootProject.materialVersion"
     implementation "androidx.preference:preference-ktx:$rootProject.preferenceVersion"
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
@@ -74,16 +76,14 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$rootProject.kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.coroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$rootProject.coroutinesVersion"
-    implementation "androidx.fragment:fragment:$rootProject.fragmentVersion"
     implementation "androidx.fragment:fragment-ktx:$rootProject.fragmentVersion"
-    implementation "androidx.activity:activity:$rootProject.activityVersion"
     implementation "androidx.activity:activity-ktx:$rootProject.activityVersion"
 
     implementation "androidx.core:core-ktx:$rootProject.coreVersion"
     //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
 
-    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.20'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.24'
 
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"
@@ -98,37 +98,37 @@ dependencies {
 
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.lifecycleExtVersion"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
     implementation "androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
 
     //Timber logger
-    implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation 'com.jakewharton.timber:timber:5.0.1'
 
 
     //Advanced Recycler View
     implementation "com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:$rootProject.advRecyclerVersion"
 
-    //Dagger
-    implementation "com.google.dagger:dagger:$rootProject.daggerVersion"
-    kapt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
+    //hilt
+    implementation "com.google.dagger:hilt-android:2.44"
+    kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
 
     //GSON
     implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
 
     //CSV
-    implementation 'com.opencsv:opencsv:5.2'
+    implementation 'com.opencsv:opencsv:5.6'
 
     //Threeten Time
-    implementation 'com.jakewharton.threetenabp:threetenabp:1.2.4'
-    testImplementation('org.threeten:threetenbp:1.4.4') {
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.4.0'
+    testImplementation('org.threeten:threetenbp:1.6.0') {
         exclude group: 'com.jakewharton.threetenabp', module: 'threetenabp'
     }
-    androidTestImplementation('org.threeten:threetenbp:1.4.4') {
+    androidTestImplementation('org.threeten:threetenbp:1.6.0') {
         exclude group: 'com.jakewharton.threetenabp', module: 'threetenabp'
     }
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
 
 
 }

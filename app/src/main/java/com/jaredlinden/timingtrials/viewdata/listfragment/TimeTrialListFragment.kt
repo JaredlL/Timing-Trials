@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,38 +21,33 @@ import com.jaredlinden.timingtrials.databinding.FragmentListGenericBinding
 import com.jaredlinden.timingtrials.databinding.ListItemTimetrialBinding
 
 import com.jaredlinden.timingtrials.util.ConverterUtils
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.viewdata.*
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
+@AndroidEntryPoint
 class TimeTrialListFragment : Fragment() {
-
-    private lateinit var listViewModel: ListViewModel
-    private lateinit var viewManager: RecyclerView.LayoutManager
-    private lateinit var adapter: GenericListAdapter<TimeTrialHeader>
-    private lateinit var viewFactory: GenericViewHolderFactory<TimeTrialHeader>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
         Timber.d("Create")
-        listViewModel = requireActivity().getViewModel { requireActivity().injector.listViewModel() }
-
-        viewFactory = TimeTrialViewHolderFactory(::longPress)
-        adapter = GenericListAdapter(requireContext(), viewFactory)
+        val listViewModel: ListViewModel by activityViewModels()
+        val viewFactory = TimeTrialViewHolderFactory {
+            longPress(it, listViewModel)
+        }
+        val adapter = GenericListAdapter(requireContext(), viewFactory)
         listViewModel.filteredAllTimeTrials.observe(viewLifecycleOwner, Observer{res->
             res?.let {adapter.setItems(it.sortedBy { it.status })}
         })
 
-        viewManager = LinearLayoutManager(context)
+        val viewManager = LinearLayoutManager(context)
 
         val binding = DataBindingUtil.inflate<FragmentListGenericBinding>(inflater, R.layout.fragment_list_generic, container, false).apply{
             lifecycleOwner = (this@TimeTrialListFragment)
             listHeading.addView(viewFactory.createTitle(inflater, container), 0, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
             genericRecyclerView.adapter = adapter
             genericRecyclerView.layoutManager = viewManager
-
         }
 
         return binding.root
@@ -62,13 +59,12 @@ class TimeTrialListFragment : Fragment() {
         super.onDetach()
     }
 
-    private fun longPress(header: TimeTrialHeader){
+    private fun longPress(header: TimeTrialHeader, listViewModel: ListViewModel){
         val msg = if(header.status == TimeTrialStatus.SETTING_UP){
             resources.getString(R.string.confirm_delete_setup_timetrial_message)
         }else{
             resources.getString(R.string.confirm_delete_timetrial_message)
         }
-
 
         AlertDialog.Builder(requireContext())
                 .setTitle(resources.getString(R.string.delete_timetrial))
@@ -77,14 +73,12 @@ class TimeTrialListFragment : Fragment() {
                     header.id?.let {
                         listViewModel.deleteTimeTrial(it)
                     }
-
                 }
                 .setNegativeButton(getString(R.string.dismiss)){ _, _->
 
                 }
                 .create().show()
     }
-
 }
 
 class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHolder<TimeTrialHeader, ListItemTimetrialBinding>(binding) {
@@ -104,16 +98,12 @@ class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHol
                     val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSetupViewPagerFragment(data.id?:0)
                     Navigation.findNavController(_binding.root).navigate(action)
                 }
-
-
-
             }
             timetrialLayout.setOnLongClickListener {
                 longPress(data)
                 true
             }
             executePendingBindings()
-
         }
     }
 }
@@ -128,7 +118,6 @@ data class TimeTrialListItem(val timeTrialHeader: TimeTrialHeader){
 }
 
 class TimeTrialViewHolderFactory(val onLongPress: (tt:TimeTrialHeader) -> Unit): GenericViewHolderFactory<TimeTrialHeader>() {
-
 
     override fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?): View {
         val binding = DataBindingUtil.inflate<ListItemTimetrialBinding>(layoutInflator, R.layout.list_item_timetrial, parent, false).apply {

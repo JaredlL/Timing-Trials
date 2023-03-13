@@ -11,16 +11,12 @@ import com.jaredlinden.timingtrials.data.ITimingTrialsEntity
 
 class GenericListAdapter<T: ITimingTrialsEntity> internal constructor(val context: Context, val vhFact: GenericViewHolderFactory<T>): RecyclerView.Adapter<BaseHolder<T>>() {
 
-
-
     var mData: List<T> = listOf()
     val layoutInflater = LayoutInflater.from(context)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder<T> {
         return vhFact.createViewHolder(layoutInflater, parent)
     }
-
-
 
     override fun onBindViewHolder(holder: BaseHolder<T>, position: Int) {
         mData[position].let { data ->
@@ -41,7 +37,6 @@ class GenericListAdapter<T: ITimingTrialsEntity> internal constructor(val contex
     }
 
     override fun getItemCount(): Int{ return mData.count() }
-
 }
 
 abstract class BaseHolder<T>(binding: ViewDataBinding): RecyclerView.ViewHolder(binding.root){
@@ -55,5 +50,4 @@ abstract class GenericViewHolderFactory<T>{
     abstract fun createViewHolder(layoutInflator: LayoutInflater, parent: ViewGroup?) : BaseHolder<T>
     abstract fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data:T) : View
     abstract fun createTitle(layoutInflator: LayoutInflater, parent: ViewGroup?) : View
-    //abstract fun performFabAction(fab:View)
 }

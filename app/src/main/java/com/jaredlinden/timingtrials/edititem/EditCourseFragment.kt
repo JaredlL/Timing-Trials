@@ -6,8 +6,8 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -16,22 +16,20 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Course
 import com.jaredlinden.timingtrials.databinding.FragmentEditCourseBinding
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class EditCourseFragment : Fragment() {
 
 
 
     private val args: EditCourseFragmentArgs by navArgs()
-    private lateinit var courseViewModel: EditCourseViewModel
+    private val courseViewModel: EditCourseViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
         val courseId = args.courseId
-
-        courseViewModel = requireActivity().getViewModel { requireActivity().injector.courseViewModel() }
-
         setHasOptionsMenu(true)
         courseViewModel.setLengthConverter(getLengthConverter())
         courseViewModel.changeCourse(courseId)
@@ -46,7 +44,7 @@ class EditCourseFragment : Fragment() {
         fabCallback.setFabVisibility(View.VISIBLE)
 
         courseViewModel.doJumpToCourseResults.observe(viewLifecycleOwner, EventObserver{
-            val action = EditCourseFragmentDirections.actionEditCourseFragmentToSheetFragment(it, Course::class.java.simpleName)
+            val action = EditCourseFragmentDirections.actionEditCourseFragmentToSheetFragment(Course::class.java.simpleName, it)
             findNavController().navigate(action)
         })
 
@@ -62,9 +60,9 @@ class EditCourseFragment : Fragment() {
 
 
 
-        val binding = DataBindingUtil.inflate<FragmentEditCourseBinding>(inflater, R.layout.fragment_edit_course, container, false).apply {
+        val binding = FragmentEditCourseBinding.inflate(inflater,container, false).apply {
             viewModel = courseViewModel
-            lifecycleOwner = (this@EditCourseFragment)
+            lifecycleOwner = viewLifecycleOwner
             fabCallback.fabClickEvent.observe(viewLifecycleOwner, EventObserver {
                 if(it){
                     if(courseViewModel.courseName.value?.trim().isNullOrBlank()) Toast.makeText(requireContext(), getString(R.string.course_requires_name), Toast.LENGTH_SHORT).show()
@@ -73,8 +71,6 @@ class EditCourseFragment : Fragment() {
                         //findNavController().popBackStack()
                     }
                 }
-
-
             })
 
             cttNameEdit.setOnEditorActionListener{_, actionId, keyEvent ->

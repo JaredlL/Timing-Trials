@@ -21,8 +21,6 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
 
     val mDbIsPopulated = MutableLiveData(false)
 
-
-
     companion object {
         @Volatile private var INSTANCE: TimingTrialsDatabase? = null
 
@@ -60,8 +58,6 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
 
             override fun onOpen(db: SupportSQLiteDatabase) {
                 super.onOpen(db)
-                // If you want to keep the data through app restarts,
-                // comment out the following line.
 
                 INSTANCE?.let { database ->
                     scope.launch(Dispatchers.IO) {
@@ -71,5 +67,4 @@ abstract class TimingTrialsDatabase : RoomDatabase() {
             }
         }
     }
-
 }

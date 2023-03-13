@@ -14,3 +14,4 @@
 *.ap_
 Thumbs.db
 /app/release/app-release.aab
+.idea/deploymentTargetDropDown.xml

@@ -52,24 +52,6 @@ data class IndexNumberRules(val startNumber: Int = 1,
 
 }
 
-//data class MapNumberRules(val numbersMap: Map<Int,Int> = mutableMapOf()){
-//
-//    fun numberFromIndex(index: Int, totalCount: Int): Int{
-//        numbersMap[index]?.let {
-//            return it
-//        }
-//        val max = numbersMap.values.max()?:1
-//        numbersMap[index] = max
-//        return max
-//
-//    }
-//
-//    fun trySetNumberAtIndex(index: Int, number: Int){
-//
-//    }
-//
-//}
-
 data class NumberRules(val mode: NumberMode = NumberMode.INDEX,
                        val indexRules: IndexNumberRules = IndexNumberRules()) {
 
@@ -79,23 +61,8 @@ data class NumberRules(val mode: NumberMode = NumberMode.INDEX,
 
     fun numberFromIndex(index: Int, totalCount: Int): Int {
          return indexRules.numberFromIndex(index, totalCount)
-        //NumberMode.MAP -> mapRules.numberFromIndex(index, totalCount)
 
     }
-
-
-//    fun exlusionsString(): String{
-//        val sb = StringBuilder()
-//        for(e in exclusions){
-//            sb.append(e)
-//            sb.append(",")
-//        }
-//        return sb.toString()
-//    }
-
-
-
-
 
     companion object{
 
@@ -109,55 +76,5 @@ data class NumberRules(val mode: NumberMode = NumberMode.INDEX,
         fun toString(rules: NumberRules): String{
             return gson.toJson(rules)
         }
+    }
 }
-}
-
-//        fun fromString(str: String): NumberRules?{
-//            if(str.isBlank()){
-//                return NumberRules()
-//            }else{
-//                var term = 1
-//                var isStart = true
-//                var direction = NumbersDirection.ASCEND
-//                val exc = mutableListOf<Int>()
-//                for(s in str.splitToSequence(",").withIndex()){
-//                   s.value.toIntOrNull()?.let {
-//                        when(s.index){
-//                            0 -> term = it
-//                            1-> isStart = it == 1
-//                            2 -> direction = if(it == 1) NumbersDirection.DESCEND else NumbersDirection.ASCEND
-//                            else-> exc.add((it))
-//                        }
-//                    }
-//
-//                }
-//                return  NumberRules(term, isStart, direction, exc)
-//            }
-//        }
-//
-//        fun stringToExclusions(excString : String): List<Int>{
-//            return excString.splitToSequence(",").mapNotNull { it.toIntOrNull() }.toList()
-//        }
-//
-//        fun toString(rules: NumberRules): String{
-//            return if(rules.isDefault()){
-//                ""
-//            }else{
-//                val sb = StringBuilder()
-//                sb.append(rules.terminus)
-//                sb.append(",")
-//                sb.append(if(rules.isStart) 1 else 0)
-//                sb.append(",")
-//                sb.append(rules.direction.ordinal)
-//                for(x in rules.exclusions){
-//                    sb.append(",")
-//                    sb.append(x)
-//
-//                }
-//                sb.toString()
-//            }
-//
-//        }
-//    }
-//
-//}

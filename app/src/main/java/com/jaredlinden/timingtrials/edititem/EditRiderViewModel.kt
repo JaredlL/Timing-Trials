@@ -1,7 +1,6 @@
 package com.jaredlinden.timingtrials.edititem
 
 
-import android.util.EventLog
 import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Gender
@@ -9,12 +8,13 @@ import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
 import com.jaredlinden.timingtrials.util.Event
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
 
-
+@HiltViewModel
 class EditRiderViewModel @Inject constructor(private val repository: IRiderRepository, private val results: TimeTrialRiderRepository): ViewModel() {
 
 
@@ -153,8 +153,6 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
         }
     }
 
-
-
     fun addOrUpdate(){
         viewModelScope.launch(Dispatchers.IO) {
             mutableRider.value?.let { rider->
@@ -175,17 +173,13 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
                     }
                     updateSuccess.postValue(Event(true))
                 }
-
             }
             //mutableRider.postValue(Rider.createBlank())
         }
-
     }
 
     val message : MutableLiveData<Event<Int>> = MutableLiveData()
     val updateSuccess : MutableLiveData<Event<Boolean>> = MutableLiveData()
-
-
 
     fun delete(){
         viewModelScope.launch(Dispatchers.IO) {

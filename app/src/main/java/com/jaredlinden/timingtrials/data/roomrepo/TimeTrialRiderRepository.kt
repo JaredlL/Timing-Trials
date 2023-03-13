@@ -1,7 +1,6 @@
 package com.jaredlinden.timingtrials.data.roomrepo
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.data.source.TimeTrialRiderDao
 import javax.inject.Inject

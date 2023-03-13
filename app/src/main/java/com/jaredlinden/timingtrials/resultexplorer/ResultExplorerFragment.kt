@@ -17,9 +17,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -32,34 +31,24 @@ import com.jaredlinden.timingtrials.domain.csv.CsvSheetWriter
 import com.jaredlinden.timingtrials.spreadsheet.SheetAdapter
 import com.jaredlinden.timingtrials.spreadsheet.SheetLayoutManager
 import com.jaredlinden.timingtrials.util.*
-import kotlinx.android.synthetic.main.fragment_spreadsheet.*
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
 
-
+@AndroidEntryPoint
 class ResultExplorerFragment : Fragment()  {
 
-
-    lateinit var viewModel: ResultExplorerViewModel
-
+    val viewModel: ResultExplorerViewModel by activityViewModels()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         val itemTypeId = arguments?.getString("itemTypeId")?:""
         val itemId = arguments?.getLong("itemId")?:0L
-
-//        arguments?.remove("itemId")
-//        arguments?.remove("itemTypeId")
 
         val fabCallback = (requireActivity() as? IFabCallbacks)
         fabCallback?.setFabVisibility(View.GONE)
 
         setHasOptionsMenu(true)
 
-        //val view =  inflater.inflate(R.layout.fragment_spreadsheet, container, false)
-
-        val binding = DataBindingUtil.inflate<FragmentSpreadsheetBinding>(inflater, R.layout.fragment_spreadsheet, container, false)
-
-        viewModel = requireActivity().getViewModel { injector.globalResultViewModel() }
-
+        val binding = FragmentSpreadsheetBinding.inflate(inflater, container, false)
 
         val displayMetrics = DisplayMetrics()
         activity?.windowManager?.defaultDisplay?.getMetrics(displayMetrics)
@@ -72,11 +61,10 @@ class ResultExplorerFragment : Fragment()  {
         }
 
         viewModel.setColumnsContext(GlobalResultViewModelData(itemId, itemTypeId, getLengthConverter()), p)
-
         val adapter = SheetAdapter(requireContext(), displayMetrics, p, ::snackBarCallback)
         val recyclerView = binding.recyclerView
 
-        viewModel.resultSpreadSheet.observe(viewLifecycleOwner, Observer { it?.let {
+        viewModel.resultSpreadSheet.observe(viewLifecycleOwner) { it?.let {
             if(it.isEmpty){
 
                 recyclerView.visibility = View.INVISIBLE
@@ -84,14 +72,12 @@ class ResultExplorerFragment : Fragment()  {
                 recyclerView.layoutManager = SheetLayoutManager(it)
 
             }else{
-                emptyTextView.visibility = View.GONE
+                binding.emptyTextView.visibility = View.GONE
                 recyclerView.visibility = View.VISIBLE
                 adapter.setNewItems(it)
                 recyclerView.layoutManager = SheetLayoutManager(it)
             }
-
-        }
-        })
+        } }
 
         viewModel.navigateToTTId.observe(viewLifecycleOwner, EventObserver {
             val action = ResultExplorerFragmentDirections.actionSheetFragmentToResultFragment(it)
@@ -102,9 +88,8 @@ class ResultExplorerFragment : Fragment()  {
         recyclerView.adapter = adapter
 
         bottomSheetBehavior = BottomSheetBehavior.from(binding.filterSheet)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
+        bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheetBehavior?.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
 
             }
@@ -120,7 +105,6 @@ class ResultExplorerFragment : Fragment()  {
                     }
                 }
             }
-
         })
 
        if(!PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(HAS_SHOWN_RESULT_EXPLORER_TIPS, false)){
@@ -140,21 +124,21 @@ class ResultExplorerFragment : Fragment()  {
         }
     }
 
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
+    private var bottomSheetBehavior: BottomSheetBehavior<*>? = null
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.resultExplorerFilters -> {
-                if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED || bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN){
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                }else if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED){
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                if(bottomSheetBehavior?.state == BottomSheetBehavior.STATE_COLLAPSED || bottomSheetBehavior?.state == BottomSheetBehavior.STATE_HIDDEN){
+                    bottomSheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
+                }else if(bottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED){
+                    bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
                 }
 
                 true
             }
             R.id.resultExplorerExport -> {
-                val count = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }.resultSpreadSheet.value?.data?.size?:0
+                val count = viewModel.resultSpreadSheet.value?.data?.size?:0
                 val s = if(count == 0) " " else " $count "
                 permissionRequiredEvent = Event{ createCsvFile.launch("TimingTrials${s}Results Export.csv") }
                 requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -170,6 +154,11 @@ class ResultExplorerFragment : Fragment()  {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        bottomSheetBehavior = null
+    }
+
     fun showTipsDialog(){
 
         val htmlString =
@@ -181,7 +170,6 @@ class ResultExplorerFragment : Fragment()  {
     
  """
 
-
         val html = HtmlCompat.fromHtml(htmlString, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         val mColor = ContextCompat.getColor(requireContext(), R.color.secondaryDarkColor)
@@ -190,11 +178,9 @@ class ResultExplorerFragment : Fragment()  {
 
         AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.tips))
-
                 .setIcon(d)
                 .setMessage(html)
                 .setPositiveButton(R.string.ok){_,_->
-
                 }
                 .show()
     }
@@ -217,7 +203,7 @@ class ResultExplorerFragment : Fragment()  {
 
     private fun writeCsv(uri: Uri){
 
-        val vmSheet = requireActivity().getViewModel { requireActivity().injector.globalResultViewModel() }.resultSpreadSheet.value
+        val vmSheet = viewModel.resultSpreadSheet.value
 
         vmSheet?.let{sheet->
             try {

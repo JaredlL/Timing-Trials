@@ -7,6 +7,7 @@ import com.jaredlinden.timingtrials.data.roomrepo.*
 import com.jaredlinden.timingtrials.domain.*
 import com.jaredlinden.timingtrials.util.Event
 import com.jaredlinden.timingtrials.util.LengthConverter
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -21,7 +22,7 @@ interface ISheetViewModel{
 
 data class GlobalResultViewModelData(val itemId: Long, val  itemType: String, val converter: LengthConverter)
 
-
+@HiltViewModel
 class ResultExplorerViewModel @Inject constructor(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository, private val courseRepository: ICourseRepository, private val timeTrialRiderRepository: TimeTrialRiderRepository) : ViewModel(), ISheetViewModel {
 
 
@@ -40,7 +41,6 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
     override val columns: MutableLiveData<List<ColumnData>> = MutableLiveData(cols)
 
     val columnViewModels = cols.map { ResultFilterViewModel(it, this) }
-
     val resultSpreadSheet: MediatorLiveData<ResultExplorerSpreadSheet> = MediatorLiveData()
 
 
@@ -112,10 +112,8 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
                 resultSpreadSheet.value?.let {
                     resultSpreadSheet.value = it.copy(columns = cols)
                 }
-
             }
         }
-
     }
 
 
@@ -181,7 +179,6 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
                        val n = mnew
                        mnew = n?.copy(currentItem.first?:n.results, currentItem.second?:n.columns) ?: currentItem.third.copy(currentItem.first?:currentItem.third.results, currentItem.second?:currentItem.third.columns)
                    }
-
                 }
                 mnew?.let { resultSpreadSheet.postValue(it) }
                 isCarolineAlive.set(false)

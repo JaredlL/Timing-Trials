@@ -9,6 +9,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -18,54 +20,44 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentEditRiderBinding
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class EditRiderFragment : Fragment() {
 
 
     private val args: EditRiderFragmentArgs by navArgs()
-    private lateinit var riderViewModel: EditRiderViewModel
+    private val riderViewModel: EditRiderViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
-
         setHasOptionsMenu(true)
-
-        riderViewModel = requireActivity().getViewModel { requireActivity().injector.riderViewModel() }
-
-
-        riderViewModel.mutableRider.observe(viewLifecycleOwner, Observer {  })
-
+        riderViewModel.mutableRider.observe(viewLifecycleOwner){ }
         riderViewModel.changeRider(args.riderId)
-
-
-
-
-
         val categoryAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
-        riderViewModel.categories.observe(viewLifecycleOwner, Observer{res->
+        riderViewModel.categories.observe(viewLifecycleOwner) {res->
             res?.let {cats->
                 categoryAdapter.clear()
                 cats.filterNot { it.isBlank() }.forEachIndexed { index, s -> categoryAdapter.insert(s, index)  }
                 categoryAdapter.notifyDataSetChanged()
             }
-        })
+        }
 
         val clubAdapter = ArrayAdapter<String>(requireActivity(), R.layout.support_simple_spinner_dropdown_item, mutableListOf())
-        riderViewModel.clubs.observe(viewLifecycleOwner, Observer{res->
+        riderViewModel.clubs.observe(viewLifecycleOwner) {res->
             res?.let {clubs->
                 clubAdapter.clear()
                 clubs.filterNot { it.isBlank() }.forEachIndexed { index, s -> clubAdapter.insert(s, index)  }
                 clubAdapter.notifyDataSetChanged()
             }
-        })
+        }
 
         riderViewModel.message.observe(viewLifecycleOwner, EventObserver{
             Toast.makeText(requireContext(), requireContext().getText(it), Toast.LENGTH_LONG).show()
         })
 
         riderViewModel.doJumpToRiderResults.observe(viewLifecycleOwner, EventObserver{
-            val action = EditRiderFragmentDirections.actionEditRiderFragmentToSheetFragment(it, Rider::class.java.simpleName)
+            val action = EditRiderFragmentDirections.actionEditRiderFragmentToSheetFragment(Rider::class.java.simpleName, it)
             findNavController().navigate(action)
         })
 
@@ -74,7 +66,6 @@ class EditRiderFragment : Fragment() {
                 findNavController().popBackStack()
             }
         })
-
 
         //Set title
         (requireActivity() as AppCompatActivity).supportActionBar?.title = if(args.riderId == 0L) getString(R.string.add_rider) else getString(R.string.edit_rider)
@@ -86,7 +77,7 @@ class EditRiderFragment : Fragment() {
 
         val binding = DataBindingUtil.inflate<FragmentEditRiderBinding>(inflater, R.layout.fragment_edit_rider, container, false).apply {
             viewModel = riderViewModel
-            lifecycleOwner = (this@EditRiderFragment)
+            lifecycleOwner = viewLifecycleOwner
             autoCompleteClub.setAdapter(clubAdapter)
             autoCompleteCategory.setAdapter(categoryAdapter)
             fabCallback.fabClickEvent.observe(viewLifecycleOwner, EventObserver {
@@ -108,11 +99,9 @@ class EditRiderFragment : Fragment() {
             }
 
         }
-        //For some reason gender spinner sometimes doesnt update
+
+        //For some reason gender spinner sometimes doesn't update
         binding.invalidateAll()
-
-
-
         return binding.root
     }
 
@@ -149,6 +138,4 @@ class EditRiderFragment : Fragment() {
         //menu.clear()
         inflater.inflate(R.menu.menu_delete, menu)
     }
-
-
 }

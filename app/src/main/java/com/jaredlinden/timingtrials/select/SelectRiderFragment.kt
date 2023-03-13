@@ -9,6 +9,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -21,18 +23,17 @@ import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.jaredlinden.timingtrials.setup.*
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 
 const val SELECTED_RIDERS = "selected_riders"
 
+@AndroidEntryPoint
 class SelectRiderFragment : Fragment() {
 
     private val args: SelectRiderFragmentArgs by navArgs()
-
-    private lateinit var viewModel: SelectRiderViewModel
+    private val viewModel: SelectRiderViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        viewModel = getViewModel { injector.selectRiderViewModel() }
 
         setHasOptionsMenu(true)
 
@@ -54,8 +55,8 @@ class SelectRiderFragment : Fragment() {
         val currentSortMode = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getInt(SORT_KEY, SORT_DEFAULT)
         viewModel.setSortMode(currentSortMode)
 
-        val binding = DataBindingUtil.inflate<FragmentSelectriderListBinding>(inflater, R.layout.fragment_selectrider_list, container, false).apply {
-            lifecycleOwner = (this@SelectRiderFragment)
+        val binding = FragmentSelectriderListBinding.inflate(inflater, container, false).apply {
+            lifecycleOwner = viewLifecycleOwner
             riderHeading.rider =  Rider.createBlank().copy( firstName = getString(R.string.name), club = getString(R.string.club))
             riderHeading.checkBox.visibility =  View.INVISIBLE
             riderRecyclerView.adapter = adapter
@@ -83,13 +84,8 @@ class SelectRiderFragment : Fragment() {
         }
 
 
-        viewModel.liveSortMode.observe(viewLifecycleOwner, Observer {
-
-        })
-
-        viewModel.riderFilter.observe(viewLifecycleOwner, Observer {
-
-        })
+        viewModel.liveSortMode.observe(viewLifecycleOwner) {}
+        viewModel.riderFilter.observe(viewLifecycleOwner) {}
 
         viewModel.selectedRidersInformation.observe(viewLifecycleOwner, Observer {result->
             result?.let {
@@ -105,9 +101,7 @@ class SelectRiderFragment : Fragment() {
                         viewManager.scrollToPositionWithOffset(pos, binding.root.height / 2)
                     }
                 }
-
             }
-
         })
 
         viewModel.showMessage.observe(viewLifecycleOwner, EventObserver{
@@ -118,6 +112,8 @@ class SelectRiderFragment : Fragment() {
 
     }
     var sv: SearchView? = null
+
+    //Keep listener ref so we can remove it later (possibly prevent mem leak)
     val expandListener = object : MenuItem.OnActionExpandListener {
         override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
 

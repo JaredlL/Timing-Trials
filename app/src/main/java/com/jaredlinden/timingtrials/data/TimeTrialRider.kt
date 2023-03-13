@@ -6,8 +6,21 @@ import org.threeten.bp.OffsetDateTime
 
 @Entity(tableName = "timetrial_rider_table",
         indices = [Index("timeTrialId"), Index("riderId")],
-        foreignKeys = [ForeignKey(entity =TimeTrialHeader::class, parentColumns = arrayOf("id"), childColumns = arrayOf("timeTrialId"), onDelete = ForeignKey.CASCADE, deferred = false),
-            ForeignKey(entity =Rider::class, parentColumns = arrayOf("id"), childColumns = arrayOf("riderId"), onDelete = ForeignKey.CASCADE, deferred = false)])
+        foreignKeys =
+        [
+            ForeignKey(
+                entity =TimeTrialHeader::class,
+                parentColumns = arrayOf("id"),
+                childColumns = arrayOf("timeTrialId"),
+                onDelete = ForeignKey.CASCADE,
+                deferred = false),
+            ForeignKey(
+                entity =Rider::class,
+                parentColumns = arrayOf("id"),
+                childColumns = arrayOf("riderId"),
+                onDelete = ForeignKey.CASCADE,
+                deferred = false)
+        ])
 data class TimeTrialRider(val riderId: Long,
                           val timeTrialId: Long?,
                           val courseId: Long?,
@@ -27,7 +40,6 @@ data class TimeTrialRider(val riderId: Long,
         return finishCode == null || finishCode >0
     }
 
-
     fun hasFinished():Boolean{
         return finishCode?.let { it>0 }?:false
     }
@@ -43,15 +55,19 @@ data class TimeTrialRider(val riderId: Long,
     companion object {
         fun fromRiderAndTimeTrial(rider:Rider, ttId: Long): TimeTrialRider{
             if(rider.id !=null){
-                return TimeTrialRider(rider.id, ttId, null, 1, gender = rider.gender, category = rider.category, club = rider.club)
+                return TimeTrialRider(
+                    rider.id,
+                    ttId,
+                    null,
+                    1,
+                    gender = rider.gender,
+                    category = rider.category,
+                    club = rider.club)
             }else{
                 throw Exception("Can't create result, rider id is null")
             }
-
         }
     }
-
-
 }
 
 data class RiderIdStartTime(val riderId: Long, val startTime: OffsetDateTime)
@@ -91,8 +107,6 @@ data class TimeTrialRiderResult(
 
     override val resultTime: Long?
         get() = timeTrialData.finishTime()
-
-
     override val splits: List<Long>
         get() = if( timeTrialData.splits.isNotEmpty()) listOf(timeTrialData.splits.first()) + timeTrialData.splits.zipWithNext{a,b -> b-a} else listOf()
 
@@ -116,7 +130,6 @@ data class TimeTrialRiderResult(
 
 data class FilledTimeTrialRider(
         @Embedded val timeTrialData: TimeTrialRider,
-
         @Relation(parentColumn = "riderId", entityColumn = "id", entity = Rider::class)
         val riderData: Rider
 ){
@@ -134,8 +147,6 @@ data class FilledTimeTrialRider(
     }
 
     fun riderId(): Long? = riderData.id
-
-
 
     companion object{
         fun createFromRiderAndTimeTrialAndNumber(rider: Rider, timeTrial: TimeTrial, number: Int?): FilledTimeTrialRider{
@@ -155,8 +166,6 @@ data class FilledTimeTrialRider(
             }else{
                 throw Exception("Rider ID is null")
             }
-
-
         }
 
         fun createFromRiderAndTimeTrial(rider: Rider, timeTrial: TimeTrial): FilledTimeTrialRider{
@@ -175,11 +184,8 @@ data class FilledTimeTrialRider(
             }else{
                 throw Exception("Rider ID is null")
             }
-
-
         }
     }
-
 }
 
 

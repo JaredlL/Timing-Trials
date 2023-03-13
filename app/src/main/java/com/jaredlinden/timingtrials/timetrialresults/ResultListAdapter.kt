@@ -53,7 +53,7 @@ class ResultListAdapter internal constructor(val context: Context, val editResul
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultViewHolder {
-        val binding: ListItemResultBinding = DataBindingUtil.inflate(layoutInflater, R.layout.list_item_result, parent, false)
+        val binding: ListItemResultBinding = ListItemResultBinding.inflate(layoutInflater, parent, false)
         return ResultViewHolder(binding)
     }
 

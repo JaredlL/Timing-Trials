@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.data.roomrepo.*
 import com.jaredlinden.timingtrials.util.ConverterUtils
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -12,7 +13,8 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
-class TimeTrialViewModel (val timeTrialRepository: ITimeTrialRepository, val viewModelScope: CoroutineScope) : ViewModel(){
+@HiltViewModel
+class TimeTrialViewModel @Inject constructor (val timeTrialRepository: ITimeTrialRepository) : ViewModel(){
 
     private val idLiveData: MutableLiveData<Long?> = MutableLiveData()
 
@@ -53,7 +55,12 @@ class TimeTrialViewModel (val timeTrialRepository: ITimeTrialRepository, val vie
     }
 }
 
-class ResultViewModel @Inject constructor(val timeTrialRepository: ITimeTrialRepository, val riderRepository: IRiderRepository, val courseRepository: ICourseRepository, val resultRepository: TimeTrialRiderRepository) : ViewModel() {
+@HiltViewModel
+class ResultViewModel @Inject constructor(
+    val timeTrialRepository: ITimeTrialRepository,
+    val riderRepository: IRiderRepository,
+    val courseRepository: ICourseRepository,
+    val resultRepository: TimeTrialRiderRepository) : ViewModel() {
 
 
     private val idLiveData: MutableLiveData<Long?> = MutableLiveData()

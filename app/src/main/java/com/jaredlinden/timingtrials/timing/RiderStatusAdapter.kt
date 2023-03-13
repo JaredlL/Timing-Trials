@@ -3,6 +3,7 @@ package com.jaredlinden.timingtrials.timing
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.jaredlinden.timingtrials.R
@@ -20,11 +21,11 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
                 viewModel = status
 
                 riderStatusTextView.background = when(status.status){
-                    RiderStatus.NOT_STARTED -> context.getDrawable(R.drawable.background_rider_status_inactive)
-                    RiderStatus.RIDING -> context.getDrawable(R.drawable.background_rider_status_active)
-                    RiderStatus.DNS -> context.getDrawable(R.drawable.background_rider_status_dnf)
-                    RiderStatus.DNF -> context.getDrawable(R.drawable.background_rider_status_dnf)
-                    else-> context.getDrawable(R.drawable.background_rider_status_inactive)
+                    RiderStatus.NOT_STARTED -> AppCompatResources.getDrawable(context, R.drawable.background_rider_status_inactive)
+                    RiderStatus.RIDING -> AppCompatResources.getDrawable(context, R.drawable.background_rider_status_active)
+                    RiderStatus.DNS -> AppCompatResources.getDrawable(context, R.drawable.background_rider_status_dnf)
+                    RiderStatus.DNF -> AppCompatResources.getDrawable(context, R.drawable.background_rider_status_dnf)
+                    else-> AppCompatResources.getDrawable(context, R.drawable.background_rider_status_inactive)
                 }
 
                 riderStatusTextView.setOnLongClickListener {

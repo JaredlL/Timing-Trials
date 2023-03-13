@@ -8,6 +8,7 @@ import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.Utils
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -24,7 +25,7 @@ interface ITimeTrialSetupViewModel {
 }
 
 
-
+@HiltViewModel
 class SetupViewModel @Inject constructor(
         val timeTrialRepository: ITimeTrialRepository,
         val riderRepository: IRiderRepository,
@@ -54,7 +55,6 @@ class SetupViewModel @Inject constructor(
         }
     }
 
-
     override val numberOptionsViewModel: NumberOptionsViewModel = NumberOptionsViewModel(this)
 
     init {
@@ -67,11 +67,7 @@ class SetupViewModel @Inject constructor(
                 }
             }
         }
-
-
-
     }
-
 
     private val queue = ConcurrentLinkedQueue<TimeTrial>()
     private var isCarolineAlive = AtomicBoolean()
@@ -130,8 +126,6 @@ class SetupViewModel @Inject constructor(
                   }
                 }
 
-                //val mBlobs = courseLapMeanSds.map {r-> Triple(r.first.name, ConverterUtils.toSecondMinuteHour(r.second.toLong()), ConverterUtils.toSecondMinuteHour(r.third.toLong())) }.distinct()
-
                 val sortedByScore = riderScores.sortedByDescending { it.second }.map { it.first }
                 val newRiderList = tt.riderList.sortedBy { it.riderData.firstName.let { sortedByScore.indexOf(it) } }
 
@@ -157,7 +151,6 @@ class SetupViewModel @Inject constructor(
         }else{
             null
         }
-
     }
 
     override val orderRidersViewModel: IOrderRidersViewModel = OrderRidersViewModel(this)

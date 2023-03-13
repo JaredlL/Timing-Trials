@@ -9,14 +9,17 @@ import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.domain.Filter
 import com.jaredlinden.timingtrials.util.Event
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
-class ListViewModel @Inject constructor(private val courseRepository: ICourseRepository,
-                                        private val riderRepository: IRiderRepository,
-                                        val timeTrialRepository: ITimeTrialRepository) : ViewModel() {
+@HiltViewModel
+class ListViewModel @Inject constructor(
+    val courseRepository: ICourseRepository,
+    val riderRepository: IRiderRepository,
+    val timeTrialRepository: ITimeTrialRepository)
+    : ViewModel() {
 
 
     val liveFilter: MutableLiveData<Filter> = MutableLiveData()
@@ -53,7 +56,6 @@ class ListViewModel @Inject constructor(private val courseRepository: ICourseRep
                 res?.filter { riderVm->
                     filterVal.passes(riderVm)
                 } ?: res
-
             }
         }
     }
@@ -75,7 +77,6 @@ class ListViewModel @Inject constructor(private val courseRepository: ICourseRep
     fun deleteTimeTrial(ttId: Long){
             viewModelScope.launch(Dispatchers.IO) {
                 timeTrialRepository.deleteById(ttId)
-
         }
     }
 

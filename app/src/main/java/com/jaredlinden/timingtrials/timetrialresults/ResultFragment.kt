@@ -27,6 +27,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -42,34 +44,25 @@ import com.jaredlinden.timingtrials.databinding.FragmentTimetrialResultBinding
 import com.jaredlinden.timingtrials.domain.JsonResultsWriter
 import com.jaredlinden.timingtrials.domain.csv.CsvTimeTrialResultWriter
 import com.jaredlinden.timingtrials.util.*
-import kotlinx.android.synthetic.main.fragment_timetrial_result.*
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.IOException
 import java.util.*
 
-
+@AndroidEntryPoint
 class ResultFragment : Fragment() {
 
     private val args: ResultFragmentArgs by navArgs()
 
-    lateinit var resultViewModel: ResultViewModel
-    lateinit var viewManager: GridLayoutManager
-    lateinit var resultGridAdapter: ResultListAdapter
-
-
-
-
-
-
+    val resultViewModel: ResultViewModel by activityViewModels()
+    var mBinding: FragmentTimetrialResultBinding? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
 
-        viewManager = GridLayoutManager(requireActivity(), 2)
+        val viewManager = GridLayoutManager(requireActivity(), 2)
 
-
-
-        resultGridAdapter = ResultListAdapter(requireActivity()) { id->
+        val resultGridAdapter = ResultListAdapter(requireActivity()) { id->
             id?.let {
                 val action = ResultFragmentDirections.actionResultFragmentToEditResultFragment(id, resultViewModel.timeTrial.value?.timeTrialHeader?.id?:0L)
                 findNavController().navigate(action)
@@ -81,9 +74,9 @@ class ResultFragment : Fragment() {
 
         (requireActivity() as? IFabCallbacks)?.setFabVisibility(View.GONE)
 
-        resultViewModel = requireActivity().getViewModel {  requireActivity().injector.resultViewModel() }.apply { changeTimeTrial(args.timeTrialId) }
+        resultViewModel.changeTimeTrial(args.timeTrialId)
 
-        val binding = DataBindingUtil.inflate<FragmentTimetrialResultBinding>(inflater, R.layout.fragment_timetrial_result, container, false).apply {
+        val binding = FragmentTimetrialResultBinding.inflate(inflater, container, false).apply {
 
             fragResultRecyclerView.setHasFixedSize(true)
             fragResultRecyclerView.isNestedScrollingEnabled = false
@@ -92,7 +85,6 @@ class ResultFragment : Fragment() {
             fragResultRecyclerView.addItemDecoration(DividerItemDecoration(requireActivity(), LinearLayoutManager.VERTICAL))
 
         }
-
 
         resultViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
             res?.let {
@@ -106,8 +98,7 @@ class ResultFragment : Fragment() {
             }
         })
 
-
-        resultViewModel.results.observe(viewLifecycleOwner, Observer {res->
+        resultViewModel.results.observe(viewLifecycleOwner){res->
             res?.let {newRes->
                 if(newRes.isNotEmpty()){
                     val rowLength = newRes.first().row.size
@@ -123,17 +114,21 @@ class ResultFragment : Fragment() {
                     })
                     resultGridAdapter.setResults(newRes)
                 }
-
             }
-        })
-
+        }
 
         if(!PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(HAS_SHOWN_TIMETRIAL_RESULT_TIPS, false)){
             showTipsDialog()
             PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putBoolean(HAS_SHOWN_TIMETRIAL_RESULT_TIPS, true).apply()
         }
 
+        mBinding = binding
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mBinding = null
     }
 
     fun showTipsDialog(){
@@ -191,14 +186,13 @@ class ResultFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.resultScreenshot -> {
-                permissionRequiredEvent = Event{view?.let {
-                    takeScreenShot(it)
-                }?:Unit}
-                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
+               //permissionRequiredEvent = Event{view?.let {
+               //    takeScreenShot(it)
+               //}?:Unit}
+               //requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                view?.let { takeScreenShot(it) }
                 true
             }
-
             R.id.resultMenuClearNotes ->{
                 resultViewModel.clearNotesColumn()
                 true
@@ -255,8 +249,6 @@ class ResultFragment : Fragment() {
                         .setNegativeButton(R.string.cancel) { _, _ ->
 
                         }.show()
-
-
                 true
             }
 
@@ -369,25 +361,18 @@ class ResultFragment : Fragment() {
         val oldWidth = view.width
         val oldHeight =  view.height
         try {
+            val binding = mBinding ?: throw Exception("Binding null")
 
-
-           // val sv = horizontalScrollView
+            // val sv = horizontalScrollView
            // val view = sv.getChildAt(0)
             val now = Date()
             val nowChars = android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
-
             val ttName = resultViewModel.timeTrial.value?.timeTrialHeader?.ttName
-            
             val imgName = "${ttName?:nowChars}.png"
 
-
-
-            val scrollViewWidth = horizontalScrollView.getChildAt(0).width
-            //val scrollViewWidth = 200
-
-            val sr = fragResultRecyclerView.computeVerticalScrollRange()
-
-            val gridHeight = if(sr == 0) fragResultRecyclerView.height else sr
+            val scrollViewWidth = binding.horizontalScrollView.getChildAt(0).width
+            val sr = binding.fragResultRecyclerView.computeVerticalScrollRange()
+            val gridHeight = if(sr == 0) binding.fragResultRecyclerView.height else sr
 
             //https://dev.to/pranavpandey/android-create-bitmap-from-a-view-3lck
             view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(gridHeight+dpToPixels(300), View.MeasureSpec.EXACTLY))
@@ -395,15 +380,12 @@ class ResultFragment : Fragment() {
             view.layout(0,0, view.measuredWidth, view.measuredHeight)
 
             val resutWaterMarkTextView = view.findViewById<TextView>(R.id.resutWaterMarkTextView)
-            //resutWaterMarkTextView.measure(View.MeasureSpec.makeMeasureSpec(, View.MeasureSpec.EXACTLY), View.MeasureSpec.EXACTLY)
             val tv1Height = resutWaterMarkTextView.measuredHeight
 
             val titleText = view.findViewById<TextView>(R.id.titleText)
-            //titleText.measure(View.MeasureSpec.EXACTLY, View.MeasureSpec.EXACTLY)
             val titleTextHeight = titleText.measuredHeight
 
             val resultNotesTextView = view.findViewById<TextView>(R.id.resultNotesTextView)
-            //resultNotesTextView.measure(View.MeasureSpec.EXACTLY, View.MeasureSpec.EXACTLY)
             val notesHeight = resultNotesTextView.measuredHeight
 
             val sum = tv1Height + titleTextHeight + notesHeight + dpToPixels(50)
@@ -419,22 +401,23 @@ class ResultFragment : Fragment() {
 
            if( view.background!=null) {
                view.background.draw(canvas)
-            }else{
+            }
+           else
+            {
                val typedValue = TypedValue()
                val theme = requireContext().theme
                theme.resolveAttribute(R.attr.colorSurface, typedValue, true)
                val color = typedValue.data
                canvas.drawColor(color)
-           }
+
+            }
             view.draw(canvas)
-
-
             val fileName = Utils.createFileName(imgName)
 
             when(Build.VERSION.SDK_INT){
 
                 //29-30
-                in(Build.VERSION_CODES.Q..Int.MAX_VALUE) ->
+                in(Build.VERSION_CODES.Q..Integer.MAX_VALUE) ->
                     saveScreenshotQ(bitmap, fileName)
                 //26-28
                 in(Build.VERSION_CODES.O..Build.VERSION_CODES.P) ->
@@ -442,16 +425,10 @@ class ResultFragment : Fragment() {
                 //21-25
                 in(Build.VERSION_CODES.LOLLIPOP..Build.VERSION_CODES.N) -> saveScreenshotN(bitmap, fileName)
 
-                else -> throw Exception("Version Unsupported")
-
             }
-
-
-
         } catch (e:Throwable) {
             // Several error may come out with file handling or DOM
             throw Exception(e)
-
         }
         finally {
 
@@ -482,16 +459,11 @@ class ResultFragment : Fragment() {
         data?.let {
             cr.openOutputStream(data)?.let {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
-
                 Timber.d("Created image Filepath API 29-30 -> ${data.path}")
-
                 it.flush()
                 it.close()
             }
-
         }
-
-
 
         Timber.d("Inserted image URI API 29-30 -> $data")
         openScreenshot(data)
@@ -538,7 +510,6 @@ class ResultFragment : Fragment() {
                 put(MediaStore.Images.Media.TITLE, imageName)
                 put(MediaStore.Images.Media.MIME_TYPE, "image/png")
                 put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
-                //put(MediaStore.MediaColumns.DATA, filePath.absolutePath)
                 put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
             }
 
@@ -555,14 +526,9 @@ class ResultFragment : Fragment() {
             }
             //refreshGallery(it)
         }
-
-
             Timber.d("Inserted image URI API 26 -> ${data?.path}")
             openScreenshot(data)
     }
-
-
-
 
     private fun openScreenshot(imageFile: Uri?) {
         val intent = Intent()
@@ -572,7 +538,6 @@ class ResultFragment : Fragment() {
         Timber.d("Request open  ${imageFile?.path}")
         startActivity(intent)
     }
-
 }
 
 

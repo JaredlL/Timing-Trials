@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools">
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".timing.TimingActivity">
@@ -23,24 +27,16 @@
                 android:layout_gravity="end"
                 android:gravity="end">
 
-
                 <TextClock
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:format12Hour="hh:mm:ss"
                 android:format24Hour="hh:mm:ss"
                 tools:text="11:23:21">
-
                 </TextClock>
 
-
-
             </androidx.appcompat.widget.LinearLayoutCompat>
-
-
         </androidx.appcompat.widget.Toolbar>
-
-
     </com.google.android.material.appbar.AppBarLayout>
 
 
@@ -94,3 +90,4 @@
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

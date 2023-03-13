@@ -22,9 +22,6 @@ data class CompleteInformationRow(
         val resultTime: Long? = null,
         val resultNotes: String ="",
         val resultSplits: List<Long> = listOf()
-
-
-
 ) {
 
     fun rider(): Rider?{
@@ -36,8 +33,15 @@ data class CompleteInformationRow(
     fun timeTrialHeader(): TimeTrialHeader?{
         val ttName = timeTrialName()
         return if(ttName != null){
-            val offsetDateTime = timeTrialDate?.let { OffsetDateTime.of(it, LocalTime.of(19,0,0), ZoneId.systemDefault().rules.getOffset(Instant.now()))}
-            TimeTrialHeader(ttName, laps = timeTrialLaps, startTime = offsetDateTime, description = timeTrialDescription, status = TimeTrialStatus.FINISHED)
+            val offsetDateTime = timeTrialDate?.let{
+                OffsetDateTime.of(it, LocalTime.of(19,0,0), ZoneId.systemDefault().rules.getOffset(Instant.now()))
+            }
+
+            TimeTrialHeader(ttName,
+                laps = timeTrialLaps,
+                startTime = offsetDateTime,
+                description = timeTrialDescription,
+                status = TimeTrialStatus.FINISHED)
         }else{
             null
         }
@@ -55,6 +59,4 @@ data class CompleteInformationRow(
     fun  course():Course?{
         return courseName?.let { Course(it, courseDistance?:0.0, courseCttName) }
     }
-
-
 }

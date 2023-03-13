@@ -13,6 +13,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.jaredlinden.timingtrials.BuildConfig
@@ -20,21 +22,20 @@ import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.data.TimeTrial
+import com.jaredlinden.timingtrials.databinding.FragmentTimerBinding
+import com.jaredlinden.timingtrials.databinding.FragmentTimerHostBinding
 import com.jaredlinden.timingtrials.select.SELECTED_RIDERS
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.Instant
 
+@AndroidEntryPoint
 class TimerHostFragment : Fragment() {
 
-    private val TIMERTAG = "timing_tag"
-    private val STATUSTAG = "status_tag"
-
-    private lateinit var viewModel : TimingViewModel
-
+    private val viewModel : TimingViewModel by activityViewModels()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        viewModel = requireActivity().getViewModel { injector.timingViewModel() }
         setHasOptionsMenu(true)
 
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
@@ -47,24 +48,10 @@ class TimerHostFragment : Fragment() {
             setFabVisibility(View.GONE)
         }
 
-        val v = inflater.inflate(R.layout.fragment_host, container, false)
-
-        childFragmentManager.findFragmentByTag(TIMERTAG)?: TimerFragment.newInstance().also {
-            childFragmentManager.beginTransaction().apply{
-                add(R.id.higherFrame, it, TIMERTAG)
-                commit()
-            }
+        val binding = FragmentTimerHostBinding.inflate(inflater, container, false).apply {
+            lifecycleOwner = viewLifecycleOwner
         }
-
-        childFragmentManager.findFragmentByTag(STATUSTAG)?: RiderStatusFragment.newInstance().also {
-            childFragmentManager.beginTransaction().apply{
-                add(R.id.lowerFrame, it, STATUSTAG)
-                commit()
-            }
-        }
-
-        return v
-
+        return binding.root
     }
 
     var selectedNumber : Event<Int?> = Event(null)
@@ -114,15 +101,13 @@ class TimerHostFragment : Fragment() {
             prevBackPress = System.currentTimeMillis()
         }else{
 
-
             viewModel.timeTrial.value?.let{
-                if(it.timeTrialHeader.startTime?.toInstant()?: Instant.MAX > Instant.now()){
+                if((it.timeTrialHeader.startTime?.toInstant() ?: Instant.MAX) > Instant.now()){
                     (requireActivity() as ITimingActivity).showExitDialogWithSetup()
                 }else{
                     showExitDialog()
                 }
             }
-
         }
     }
 
@@ -160,15 +145,10 @@ class TimerHostFragment : Fragment() {
                         val action = TimerHostFragmentDirections.actionTimerHostFragmentToSelectRiderFragment(ids.toLongArray(), true)
                         findNavController().navigate(action)
                     }
-
                 }
-
-
                 true
             }
-
             else -> true
-
         }
 //        Toast.makeText(this, "ToDo...", Toast.LENGTH_SHORT).show()
 //        return true
@@ -179,7 +159,7 @@ class TimerHostFragment : Fragment() {
         val edittext = EditText(requireContext())
 
         val usedNumbers = tt.riderList.mapNotNull { it.timeTrialData.assignedNumber }
-        val max = if(usedNumbers.any()) usedNumbers.max()?:0 else 0
+        val max = if(usedNumbers.any()) usedNumbers.maxOrNull()?:0 else 0
 
         edittext.setText((max + 1).toString())
         alert.setTitle(getString(R.string.what_number_will_late_rider_use))
@@ -223,7 +203,6 @@ class TimerHostFragment : Fragment() {
                     Toast.makeText(requireContext(), getString(R.string.number_already_taken), Toast.LENGTH_SHORT).show()
                 }
             }
-
         }
 
         alert.setNegativeButton(R.string.cancel) { _, _ -> }

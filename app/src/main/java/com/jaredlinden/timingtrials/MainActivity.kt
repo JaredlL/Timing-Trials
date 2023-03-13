@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.*
@@ -31,10 +32,14 @@ import androidx.preference.PreferenceManager
 import com.jaredlinden.timingtrials.timing.TimingActivity
 import com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.data.NumberMode
+import com.jaredlinden.timingtrials.databinding.ActivityMainBinding
 import com.jaredlinden.timingtrials.util.*
-import kotlinx.android.synthetic.main.activity_main.*
+import com.jaredlinden.timingtrials.viewdata.IOViewModel
+import com.jaredlinden.timingtrials.viewdata.ListViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.io.IOException
@@ -46,7 +51,6 @@ import kotlin.math.abs
 
 
 interface IFabCallbacks{
-    
     fun currentVisibility(): Int
 
     fun setFabVisibility(visibility: Int)
@@ -56,7 +60,7 @@ interface IFabCallbacks{
     val fabClickEvent: MutableLiveData<Event<Boolean>>
 }
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), IFabCallbacks {
 
 
@@ -85,25 +89,24 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         val html = HtmlCompat.fromHtml(getString(R.string.demo_data_description_ques), HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         AlertDialog.Builder(this)
-                .setTitle(getString(R.string.demo_data))
-                .setIcon(R.mipmap.tt_logo_round)
-                .setMessage(html)
-                .setPositiveButton(R.string.ok){_,_->
-                    try{
-                        val url = URL("https://bb.githack.com/lindenj/timingtrialsdata/raw/master/LiveDebugRDFCC.tt")
-                        val vm = getViewModel { injector.importViewModel()}
-                        vm.readUrlInput(url)
-                        vm.importMessage.observe(this, EventObserver{
-                            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
-                        })
-                    }catch (e:Exception){
-                        Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
-                    }
-
+            .setTitle(getString(R.string.demo_data))
+            .setIcon(R.mipmap.tt_logo_round)
+            .setMessage(html)
+            .setPositiveButton(R.string.ok){_,_->
+                try{
+                    val url = URL("https://bbcdn.githack.com/lindenj/timingtrialsdata/raw/master/LiveDebugRDFCC.tt")
+                    val vm:IOViewModel by viewModels()
+                    vm.readUrlInput(url)
+                    vm.importMessage.observe(this, EventObserver{
+                        Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+                    })
+                }catch (e:Exception){
+                    Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
                 }
-                .show().apply {
-                    findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
-                }
+            }
+            .show().apply {
+                findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
+            }
     }
 
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
@@ -129,20 +132,23 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }
     }
 
+    private lateinit var binding: ActivityMainBinding
+
+    var mainFab : FloatingActionButton? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-
-
-        val collapsingToolbar = collapsing_toolbar_layout
+        val collapsingToolbar = binding.collapsingToolbarLayout
         val navController = findNavController(R.id.nav_host_fragment)
 
-        appBarConfiguration = AppBarConfiguration(navController.graph, drawer_layout)
-        collapsingToolbar.setupWithNavController(toolbar, navController, appBarConfiguration)
+        appBarConfiguration = AppBarConfiguration(navController.graph, binding.drawerLayout)
+        collapsingToolbar.setupWithNavController(binding.toolbar, navController, appBarConfiguration)
 
-        main_app_bar_layout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+        binding.mainAppBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             if (abs(verticalOffset)-(appBarLayout?.totalScrollRange?:0) == 0) {
                 //  Collapsed
                 toolbarCollapsed = true
@@ -151,10 +157,13 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 //Expanded
                 toolbarCollapsed = false
                 refreshFab()
-
             }
-        })
+        }
 
+        mainFab = binding.mainFab
+        val drawer_layout = binding.drawerLayout
+        val nav_view = binding.navView
+        val main_app_bar_layout = binding.mainAppBarLayout
 
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(listener)
 
@@ -163,23 +172,22 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(HAS_SHOWN_ONBOARDING, true).apply()
         }
 
-        mainFab.setOnClickListener {
+        binding.mainFab.setOnClickListener {
             fabClickEvent.postValue(Event(true))
         }
 
-        setSupportActionBar(toolbar)
-        nav_view.setupWithNavController(navController)
+        setSupportActionBar(binding.toolbar)
+        binding.navView.setupWithNavController(navController)
         setupActionBarWithNavController(navController, appBarConfiguration)
-        rootCoordinator = mainActivityCoordinator
+        rootCoordinator = binding.mainActivityCoordinator
 
-        val vm = getViewModel { injector.mainViewModel()}
-        vm.timingTimeTrial.observe(this, Observer {
+        val vm:TitleViewModel by viewModels ()
+        vm.timingTimeTrial.observe(this) {
             it?.let {
                 val intent = Intent(this, TimingActivity::class.java)
                 startActivity(intent)
             }
-
-        })
+        }
 
         if(BuildConfig.DEBUG){
            nav_view.menu.findItem(R.id.app_bar_test).isVisible = true
@@ -235,8 +243,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             }
         }
 
-
-
         drawer_layout.addDrawerListener(object : DrawerLayout.DrawerListener{
             override fun onDrawerStateChanged(newState: Int) {
 
@@ -253,7 +259,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                         val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToTitleFragment()
                         navController.navigate(action)
                         drawer_layout.closeDrawer(GravityCompat.START)
-
                     }
                     R.id.app_bar_settings -> {
                         if(navController.currentDestination?.id == R.id.dataBaseViewPagerFragment){
@@ -262,11 +267,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                         }else{
                             navController.navigate(R.id.settingsFragment)
                         }
-
-
-
                     }
-
                     R.id.app_bar_help ->{
                         if(navController.currentDestination?.id == R.id.dataBaseViewPagerFragment){
                             val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToHelpPrefsFragment()
@@ -275,9 +276,8 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                             navController.navigate(R.id.helpPrefsFragment)
                         }
                     }
-
                     R.id.app_bar_new_timetrial -> {
-                        val viewModel = getViewModel { injector.listViewModel() }
+                        val viewModel:ListViewModel by viewModels()
                         viewModel.timeTrialInsertedEvent.observe(this@MainActivity, EventObserver {
                             val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
                             //navController.navigate(action)
@@ -289,26 +289,20 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
                         viewModel.insertNewTimeTrial(mode)
                     }
-
-
                     R.id.app_bar_spreadsheet->{
-                        val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(0,"")
+                        val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment("",0)
                         navController.navigate(action)
                         drawer_layout.closeDrawer(GravityCompat.START)
 
                     }
                     else->{
-
                     }
                 }
                 drawButtonPressed = 0
-
             }
 
             override fun onDrawerOpened(drawerView: View) {
-
             }
-
         })
 
         navController.addOnDestinationChangedListener{_,dest,_->
@@ -328,7 +322,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             }
         }
 
-
         intent?.let { intent->
             val data = intent.data
 
@@ -342,7 +335,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     }
 
     private fun importData(uri: Uri){
-        val importVm = getViewModel { injector.importViewModel()}
+        val importVm:IOViewModel by viewModels()
         val inputStream = contentResolver.openInputStream(uri)
         val fName = getFileName(uri)
 
@@ -359,7 +352,13 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         if (uri.scheme == "content") {
             contentResolver.query(uri, null, null, null, null)?.let {cursor->
                 if (cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                    val index = if (cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME) < 0)
+                    {
+                        0
+                    }else{
+                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    }
+                    result = cursor.getString(index)
                 }
             }
         }
@@ -375,12 +374,11 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         return result
     }
 
-
     fun writeAllResults(uri: Uri){
         try {
             val outputStream = contentResolver.openOutputStream(uri)
             if(outputStream != null){
-                val allTtsVm = getViewModel { injector.importViewModel()}
+                val allTtsVm:IOViewModel by viewModels()
 
                 allTtsVm.writeAllTimeTrialsToPath(outputStream)
                 allTtsVm.importMessage.observe(this, EventObserver{
@@ -420,15 +418,10 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }
     }
 
-
     override val fabClickEvent: MutableLiveData<Event<Boolean>> = MutableLiveData()
-
     override fun setFabImage(resourceId: Int) {
         mainFab?.setImageResource(resourceId)
     }
-
-
-
 }
 
 

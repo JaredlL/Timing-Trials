@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
@@ -16,20 +18,17 @@ import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.databinding.FragmentCourseListBinding
 import com.jaredlinden.timingtrials.ui.SelectableCourseViewModel
 import com.jaredlinden.timingtrials.util.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SelectCourseFragment : Fragment() {
 
-    private lateinit var setupViewModel: SetupViewModel
-    private lateinit var viewModel: ISelectCourseViewModel
-    private lateinit var adapter: CourseListAdapter
-    private lateinit var viewManager: RecyclerView.LayoutManager
+    private val setupViewModel: SetupViewModel by activityViewModels()
 
     private val args: SelectCourseFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
-        setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
 
         if(args.timeTrialId != -1L){
             setupViewModel.changeTimeTrial(args.timeTrialId)
@@ -40,45 +39,35 @@ class SelectCourseFragment : Fragment() {
             setFabImage(R.drawable.ic_add_white_24dp)
             fabClickEvent.observe(viewLifecycleOwner, EventObserver {
                 if(it){
-                    val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")
+                    val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(context?.getString(R.string.new_course)?:"",0)
                     findNavController().navigate(action)
                 }
-
             })
         }
 
-
-
-        viewModel = setupViewModel.selectCourseViewModel
-        viewManager = LinearLayoutManager(context)
-        adapter = CourseListAdapter(requireContext())
+        val viewModel = setupViewModel.selectCourseViewModel
+        val viewManager = LinearLayoutManager(context)
+        val adapter = CourseListAdapter(requireContext())
         adapter.editCourse = ::editCourse
 
-        viewModel.getAllCourses().observe(viewLifecycleOwner, Observer { courses ->
+        viewModel.getAllCourses().observe(viewLifecycleOwner) { courses ->
             courses?.let{adapter.setCourses(it, getLengthConverter())}
-        })
-        adapter.courseSelected = { blobs ->
+        }
 
-            //val origCourse = viewModel.getAllCourses().value?.selectedId
+        adapter.courseSelected = { blobs ->
             viewModel.setSelectedCourse(blobs)
             val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToSetupViewPagerFragment()
             findNavController().navigate(action)
-
-
-
-
-
-
         }
 
         adapter.setHasStableIds(true)
 
         val unitString = getLengthConverter().unitDef.miniString
 
-        val heading: SelectableCourseViewModel = SelectableCourseViewModel("Course Name", "Distance ($unitString)", "CTT Name")
+        val heading = SelectableCourseViewModel("Course Name", "Distance ($unitString)", "CTT Name")
 
-        val binding = DataBindingUtil.inflate<FragmentCourseListBinding>(inflater, R.layout.fragment_course_list, container, false).apply{
-            lifecycleOwner = (this@SelectCourseFragment)
+        val binding = FragmentCourseListBinding.inflate(inflater, container, false).apply{
+            lifecycleOwner = viewLifecycleOwner
             courseHeading.courseVm = heading
             courseHeading.checkBox.visibility = View.INVISIBLE
             courseRecyclerView.adapter = adapter
@@ -115,7 +104,7 @@ class SelectCourseFragment : Fragment() {
 //    }
 
     private fun editCourse(course: Course){
-        val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(course.id?:0, resources.getString(R.string.edit_course))
+        val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(resources.getString(R.string.edit_course), course.id?:0)
         findNavController().navigate(action)
     }
 

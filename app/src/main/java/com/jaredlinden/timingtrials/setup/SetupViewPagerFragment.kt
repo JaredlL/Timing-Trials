@@ -10,6 +10,8 @@ import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -21,9 +23,8 @@ import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
 import com.jaredlinden.timingtrials.util.EventObserver
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
 import com.jaredlinden.timingtrials.util.showKeyboard
+import dagger.hilt.android.AndroidEntryPoint
 
 
 const val SORT_RECENT_ACTIVITY = 0
@@ -31,19 +32,16 @@ const val SORT_ALPHABETICAL = 1
 const val SORT_DEFAULT = SORT_ALPHABETICAL
 const val SORT_KEY = "sorting"
 
+@AndroidEntryPoint
 class SetupViewPagerFragment: Fragment() {
 
+    private val setupViewModel: SetupViewModel by activityViewModels()
 
-    private lateinit var setupViewModel: SetupViewModel
-
-    private val args: SetupViewPagerFragmentArgs by navArgs()
-
-    lateinit var tabLayoutMediator: TabLayoutMediator
-
+    var tabLayoutMediator: TabLayoutMediator? = null
     var setupMenu: Menu? = null
-
-    lateinit var prefListner : SharedPreferences.OnSharedPreferenceChangeListener
-    lateinit var viewPager : ViewPager2
+    var prefListner : SharedPreferences.OnSharedPreferenceChangeListener? = null
+    var viewPager : ViewPager2? = null
+    var searchView: SearchView? = null
 
     private val mPageChangeCallback = object :ViewPager2.OnPageChangeCallback(){
         override fun onPageSelected(position: Int) {
@@ -54,55 +52,46 @@ class SetupViewPagerFragment: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        setupViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }
         val binding = FragmentDatabaseViewPagerBinding.inflate(inflater, container, false)
         val tabLayout = binding.tabs
-        viewPager = binding.viewPager2
+        val viewPager2 = binding.viewPager2
+        viewPager = viewPager2;
         val pagerAdapter = SetupPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle){
             setFabStatus(setupViewModel.currentPage)
         }
-        viewPager.adapter = pagerAdapter
-
-
+        val args: SetupViewPagerFragmentArgs by navArgs()
+        viewPager2.adapter = pagerAdapter
         setupViewModel.changeTimeTrial(args.timeTrialId)
-
-        viewPager.registerOnPageChangeCallback(mPageChangeCallback)
-
-
+        viewPager2.registerOnPageChangeCallback(mPageChangeCallback)
         setHasOptionsMenu(true)
 
-        viewPager.offscreenPageLimit = 2
+        viewPager2.offscreenPageLimit = 2
         // Set the icon and text for each tab
-        tabLayoutMediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+        val tabLayoutMediator = TabLayoutMediator(tabLayout, viewPager2) { tab, position ->
             tab.setIcon(getTabIcon(position))
             tab.text = getTabTitle(position)
-            //manageFabVisibility(position)
         }
         tabLayoutMediator.attach()
 
-        prefListner =  object : SharedPreferences.OnSharedPreferenceChangeListener{
-            override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
-                setupViewModel.selectRidersViewModel.setSortMode(p0?.getInt(SORT_KEY, 0)?:0)
-            }
+        prefListner = SharedPreferences.OnSharedPreferenceChangeListener{ p0, p1 ->
+            setupViewModel.selectRidersViewModel.setSortMode(p0?.getInt(SORT_KEY, 0)?:0)
         }
+
         val prefMan = PreferenceManager.getDefaultSharedPreferences(requireContext())
         prefMan.registerOnSharedPreferenceChangeListener(prefListner)
         prefMan.getInt(SORT_KEY, 0).let {
             setupViewModel.selectRidersViewModel.setSortMode(it)
         }
 
-
         (activity as? IFabCallbacks)?.fabClickEvent?.observe(viewLifecycleOwner, EventObserver{
-            if(it && viewPager.currentItem == RIDER_PAGE_INDEX){
+            if(it && viewPager2.currentItem == RIDER_PAGE_INDEX){
                 val action = SetupViewPagerFragmentDirections.actionSetupViewPagerFragment2ToEditRiderFragment(0)
                 findNavController().navigate(action)
             }
-
         })
 
-        viewPager.setCurrentItem(setupViewModel.currentPage, false)
+        viewPager2.setCurrentItem(setupViewModel.currentPage, false)
         setFabStatus(setupViewModel.currentPage)
-
 
         return binding.root
     }
@@ -140,9 +129,6 @@ class SetupViewPagerFragment: Fragment() {
             }
         }
     }
-
-
-    var searchView: SearchView? = null
 
 //
 //    val closeListner = object : SearchView.OnCloseListener{
@@ -185,7 +171,7 @@ class SetupViewPagerFragment: Fragment() {
             setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
 
             isIconifiedByDefault = false
-            val selectRiderVm = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.selectRidersViewModel
+            val selectRiderVm = setupViewModel.selectRidersViewModel
             setQuery(selectRiderVm.riderFilter.value?:"", false)
             setOnQueryTextListener(object : SearchView.OnQueryTextListener{
                 override fun onQueryTextSubmit(searchText: String?): Boolean {
@@ -230,7 +216,7 @@ class SetupViewPagerFragment: Fragment() {
                     .setIcon(R.mipmap.tt_logo_round)
                     .setMessage(getString(R.string.seed_riders_message))
                     .setPositiveButton(R.string.ok) { _, _->
-                        (requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }).seedRiders()
+                        setupViewModel.seedRiders()
                     }.create().show()
             true
         }
@@ -241,10 +227,14 @@ class SetupViewPagerFragment: Fragment() {
 
     override fun onDestroyView() {
 
-        tabLayoutMediator.detach()
+        tabLayoutMediator?.detach()
         viewPager?.unregisterOnPageChangeCallback(mPageChangeCallback)
         searchView?.setOnQueryTextListener(null)
+        searchView = null
         viewPager?.adapter = null
+        tabLayoutMediator = null
+        setupMenu = null
+        prefListner = null
         super.onDestroyView()
     }
 
@@ -275,11 +265,9 @@ class SetupViewPagerFragment: Fragment() {
 
 }
 
-
 const val TIMETRIAL_PAGE_INDEX = 2
 const val RIDER_PAGE_INDEX = 0
 const val ORDER_RIDER_INDEX = 1
-
 
 class SetupPagerAdapter(fm: FragmentManager, ls: Lifecycle, val fragCreated: () -> Unit) : FragmentStateAdapter(fm,ls) {
 
@@ -297,7 +285,6 @@ class SetupPagerAdapter(fm: FragmentManager, ls: Lifecycle, val fragCreated: () 
 
     override fun createFragment(position: Int): Fragment {
         val f = tabFragmentsCreators[position]?.invoke() ?: throw IndexOutOfBoundsException()
-        fragCreated()
         return f
     }
 }

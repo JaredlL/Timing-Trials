@@ -16,42 +16,38 @@ import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.TimeTrialStatus
 import com.jaredlinden.timingtrials.databinding.FragmentSetupTimeTrialBinding
 import com.jaredlinden.timingtrials.timing.TimingActivity
 import com.jaredlinden.timingtrials.util.ConverterUtils
-import com.jaredlinden.timingtrials.util.getViewModel
-import com.jaredlinden.timingtrials.util.injector
+import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.*
 
-
+@AndroidEntryPoint
 class SetupTimeTrialFragment : Fragment() {
-
-    private lateinit var propsViewModel: ITimeTrialPropertiesViewModel
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        propsViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.timeTrialPropertiesViewModel
+        val setupVm:SetupViewModel by activityViewModels()
+        val propsViewModel = setupVm.timeTrialPropertiesViewModel
 
         //Order is important
         propsViewModel.setupMediator.observe(viewLifecycleOwner, object : Observer<Any> {
             override fun onChanged(t: Any?) {
 
             }
-
         })
 
-
-        val mAdapter = ArrayAdapter<String>(requireContext(), R.layout.support_simple_spinner_dropdown_item, listOf("15", "30", "60", "90", "120"))
-        val binding = DataBindingUtil.inflate<FragmentSetupTimeTrialBinding>(inflater, R.layout.fragment_setup_time_trial, container, false).apply {
+        val mAdapter = ArrayAdapter(requireContext(), R.layout.support_simple_spinner_dropdown_item, listOf("15", "30", "60", "90", "120"))
+        val binding = FragmentSetupTimeTrialBinding.inflate(inflater, container, false).apply {
             viewModel = propsViewModel
-            lifecycleOwner = (this@SetupTimeTrialFragment)
+            lifecycleOwner = viewLifecycleOwner
             autocomplete.threshold = 1
             autocomplete.setAdapter(mAdapter)
             coursebutton.setOnClickListener {
@@ -86,55 +82,40 @@ class SetupTimeTrialFragment : Fragment() {
                     val startString = "First rider starting at ${tt.let{ ConverterUtils.instantToSecondsDisplayString(tt.timeTrialHeader.startTime.toInstant())}}"
 
                     AlertDialog.Builder(requireContext())
-                            .setTitle(getString(R.string.starting_tt))
-                            .setMessage(courseString
-                                    + System.lineSeparator()
-                                    + System.lineSeparator()
-                                    + riderString
-                                    + System.lineSeparator()
-                                    + System.lineSeparator()
-                                    + startString
-)
-                            .setPositiveButton(R.string.ok){_,_->
-                                if(tt.timeTrialHeader.startTime.isAfter(OffsetDateTime.now())){
-                                    val newTt = tt.updateHeader(tt.timeTrialHeader.copy(status = TimeTrialStatus.IN_PROGRESS))
-                                    requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.updateTimeTrial(newTt)
-//                                    val intent = Intent(requireActivity(), TimingActivity::class.java)
-//                                    startActivity(intent)
-                                }else{
-                                    Toast.makeText(requireActivity(), getString(R.string.tt_must_start_in_the_future), Toast.LENGTH_LONG).show()
-                                }
+                        .setTitle(getString(R.string.starting_tt))
+                        .setMessage(courseString
+                                + System.lineSeparator()
+                                + System.lineSeparator()
+                                + riderString
+                                + System.lineSeparator()
+                                + System.lineSeparator()
+                                + startString)
+                        .setPositiveButton(R.string.ok){_,_->
+                            if(tt.timeTrialHeader.startTime.isAfter(OffsetDateTime.now())){
+                                val newTt = tt.updateHeader(tt.timeTrialHeader.copy(status = TimeTrialStatus.IN_PROGRESS))
+                                setupVm.updateTimeTrial(newTt)
+                            }else{
+                                Toast.makeText(requireActivity(), getString(R.string.tt_must_start_in_the_future), Toast.LENGTH_LONG).show()
                             }
-                            .setNegativeButton(R.string.dismiss){_,_->
-
-                            }
-                            .create().show()
-
-//                    }
-
+                        }
+                        .setNegativeButton(R.string.dismiss){_,_-> }
+                        .create()
+                        .show()
                 }
             }
-
-
-
         }
 
-        propsViewModel.timeTrial.observe(viewLifecycleOwner, Observer {tt->
+        propsViewModel.timeTrial.observe(viewLifecycleOwner)  {tt->
           tt?.let {
               if (it.timeTrialHeader.ttName == "" && it.course == null) {
-                  showCourseFrag()
+                  // showCourseFrag()
               }
               if(it.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS){
-                  val intent = Intent(requireActivity(), TimingActivity::class.java)
-                  startActivity(intent)
+                  //val intent = Intent(requireActivity(), TimingActivity::class.java)
+                  //startActivity(intent)
               }
           }
-        })
-
-
-
-
-
+        }
         return binding.root
     }
 
@@ -144,9 +125,6 @@ class SetupTimeTrialFragment : Fragment() {
         findNavController().navigate(action)
     }
 
-
-
-
     companion object {
 
         @JvmStatic
@@ -154,14 +132,13 @@ class SetupTimeTrialFragment : Fragment() {
     }
 }
 
+@AndroidEntryPoint
 class  TimePickerFragment2 : DialogFragment(){
-
-
-    //var tp :TimePicker? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
+            val setupVm:SetupViewModel by activityViewModels()
             // Get the layout inflater
             val inflater = it.layoutInflater
 
@@ -169,7 +146,7 @@ class  TimePickerFragment2 : DialogFragment(){
             val currentTp: TimePicker = v.findViewById(R.id.timePicker1)
             val title: TextView = v.findViewById(R.id.timePickerTitle)
 
-            val timeTrialViewModel = requireActivity().getViewModel { requireActivity().injector.timeTrialSetupViewModel() }.timeTrialPropertiesViewModel
+            val timeTrialViewModel = setupVm.timeTrialPropertiesViewModel
 
             val initialLdt = LocalDateTime.ofInstant(Instant.now().plusSeconds(60*10), ZoneId.systemDefault())
             val ldtNow = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault())

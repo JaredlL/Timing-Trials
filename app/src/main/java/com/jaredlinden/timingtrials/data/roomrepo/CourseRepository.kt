@@ -101,6 +101,5 @@ class RoomCourseRepository @Inject constructor(private val courseDao: CourseDao)
         }else{
             courseDao.insert(course)
         }
-
     }
 }

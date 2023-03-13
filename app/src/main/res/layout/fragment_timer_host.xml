@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:layout_height="match_parent">
+    android:id="@+id/layout_root">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerViewTop"
-        android:name="com.jaredlinden.timingtrials.timing.TimerFragment"
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:layout_height="0dp" />
+        android:orientation="vertical"
+        android:layout_height="match_parent">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerViewBottom"
-        android:name="com.example.MyFragment"
-        android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:layout_height="0dp"/>
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentContainerViewTop"
+            android:name="com.jaredlinden.timingtrials.timing.TimerFragment"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp" />
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentContainerViewBottom"
+            android:name="com.jaredlinden.timingtrials.timing.RiderStatusFragment"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

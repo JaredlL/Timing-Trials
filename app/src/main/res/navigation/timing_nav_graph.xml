@@ -8,7 +8,7 @@
         android:id="@+id/timerHostFragment"
         android:name="com.jaredlinden.timingtrials.timing.TimerHostFragment"
         android:label="@string/time_trial_in_progress"
-        tools:layout="@layout/fragment_host">
+        tools:layout="@layout/fragment_timer_host">
         <action
             android:id="@+id/action_timerHostFragment_to_mainPrefsFragment"
             app:destination="@id/mainPrefsFragment"

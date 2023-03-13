@@ -7,6 +7,7 @@ import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.data.source.TimingTrialsDatabase
 import com.jaredlinden.timingtrials.util.Event
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
@@ -15,6 +16,7 @@ import org.threeten.bp.temporal.ChronoUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
+@HiltViewModel
 class TestViewModel@Inject constructor(
         val timeTrialRepository: ITimeTrialRepository,
         val riderRepository: IRiderRepository,
@@ -44,7 +46,7 @@ class TestViewModel@Inject constructor(
                                     startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
                                     firstRiderStartOffset = 0,
                                     interval = 2,
-                                    courseId = courses[3].id,
+                                    courseId = courses[1].id,
                                     laps = 2,
                                     status = TimeTrialStatus.SETTING_UP))
                     val copy = newTt.addRiders(rList)
@@ -227,9 +229,9 @@ class TestViewModel@Inject constructor(
                                 startTime = OffsetDateTime.ofInstant(Instant.now().truncatedTo(ChronoUnit.SECONDS).plusSeconds(15), ZoneId.systemDefault()),
                                 firstRiderStartOffset = 0,
                                 interval = 2,
-                                courseId = courses[3].id,
+                                courseId = courses[1].id,
                                 laps = 1,
-                                status = TimeTrialStatus.FINISHED)).updateCourse(courses[3])
+                                status = TimeTrialStatus.FINISHED)).updateCourse(courses[1])
 
 
 

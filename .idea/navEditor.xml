@@ -268,17 +268,14 @@
                             <option name="y" value="1975" />
                           </Point>
                         </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
-                  <entry key="navigation">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="-1134" />
-                            <option name="y" value="2292" />
-                          </Point>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_helpPrefsFragment_to_aboutFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -326,8 +323,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-349" />
-                            <option name="y" value="-713" />
+                            <option name="x" value="-679" />
+                            <option name="y" value="-741" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -384,7 +381,17 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_settingsFragment_to_advancedFragment2">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_settingsFragment_to_helpPrefsFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_settingsFragment_to_helpPrefsFragment2">
                               <value>
                                 <LayoutPositions />
                               </value>
