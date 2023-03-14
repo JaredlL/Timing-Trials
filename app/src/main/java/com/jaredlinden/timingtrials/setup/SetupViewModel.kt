@@ -35,7 +35,7 @@ class SetupViewModel @Inject constructor(
 
 
     private val _mTimeTrial = MediatorLiveData<TimeTrial?>()
-    val timeTrial: LiveData<TimeTrial?> = Transformations.map(_mTimeTrial){
+    val timeTrial: LiveData<TimeTrial?> = _mTimeTrial.map{
         it
     }
 
@@ -43,7 +43,7 @@ class SetupViewModel @Inject constructor(
 
     private val currentId: MutableLiveData<Long?> = MutableLiveData()
 
-    private val idSwitcher = Transformations.switchMap(currentId){
+    private val idSwitcher = currentId.switchMap{
         it?.let {ttId->
             timeTrialRepository.getSetupTimeTrialById(ttId)
         }

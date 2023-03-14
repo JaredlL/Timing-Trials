@@ -31,7 +31,7 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
     val category = MutableLiveData<String>("")
     val genders = Gender.values().map { it.fullString() }
 
-    val statsString = Transformations.switchMap(mutableRider){
+    val statsString = mutableRider.switchMap{
         it?.id?.let {
             results.getRiderResults(it)
         }?:MutableLiveData(listOf())
@@ -131,7 +131,7 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
                 }
             }
         }
-        mutableRider.addSource(Transformations.switchMap(currentId){
+        mutableRider.addSource(currentId.switchMap{
             if(it != mutableRider.value?.id){
                 repository.getRider(it)
             }else{

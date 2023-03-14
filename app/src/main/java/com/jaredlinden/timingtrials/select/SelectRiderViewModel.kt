@@ -26,9 +26,9 @@ class  SelectRiderViewModel @Inject constructor (val riderRepository: IRiderRepo
 
     private val groupedStartTimeRiders = timeTrialRiderRepository.lastTimeTrialRiders()
 
-    private val groupedAllRiders = Transformations.switchMap(riderRepository.allRiders){ riderList->
+    private val groupedAllRiders = riderRepository.allRiders.switchMap{ riderList->
         riderList?.let { rList->
-            Transformations.map(groupedStartTimeRiders){ lastTimeTrialList->
+            groupedStartTimeRiders.map{ lastTimeTrialList->
                 lastTimeTrialList?.let {
                     val startTimeMap = it.asSequence().filter { it.startTime.isAfter(lastYear) }.groupBy { it.riderId }.map { Pair(it.key, it.value.count()) }.toMap()
                     val ordered = rList.sortedByDescending { startTimeMap[it.id]?:0 }

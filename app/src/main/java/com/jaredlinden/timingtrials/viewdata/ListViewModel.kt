@@ -30,29 +30,29 @@ class ListViewModel @Inject constructor(
 
     val allCourses = courseRepository.allCoursesLight
     val allRiders = riderRepository.allRidersLight
-    val allTimeTrials = Transformations.map(timeTrialRepository.allTimeTrialsHeader){tt->
+    val allTimeTrials = timeTrialRepository.allTimeTrialsHeader.map{tt->
         tt.sortedByDescending { it.startTime }
     }
 
-    val filteredAllCourse = Transformations.switchMap(liveFilter){ filterVal->
+    val filteredAllCourse = liveFilter.switchMap{ filterVal->
         if(filterVal == null){
             allCourses
         }else{
-            Transformations.map(allCourses){res->
-                res?.let {
+            allCourses.map{res->
+                res.let {
                     res.filter {courseVm->
                         filterVal.passes(courseVm)
                     }
-                }?: res
+                }
             }
         }
     }
 
-    val filteredAllRiders = Transformations.switchMap(liveFilter){ filterVal->
+    val filteredAllRiders = liveFilter.switchMap{ filterVal->
         if(filterVal == null){
             allRiders
         }else{
-            Transformations.map(allRiders){res->
+            allRiders.map{res->
                 res?.filter { riderVm->
                     filterVal.passes(riderVm)
                 } ?: res
@@ -60,12 +60,12 @@ class ListViewModel @Inject constructor(
         }
     }
 
-    val filteredAllTimeTrials = Transformations.switchMap(liveFilter){ filterVal->
+    val filteredAllTimeTrials = liveFilter.switchMap{ filterVal->
         if(filterVal == null){
             allTimeTrials
         }else{
-            Transformations.map(allTimeTrials){res->
-                res?.let {
+            allTimeTrials.map{res->
+                res.let {
                     res.filter {ttVm->
                         filterVal.passes(ttVm)
                     }

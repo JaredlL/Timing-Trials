@@ -34,7 +34,7 @@ class TimingViewModel  @Inject constructor(
     val timeLine: MediatorLiveData<TimeLine> = MediatorLiveData()
     private var prevMilis = 0L
     private var prevString = ""
-    val timeString: LiveData<String> = Transformations.map(liveMilisSinceStart){
+    val timeString: LiveData<String> = liveMilisSinceStart.map{
         if(((it % 1000) / 100) != prevMilis){
             prevMilis = it
             prevString = ConverterUtils.toTenthsDisplayString(it)
@@ -50,7 +50,7 @@ class TimingViewModel  @Inject constructor(
 
     init {
         timeTrial.addSource(timeTrialRepository.getTimingTimeTrial()) {new ->
-            if(new != null && !isCorotineAlive.get() && !new.equalsOtherExcludingIds(timeTrial.value)) {
+            if(new != null && !isCorotineAlive.get() && new.equalsOtherExcludingIds(timeTrial.value)) {
                 Timber.d("TimingTt self updating TT, ${new.timeTrialHeader.timeStamps} unassigned")
                 timeTrial.value = new
             }else if(new == null){

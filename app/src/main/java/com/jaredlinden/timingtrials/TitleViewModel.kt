@@ -12,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TitleViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepository) : ViewModel() {
 
-    val nonFinishedTimeTrial = Transformations.map(timeTrialRepository.allTimeTrialsHeader){tt->
+    val nonFinishedTimeTrial = timeTrialRepository.allTimeTrialsHeader.map{tt->
         tt.firstOrNull()
     }
 

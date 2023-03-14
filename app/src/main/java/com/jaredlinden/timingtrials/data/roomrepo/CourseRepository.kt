@@ -22,19 +22,16 @@ interface ICourseRepository {
 
     fun getFirst() : LiveData<Course>
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun insert(course: Course): Long
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun update(course: Course)
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun delete(course: Course)
 
-    @Suppress("RedundantSuspendModifier")
+
     @WorkerThread
     suspend fun insertOrUpdate(course: Course)
 }

@@ -27,15 +27,15 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
     var originalRiderId: Long? = null
     val result: MediatorLiveData<TimeTrialRider?> = MediatorLiveData()
 
-    val excludedRiderIds  =Transformations.switchMap(timeTrialId){
-           Transformations.map(resultRepository.getRidersForTimeTrial(it)){
+    val excludedRiderIds  =timeTrialId.switchMap{
+        resultRepository.getRidersForTimeTrial(it).map{
                it.map { it.riderData.id }
            }
     }
 
-    val rider = Transformations.switchMap(result){
+    val rider = result.switchMap{
         it?.riderId?.let {
-           Transformations.map(riderRepository.getRider(it)){it?.fullName()}
+            riderRepository.getRider(it).map{it?.fullName()}
         }?:MutableLiveData("Select Rider...")
     }
 
@@ -66,8 +66,8 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
 
     }
 
-    val availibleRiders = Transformations.switchMap(excludedRiderIds){exclusions->
-        Transformations.map(riderRepository.allRiders){
+    val availibleRiders = excludedRiderIds.switchMap{exclusions->
+        riderRepository.allRiders.map{
             it?.let {
                 it.filter { !exclusions.contains(it.id) || result.value?.riderId == it.id || it.id == originalRiderId }
             }
@@ -75,10 +75,10 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
     }
 
     val selectRiderVm: ISelectRidersViewModel = SelectSingleRiderViewModel(
-            availibleRiders,
-            resultRepository,
-            Transformations.map(result){ it?.riderId?.let { listOf(it) }?: listOf() },
-            ::changeRider) {Unit}
+        availibleRiders,
+        resultRepository,
+        result.map{ it?.riderId?.let { listOf(it) }?: listOf() },
+        ::changeRider) {Unit}
 
 
     private fun changeRider(newRider: Rider){
@@ -110,7 +110,7 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
         }
 
     init {
-        result.addSource(Transformations.switchMap(resultId){it?.let { resultRepository.getResultById(it) }}){ttResult->
+        result.addSource(resultId.switchMap{it?.let { resultRepository.getResultById(it) }}){ttResult->
             ttResult?.let {
 
                 originalRiderId = it.rider.id
@@ -207,9 +207,9 @@ class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
 
     private val ridersWithStartTimes = timeTrialRiderRepository.lastTimeTrialRiders()
 
-    private val ridersOrderedByRecentActivity = Transformations.switchMap(availibleRiders){riderList->
+    private val ridersOrderedByRecentActivity = availibleRiders.switchMap{riderList->
         riderList?.let { rList->
-            Transformations.map(ridersWithStartTimes){lastTimeTrialList->
+            ridersWithStartTimes.map{lastTimeTrialList->
                 lastTimeTrialList?.let {
                     val startTimeMap = it.asSequence().filter { it.startTime.isAfter(lastYear) }.groupBy { it.riderId }.map { Pair(it.key, it.value.count()) }.toMap()
                     val ordered = rList.sortedByDescending { startTimeMap[it.id]?:0 }

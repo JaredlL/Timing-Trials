@@ -29,7 +29,7 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
         selectedItemPosition = lengthUnits.indexOf(value.getUnitName())
     }
 
-    val statsString = Transformations.switchMap(mutableCourse){
+    val statsString = mutableCourse.switchMap{
         it?.id?.let {
             results.getCourseResults(it)
         }?:MutableLiveData(listOf())
@@ -78,7 +78,7 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
             }
         }
 
-        mutableCourse.addSource(Transformations.switchMap(currentId){
+        mutableCourse.addSource(currentId.switchMap{
             if(it != mutableCourse.value?.id){
                 repository.getCourse(it)
             }else{

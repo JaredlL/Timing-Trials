@@ -3,7 +3,7 @@ package com.jaredlinden.timingtrials.data.roomrepo
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.jaredlinden.timingtrials.data.Gender
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.data.source.RiderDao
@@ -65,7 +65,7 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
     override val allClubs: LiveData<List<String>> = riderDao.getAllClubs()
 
 
-    override val allCategories: LiveData<List<String>> = Transformations.map(riderDao.getAllCategories()){res-> res.filterNotNull() }
+    override val allCategories: LiveData<List<String>> = riderDao.getAllCategories().map{res-> res.filterNotNull() }
 
     override suspend fun allRidersLightSuspend(): List<Rider> {
         return riderDao.getAllRidersLightSuspend()

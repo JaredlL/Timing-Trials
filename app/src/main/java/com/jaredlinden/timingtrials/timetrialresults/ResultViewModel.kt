@@ -24,7 +24,7 @@ class TimeTrialViewModel @Inject constructor (val timeTrialRepository: ITimeTria
         }
     }
 
-    val timeTrial = Transformations.switchMap(idLiveData){
+    val timeTrial = idLiveData.switchMap{
         it?.let { id->
             timeTrialRepository.getResultTimeTrialById(id)
         }
@@ -71,14 +71,14 @@ class ResultViewModel @Inject constructor(
         }
     }
 
-    val timeTrial = Transformations.switchMap(idLiveData){
+    val timeTrial = idLiveData.switchMap{
         it?.let { id->
             timeTrialRepository.getResultTimeTrialById(id)
         }
     }
 
 
-    val results = Transformations.map(timeTrial){tt->
+    val results = timeTrial.map{tt->
         if(tt != null && tt.timeTrialHeader.status == TimeTrialStatus.FINISHED) {
             (sequenceOf(getHeading(tt)) + tt.helper.results.asSequence().map { res-> ResultRowViewModel(res, tt.timeTrialHeader.laps, res.timeTrialData.id) }).toList()
         }else{

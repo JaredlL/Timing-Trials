@@ -1,11 +1,9 @@
 package com.jaredlinden.timingtrials.resultexplorer
 
-import androidx.databinding.BindingAdapter
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.jaredlinden.timingtrials.domain.*
-import com.jaredlinden.timingtrials.util.LengthConverter
 import com.jaredlinden.timingtrials.util.changeValIfNotEqual
 import com.jaredlinden.timingtrials.util.setIfNotEqual
 
@@ -23,14 +21,14 @@ class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
     val mutableColumn = MediatorLiveData<ColumnData>().apply { value = currentCol() }
 
 
-    val imageRes = Transformations.map(mutableColumn){
+    val imageRes = mutableColumn.map{
         it?.imageRes
     }
 
     val isVisible = MutableLiveData(true)
     val filterText = MutableLiveData("")
     val sortIndex= MutableLiveData(0)
-    val description = Transformations.map(mutableColumn){
+    val description = mutableColumn.map{
         it?.description
 
     }
@@ -40,7 +38,7 @@ class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
     }
 
     init {
-        mutableColumn.addSource(Transformations.map(sheetVm.columns){ it.firstOrNull{it.key == columnKey}}){res->
+        mutableColumn.addSource(sheetVm.columns.map{ it.firstOrNull{it.key == columnKey}}){res->
             res?.let { col->
                 isVisible.setIfNotEqual(col.isVisible)
                 filterText.setIfNotEqual(col.filterText)

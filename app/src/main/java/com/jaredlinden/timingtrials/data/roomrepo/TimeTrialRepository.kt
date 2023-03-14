@@ -2,7 +2,7 @@ package com.jaredlinden.timingtrials.data.roomrepo
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.jaredlinden.timingtrials.data.TimeTrial
 import com.jaredlinden.timingtrials.data.TimeTrialBasicInfo
 import com.jaredlinden.timingtrials.data.TimeTrialHeader
@@ -133,10 +133,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     }
 
     override fun getTimingTimeTrial(): LiveData<TimeTrial?> {
-        return Transformations.map(timeTrialDao.getTimingTimeTrials()){
-//            if(it.size > 1){
-//                throw Exception("Multiple Timing TimeTrials In DB!!!")
-//            }
+        return timeTrialDao.getTimingTimeTrials().map{
             it.firstOrNull()
         }
     }

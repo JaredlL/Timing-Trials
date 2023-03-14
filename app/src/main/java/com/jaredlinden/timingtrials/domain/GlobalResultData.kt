@@ -2,7 +2,7 @@ package com.jaredlinden.timingtrials.domain
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.jaredlinden.timingtrials.data.Course
 import com.jaredlinden.timingtrials.data.IResult
 import com.jaredlinden.timingtrials.data.Rider
@@ -77,10 +77,10 @@ class RiderResultDataFactory(private val riderRepository: IRiderRepository, priv
     }
 
     override fun getTitle(itemId: Long): LiveData<String> {
-        return Transformations.map(riderRepository.getRider(itemId)){res->
+        return riderRepository.getRider(itemId).map{res->
             res?.let {
                 "${it.firstName} ${it.lastName} Results"
-            }
+            }?:"NULL"
         }
     }
     override fun getHeading():IGenericListItem{
@@ -91,8 +91,8 @@ class RiderResultDataFactory(private val riderRepository: IRiderRepository, priv
     }
 
     override fun getResultList(itemId: Long): LiveData<List<IGenericListItem>> {
-        return Transformations.map(timeTrialRiderRepository.getRiderResults(itemId)){res->
-            res?.let{ list ->
+        return timeTrialRiderRepository.getRiderResults(itemId).map{res->
+            res.let{ list ->
                 list.mapNotNull {r-> r.resultTime?.let{ listItemForRiderResult(r) } }
             }
         }
@@ -121,8 +121,8 @@ class CourseResultDataFactory(private val courseRepository: ICourseRepository, p
 
     //EG Lydbrook 10 Results
     override fun getTitle(itemId: Long): LiveData<String> {
-        return Transformations.map(courseRepository.getCourse(itemId)){res->
-            res?.let {
+        return courseRepository.getCourse(itemId).map{res->
+            res.let {
                 "${it.courseName} Results"
             }
         }
@@ -138,11 +138,9 @@ class CourseResultDataFactory(private val courseRepository: ICourseRepository, p
     }
 
     override fun getResultList(itemId: Long): LiveData<List<IGenericListItem>> {
-        return Transformations.map(timeTrialRiderRepository.getCourseResults(itemId)){res->
-            res?.let{ list ->
+        return timeTrialRiderRepository.getCourseResults(itemId).map{res->
+            res.let{ list ->
                 list.mapNotNull {r-> r.resultTime?.let{ listItemForCourseResult(r) } }
-                //list.filter { it.resultTime != null }.map { listItemForCourseResult(it) }
-
             }
         }
     }

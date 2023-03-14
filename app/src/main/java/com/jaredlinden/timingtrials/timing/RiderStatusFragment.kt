@@ -100,7 +100,6 @@ class RiderStatusFragment : Fragment() {
 
     private fun createRiderActionsDialog(rs: RiderStatusViewWrapper){
 
-
         val tt = timingViewModel.timeTrial.value ?: return
 
         val milisNow = System.currentTimeMillis()
@@ -124,8 +123,6 @@ class RiderStatusFragment : Fragment() {
                     getString(R.string.missed_start_move_to_back),
                     getString(R.string.set_custom_start_time))
         }
-
-
 
         val timeTrialRider = rs.timeTrialRider
          AlertDialog.Builder(requireContext()).
@@ -153,8 +150,6 @@ class RiderStatusFragment : Fragment() {
                     }
 
                 }.setNegativeButton(resources.getString(R.string.cancel)){_,_ ->}.show()
-
-
     }
 
     private fun createDnfRiderDialog(rs: RiderStatusViewWrapper){
@@ -168,10 +163,10 @@ class RiderStatusFragment : Fragment() {
         AlertDialog.Builder(requireContext())
                 .setTitle(title)
                 .setMessage(resources.getString(R.string.undo_dns_description))
-                .setPositiveButton(resources.getString(R.string.undo)) { _, _ ->
+                .setPositiveButton(resources.getString(R.string.ok)) { _, _ ->
                     timingViewModel.undoDnf(rs.timeTrialRider)
                 }
-                .setNegativeButton("Dismiss"){_,_->
+                .setNegativeButton(R.string.cancel){_,_->
 
                 }
                 .create().show()

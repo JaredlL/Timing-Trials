@@ -78,9 +78,9 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
 
     private fun getItemName(itemId: Long, itemTypeId: String) : LiveData<ITimingTrialsEntity?>{
         return if(itemTypeId == Rider::class.java.simpleName){
-            Transformations.map(riderRepository.getRider(itemId)){it}
+            riderRepository.getRider(itemId).map{it}
         }else{
-            Transformations.map(courseRepository.getCourse(itemId)){ it}
+            courseRepository.getCourse(itemId).map{ it}
         }
     }
 
@@ -90,7 +90,7 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
     init {
         resultSpreadSheet.value = orig
 
-        resultSpreadSheet.addSource(Transformations.switchMap(columnsContext){ it?.let { getItemName(it.itemId, it.itemType)} }){res->
+        resultSpreadSheet.addSource(columnsContext.switchMap{ it?.let { getItemName(it.itemId, it.itemType)} }){res->
 
             res?.let {
                 when(it){

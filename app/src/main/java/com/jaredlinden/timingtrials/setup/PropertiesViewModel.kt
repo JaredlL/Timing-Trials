@@ -29,29 +29,28 @@ interface ITimeTrialPropertiesViewModel{
 class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITimeTrialPropertiesViewModel{
 
     override val timeTrial = ttSetup.timeTrial
-   override val timeTrialHeader = Transformations.map(ttSetup.timeTrial){it?.timeTrialHeader}
+   override val timeTrialHeader = ttSetup.timeTrial.map{it?.timeTrialHeader}
 
 
-    override val courseName: LiveData<String> = Transformations.map(ttSetup.timeTrial){ tt->
+    override val courseName: LiveData<String> = ttSetup.timeTrial.map{ tt->
         tt?.let{
-
             tt.course?.courseName
-        }
+        } ?: "NULL"
     }
     override val startTime = MutableLiveData<OffsetDateTime>()
     override val firstRiderOffset = MutableLiveData<String>()
     override val laps = MutableLiveData<String>()
     override val interval = MutableLiveData<String>()
 
-    override val offsetDescription: LiveData<String> = Transformations.map(timeTrialHeader){tt->
+    override val offsetDescription: LiveData<String> = timeTrialHeader.map{tt->
         tt?.startTime?.let {
             val tString = ConverterUtils.instantToSecondsDisplayString(it.toInstant().plusSeconds(tt.firstRiderStartOffset.toLong()))
             "(ie first rider starts at $tString)"
-        }
+        } ?: "NULL"
     }
 
-    override val startTimeString: LiveData<String>  = Transformations.map(timeTrialHeader){ tt->
-        tt?.startTime?.let { ConverterUtils.instantToSecondsDisplayString(it.toInstant())}
+    override val startTimeString: LiveData<String>  = timeTrialHeader.map{ tt->
+        tt?.startTime?.let { ConverterUtils.instantToSecondsDisplayString(it.toInstant())}?:"NULL"
     }
 
     override val availableLaps = 1.rangeTo(99).map { i -> i.toString() }

@@ -328,20 +328,18 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
         val courseInDb: Course
         val courseList = courseRepository.getCoursesByName(course.courseName)
 
-
-            when(courseList.size){
-                0->{
-                    val id = courseRepository.insert(course)
-                    courseInDb = courseRepository.getCourseSuspend(id)
-                }
-                1->{
-                    courseInDb = courseList.first()
-                }
-                else-> courseInDb = courseList.first()
+        courseInDb = when(courseList.size){
+            0->{
+                val id = courseRepository.insert(course)
+                courseRepository.getCourseSuspend(id)
             }
-        return courseInDb
-
+            1->{
+                courseList.first()
+            }
+            else-> courseList.first()
         }
+        return courseInDb
+    }
 
 
 

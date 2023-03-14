@@ -1,33 +1,23 @@
 package com.jaredlinden.timingtrials.timing
 
 import android.content.*
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.jaredlinden.timingtrials.BuildConfig
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.TimeTrial
-import com.jaredlinden.timingtrials.data.TimeTrialHeader
 import com.jaredlinden.timingtrials.data.TimeTrialStatus
 import com.jaredlinden.timingtrials.databinding.ActivityTimingBinding
 import com.jaredlinden.timingtrials.setup.SetupViewPagerFragmentArgs
@@ -111,7 +101,7 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
         binding.timingToolBar.setupWithNavController(navController, appBarConfiguration)
         title = getString(R.string.time_trial_in_progress)
 
-        val liveTick = Transformations.switchMap(mService){result->
+        val liveTick = mService.switchMap{result->
             result?.timerTick
         }
 

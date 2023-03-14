@@ -15,8 +15,8 @@ class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCou
 
 
 
-    override fun getAllCourses(): LiveData<SelectableCourseData> = Transformations.switchMap(ttSetup.timeTrial) {
-        Transformations.map(ttSetup.courseRepository.allCoursesLight) { courseList ->
+    override fun getAllCourses(): LiveData<SelectableCourseData> = ttSetup.timeTrial.switchMap {
+        ttSetup.courseRepository.allCoursesLight.map { courseList ->
             SelectableCourseData(courseList, it?.course?.id)
         }
     }
