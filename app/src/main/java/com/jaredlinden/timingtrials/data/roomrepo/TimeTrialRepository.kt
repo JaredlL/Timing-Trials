@@ -44,7 +44,6 @@ interface ITimeTrialRepository{
 @Singleton
 class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: TimeTrialDao): ITimeTrialRepository {
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun getTimeTrialByName(name: String): TimeTrial? {
         return timeTrialDao.getTimeTrialByName(name)
@@ -54,13 +53,11 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
         return timeTrialDao.getFullTimeTrialSuspend(id)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun getHeadersByName(name: String): List<TimeTrialHeader> {
         return timeTrialDao.getHeadersByName(name)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun updateFull(timeTrial: TimeTrial) {
         Timber.d("JAREDMSG -> TTREPO -> Updating ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
@@ -80,7 +77,6 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     // suspend function so the caller methods know this.
     // Like this, Room ensures that you're not doing any long running operations on the main
     // thread, blocking the UI.
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun insert(timeTrial: TimeTrial):Long {
         Timber.d("JAREDMSG -> TTREPO -> Inserting New TT ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
@@ -90,7 +86,6 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
        return timeTrialDao.insertFull(timeTrial)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun insertNewHeader(timeTrialHeader: TimeTrialHeader):Long {
         Timber.d("JAREDMSG -> TTREPO -> Inserting New TT Header into DB from background thread")
@@ -113,7 +108,6 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     }
 
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun update(timeTrialHeader: TimeTrialHeader) {
         Timber.d("JAREDMSG -> TTREPO -> Updating ${timeTrialHeader.id} ${timeTrialHeader.ttName} into DB from background thread")
@@ -138,20 +132,16 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
         }
     }
 
-
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun delete(timeTrial: TimeTrial) {
         timeTrialDao.delete(timeTrial)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun deleteById(id: Long) {
         timeTrialDao.deleteTimeTrialById(id)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun deleteHeader(timeTrialHeader: TimeTrialHeader) {
         timeTrialDao.delete(timeTrialHeader)

@@ -57,7 +57,8 @@ class TimerHostFragment : Fragment() {
     var selectedNumber : Event<Int?> = Event(null)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<LongArray>(SELECTED_RIDERS)?.observe(viewLifecycleOwner, Observer{selectedIds->
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<LongArray>(SELECTED_RIDERS)?.observe(viewLifecycleOwner){ selectedIds->
 
             selectedIds?.firstOrNull()?.let {id->
                 viewModel.timeTrial.value?.let {tt->
@@ -71,7 +72,7 @@ class TimerHostFragment : Fragment() {
             }
 
             findNavController().currentBackStackEntry?.savedStateHandle?.remove<LongArray>(SELECTED_RIDERS)
-        })
+        }
     }
 
     fun showExitDialog(){
