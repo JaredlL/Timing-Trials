@@ -50,7 +50,7 @@ class TimingViewModel  @Inject constructor(
 
     init {
         timeTrial.addSource(timeTrialRepository.getTimingTimeTrial()) {new ->
-            if(new != null && !isCorotineAlive.get() && new.equalsOtherExcludingIds(timeTrial.value)) {
+            if(new != null && !isCorotineAlive.get() && !new.equalsOtherExcludingIds(timeTrial.value)) {
                 Timber.d("TimingTt self updating TT, ${new.timeTrialHeader.timeStamps} unassigned")
                 timeTrial.value = new
             }else if(new == null){
