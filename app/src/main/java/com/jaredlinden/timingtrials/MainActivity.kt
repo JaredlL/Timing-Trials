@@ -377,9 +377,9 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     fun writeAllResults(uri: Uri){
         try {
             val outputStream = contentResolver.openOutputStream(uri)
-            if(outputStream != null){
+            if(outputStream != null)
+            {
                 val allTtsVm:IOViewModel by viewModels()
-
                 allTtsVm.writeAllTimeTrialsToPath(outputStream)
                 allTtsVm.importMessage.observe(this, EventObserver{
                     Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
@@ -390,7 +390,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     intent.putExtra(FROM_TIMING_TRIALS, true)
                     startActivity(intent)
                 })
-
             }
         }
         catch(e: IOException)

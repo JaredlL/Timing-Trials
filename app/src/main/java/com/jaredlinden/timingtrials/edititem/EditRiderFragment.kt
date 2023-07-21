@@ -3,19 +3,16 @@ package com.jaredlinden.timingtrials.edititem
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.EditorInfo
-import androidx.fragment.app.Fragment
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.jaredlinden.timingtrials.IFabCallbacks
-
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentEditRiderBinding
@@ -99,9 +96,10 @@ class EditRiderFragment : Fragment() {
             }
 
         }
+        riderViewModel.selectedGenderPosition.observe(viewLifecycleOwner){
+            binding.spinner3.setSelection(it)
+        }
 
-        //For some reason gender spinner sometimes doesn't update
-        binding.invalidateAll()
         return binding.root
     }
 

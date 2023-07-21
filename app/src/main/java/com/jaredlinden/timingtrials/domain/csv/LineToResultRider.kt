@@ -280,7 +280,6 @@ class LineToResultRiderConverter: ILineToObjectConverter<TimeTrialRiderIO> {
     override fun importLine(dataLine: List<String>): TimeTrialRiderIO? {
         var importRider = TimeTrialRiderIO()
 
-
         for(fieldFiller in stringToFieldList){
             importRider = fieldFiller.applyFieldToObject(dataLine, importRider)
         }
@@ -291,6 +290,4 @@ class LineToResultRiderConverter: ILineToObjectConverter<TimeTrialRiderIO> {
             null
         }
     }
-
-
 }

@@ -38,7 +38,7 @@ import javax.inject.Inject
 class IOViewModel @Inject constructor(private val riderRespository: IRiderRepository,
                                       private val courseRepository: ICourseRepository,
                                       private val timeTrialRepository: ITimeTrialRepository,
-                                      private val  timeTrialRiderRepository: TimeTrialRiderRepository): ViewModel() {
+                                      private val timeTrialRiderRepository: TimeTrialRiderRepository): ViewModel() {
 
 
     private val writeAllResult: MutableLiveData<Event<String>> = MutableLiveData()

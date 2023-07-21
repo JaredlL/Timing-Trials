@@ -71,8 +71,9 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
                     yearOfBirth.value = yobString
                 }
                 val genInt = Gender.values().indexOf(rider.gender)
-                selectedGenderPosition.value = genInt
-
+                if(selectedGenderPosition.value != genInt){
+                    selectedGenderPosition.value = genInt
+                }
             }
         }
         mutableRider.addSource(firstName){res->

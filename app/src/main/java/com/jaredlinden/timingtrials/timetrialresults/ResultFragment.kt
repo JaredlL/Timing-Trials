@@ -148,9 +148,8 @@ class ResultFragment : Fragment() {
     }
 
 
-    val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
+    val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+        if (isGranted || Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // Permission is granted. Continue the action or workflow in your
             // app.
             //Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show()
@@ -186,10 +185,6 @@ class ResultFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.resultScreenshot -> {
-               //permissionRequiredEvent = Event{view?.let {
-               //    takeScreenShot(it)
-               //}?:Unit}
-               //requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 view?.let { takeScreenShot(it) }
                 true
             }
@@ -240,7 +235,9 @@ class ResultFragment : Fragment() {
                                    requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                                }
                                 getString(R.string.csv_file) ->{
-                                    permissionRequiredEvent = Event{ createCsvFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.csv") }
+                                    permissionRequiredEvent = Event{
+                                        createCsvFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.csv")
+                                    }
                                     requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                                 }
                             }

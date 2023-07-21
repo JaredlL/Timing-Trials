@@ -26,6 +26,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
 
@@ -79,10 +80,6 @@ dependencies {
     implementation "androidx.activity:activity-ktx:$rootProject.activityVersion"
 
     implementation "androidx.core:core-ktx:$rootProject.coreVersion"
-    //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-
-
-    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.24'
 
     //navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"
@@ -109,23 +106,23 @@ dependencies {
     implementation "com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:$rootProject.advRecyclerVersion"
 
     //hilt
-    implementation "com.google.dagger:hilt-android:2.44"
+    implementation 'com.google.dagger:hilt-android:2.46.1'
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
 
     //GSON
     implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
 
     //CSV
-    implementation 'com.opencsv:opencsv:5.6'
+    implementation 'com.opencsv:opencsv:5.7.1'
 
     //Threeten Time
-    implementation 'com.jakewharton.threetenabp:threetenabp:1.4.0'
-    testImplementation('org.threeten:threetenbp:1.6.0') {
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.4.6'
+    testImplementation('org.threeten:threetenbp:1.6.8') {
         exclude group: 'com.jakewharton.threetenabp', module: 'threetenabp'
     }
-    androidTestImplementation('org.threeten:threetenbp:1.6.0') {
+    androidTestImplementation('org.threeten:threetenbp:1.6.8') {
         exclude group: 'com.jakewharton.threetenabp', module: 'threetenabp'
     }
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
 }

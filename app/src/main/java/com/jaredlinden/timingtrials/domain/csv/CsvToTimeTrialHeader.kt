@@ -72,7 +72,7 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
             val ttName = nameIndex?.let { dataList.getOrNull(it)}?:""
             val dateString = dateindex?.let { dataList.getOrNull(it) }
             val status = statusIndex?.let { if((dataList.getOrNull(it)?:"").contains("setting up", ignoreCase = true)) TimeTrialStatus.SETTING_UP else TimeTrialStatus.FINISHED }
-            var date= dateString?.let {  ObjectFromString.date(it)}
+            val date= dateString?.let {  ObjectFromString.date(it)}
             val notes = notesIndex?.let { (dataList.getOrNull(it)) }?:""
             val offsetDateTime = date?.let { OffsetDateTime.of(it, LocalTime.of(19,0,0), ZoneId.systemDefault().rules.getOffset(Instant.now()))}
             val laps = lapsIndex?.let { dataList.getOrNull(it)?.toIntOrNull() }?:1
@@ -87,19 +87,15 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
 
     fun fromCttTitle(cttTitle: String): TimeTrialHeader{
         val titleString = cttTitle.replace(".csv", "", ignoreCase = true).replace("startsheet-", "", ignoreCase = true).replace("results-", "", ignoreCase = true)
-//        val dateList = titleString.split("-").reversed().mapNotNull { it.toIntOrNull() }
-//        val date = if(dateList.size > 2){
-//
-//            OffsetDateTime.of(LocalDate.of(2000+dateList[0], dateList[1],dateList[2]), LocalTime.of(1,0,0),ZoneId.systemDefault().rules.getOffset(Instant.now()))
-//        }else{
-//            OffsetDateTime.MIN
-//        }
-        val dateString = Regex("""\d{1,2}[-]\d{1,2}[-]\d{1,2}""").find(titleString)?.value
 
-        val localDate = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("d-M-y"))
+        val localDate = Regex("""\d{1,2}[-]\d{1,2}[-]\d{1,2}""").find(titleString)?.value?.let {
+            LocalDate.parse(it, DateTimeFormatter.ofPattern("d-M-y"))
+        }
 
         val date = localDate?.let {
-            OffsetDateTime.of(LocalDate.of(2000 +localDate.year, localDate.month,localDate.dayOfMonth), LocalTime.of(1,0,0),ZoneId.systemDefault().rules.getOffset(Instant.now()))
+            OffsetDateTime.of(
+                LocalDate.of(2000 +localDate.year, localDate.month,localDate.dayOfMonth),
+                LocalTime.of(1,0,0),ZoneId.systemDefault().rules.getOffset(Instant.now()))
         }
 
         val datePortion = Regex("""[-]\d{1,2}[-]\d{1,2}[-]\d{1,2}""").find(titleString)?.value
