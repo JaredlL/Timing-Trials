@@ -81,7 +81,7 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                 .create().show()
     }
 
-    val timeMed = MediatorLiveData<Long>()
+    private val timeMed = MediatorLiveData<Long>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -152,9 +152,9 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
             addSource(liveTick){
                 value = it
             }
-        }.observe(this, Observer {
-            viewModel.updateLoop()
-        })
+        }.observe(this) {
+            viewModel.updateLoop(System.currentTimeMillis())
+        }
     }
 
     fun viewModelChange(timeTrial: TimeTrial, service: TimingService){
