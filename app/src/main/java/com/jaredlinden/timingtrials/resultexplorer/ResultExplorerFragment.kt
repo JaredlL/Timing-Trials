@@ -140,8 +140,18 @@ class ResultExplorerFragment : Fragment()  {
             R.id.resultExplorerExport -> {
                 val count = viewModel.resultSpreadSheet.value?.data?.size?:0
                 val s = if(count == 0) " " else " $count "
-                permissionRequiredEvent = Event{ createCsvFile.launch("TimingTrials${s}Results Export.csv") }
-                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                try {
+                    createCsvFile.launch("TimingTrials${s}Results Export.csv")
+                }catch (e: Exception){
+                    val alertDialog = AlertDialog.Builder(requireContext()).create()
+                    alertDialog.setTitle("Failed to export CSV")
+                    alertDialog.setMessage((e.localizedMessage ?: e.message) + System.lineSeparator() + e.printStackTrace())
+                    alertDialog.setButton(
+                        AlertDialog.BUTTON_NEUTRAL, getString(R.string.close)
+                    ) { dialog, which -> dialog.dismiss() }
+                    alertDialog.show()
+                }
+
                 true
             }
 
@@ -185,20 +195,12 @@ class ResultExplorerFragment : Fragment()  {
                 .show()
     }
 
-    private val createCsvFile = registerForActivityResult(ActivityResultContracts.CreateDocument()){
+    private val createCsvFile = registerForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){
         it?.let {
             writeCsv(it)
         }
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            permissionRequiredEvent.getContentIfNotHandled()?.invoke()
-        } else {
-            Toast.makeText(requireContext(), "Permission Denied. Allow permissions in android settings.", Toast.LENGTH_LONG).show()
-        }
-    }
     private var permissionRequiredEvent:Event<() -> Unit> = Event{}
 
     private fun writeCsv(uri: Uri){

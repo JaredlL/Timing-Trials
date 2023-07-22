@@ -215,5 +215,6 @@
     <string name="time_trial_in_progress">Time trial in progress</string>
     <string name="tabs">Tabs</string>
     <string name="ttIsNull">TT is null</string>
+    <string name="close">Close</string>
 
 </resources>

@@ -19,6 +19,9 @@ import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.Event
 import com.google.gson.Gson
 import com.jaredlinden.timingtrials.domain.csv.LineToCompleteResult
+import com.jaredlinden.timingtrials.functors.Either
+import com.jaredlinden.timingtrials.functors.Left
+import com.jaredlinden.timingtrials.functors.Right
 import com.opencsv.CSVReader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +44,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                                       private val timeTrialRiderRepository: TimeTrialRiderRepository): ViewModel() {
 
 
-    private val writeAllResult: MutableLiveData<Event<String>> = MutableLiveData()
+    val allResultsWrittenEvent: MutableLiveData<Event<Boolean>> = MutableLiveData()
     private val ioLock = Mutex()
 
     fun writeAllTimeTrialsToPath(outputStream: OutputStream){
@@ -50,9 +53,10 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                 try {
                     val allTts = timeTrialRepository.allTimeTrials()
                     JsonResultsWriter().writeToPath(outputStream, allTts)
-                    writeAllResult.postValue(Event("Success"))
+                    importMessage.postValue(Event(Right("Success")))
+                    allResultsWrittenEvent.postValue(Event(true))
                 } catch (e: Exception) {
-                    writeAllResult.postValue(Event(e.message ?: "Error"))
+                    importMessage.postValue(Event(Left(Pair("Error writing results", e))))
                 }
             }
         }
@@ -69,10 +73,9 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                 connection.connect()
                 val input: InputStream = BufferedInputStream(url.openStream(), 8192)
                 readInput(input)
-            }catch (e:UnknownHostException){
-                importMessage.postValue(Event("Error accessing URL, check network access"))
             }catch (e:Exception){
-                importMessage.postValue(Event(e.message?:"Error accessing URL, check network access"))
+                val left = Left(Pair("Error accessing URL", e))
+                importMessage.postValue(Event(left))
             }
         }
     }
@@ -121,7 +124,8 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                     }
                     catch (e: Exception)
                     {
-                        importMessage.postValue(Event(e.message?:"Error reading file: ${e.message}"))
+                        val left = Left(Pair("Error reading file", e))
+                        importMessage.postValue(Event(left))
                     }
                 }
             }
@@ -135,23 +139,20 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
     val READING_COMPLETE_RESULT_HEADING = 4
     val READING_COMPLETE_RESULT = 5
 
-    val importMessage: MutableLiveData<Event<String>> = MutableLiveData()
+    val importMessage: MutableLiveData<Event<Either<Pair<String, Exception>,String>>> = MutableLiveData()
 
-    private suspend fun readJsonInputIntoDb(fileString: String): String{
-       return try{
+    private suspend fun readJsonInputIntoDb(fileString: String): Either<Pair<String, Exception>,String>{
+
+        return try{
             val result = Gson().fromJson(fileString, TimingTrialsExport::class.java)
-
-           val numAdded = result.timingTrialsData.map { addImportTtToDb(it) }.filter { it }.count()
-
-           if(numAdded > 0){
-               "Imported $numAdded"
-           }else{
-               "Found no new time trials to import"
-           }
-
-
+            val numAdded = result.timingTrialsData.map { addImportTtToDb(it) }.filter { it }.count()
+            if(numAdded > 0){
+                Right("Imported $numAdded")
+            }else{
+                Right("Found no new time trials to import")
+            }
         }catch (e:Exception){
-            "Failed to parse JSON file: ${e.message}"
+            Left(Pair("Failed to parse JSON file", e))
         }
     }
 
@@ -159,7 +160,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
         return fileName.contains("startsheet-")
     }
 
-    private suspend fun readCsvInputIntoDb(fileName: String, fileContents: String): String{
+    private suspend fun readCsvInputIntoDb(fileName: String, fileContents: String): Either<Pair<String, Exception>,String>{
         try{
             val lineToTt = LineToTimeTrialConverter()
             val lineToCourse = LineToCourseConverter()
@@ -236,15 +237,15 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             val rows = addCompleteListToDb(completeRowlist)
             val num = numImported.filter { it }.count()
            return if(num > 0){
-               "Imported $num time trials"
+               Right("Imported $num time trials")
            }else if(rows > 0){
-               "Imported $rows rows"
+               Right("Imported $rows rows")
            }else{
-               "Found no new time trials to import"
+               Right("Found no new time trials to import")
            }
 
         }catch (e:Exception){
-            return "Failed to import csv data ${e.message}"
+            return Left(Pair("Failed to import csv data", e))
         }
     }
 

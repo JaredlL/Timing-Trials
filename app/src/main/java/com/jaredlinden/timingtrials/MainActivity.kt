@@ -1,9 +1,7 @@
 package com.jaredlinden.timingtrials
 
-import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -15,39 +13,42 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate.*
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.text.HtmlCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
-import com.jaredlinden.timingtrials.timing.TimingActivity
-import com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.databinding.ActivityMainBinding
-import com.jaredlinden.timingtrials.util.*
+import com.jaredlinden.timingtrials.functors.Left
+import com.jaredlinden.timingtrials.functors.Right
+import com.jaredlinden.timingtrials.timing.TimingActivity
+import com.jaredlinden.timingtrials.util.Event
+import com.jaredlinden.timingtrials.util.EventObserver
+import com.jaredlinden.timingtrials.util.FROM_TIMING_TRIALS
+import com.jaredlinden.timingtrials.util.HAS_SHOWN_ONBOARDING
+import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
+import com.jaredlinden.timingtrials.viewdata.DataBaseViewPagerFragmentDirections
 import com.jaredlinden.timingtrials.viewdata.IOViewModel
 import com.jaredlinden.timingtrials.viewdata.ListViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
-import java.io.IOException
-import java.lang.Exception
 import java.net.URL
 import kotlin.math.abs
-
-
 
 
 interface IFabCallbacks{
@@ -98,10 +99,12 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     val vm:IOViewModel by viewModels()
                     vm.readUrlInput(url)
                     vm.importMessage.observe(this, EventObserver{
-                        Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+                        if(it is Left){
+                            displayError(it.value.first, it.value.second)
+                        }
                     })
                 }catch (e:Exception){
-                    Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+                    displayError("Importing demo data failed", e)
                 }
             }
             .show().apply {
@@ -109,18 +112,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             }
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            permissionRequiredEvent.getContentIfNotHandled()?.invoke()
-        } else {
-            Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private var permissionRequiredEvent:Event<() -> Unit> = Event{}
-
-    private val writeAllResults = registerForActivityResult(ActivityResultContracts.CreateDocument()){
+    private val writeAllResults = registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")){
         it?.let {
             writeAllResults(it)
         }
@@ -204,8 +196,14 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 }
 
                 R.id.app_bar_import -> {
-                    importData.launch(arrayOf("*/*"))
-                    Toast.makeText(this, "Select CSV or .tt File", Toast.LENGTH_LONG).show()
+                    try {
+                        importData.launch(arrayOf("*/*"))
+                    } catch (e : Exception){
+                        displayError("Failed to import data", e)
+                    }
+
+
+                    Toast.makeText(this, "Select CSV or .tt File", Toast.LENGTH_SHORT).show()
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
                 }
@@ -232,8 +230,11 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                     val date = LocalDateTime.now()
                     val fString = date.format(DateTimeFormatter.ofPattern("dd-MM-yy"))
 
-                    permissionRequiredEvent = Event{ writeAllResults.launch("Timing Trials Export $fString.tt") }
-                    requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    try {
+                        writeAllResults.launch("Timing Trials Export $fString.tt")
+                    } catch (e : Exception){
+                        displayError("Failed to export data", e)
+                    }
 
                     true
                 }
@@ -342,7 +343,10 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         if(inputStream != null){
             importVm.readInput(fName,uri, inputStream)
             importVm.importMessage.observe(this, EventObserver {
-                Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
+                when (it){
+                    is Right -> Snackbar.make(rootCoordinator, it.value, Snackbar.LENGTH_LONG).show()
+                    is Left -> displayError(it.value.first, it.value.second)
+                }
             })
         }
     }
@@ -381,8 +385,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             {
                 val allTtsVm:IOViewModel by viewModels()
                 allTtsVm.writeAllTimeTrialsToPath(outputStream)
-                allTtsVm.importMessage.observe(this, EventObserver{
-                    Snackbar.make(rootCoordinator, it, Snackbar.LENGTH_LONG).show()
+                allTtsVm.allResultsWrittenEvent.observe(this, EventObserver{
                     val intent = Intent()
                     intent.action = Intent.ACTION_VIEW
                     intent.setDataAndType(uri, "text/*")
@@ -392,10 +395,9 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                 })
             }
         }
-        catch(e: IOException)
+        catch(e: Exception)
         {
-            e.printStackTrace()
-            Toast.makeText(this, "Save failed - ${e.message}", Toast.LENGTH_LONG).show()
+            displayError("Exporting results failed", e)
         }
     }
 
@@ -415,6 +417,16 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         }else if ((!fabShouldShow || toolbarCollapsed) && mainFab?.visibility == View.VISIBLE) {
             mainFab?.hide()
         }
+    }
+
+    private fun displayError(title: String, e: Exception){
+        val alertDialog = AlertDialog.Builder(this@MainActivity).create()
+        alertDialog.setTitle(title)
+        alertDialog.setMessage((e.localizedMessage ?: e.message) + System.lineSeparator() + e.printStackTrace())
+        alertDialog.setButton(
+            AlertDialog.BUTTON_NEUTRAL, getString(R.string.close)
+        ) { dialog, which -> dialog.dismiss() }
+        alertDialog.show()
     }
 
     override val fabClickEvent: MutableLiveData<Event<Boolean>> = MutableLiveData()

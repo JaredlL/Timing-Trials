@@ -147,36 +147,17 @@ class ResultFragment : Fragment() {
                 .show()
     }
 
-
-    val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-        if (isGranted || Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // Permission is granted. Continue the action or workflow in your
-            // app.
-            //Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show()
-            permissionRequiredEvent.getContentIfNotHandled()?.invoke()
-        } else {
-            // Explain to the user that the feature is unavailable because the
-            // features requires a permission that the user has denied. At the
-            // same time, respect the user's decision. Don't link to system
-            // settings in an effort to convince the user to change their
-            // decision.
-            Toast.makeText(requireContext(), "Permission Denied. Allow permissions in android settings.", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    var permissionRequiredEvent:Event<() -> Unit> = Event{}
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_results, menu)
     }
 
-    val createCsvFile = registerForActivityResult(ActivityResultContracts.CreateDocument()){
+    val createCsvFile = registerForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){
         it?.let {
             writeCsv(it)
         }
     }
 
-    val createJsonFile = registerForActivityResult(ActivityResultContracts.CreateDocument()){
+    val createJsonFile = registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")){
         it?.let {
             writeJson(it)
         }
@@ -229,17 +210,17 @@ class ResultFragment : Fragment() {
                         .setIcon(R.mipmap.tt_logo_round)
                         //.setMessage(R.string.export_file_description)
                         .setItems(R.array.exportTypes){_, i ->
-                            when(resources.getStringArray(R.array.exportTypes)[i]){
-                               getString(R.string.tt_file) ->{
-                                   permissionRequiredEvent = Event{ createJsonFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.tt") }
-                                   requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                               }
-                                getString(R.string.csv_file) ->{
-                                    permissionRequiredEvent = Event{
-                                        createCsvFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName?:"results"}.csv")
+                            try {
+                                when (resources.getStringArray(R.array.exportTypes)[i]) {
+                                    getString(R.string.tt_file) -> {
+                                        createJsonFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName ?: "results"}.tt")
                                     }
-                                    requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                    getString(R.string.csv_file) -> {
+                                        createCsvFile.launch("${resultViewModel.timeTrial.value?.timeTrialHeader?.ttName ?: "results"}.csv")
+                                    }
                                 }
+                            } catch (e:Exception){
+                                displayError("Failed to export", e)
                             }
                         }
 
@@ -313,10 +294,9 @@ class ResultFragment : Fragment() {
                     startActivity(intent)
                 }
             }
-            catch(e: IOException)
+            catch(e: Exception)
             {
-                e.printStackTrace()
-                Snackbar.make((requireActivity() as MainActivity).rootCoordinator, "Save failed - ${e.message}", Snackbar.LENGTH_LONG).show()
+                displayError("Writing CSV failed", e)
             }
         }
     }
@@ -340,10 +320,9 @@ class ResultFragment : Fragment() {
                     startActivity(intent)
                 }
             }
-            catch(e: IOException)
+            catch(e: Exception)
             {
-                e.printStackTrace()
-                Snackbar.make((requireActivity() as MainActivity).rootCoordinator, "Save failed - ${e.message}", Snackbar.LENGTH_LONG).show()
+                displayError("Writing JSON failed", e)
             }
         }
     }
@@ -423,14 +402,13 @@ class ResultFragment : Fragment() {
                 in(Build.VERSION_CODES.LOLLIPOP..Build.VERSION_CODES.N) -> saveScreenshotN(bitmap, fileName)
 
             }
-        } catch (e:Throwable) {
-            // Several error may come out with file handling or DOM
-            throw Exception(e)
+        } catch (e:Exception) {
+            displayError("Failed to save screenshot", e)
         }
         finally {
 
             view.measure(View.MeasureSpec.makeMeasureSpec(oldWidth, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(oldHeight, View.MeasureSpec.EXACTLY))
+                View.MeasureSpec.makeMeasureSpec(oldHeight, View.MeasureSpec.EXACTLY))
 
             view.layout(0,0, view.measuredWidth, view.measuredHeight)
         }
@@ -534,6 +512,16 @@ class ResultFragment : Fragment() {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         Timber.d("Request open  ${imageFile?.path}")
         startActivity(intent)
+    }
+
+    private fun displayError(title: String, e: Exception){
+        val alertDialog = AlertDialog.Builder(requireContext()).create()
+        alertDialog.setTitle(title)
+        alertDialog.setMessage((e.localizedMessage ?: e.message) + System.lineSeparator() + e.printStackTrace())
+        alertDialog.setButton(
+            AlertDialog.BUTTON_NEUTRAL, getString(R.string.close)
+        ) { dialog, which -> dialog.dismiss() }
+        alertDialog.show()
     }
 }
 
