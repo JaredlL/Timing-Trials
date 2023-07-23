@@ -8,7 +8,6 @@ import android.provider.OpenableColumns
 import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -33,6 +32,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.databinding.ActivityMainBinding
+import com.jaredlinden.timingtrials.dialog.ErrorDialog
 import com.jaredlinden.timingtrials.functors.Left
 import com.jaredlinden.timingtrials.functors.Right
 import com.jaredlinden.timingtrials.timing.TimingActivity
@@ -64,15 +64,16 @@ interface IFabCallbacks{
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), IFabCallbacks {
 
+    private val ioViewModel:IOViewModel by viewModels()
+    private lateinit var appBarConfiguration: AppBarConfiguration
+    lateinit var rootCoordinator: CoordinatorLayout
+    var drawButtonPressed = 0
 
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
-    lateinit var rootCoordinator: CoordinatorLayout
 
-    var drawButtonPressed = 0
     private val listener = SharedPreferences.OnSharedPreferenceChangeListener{ i, _->
 
         when(i.getString("dayNight", getString(R.string.system_default))){
@@ -82,13 +83,11 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             getString(R.string.follow_battery_saver_feature) -> setDefaultNightMode(MODE_NIGHT_AUTO_BATTERY)
             else -> setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
         }
-
     }
 
     fun showDemoDataDialog(){
 
         val html = HtmlCompat.fromHtml(getString(R.string.demo_data_description_ques), HtmlCompat.FROM_HTML_MODE_LEGACY)
-
         AlertDialog.Builder(this)
             .setTitle(getString(R.string.demo_data))
             .setIcon(R.mipmap.tt_logo_round)
@@ -96,13 +95,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             .setPositiveButton(R.string.ok){_,_->
                 try{
                     val url = URL("https://bbcdn.githack.com/lindenj/timingtrialsdata/raw/master/LiveDebugRDFCC.tt")
-                    val vm:IOViewModel by viewModels()
-                    vm.readUrlInput(url)
-                    vm.importMessage.observe(this, EventObserver{
-                        if(it is Left){
-                            displayError(it.value.first, it.value.second)
-                        }
-                    })
+                    ioViewModel.readUrlInput(url)
                 }catch (e:Exception){
                     displayError("Importing demo data failed", e)
                 }
@@ -112,7 +105,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             }
     }
 
-    private val writeAllResults = registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")){
+    private val writeAllResults = registerForActivityResult(ActivityResultContracts.CreateDocument("application/tt")){
         it?.let {
             writeAllResults(it)
         }
@@ -125,7 +118,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     }
 
     private lateinit var binding: ActivityMainBinding
-
     var mainFab : FloatingActionButton? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -168,6 +160,13 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             fabClickEvent.postValue(Event(true))
         }
 
+        ioViewModel.importMessage.observe(this, EventObserver {
+            when (it){
+                is Right -> Snackbar.make(rootCoordinator, it.value, Snackbar.LENGTH_LONG).show()
+                is Left -> displayError(it.value.first, it.value.second)
+            }
+        })
+
         setSupportActionBar(binding.toolbar)
         binding.navView.setupWithNavController(navController)
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -202,8 +201,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                         displayError("Failed to import data", e)
                     }
 
-
-                    Toast.makeText(this, "Select CSV or .tt File", Toast.LENGTH_SHORT).show()
+                    Snackbar.make(rootCoordinator, "Select CSV or .tt File", Snackbar.LENGTH_SHORT).show()
                     drawer_layout.closeDrawer(GravityCompat.START)
                     true
                 }
@@ -227,10 +225,9 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
                 }
                 R.id.app_bar_export->{
-                    val date = LocalDateTime.now()
-                    val fString = date.format(DateTimeFormatter.ofPattern("dd-MM-yy"))
-
                     try {
+                        val date = LocalDateTime.now()
+                        val fString = date.format(DateTimeFormatter.ofPattern("dd-MM-yy"))
                         writeAllResults.launch("Timing Trials Export $fString.tt")
                     } catch (e : Exception){
                         displayError("Failed to export data", e)
@@ -281,7 +278,6 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
                         val viewModel:ListViewModel by viewModels()
                         viewModel.timeTrialInsertedEvent.observe(this@MainActivity, EventObserver {
                             val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSelectCourseFragment2(it)
-                            //navController.navigate(action)
                             navController.navigate(R.id.selectCourseFragment, action.arguments)
                         })
                         val mode = PreferenceManager.getDefaultSharedPreferences(applicationContext).getString(PREF_NUMBERING_MODE, NumberMode.INDEX.name)?.let {
@@ -328,27 +324,23 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
             if(!intent.getBooleanExtra(FROM_TIMING_TRIALS, false) && data != null){
                 //TODO probably shouldnt fire this off every rotation
+                intent.data = null
                 importData(data)
             }
-
         }
-
     }
 
     private fun importData(uri: Uri){
-        val importVm:IOViewModel by viewModels()
-        val inputStream = contentResolver.openInputStream(uri)
-        val fName = getFileName(uri)
-
-        if(inputStream != null){
-            importVm.readInput(fName,uri, inputStream)
-            importVm.importMessage.observe(this, EventObserver {
-                when (it){
-                    is Right -> Snackbar.make(rootCoordinator, it.value, Snackbar.LENGTH_LONG).show()
-                    is Left -> displayError(it.value.first, it.value.second)
-                }
-            })
+        try {
+            val inputStream = contentResolver.openInputStream(uri)
+            val fName = getFileName(uri)
+            if(inputStream != null){
+                ioViewModel.readInput(fName,uri, inputStream)
+            }
+        } catch (e: Exception){
+            displayError("Failed to import data", e)
         }
+
     }
 
     private fun getFileName(uri: Uri): String? {
@@ -383,9 +375,8 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             val outputStream = contentResolver.openOutputStream(uri)
             if(outputStream != null)
             {
-                val allTtsVm:IOViewModel by viewModels()
-                allTtsVm.writeAllTimeTrialsToPath(outputStream)
-                allTtsVm.allResultsWrittenEvent.observe(this, EventObserver{
+                ioViewModel.writeAllTimeTrialsToPath(outputStream)
+                ioViewModel.allResultsWrittenEvent.observe(this, EventObserver{
                     val intent = Intent()
                     intent.action = Intent.ACTION_VIEW
                     intent.setDataAndType(uri, "text/*")
@@ -420,13 +411,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     }
 
     private fun displayError(title: String, e: Exception){
-        val alertDialog = AlertDialog.Builder(this@MainActivity).create()
-        alertDialog.setTitle(title)
-        alertDialog.setMessage((e.localizedMessage ?: e.message) + System.lineSeparator() + e.printStackTrace())
-        alertDialog.setButton(
-            AlertDialog.BUTTON_NEUTRAL, getString(R.string.close)
-        ) { dialog, which -> dialog.dismiss() }
-        alertDialog.show()
+        ErrorDialog.display(this@MainActivity, title, e)
     }
 
     override val fabClickEvent: MutableLiveData<Event<Boolean>> = MutableLiveData()

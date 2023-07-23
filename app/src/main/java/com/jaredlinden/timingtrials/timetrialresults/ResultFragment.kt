@@ -41,6 +41,7 @@ import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.FragmentTimetrialResultBinding
+import com.jaredlinden.timingtrials.dialog.ErrorDialog
 import com.jaredlinden.timingtrials.domain.JsonResultsWriter
 import com.jaredlinden.timingtrials.domain.csv.CsvTimeTrialResultWriter
 import com.jaredlinden.timingtrials.util.*
@@ -309,15 +310,7 @@ class ResultFragment : Fragment() {
             try {
                 val outputStream = requireActivity().contentResolver.openOutputStream(uri)
                 if(outputStream != null){
-
                     JsonResultsWriter().writeToPath(outputStream, tt)
-
-                    val intent = Intent()
-                    intent.action = Intent.ACTION_VIEW
-                    intent.setDataAndType(uri, "text/*")
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    intent.putExtra(FROM_TIMING_TRIALS, true)
-                    startActivity(intent)
                 }
             }
             catch(e: Exception)
@@ -326,7 +319,6 @@ class ResultFragment : Fragment() {
             }
         }
     }
-
 
     fun dpToPixels(dip:Int): Int{
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip.toFloat(), resources.displayMetrics).toInt()
@@ -515,13 +507,7 @@ class ResultFragment : Fragment() {
     }
 
     private fun displayError(title: String, e: Exception){
-        val alertDialog = AlertDialog.Builder(requireContext()).create()
-        alertDialog.setTitle(title)
-        alertDialog.setMessage((e.localizedMessage ?: e.message) + System.lineSeparator() + e.printStackTrace())
-        alertDialog.setButton(
-            AlertDialog.BUTTON_NEUTRAL, getString(R.string.close)
-        ) { dialog, which -> dialog.dismiss() }
-        alertDialog.show()
+        ErrorDialog.display(requireContext(), title, e)
     }
 }
 

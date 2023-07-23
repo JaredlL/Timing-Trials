@@ -52,9 +52,12 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             ioLock.withLock {
                 try {
                     val allTts = timeTrialRepository.allTimeTrials()
-                    JsonResultsWriter().writeToPath(outputStream, allTts)
-                    importMessage.postValue(Event(Right("Success")))
-                    allResultsWrittenEvent.postValue(Event(true))
+                    if(allTts.any()){
+                        JsonResultsWriter().writeToPath(outputStream, allTts)
+                        allResultsWrittenEvent.postValue(Event(true))
+                    }else{
+                        importMessage.postValue(Event(Right("Nothing to export")))
+                    }
                 } catch (e: Exception) {
                     importMessage.postValue(Event(Left(Pair("Error writing results", e))))
                 }

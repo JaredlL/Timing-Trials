@@ -27,6 +27,7 @@ import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.FragmentSpreadsheetBinding
+import com.jaredlinden.timingtrials.dialog.ErrorDialog
 import com.jaredlinden.timingtrials.domain.csv.CsvSheetWriter
 import com.jaredlinden.timingtrials.spreadsheet.SheetAdapter
 import com.jaredlinden.timingtrials.spreadsheet.SheetLayoutManager
@@ -143,15 +144,8 @@ class ResultExplorerFragment : Fragment()  {
                 try {
                     createCsvFile.launch("TimingTrials${s}Results Export.csv")
                 }catch (e: Exception){
-                    val alertDialog = AlertDialog.Builder(requireContext()).create()
-                    alertDialog.setTitle("Failed to export CSV")
-                    alertDialog.setMessage((e.localizedMessage ?: e.message) + System.lineSeparator() + e.printStackTrace())
-                    alertDialog.setButton(
-                        AlertDialog.BUTTON_NEUTRAL, getString(R.string.close)
-                    ) { dialog, which -> dialog.dismiss() }
-                    alertDialog.show()
+                    ErrorDialog.display(requireContext(), "Failed to export CSV", e)
                 }
-
                 true
             }
 

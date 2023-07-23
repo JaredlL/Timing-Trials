@@ -23,23 +23,15 @@ class JsonResultsWriter{
             override fun shouldSkipField(f: FieldAttributes?): Boolean {
                 return f?.name == "id" || f?.name == "courseId"
             }
-
         }
 
         val output = TimingTrialsExport(timeTrialList.map { TimeTrialIO(it) })
-
         val zip = ZipOutputStream(BufferedOutputStream(filePath))
         val writer = OutputStreamWriter(zip)
 
         zip.putNextEntry(ZipEntry("TimingTrials.json"))
-
         GsonBuilder().addSerializationExclusionStrategy(exclusionStrategy).create().toJson(output,writer)
         writer.close()
-        if(timeTrialList.size > 1){
-            zip.closeEntry()
-        }
         zip.close()
-        //writer.close()
     }
-
 }
