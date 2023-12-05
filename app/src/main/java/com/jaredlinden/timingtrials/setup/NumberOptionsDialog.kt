@@ -54,13 +54,6 @@ class NumberOptionsDialog: DialogFragment(){
             }
         })
 
-//        mViewModel.selectedNumberOptionType.observe(viewLifecycleOwner, Observer {
-////            if(it == 1){
-////                binding.autoNumberOptionsLayout.visibility = View.GONE
-////            }else{
-////                binding.autoNumberOptionsLayout.visibility = View.VISIBLE
-////            }
-//        })
         mViewModel.numberDirection.observe(viewLifecycleOwner, Observer {
             it?.let {
                 when(it){
@@ -73,7 +66,6 @@ class NumberOptionsDialog: DialogFragment(){
                 }
             }
         })
-
         return binding.root
     }
 

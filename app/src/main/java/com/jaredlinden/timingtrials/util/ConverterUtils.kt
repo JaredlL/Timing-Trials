@@ -10,12 +10,6 @@ import kotlin.math.*
 
 object ConverterUtils{
 
-    val lengthDisplayUnitConversion = 1 / 1609.34
-
-    fun toLengthDisplayUnit(length: Double): Double {
-        return length * lengthDisplayUnitConversion
-    }
-
     fun instantToSecondsDisplayString(instant: Instant): String{
         val  f:DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault())
         return (f.format(instant))
@@ -32,7 +26,6 @@ object ConverterUtils{
             val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
             dateTime.format(formatter)
         }?:""
-
     }
 
     @BindingConversion
@@ -42,9 +35,7 @@ object ConverterUtils{
             val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
             dateTime.format(formatter)
         }?:""
-
     }
-
 
     fun toSecondsDisplayString(milliseconds: Long?): String{
         return milliseconds?.let {
@@ -52,7 +43,6 @@ object ConverterUtils{
             val secs =  (millis/1000)
             String.format("%d:%02d:%02d", secs / 3600, (secs % 3600) / 60, (secs % 60))
         }?:""
-
     }
 
     fun toTenthsDisplayString(milliseconds: Long?): String{
@@ -189,6 +179,6 @@ data class LengthConverter(val unitKey: String){
             return default
         }
     }
-
 }
+
 data class LengthDef(val key:String, val name:String, val miniString: String, val conversion: Double)

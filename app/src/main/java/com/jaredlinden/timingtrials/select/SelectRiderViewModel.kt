@@ -38,7 +38,6 @@ class  SelectRiderViewModel @Inject constructor (val riderRepository: IRiderRepo
         }
     }
 
-
     val liveSortMode : MutableLiveData<Int> = MutableLiveData(SORT_RECENT_ACTIVITY)
 
     override fun setSortMode(sortMode: Int) {
@@ -92,11 +91,8 @@ class  SelectRiderViewModel @Inject constructor (val riderRepository: IRiderRepo
                 }else{
                     allRiders.filter { it.fullName().contains(filterString, ignoreCase = true) }
                 }
-
             }
             selectedRidersInformation.value = SelectedRidersInformation(filteredRiders, selectedInfo.selectedIds)
         }
     }
-
-
 }

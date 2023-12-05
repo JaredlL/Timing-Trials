@@ -19,7 +19,6 @@ fun <T : Any> AppCompatActivity.argument(key: String) =
 
 
 fun Fragment.getLengthConverter():LengthConverter{
-    //val unitString =  requireActivity().getPreferences(Context.MODE_PRIVATE).getString("unit", "km")?:"km"
     val unitString = PreferenceManager.getDefaultSharedPreferences(requireActivity()).getString("units", "km")?:"km"
     return LengthConverter(unitString)
 }
@@ -33,32 +32,6 @@ fun Fragment.showKeyboard(){
     val imm: InputMethodManager = context!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 }
-
-
-
-//inline fun <reified T: ViewModel> Fragment.getViewModel(crossinline factory: () -> T): T = T::class.java.let { clazz ->
-//    ViewModelProvider(this, object: ViewModelProvider.Factory {
-//        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-//            if(modelClass == clazz) {
-//                @Suppress("UNCHECKED_CAST")
-//                return factory() as T
-//            }
-//            throw IllegalArgumentException("Unexpected argument: $modelClass")
-//        }
-//    }).get(clazz)
-//}
-//
-//inline fun <reified T: ViewModel> FragmentActivity.getViewModel(crossinline factory: () -> T): T = T::class.java.let { clazz ->
-//    ViewModelProvider(this, object: ViewModelProvider.Factory {
-//        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-//            if(modelClass == clazz) {
-//                @Suppress("UNCHECKED_CAST")
-//                return factory() as T
-//            }
-//            throw IllegalArgumentException("Unexpected argument: $modelClass")
-//        }
-//    }).get(clazz)
-//}
 
 fun <T> MutableLiveData<T>.setIfNotEqual(newVal:T){
     if(value != newVal){

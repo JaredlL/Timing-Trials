@@ -58,7 +58,6 @@ class ResultsFilterFragment : BottomSheetDialogFragment(){
         }
         return binding.root
     }
-
 }
 
 class ResultFilterAdapter internal constructor(val context: Context, val vlo: LifecycleOwner): RecyclerView.Adapter<ResultFilterAdapter.ViewHolder>() {

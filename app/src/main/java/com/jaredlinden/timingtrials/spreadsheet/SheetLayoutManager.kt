@@ -85,7 +85,7 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
         val layoutDataPair = workOutLeftColumnForFocus()
         leftColumn = layoutDataPair.first
 
-        //Incase remebered row is greater than new total rows
+        //Incase remembered row is greater than new total rows
         if(options.numberOfRows in 1 until topRow){
             topRow = 1
         }
@@ -112,7 +112,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
         }
 
         var correctionOffset = 0
-        var rowMarkersWidth  = 0
 
         val mOffset = layoutDataPair.second
         var hasAdded = false
@@ -125,7 +124,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
                 val cellWidth = getDecoratedSide(cellView, Tilt.VERTICAL)
                 filledWidth += cellWidth
                 if(!hasAdded && mOffset < 0 && totalColsWidth > width){
-                    rowMarkersWidth = filledWidth
                     filledWidth = mOffset - filledWidth
                     hasAdded = true
                 }
@@ -134,7 +132,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
                 if(currentColumn == totalColumns && totalColsWidth > width){
                     correctionOffset =  width - filledWidth
                 }
-
             }
             hasAdded = false
             currentColumn = HEADER_COLUMN
@@ -144,31 +141,23 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
             currentRow = jumpRow + rowInc++
         }
 
-
         if(correctionOffset > 0 && totalColsWidth > width){
             offsetCells(-correctionOffset, ROW)
         }
     }
 
-    fun workOutLeftColumnForFocus(): Pair<Int, Int>{
-
-
-
+    private fun workOutLeftColumnForFocus(): Pair<Int, Int>{
         val col = options.focusedColumn
-
-
 
         if(options.focusedColumn <= 0){
             return Pair(1, 0)
         }
-        val actualCol = options.sheetColumns[col]
 
         val midPointOfCell = (options.sheetColumns[col].width / 2).toInt()
         val midPointOfScreen = width / 2
 
         val cellsBefore = options.sheetColumns.take(col).reversed()
         val cellsAfter = options.sheetColumns.drop(col+1)
-
         val widthAfter = cellsAfter.sumBy { it.width.toInt() } + midPointOfCell
 
         var start = midPointOfScreen - midPointOfCell
@@ -185,16 +174,10 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
                 break
             }
         }
+
         if(start > 0) start = 0
 
-        var end = width
-        for(y in cellsAfter){
-
-
-        }
-
         return Pair(colToStart+1, start)
-
     }
 
 
@@ -214,7 +197,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
                                 fWidth: Int, fHeight: Int,
                                 direction: Direction, tilt: Tilt): View? {
 
-
         if(row >= totalRows || column >= totalColumns)
             return null
         val position = markerToPos(row, column)
@@ -222,7 +204,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
             return null
 
         val cellView = recycler?.getViewForPosition(position) ?: return null
-
 
 
         // TODO: This call is needed for a newly loaded file, not for a rotation etc.
@@ -244,7 +225,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
         }
 
         setCellType(cellView, row, column)
-
         return cellView
     }
 
@@ -272,7 +252,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
             cellView?.tag = CELL
         }
     }
-
 
     private fun handleScroll(d: Int, recycler: RecyclerView.Recycler?, tilt : Tilt): Int {
 
@@ -303,12 +282,9 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
     private fun processUnlimitedScroll(scrollSize: Int, recycler: RecyclerView.Recycler?, tilt: Tilt) : Int {
 
         val orientation = if (tilt == Tilt.VERTICAL) COLUMN else ROW
-
         val farthestOut = getFarthest(tilt)
-
         val breadth = if (tilt == Tilt.VERTICAL) height else width
         val amountBeyondScreen = farthestOut - breadth
-
         var currentRow = getSideCount(Side.ROWS) + topRow
         var currentCol = getSideCount(Side.COLUMNS) + leftColumn
 
@@ -332,7 +308,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
     private fun processLimitedScroll(scrollSize: Int, recycler: RecyclerView.Recycler?, tilt : Tilt) : Int {
 
         val orientation = if (tilt == Tilt.VERTICAL) COLUMN else ROW
-
         val ltd = getLimited(tilt)
 
         if (ltd >= scrollSize) { // or >
@@ -347,7 +322,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
 
         return 0
     }
-
 
     private fun newMarker(recycler: RecyclerView.Recycler?, direction: Direction, tilt: Tilt): Int {
 
@@ -395,7 +369,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
         val filled = offset + getDecoratedSide(cellView, tilt)
 
         fillNewSide(screenBreadth, filled, tilt, currentColumn, currentRow, recycler, screenLimit, direction)
-
         return cellBreadth
     }
 
@@ -432,7 +405,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
                 currentRow++
             }
         }
-
     }
 
 
@@ -503,14 +475,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
         }
     }
 
-
-
-    // XXX: maybe scrap within scroll
-    // maybe increase height/depth
-    // maybe relayout screen when shifting directions
-    // TODO: scrapping is probably premature, maybe don't scrap until whenever, and
-    // send the information to getrows
-
     private fun scrapOffscreenViews(recycler: RecyclerView.Recycler?, direction : Direction, tilt: Tilt) {
 
         val initialRows = getSideCount(Side.ROWS)
@@ -554,7 +518,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
 
     private fun sideAdjust(direction: Direction, initialRows: Int, initialColumns: Int,
                            bottomCellsGone: Int, rightCellsGone: Int) {
-
         val rowDiff : Int
         val columnDiff : Int
         if (direction == Direction.UNLIMITED) {
@@ -571,7 +534,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
         }
         topRow += rowDiff
         leftColumn += columnDiff
-
     }
 
 

@@ -230,8 +230,6 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
         }catch (e:Exception){
             Timber.e(e)
         }
-
-
         super.onStop()
     }
 
@@ -244,7 +242,6 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                         applicationContext.unbindService(connection)
                         mService.value?.stop()
                         mBound = false
-
                     }
                     viewModel.discardTt()
                 }
@@ -263,7 +260,6 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                            Toast.makeText(this, getString(R.string.tt_has_started_cannot_go_back), Toast.LENGTH_SHORT).show()
                         }
                     }
-
                 }
                 .setNegativeButton(getString(R.string.dismiss)){ _, _->
 

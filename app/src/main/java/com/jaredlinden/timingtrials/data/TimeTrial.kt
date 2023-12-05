@@ -47,7 +47,6 @@ data class TimeTrialWithCourse(
     @Relation(parentColumn = "courseId", entityColumn = "id", entity = Course::class)
     val course: Course? = null
 ){
-
     fun updateCourse(newCourse: Course): TimeTrialWithCourse{
         return this.copy(course = newCourse, timeTrialHeader = this.timeTrialHeader.copy(courseId = newCourse.id))
     }
@@ -62,9 +61,7 @@ data class TimeTrial(
         @Relation(parentColumn = "id", entityColumn = "timeTrialId", entity = TimeTrialRider::class)
         val riderList: List<FilledTimeTrialRider> = listOf()
 ) {
-
-
-
+    
     fun updateCourse(newCourse: Course):TimeTrial{
         val newHeader = this.timeTrialHeader.copy(courseId = newCourse.id)
         return this.copy(course = newCourse, timeTrialHeader = newHeader, riderList = this.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(courseId = newCourse.id)) })
@@ -122,7 +119,6 @@ data class TimeTrial(
         return if(timeTrialHeader.numberRules.mode == NumberMode.MAP){
             riderList.first { it.riderData.id == riderId }.timeTrialData.assignedNumber?:0
         }else{
-
             timeTrialHeader.numberRules.numberFromIndex(riderList.first { it.riderData.id == riderId }.timeTrialData.index, riderList.size)
         }
     }

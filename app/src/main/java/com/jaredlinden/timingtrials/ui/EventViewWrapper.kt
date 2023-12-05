@@ -10,7 +10,6 @@ import com.jaredlinden.timingtrials.util.ConverterUtils
 class EventViewWrapper(val event: ITimelineEvent, val timeTrial: TimeTrial) : BaseObservable(){
 
     val timeStampString = ConverterUtils.toTenthsDisplayString(event.timeStamp)
-
     var getSelected: (ITimelineEvent) -> Boolean = { _ -> false}
     var onSelectionChanged = { _: ITimelineEvent, _:Boolean -> Unit}
 

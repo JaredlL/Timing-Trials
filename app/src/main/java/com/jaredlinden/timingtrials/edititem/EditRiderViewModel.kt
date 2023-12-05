@@ -175,7 +175,6 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
                     updateSuccess.postValue(Event(true))
                 }
             }
-            //mutableRider.postValue(Rider.createBlank())
         }
     }
 

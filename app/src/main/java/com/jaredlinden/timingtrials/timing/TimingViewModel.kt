@@ -367,7 +367,6 @@ class TimingViewModel  @Inject constructor(
         if(nextIndex < tte.helper.sparseRiderStartTimes.size()){
 
             //If we are more than 1 min before TT start time
-
             val nextStartMilli = sparse.keyAt(nextIndex)
             if((nextStartMilli - millisSinceStart) > 60000){
                 return "${tte.timeTrialHeader.ttName} starts at 0:00:00:0"
@@ -411,7 +410,6 @@ class TimingViewModel  @Inject constructor(
                 else ->
                     "Next rider is $riderString"
             }
-            //return "NULL"
         } else {
             return "${tte.helper.finishedRiders.size} riders have finished, ${tte.helper.ridersOnCourse(millisSinceStart).size} riders on course"
         }
@@ -453,7 +451,6 @@ class TimingViewModel  @Inject constructor(
                 val now = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis
                 val helper = c.helper
                 c = helper.assignRiderToEvent(ttr.timeTrialData, now).tt
-
             }
             updateTimeTrial(c)
         }

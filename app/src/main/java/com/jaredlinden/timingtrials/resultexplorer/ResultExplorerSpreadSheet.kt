@@ -30,11 +30,6 @@ class ResultExplorerSpreadSheet(val results: List<IResult>,
     }
 
     override val data: List<List<String>> = sortedVisibleResults.map { res -> visibleCols.map { it.getValue(res) } }
-//            if (comp != null) {
-//                results.sortedWith(comp).filter { res -> columns.all { it.passesFilter(res) } }.map { res -> visibleCols.map { it.getValue(res) } }
-//            } else {
-//                results.filter { res -> columns.all { it.passesFilter(res) } }.map { res -> visibleCols.map { it.getValue(res) } }
-//            }
 
 
     private val colWidths: List<Float> = data.fold(visibleCols.map { measureString(it.description) }, { currentLongest, strings -> currentLongest.zip(strings).map { if (it.first >= measureString(it.second)) it.first else measureString(it.second) } })
@@ -55,9 +50,7 @@ class ResultExplorerSpreadSheet(val results: List<IResult>,
                 }
                 val newCols = columns.map { columnData -> if (colData.key == columnData.key) columnData.copy(sortType = newSortType, isFocused = true) else columnData.copy(sortType = SortType.NONE, isFocused = false) }
                 setNewColumns(newCols)
-
             }
-
         }
     }
 
@@ -67,7 +60,6 @@ class ResultExplorerSpreadSheet(val results: List<IResult>,
     override val isEmpty: Boolean = data.isEmpty()
 
     override val focusedColumn: Int = sheetColumns.indexOfFirst { it.focused }
-
 
     override fun getRowHeight(row: Int): Int {
         return 1
@@ -81,7 +73,6 @@ class ResultExplorerSpreadSheet(val results: List<IResult>,
             val newCol = visibleCols[col].copy(filterText = newFilter, isFocused = true)
             setNewColumns(columns.map { if (it.key == newCol.key) newCol else it.copy(isFocused = false) })
         }
-
     }
 
     override fun onCellLongPress(row: Int, col: Int) {
@@ -89,22 +80,9 @@ class ResultExplorerSpreadSheet(val results: List<IResult>,
         sortedVisibleResults[row].timeTrial?.id?.let {
             onNavigateToTt(it)
         }
-//        if (comp != null) {
-//            results.sortedWith(comp).filter { res -> columns.all { it.passesFilter(res) } }[row].timeTrial?.id?.let {
-//                onNavigateToTt(it)
-//            }
-//        } else {
-//            results.filter { res -> columns.all { it.passesFilter(res) } }[row].timeTrial?.id?.let {
-//                onNavigateToTt(it)
-//            }
-//        }
-
-
     }
 
     fun copy(results: List<IResult> = this.results, columns: List<ColumnData> = this.columns): ResultExplorerSpreadSheet {
         return ResultExplorerSpreadSheet(results, columns, setNewColumns, onNavigateToTt, measureString)
     }
-
-
 }

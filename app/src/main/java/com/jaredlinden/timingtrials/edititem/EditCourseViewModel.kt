@@ -93,11 +93,7 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
                 }
             }
         }
-
-
     }
-
-
 
     val lengthUnits = LengthConverter.unitList.map { it.name }
 
@@ -109,9 +105,6 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
         }
     }
 
-
-
-
     var selectedItemPosition = 0
     val converstions = LengthConverter.unitList.map { it.conversion }
 
@@ -121,8 +114,6 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
         }
     }
 
-
-
     fun deleteCourse(){
         viewModelScope.launch(Dispatchers.IO) {
 
@@ -131,7 +122,6 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
             }
         }
     }
-
 
     fun addOrUpdate(){
         viewModelScope.launch(Dispatchers.IO) {
@@ -159,8 +149,6 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
                     }
                     updateSuccess.postValue(Event(true))
                 }
-
-                //repository.insertOrUpdate(trimmed)
             }
         }
     }

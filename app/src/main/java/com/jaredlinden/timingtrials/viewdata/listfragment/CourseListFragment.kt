@@ -58,7 +58,6 @@ class CourseListFragment : Fragment() {
         }
 
         return binding.root
-
     }
 
     override fun onDetach() {
@@ -102,10 +101,9 @@ class CourseViewHolderFactory(private val unitString: String): GenericViewHolder
             genericTextView1.typeface = Typeface.DEFAULT_BOLD
             genericTextView2.typeface = Typeface.DEFAULT_BOLD
             genericTextView3.typeface = Typeface.DEFAULT_BOLD
-
         }
-        return binding.root
 
+        return binding.root
     }
 
     override fun createView(layoutInflator: LayoutInflater, parent: ViewGroup?, data: SelectableCourseViewModel): View {
@@ -120,5 +118,4 @@ class CourseViewHolderFactory(private val unitString: String): GenericViewHolder
         val binding = DataBindingUtil.inflate<ListItemCourseBinding>(layoutInflator, R.layout.list_item_course, parent, false)
         return CourseListViewHolder(binding)
     }
-
 }

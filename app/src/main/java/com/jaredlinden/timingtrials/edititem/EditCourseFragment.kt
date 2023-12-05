@@ -58,8 +58,6 @@ class EditCourseFragment : Fragment() {
             Toast.makeText(requireContext(), requireContext().getText(it), Toast.LENGTH_LONG).show()
         })
 
-
-
         val binding = FragmentEditCourseBinding.inflate(inflater,container, false).apply {
             viewModel = courseViewModel
             lifecycleOwner = viewLifecycleOwner
@@ -80,11 +78,9 @@ class EditCourseFragment : Fragment() {
                 }
                 return@setOnEditorActionListener false
             }
-
         }
 
         return binding.root
-
 
     }
 
@@ -107,7 +103,6 @@ class EditCourseFragment : Fragment() {
         super.onDestroyView()
     }
 
-
     fun showDeleteDialog(){
         AlertDialog.Builder(requireContext())
                 .setTitle(resources.getString(R.string.delete_course))
@@ -121,6 +116,4 @@ class EditCourseFragment : Fragment() {
                 }
                 .create().show()
     }
-
-
 }

@@ -69,20 +69,7 @@ class NumberOptionsViewModel(val setupViewModel: SetupViewModel) {
                     }
                 }
             }
-
         }
-
-//        numberRulesMediator.addSource(exclusions){newExc->
-//            val currentTt = setupViewModel.timeTrial.value
-//            val currentExc = setupViewModel.timeTrial.value?.timeTrialHeader?.numberRules?.indexRules?.exclusions
-//            if(newExc != null && currentExc!= null && currentTt != null){
-//                val newList = IndexNumberRules.stringToExclusions(newExc)
-//                if(currentExc != newList){
-//                    val newNumRules = currentTt.timeTrialHeader.numberRules.copy(indexRules = currentTt.timeTrialHeader.numberRules.indexRules.copy(exclusions = newList))
-//                    setupViewModel.updateTimeTrial(currentTt.copy(timeTrialHeader = currentTt.timeTrialHeader.copy(numberRules = newNumRules)))
-//                }
-//            }
-//        }
     }
 
 }

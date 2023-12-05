@@ -57,7 +57,6 @@ class OrderableRiderListAdapter(val context: Context) : RecyclerView.Adapter<Ord
         notifyDataSetChanged()
     }
 
-
     override fun getItemCount(): Int {
         return mTimeTrial.riderList.count()
     }

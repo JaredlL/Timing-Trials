@@ -72,42 +72,15 @@ class SelectCourseFragment : Fragment() {
             courseHeading.checkBox.visibility = View.INVISIBLE
             courseRecyclerView.adapter = adapter
             courseRecyclerView.layoutManager = viewManager
-//            courseListFab.setOnClickListener {
-//                val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(0,context?.getString(R.string.new_course)?:"")
-//                findNavController().navigate(action)
-//
-//                //editCourse(0)
-//               // dismiss()
-//            }
         }
-
-
         return binding.root
     }
 
-//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-//        // The only reason you might override this method when using onCreateView() is
-//        // to modify any dialog characteristics. For example, the dialog includes a
-//        // title by default, but your custom layout might not need it. So here you can
-//        // remove the dialog title, but you must call the superclass to get the Dialog.
-//        val dialog = super.onCreateDialog(savedInstanceState)
-//        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-//
-//        val root: RelativeLayout = RelativeLayout(activity).apply {
-//            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-//        }
-//        dialog.setContentView(root)
-//
-//        //dialog.window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-//        return dialog
-//    }
 
     private fun editCourse(course: Course){
         val action = SelectCourseFragmentDirections.actionSelectCourseFragmentToEditCourseFragment(resources.getString(R.string.edit_course), course.id?:0)
         findNavController().navigate(action)
     }
-
 
     companion object {
         fun newInstance(): SelectCourseFragment {

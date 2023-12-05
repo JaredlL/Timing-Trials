@@ -47,8 +47,6 @@ class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
             }
         }
 
-
-
         mutableColumn.changeValIfNotEqual(isVisible, {x -> x.isVisible}, {x,y -> y.copy(isVisible = x)})
         mutableColumn.changeValIfNotEqual(filterText, {x -> x.filterText}, {x,y -> y.copy(filterText = x)})
         mutableColumn.changeValIfNotEqual(sortIndex, {x -> x.sortOrder}, {x,y ->y.copy(sortOrder = x)})

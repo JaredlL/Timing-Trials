@@ -21,24 +21,20 @@ import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.domain.SortType
 
 
-class SheetAdapter internal constructor(val context: Context, val displayMetrics: DisplayMetrics, val paint: Paint, val snackBarCallback: () -> Unit): RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+class SheetAdapter internal constructor(
+    val context: Context,
+    displayMetrics: DisplayMetrics,
+    private val paint: Paint,
+    val snackBarCallback: () -> Unit)
+    : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
     companion object{
         private const val CELL = 3
         private const val COLUMN_MARKER = 2
         private const val ROW_MARKER = 1
         private const val TOP_LEFT = 4
-
         private const val ROW_MARKER_WIDTH = 3
-
-        private const val COLUMN_MARKER_HEIGHT = 30
-        private const val ROW_HEIGHT = 60
-
-        private const val WIDTH_MULTIPLIER = 12
     }
-
-    val density = displayMetrics.density.toInt()
-
 
     inner class CellViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
@@ -65,7 +61,6 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
     var mOptions: ISheetLayoutManagerOptions = SheetLayoutManagerOptions(dummy,  listOf())
 
     fun setNewItems(options: ISheetLayoutManagerOptions){
-        //mItems = newItems
         mOptions = options
         notifyDataSetChanged()
     }
@@ -88,9 +83,8 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
         }
     }
 
-    fun totalColumns(): Int = mOptions.sheetColumns.size + 1
-    fun totalRows(): Int = mOptions.numberOfRows + 1
-
+    private fun totalColumns(): Int = mOptions.sheetColumns.size + 1
+    private fun totalRows(): Int = mOptions.numberOfRows + 1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
        return when(viewType){
@@ -186,24 +180,17 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
         }
 
         viewHolder.textView.text = cellsValue
-
-
         viewHolder.textView.width = getColumnWidthInPixels(c)
-
-
-
         viewHolder.textView.height = getRowHeight(r+4)
         viewHolder.textView.setGravity(Gravity.CENTER)
-
         viewHolder.textView.setOnClickListener {
             mOptions.onCellClick(r,c)
             snackBarCallback()
-
         }
+
         viewHolder.textView.setOnLongClickListener {
             mOptions.onCellLongPress(r,c)
             true
-
         }
     }
 
@@ -214,19 +201,15 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
         val mdrawable = context.getDrawable(R.drawable.background_spreadsheet_heading)
 
         if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            //setBackgroundDrawable();
             viewHolder.textView.setBackgroundDrawable(mdrawable)
 
         } else {
             viewHolder.textView.setBackground(mdrawable)
-
         }
 
         val width = ROW_MARKER_WIDTH *(widthOfALetter?:10)
-
         viewHolder.textView.width = width
         viewHolder.textView.gravity = Gravity.CENTER
-
         viewHolder.textView.text = " "
         viewHolder.textView.height = getRowHeight(0)
     }
@@ -237,12 +220,6 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
         var (row,_) = posToMarkers(position)
         row--
 
-
-
-
-
-        val gray = 193
-
         val sdk = android.os.Build.VERSION.SDK_INT
 
         if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
@@ -252,23 +229,16 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
             viewHolder.textView.setBackground(drawable)
         }
 
-
         if(row+1 <= 0){
-
             viewHolder.textView.text = ""
             viewHolder.textView.height = getRowHeight(0)
-
         }else{
-
             val rm = (row + 1).toString()
             viewHolder.textView.text = rm
             viewHolder.textView.height = getRowHeight(8)
         }
 
-
-
         val width = ROW_MARKER_WIDTH *(widthOfALetter?:10)
-
         viewHolder.textView.width = width
         viewHolder.textView.gravity = Gravity.CENTER
     }
@@ -277,17 +247,14 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
     private fun makeColumnMarker(viewHolder: ColumnHeaderViewHolder, position: Int) {
 
         val (_, c) = posToMarkers(position)
-
         val mc = c -1
-
         val colData = mOptions.sheetColumns[mc]
-
         val widthOfText = colData.headingTextWidth.toInt()
         val fullColWidth = getColumnWidthInPixels(mc)
         val leftPadding = ((fullColWidth - widthOfText) / 2)
         val rightPadding = if ((fullColWidth - widthOfText).rem(2) == 1) leftPadding + 1 else leftPadding
-
         viewHolder.textView.height = getRowHeight(0)
+
         when(colData.sortType){
             SortType.ASCENDING->{
                 viewHolder.textView.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.ic_baseline_arrow_drop_down_24, 0)
@@ -317,9 +284,7 @@ class SheetAdapter internal constructor(val context: Context, val displayMetrics
                 colData.onClick()
         }
         viewHolder.textView.setGravity(Gravity.CENTER)
-        //setBackground(viewHolder)
     }
-
 
     // translate position to column and row
     private fun posToMarkers(pos: Int): Coordinate {

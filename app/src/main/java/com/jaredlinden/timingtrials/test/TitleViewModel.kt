@@ -1,9 +1,8 @@
-package com.jaredlinden.timingtrials
+package com.jaredlinden.timingtrials.test
 
 import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.data.TimeTrialHeader
-import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

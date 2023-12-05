@@ -23,7 +23,6 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
                 event = eventWrapper
                 executePendingBindings()
             }
-
         }
     }
     inner class TextEventViewHolder(binding: ListItemEventTextBinding): RecyclerView.ViewHolder(binding.root){
@@ -115,7 +114,6 @@ class EventListAdapter internal constructor(val context:Context): RecyclerView.A
             R.layout.list_item_event_button
         else
             R.layout.list_item_event_text
-        //return mEvents[position].event.eventType.ordinal
     }
 
     override fun getItemCount(): Int {

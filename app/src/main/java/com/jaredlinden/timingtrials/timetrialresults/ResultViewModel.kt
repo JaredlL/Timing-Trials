@@ -62,7 +62,6 @@ class ResultViewModel @Inject constructor(
     val courseRepository: ICourseRepository,
     val resultRepository: TimeTrialRiderRepository) : ViewModel() {
 
-
     private val idLiveData: MutableLiveData<Long?> = MutableLiveData()
 
     fun changeTimeTrial(newId: Long){
@@ -77,25 +76,23 @@ class ResultViewModel @Inject constructor(
         }
     }
 
-
     val results = timeTrial.map{tt->
         if(tt != null && tt.timeTrialHeader.status == TimeTrialStatus.FINISHED) {
-            (sequenceOf(getHeading(tt)) + tt.helper.results.asSequence().map { res-> ResultRowViewModel(res, tt.timeTrialHeader.laps, res.timeTrialData.id) }).toList()
+            val displaySplits = anySplitHasValue(tt)
+            (sequenceOf(getHeading(tt)) + tt.helper.results.asSequence().map {
+                    res-> ResultRowViewModel(res, res.timeTrialData.id, tt, displaySplits)
+            }).toList()
         }else{
             null
         }
-
     }
-
 
     fun delete(){
         timeTrial.value?.let {
             viewModelScope.launch(Dispatchers.IO) {
                 timeTrialRepository.delete(it)
             }
-
         }
-
     }
 
     fun clearNotesColumn(){
@@ -112,16 +109,22 @@ class ResultViewModel @Inject constructor(
         }
     }
 
-    fun getHeading(tt: TimeTrial): ResultRowViewModel{
+    private fun getHeading(tt: TimeTrial): ResultRowViewModel{
         val mutList: MutableList<String> = mutableListOf()
 
         mutList.add("Rider Name")
         mutList.add("Total Time")
         mutList.add("Club")
         mutList.add("Gender")
-        mutList.add("Category")
-        mutList.add("Notes")
-        if(tt.timeTrialHeader.laps > 1){
+
+        if (hasAnyCategory(tt)){
+            mutList.add("Category")
+        }
+        if (hasAnyNotes(tt)){
+            mutList.add("Notes")
+        }
+
+        if(tt.timeTrialHeader.laps > 1 && anySplitHasValue(tt)){
             for(i in 1..tt.timeTrialHeader.laps){
                 mutList.add("Split $i")
             }
@@ -130,6 +133,17 @@ class ResultViewModel @Inject constructor(
         return ResultRowViewModel(mutList, null)
     }
 
+    private fun hasAnyCategory(tt: TimeTrial): Boolean{
+        return tt.riderList.any { x -> x.timeTrialData.category.any() }
+    }
+
+    private fun hasAnyNotes(tt: TimeTrial): Boolean{
+        return tt.riderList.any { x -> x.timeTrialData.notes.any() }
+    }
+
+    private fun anySplitHasValue(tt: TimeTrial): Boolean{
+        return tt.riderList.flatMap { x -> x.timeTrialData.splits }.any()
+    }
 }
 
 class ResultRowViewModel{
@@ -140,24 +154,30 @@ class ResultRowViewModel{
         strings.forEach { row.add(ResultCell(id,MutableLiveData(it))) }
     }
 
-    constructor(result: IResult, laps:Int, resId: Long?)
+    constructor(result: IResult, resId: Long?, tt: TimeTrial,  addSplits: Boolean)
      {
+         val laps = tt.timeTrialHeader.laps
          row.add(ResultCell(resId, MutableLiveData("${result.rider.firstName} ${result.rider.lastName}")))
          row.add(ResultCell(resId,MutableLiveData(ConverterUtils.toTenthsDisplayString(result.resultTime))))
          row.add(ResultCell(resId,MutableLiveData(result.riderClub)))
          row.add(ResultCell(resId,MutableLiveData(result.gender.fullString())))
-         row.add(ResultCell(resId,MutableLiveData(result.category)))
-         row.add(ResultCell(resId,MutableLiveData(result.notes)))
-         if(laps > 1){
+
+         if(tt.riderList.any { x -> x.timeTrialData.category.any() }){
+             row.add(ResultCell(resId,MutableLiveData(result.category)))
+         }
+
+         if(tt.riderList.any { x -> x.timeTrialData.notes.any() }){
+             row.add(ResultCell(resId,MutableLiveData(result.notes)))
+         }
+
+         if(laps > 1 && addSplits){
              for (i in 0 until laps){
                  val splitVal = result.splits.getOrNull(i)
                  val splitString = if(splitVal != null) ConverterUtils.toTenthsDisplayString(splitVal) else ""
                  row.add(ResultCell(resId,MutableLiveData(splitString)))
              }
          }
-
-
-
     }
 }
+
 class ResultCell(val resultId: Long?, val content:MutableLiveData<String>)

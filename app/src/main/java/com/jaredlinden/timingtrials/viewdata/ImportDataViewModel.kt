@@ -43,7 +43,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                                       private val timeTrialRepository: ITimeTrialRepository,
                                       private val timeTrialRiderRepository: TimeTrialRiderRepository): ViewModel() {
 
-
     val allResultsWrittenEvent: MutableLiveData<Event<Boolean>> = MutableLiveData()
     private val ioLock = Mutex()
 
@@ -230,7 +229,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                             lineToCompleteResult.importLine(cLineList)?.let {
                                 completeRowlist.add(it)
                             }
-
                         }
                     }
                 }
@@ -309,10 +307,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
             }
         }
         return false
-
-        //var courseInDb: Course? = null
-
-
     }
 
     suspend fun getTimeTrialByCourseDate(course: Course, localDate: LocalDate): TimeTrialHeader?{
@@ -344,9 +338,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
         }
         return courseInDb
     }
-
-
-
 
     suspend fun getDbRider(importRider:Rider): Rider{
         val riderInDbId:Rider
@@ -402,7 +393,6 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                 }
                 else-> courseInDb = courseList.minByOrNull { (it.length?:0.0) - (course.length?:0.0) }!!
             }
-
         }
 
         if(header != null){
@@ -488,15 +478,12 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                 else->{
                     val onCourseList = headerList.filter { it.courseId == courseInDb?.id }.sortedBy { it.startTimeMilis - headerToInsert.startTimeMilis }
                     onCourseList.firstOrNull()
-
                 }
             }
-
         }
         importTt.timeTrialRiders.asSequence().filter { it.firstName.isNotBlank() }.sortedBy { it.bib?:it.startTime?.toSecondOfDay()?:0 }.forEachIndexed { index, importRider ->
 
             val existingRiders = riderRespository.ridersFromFirstLastName(importRider.firstName, importRider.lastName)
-            //var timeTrialRider:TimeTrialRider? = null
             val riderInDbId:Rider = when(existingRiders.size){
                 0->{
                     val newRider = Rider(importRider.firstName, importRider.lastName, importRider.club, null, importRider.category?:"", importRider.gender)
@@ -561,7 +548,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
     }
 
-    suspend fun insertTimeTrialRider(timeTrialRider: TimeTrialRider){
+    fun insertTimeTrialRider(timeTrialRider: TimeTrialRider){
 
         val riderId = timeTrialRider.riderId
         val timeTrialId = timeTrialRider.timeTrialId

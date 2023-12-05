@@ -5,19 +5,6 @@ import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.LengthConverter
 import org.threeten.bp.OffsetDateTime
 
-//interface  IResultColumn{
-//
-//    val key: String
-//    val description : String
-//    val descriptionResourceId : Int
-//    fun getValue(result: IResult): String
-//    val isVisible : Boolean
-//    val index: Int
-//    val sortOrder: Int
-//    val filterText: String
-//    fun compare(result1 : IResult, result2: IResult): Int
-//}
-
 enum class SortType{
     NONE, ASCENDING, DESCENDING
 }
@@ -74,7 +61,6 @@ data class ColumnData(
             }
         }
 
-
         fun getAllKeys():List<String>{
             return listOf(
                     RiderNameColumn.columnKey,
@@ -87,16 +73,13 @@ data class ColumnData(
                     DateColumn.columnKey,
                     DistanceColumn.columnKey,
                     SpeedColumn.columnKey)
-
         }
-
     }
 }
 
 
 
 class RiderNameColumn:IColumnDefinition{
-
     companion object{
         const val columnKey = "rider"
     }
@@ -117,15 +100,13 @@ class RiderNameColumn:IColumnDefinition{
     override fun passesFilter(filterText: String, result: IResult): Boolean {
         return result.rider.fullName().contains(filterText, true)
     }
-
-
 }
 
 
 class CourseNameColumn : IColumnDefinition{
 
     companion object{
-        const val columnKey = "co"
+        const val columnKey = "course"
     }
 
     override val key: String = columnKey
@@ -150,7 +131,7 @@ class ClubColumn : IColumnDefinition{
 
 
     companion object{
-        const val columnKey = "clu"
+        const val columnKey = "club"
     }
 
     override val key: String = columnKey
@@ -174,7 +155,7 @@ class ClubColumn : IColumnDefinition{
 class CategoryColumn : IColumnDefinition{
 
     companion object{
-        const val columnKey = "cat"
+        const val columnKey = "category"
     }
 
     override val key: String = columnKey
@@ -199,7 +180,7 @@ class CategoryColumn : IColumnDefinition{
 class GenderColumn : IColumnDefinition{
 
     companion object{
-        const val columnKey = "gen"
+        const val columnKey = "gender"
     }
 
     override val key: String = columnKey
@@ -223,7 +204,7 @@ class GenderColumn : IColumnDefinition{
 class TimeColumn : IColumnDefinition{
 
     companion object{
-        const val columnKey = "tim"
+        const val columnKey = "time"
     }
 
     override val key: String = columnKey
@@ -246,7 +227,7 @@ class TimeColumn : IColumnDefinition{
 class DateColumn : IColumnDefinition{
 
     companion object{
-        const val columnKey = "dat"
+        const val columnKey = "date"
     }
 
     override val key: String = columnKey
@@ -269,7 +250,7 @@ class DateColumn : IColumnDefinition{
 class DistanceColumn(private val distConverter: LengthConverter) : IColumnDefinition{
 
     companion object{
-        const val columnKey = "dis"
+        const val columnKey = "distance"
     }
 
     override val key: String = columnKey
@@ -293,7 +274,7 @@ class DistanceColumn(private val distConverter: LengthConverter) : IColumnDefini
 class LapsColumn : IColumnDefinition{
 
     companion object{
-        const val columnKey = "lap"
+        const val columnKey = "laps"
     }
 
     override val key: String = columnKey
@@ -308,6 +289,7 @@ class LapsColumn : IColumnDefinition{
     override fun compare(result1: IResult, result2: IResult): Int {
         return (result1.laps).compareTo(result2.laps)
     }
+
     override fun passesFilter(filterText: String, result: IResult): Boolean {
         return getValue(result).contains(filterText, true)
     }
@@ -316,7 +298,7 @@ class LapsColumn : IColumnDefinition{
 class SpeedColumn(private val distConverter: LengthConverter) : IColumnDefinition{
 
     companion object{
-        const val columnKey = "spe"
+        const val columnKey = "speed"
     }
 
     override val key: String = columnKey
@@ -336,7 +318,7 @@ class SpeedColumn(private val distConverter: LengthConverter) : IColumnDefinitio
         }
     }
 
-    fun  averageSpeed(result: IResult): Double{
+    private fun averageSpeed(result: IResult): Double{
         val rt = result.resultTime
         return if(rt!= null && rt > 0){
             ((result.course.length?:0.0) * result.laps) / rt.toDouble()
@@ -345,7 +327,6 @@ class SpeedColumn(private val distConverter: LengthConverter) : IColumnDefinitio
             Double.MAX_VALUE
         }
     }
-
 
     override fun compare(result1: IResult, result2: IResult): Int {
         return averageSpeed(result1).compareTo(averageSpeed(result2))

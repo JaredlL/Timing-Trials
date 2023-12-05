@@ -102,7 +102,6 @@ class ResultExplorerFragment : Fragment()  {
                     view?.let { v ->
                         val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
                         imm?.hideSoftInputFromWindow(v.windowToken, 0)
-
                     }
                 }
             }
@@ -237,7 +236,6 @@ class ResultExplorerFragment : Fragment()  {
             }
         }
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_results_explorer, menu)

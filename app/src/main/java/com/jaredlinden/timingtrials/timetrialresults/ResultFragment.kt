@@ -84,7 +84,6 @@ class ResultFragment : Fragment() {
             fragResultRecyclerView.layoutManager = viewManager
             fragResultRecyclerView.adapter = resultGridAdapter
             fragResultRecyclerView.addItemDecoration(DividerItemDecoration(requireActivity(), LinearLayoutManager.VERTICAL))
-
         }
 
         resultViewModel.timeTrial.observe(viewLifecycleOwner, Observer { res->
@@ -331,8 +330,6 @@ class ResultFragment : Fragment() {
         try {
             val binding = mBinding ?: throw Exception("Binding null")
 
-            // val sv = horizontalScrollView
-           // val view = sv.getChildAt(0)
             val now = Date()
             val nowChars = android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now)
             val ttName = resultViewModel.timeTrial.value?.timeTrialHeader?.ttName
@@ -343,7 +340,10 @@ class ResultFragment : Fragment() {
             val gridHeight = if(sr == 0) binding.fragResultRecyclerView.height else sr
 
             //https://dev.to/pranavpandey/android-create-bitmap-from-a-view-3lck
-            view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(gridHeight+dpToPixels(300), View.MeasureSpec.EXACTLY))
+            view.measure(
+                View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(gridHeight+dpToPixels(300), View.MeasureSpec.EXACTLY)
+            )
 
             view.layout(0,0, view.measuredWidth, view.measuredHeight)
 
@@ -358,18 +358,19 @@ class ResultFragment : Fragment() {
 
             val sum = tv1Height + titleTextHeight + notesHeight + dpToPixels(50)
 
-            view.measure(View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(gridHeight+sum, View.MeasureSpec.EXACTLY))
+            view.measure(
+                View.MeasureSpec.makeMeasureSpec(scrollViewWidth, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(gridHeight+sum, View.MeasureSpec.EXACTLY)
+            )
 
             view.layout(0,0, view.measuredWidth, view.measuredHeight)
 
             val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
-
             val canvas = Canvas(bitmap)
 
-           if( view.background!=null) {
+           if(view.background!=null){
                view.background.draw(canvas)
-            }
+           }
            else
             {
                val typedValue = TypedValue()
@@ -377,7 +378,6 @@ class ResultFragment : Fragment() {
                theme.resolveAttribute(R.attr.colorSurface, typedValue, true)
                val color = typedValue.data
                canvas.drawColor(color)
-
             }
             view.draw(canvas)
             val fileName = Utils.createFileName(imgName)
@@ -398,7 +398,6 @@ class ResultFragment : Fragment() {
             displayError("Failed to save screenshot", e)
         }
         finally {
-
             view.measure(View.MeasureSpec.makeMeasureSpec(oldWidth, View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(oldHeight, View.MeasureSpec.EXACTLY))
 
@@ -419,7 +418,6 @@ class ResultFragment : Fragment() {
             put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
             put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
         }
-
 
         val data = cr.insert(MediaStore.Images.Media.getContentUri(VOLUME_EXTERNAL_PRIMARY), contentVals)
 
@@ -460,7 +458,6 @@ class ResultFragment : Fragment() {
                 it.flush()
                 it.close()
             }
-
         }
         openScreenshot(data)
     }
@@ -491,10 +488,9 @@ class ResultFragment : Fragment() {
                 it.flush()
                 it.close()
             }
-            //refreshGallery(it)
         }
-            Timber.d("Inserted image URI API 26 -> ${data?.path}")
-            openScreenshot(data)
+        Timber.d("Inserted image URI API 26 -> ${data?.path}")
+        openScreenshot(data)
     }
 
     private fun openScreenshot(imageFile: Uri?) {

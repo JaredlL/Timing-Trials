@@ -12,10 +12,7 @@ import com.jaredlinden.timingtrials.ui.IGenericListItem
 
 class GenericListItemAdapter internal constructor(val context: Context): RecyclerView.Adapter<GenericListItemAdapter.GenericListItemViewHolder>() {
 
-
     inner class GenericListItemViewHolder(val binding: ListItemGenericBinding): RecyclerView.ViewHolder(binding.root) {
-
-        //var longPress = {(rider): IGenericListItem -> Unit}
 
         fun bind(genericItem: IGenericListItem){
 
@@ -43,7 +40,6 @@ class GenericListItemAdapter internal constructor(val context: Context): Recycle
 
         val binding = DataBindingUtil.inflate<ListItemGenericBinding>(layoutInflater, R.layout.list_item_generic, parent, false)
         return GenericListItemViewHolder(binding)
-
     }
 
     override fun onBindViewHolder(holder: GenericListItemViewHolder, position: Int) {

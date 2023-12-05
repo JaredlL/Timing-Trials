@@ -97,7 +97,6 @@ class RiderStatusFragment : Fragment() {
         }
     }
 
-
     private fun createRiderActionsDialog(rs: RiderStatusViewWrapper){
 
         val tt = timingViewModel.timeTrial.value ?: return

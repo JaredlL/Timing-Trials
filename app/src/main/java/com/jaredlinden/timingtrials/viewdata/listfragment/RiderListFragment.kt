@@ -48,9 +48,7 @@ class RiderListFragment : Fragment() {
             genericRecyclerView.adapter = adapter
             genericRecyclerView.layoutManager = viewManager
         }
-
         return binding.root
-
     }
 
     override fun onDetach() {
@@ -66,15 +64,12 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, L
         binding.apply{
             rider = data
             riderLayout.setOnLongClickListener {
-
-
                 val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.javaClass.simpleName,data.id?:0)
                 Navigation.findNavController(binding.root).navigate(action)
                 true
             }
 
             riderLayout.setOnClickListener {
-                //val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToGlobalResultFragment(data.id?:0, data.javaClass.simpleName)
                 val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment(data.id ?: 0)
                 Navigation.findNavController(binding.root).navigate(action)
             }

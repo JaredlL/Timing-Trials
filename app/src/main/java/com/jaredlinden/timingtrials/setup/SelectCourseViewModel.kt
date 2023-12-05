@@ -24,8 +24,6 @@ class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCou
 
     override fun setSelectedCourse(course: Course) {
 
-
-
             ttSetup.timeTrial.value?.let { currentTimeTrial ->
                 if (currentTimeTrial.course?.id != course.id) {
                     val oldCourseName =currentTimeTrial.course?. courseName ?: ""

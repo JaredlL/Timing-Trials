@@ -20,7 +20,6 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
 
         var longPress = {_: Course -> Unit}
 
-
         fun bind(courseWrapper: SelectableCourseViewModel){
 
             _binding.apply{
@@ -30,8 +29,6 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
                 }
 
                 checkBox.isChecked = (courseWrapper.course.id == selectedId)
-
-
                 executePendingBindings()
 
                 checkBox.setOnClickListener {
@@ -44,9 +41,7 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
                 }
             }
         }
-
     }
-
 
     private var selectedId : Long? = 0
     private var mCourses: List<SelectableCourseViewModel> = listOf()
@@ -66,9 +61,6 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
         }
     }
 
-
-
-
     fun setCourses(data: SelectableCourseData, unitConverter: LengthConverter){
         if(data.selectedId != selectedId || data.courses != mCourses){
             selectedId = data.selectedId
@@ -82,16 +74,12 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
         return mCourses[position].course.id?:0
     }
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseViewHolder {
 
         val binding: ListItemCourseBinding = DataBindingUtil.inflate(layoutInflater, R.layout.list_item_course, parent, false)
         return CourseViewHolder(binding)
-
-
     }
 
     override fun getItemCount(): Int{ return mCourses.count() }
-
 
 }

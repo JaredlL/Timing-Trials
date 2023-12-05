@@ -10,12 +10,9 @@ import java.io.StringReader
 
 class LineToCompleteResult: ILineToObjectConverter<CompleteInformationRow>{
 
-
     companion object{
 
     }
-
-
 
     override fun isHeading(line: String): Boolean {
         return line.startsWith(">>timing trials mixed results")

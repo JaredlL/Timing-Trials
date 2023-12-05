@@ -35,6 +35,7 @@ import com.jaredlinden.timingtrials.databinding.ActivityMainBinding
 import com.jaredlinden.timingtrials.dialog.ErrorDialog
 import com.jaredlinden.timingtrials.functors.Left
 import com.jaredlinden.timingtrials.functors.Right
+import com.jaredlinden.timingtrials.test.TitleViewModel
 import com.jaredlinden.timingtrials.timing.TimingActivity
 import com.jaredlinden.timingtrials.util.Event
 import com.jaredlinden.timingtrials.util.EventObserver
@@ -172,7 +173,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
         setupActionBarWithNavController(navController, appBarConfiguration)
         rootCoordinator = binding.mainActivityCoordinator
 
-        val vm:TitleViewModel by viewModels ()
+        val vm: TitleViewModel by viewModels ()
         vm.timingTimeTrial.observe(this) {
             it?.let {
                 val intent = Intent(this, TimingActivity::class.java)

@@ -13,7 +13,6 @@ import org.threeten.bp.format.DateTimeFormatter
 
 class Converters {
 
-
     @TypeConverter
     fun instantFromTimestamp(value: Long?): Instant? {
         return value?.let { Instant.ofEpochMilli(value) }
@@ -72,7 +71,6 @@ class Converters {
         return courseRecordString?.let{
             val courseType = object : TypeToken<List<CourseRecord>>() {}.type
             Gson().fromJson<List<CourseRecord>>(courseRecordString, courseType)}
-
     }
 
     @TypeConverter
@@ -80,7 +78,6 @@ class Converters {
         return courseString?.let{
             val courseType = object : TypeToken<Course>() {}.type
             Gson().fromJson<Course>(courseString, courseType)}
-
     }
 
     @TypeConverter
@@ -108,7 +105,6 @@ class Converters {
         }else{
              splitsString.split(",").map { it.toLong() }
         }
-
     }
 
     @TypeConverter

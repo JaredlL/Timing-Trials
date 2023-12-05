@@ -15,40 +15,31 @@ interface IRiderRepository {
 
     val allRiders: LiveData<List<Rider>>
 
-
     val allRidersLight: LiveData<List<Rider>>
 
     suspend fun allRidersLightSuspend():List<Rider>
 
     val allClubs: LiveData<List<String>>
-
     val allCategories: LiveData<List<String>>
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun insert(rider: Rider): Long
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun update(rider: Rider)
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun updateRiders(riders: List<Rider>)
 
     fun getRider(riderId: Long) : LiveData<Rider?>
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun delete(rider: Rider)
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun insertOrUpdate(rider: Rider)
 
     suspend fun ridersFromIds(ids: List<Long>): List<Rider>
-
-
 
     suspend fun ridersFromFirstLastName(firstName:String, lastName:String): List<Rider>
 
@@ -63,7 +54,6 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
     override val allRidersLight: LiveData<List<Rider>> = riderDao.getAllRidersLight()
 
     override val allClubs: LiveData<List<String>> = riderDao.getAllClubs()
-
 
     override val allCategories: LiveData<List<String>> = riderDao.getAllCategories().map{res-> res.filterNotNull() }
 
@@ -89,7 +79,6 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
         return riderDao.ridersFromFirstLastName(firstName, lastName)
     }
 
-
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun update(rider: Rider) {
@@ -102,15 +91,12 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
         riderDao.updateList(riders)
     }
 
-
     override fun getRider(riderId: Long) : LiveData<Rider?> {
         return when(riderId){
             0L ->  MutableLiveData<Rider>(Rider.createBlank().copy(gender = Gender.MALE))
             else ->  riderDao.getRiderById(riderId)
         }
     }
-
-
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
@@ -127,7 +113,5 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
             }else{
                 riderDao.insert(rider)
             }
-
         }
-
 }

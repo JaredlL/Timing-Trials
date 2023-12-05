@@ -125,23 +125,9 @@ class SetupViewPagerFragment: Fragment() {
                     it.findItem(R.id.settings_menu_sort)?.isVisible = true
                 }
                 //setHasOptionsMenu(false)
-
             }
         }
     }
-
-//
-//    val closeListner = object : SearchView.OnCloseListener{
-//        override fun onClose(): Boolean {
-//            val view = activity?.currentFocus
-//            view?.let { v ->
-//                val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-//                imm?.hideSoftInputFromWindow(v.windowToken, 0)
-//            }
-//            return true
-//        }
-//
-//    }
 
 
     val expandListener = object : MenuItem.OnActionExpandListener {
@@ -220,10 +206,7 @@ class SetupViewPagerFragment: Fragment() {
                     }.create().show()
             true
         }
-
-
     }
-
 
     override fun onDestroyView() {
 
@@ -237,7 +220,6 @@ class SetupViewPagerFragment: Fragment() {
         prefListner = null
         super.onDestroyView()
     }
-
 
     private fun getTabIcon(position: Int): Int {
         return when (position) {
@@ -261,8 +243,6 @@ class SetupViewPagerFragment: Fragment() {
             else -> null
         }
     }
-
-
 }
 
 const val TIMETRIAL_PAGE_INDEX = 2
@@ -278,7 +258,6 @@ class SetupPagerAdapter(fm: FragmentManager, ls: Lifecycle, val fragCreated: () 
             TIMETRIAL_PAGE_INDEX to {SetupTimeTrialFragment.newInstance()},
             RIDER_PAGE_INDEX to { SelectRidersFragment.newInstance(SelectRidersFragmentArgs(SelectRidersFragment.SELECT_RIDER_FRAGMENT_MULTI))},
             ORDER_RIDER_INDEX to { OrderRidersFragment.newInstance() }
-
     )
 
     override fun getItemCount() = tabFragmentsCreators.size

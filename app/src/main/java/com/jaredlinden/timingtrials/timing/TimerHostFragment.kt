@@ -85,7 +85,6 @@ class TimerHostFragment : Fragment() {
             menu.findItem(R.id.timingTest)?.isVisible = true
             menu.findItem(R.id.timingTest2)?.isVisible = true
         }
-
     }
 
     var prevBackPress = 0L
@@ -151,8 +150,6 @@ class TimerHostFragment : Fragment() {
             }
             else -> true
         }
-//        Toast.makeText(this, "ToDo...", Toast.LENGTH_SHORT).show()
-//        return true
     }
 
     fun showSetNumberDialog(tt:TimeTrial){
@@ -166,9 +163,6 @@ class TimerHostFragment : Fragment() {
         alert.setTitle(getString(R.string.what_number_will_late_rider_use))
 
         alert.setView(edittext)
-
-
-
         edittext.inputType = InputType.TYPE_CLASS_NUMBER
 
         edittext.addTextChangedListener(object: TextWatcher {
@@ -183,11 +177,9 @@ class TimerHostFragment : Fragment() {
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
             }
 
         })
@@ -224,22 +216,17 @@ class TimerHostFragment : Fragment() {
     
  """
 
-
         val html = HtmlCompat.fromHtml(htmlString, HtmlCompat.FROM_HTML_MODE_LEGACY)
-
         val mColor = ContextCompat.getColor(requireContext(), R.color.secondaryDarkColor)
         val d = ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_help_outline_24)
         Utils.colorDrawable(mColor, d)
 
         AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.tips))
-
                 .setIcon(d)
                 .setMessage(html)
                 .setPositiveButton(R.string.ok){_,_->
-
                 }
                 .show()
     }
-
 }

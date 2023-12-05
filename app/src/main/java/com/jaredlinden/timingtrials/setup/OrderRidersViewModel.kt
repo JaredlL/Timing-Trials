@@ -32,8 +32,6 @@ class OrderRidersViewModel(val setupViewModel: SetupViewModel) : IOrderRidersVie
             val updateList = mutList.mapIndexed { i, r -> r.copy(timeTrialData = r.timeTrialData.copy(index = i)) }.sortedBy { it.timeTrialData.index }
             setupViewModel.updateTimeTrial(currentTimeTrial.updateRiderList(updateList))
         }
-
-
     }
 
 
@@ -54,13 +52,7 @@ class OrderRidersViewModel(val setupViewModel: SetupViewModel) : IOrderRidersVie
                 setupViewModel.updateTimeTrial(tt.updateRiderList(tt.riderList.map { if(it.riderData.id == riderToChange.riderData.id) riderToChange.copy(timeTrialData = riderToChange.timeTrialData.copy(assignedNumber = newNumber)) else it }))
             }
         }
-
     }
-
-
-
-
-
 
     override fun getOrderableRiderData(): LiveData<TimeTrial?> {
         return _mTimeTrial

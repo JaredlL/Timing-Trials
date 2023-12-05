@@ -21,7 +21,6 @@ class ListViewModel @Inject constructor(
     val timeTrialRepository: ITimeTrialRepository)
     : ViewModel() {
 
-
     val liveFilter: MutableLiveData<Filter> = MutableLiveData()
 
     fun setFilter(filterVal: Filter){
@@ -83,7 +82,6 @@ class ListViewModel @Inject constructor(
     private val _mTimeTrialInsertedEvent: MutableLiveData<Event<Long>> = MutableLiveData()
 
     val timeTrialInsertedEvent: LiveData<Event<Long>> = _mTimeTrialInsertedEvent
-
 
     fun insertNewTimeTrial(numberMode: NumberMode){
         val newHeader = TimeTrialHeader.createBlank().copy(numberRules = NumberRules(mode = numberMode))

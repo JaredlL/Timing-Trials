@@ -36,9 +36,6 @@ class ResultDataSource(private val timeTrialRepository: ITimeTrialRepository, pr
 
     private val factList: List<IResultDataFactory> = listOf(riderResultFact, courseResultfact)
 
-
-
-
     fun getResutTitle(typeIdData: GenericListItemNext): LiveData<String>{
          typeIdData.nextId?.let { id->
             factList.firstOrNull { it.isValidForData(typeIdData.itemType) }?.let {fact->

@@ -23,12 +23,10 @@ interface ISheetViewModel{
 data class GlobalResultViewModelData(val itemId: Long, val  itemType: String, val converter: LengthConverter)
 
 @HiltViewModel
-class ResultExplorerViewModel @Inject constructor(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository, private val courseRepository: ICourseRepository, private val timeTrialRiderRepository: TimeTrialRiderRepository) : ViewModel(), ISheetViewModel {
-
-
-
-    private var itemId: Long = 0
-    private var itemTypeId: String = ""
+class ResultExplorerViewModel @Inject constructor(
+    private val riderRepository: IRiderRepository,
+    private val courseRepository: ICourseRepository,
+    timeTrialRiderRepository: TimeTrialRiderRepository) : ViewModel(), ISheetViewModel {
 
     private val columnsContext: MutableLiveData<GlobalResultViewModelData> = MutableLiveData()
     private val allResults = timeTrialRiderRepository.getAllResults()
@@ -43,24 +41,19 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
     val columnViewModels = cols.map { ResultFilterViewModel(it, this) }
     val resultSpreadSheet: MediatorLiveData<ResultExplorerSpreadSheet> = MediatorLiveData()
 
-
     var m_paint: Paint? = null
 
     fun setColumnsContext(newData: GlobalResultViewModelData, paint: Paint){
 
         m_paint = paint
 
-
-
         val currentCols = columns.value
 
         if(currentCols != null){
             val newCols = ColumnData.updateConverter(currentCols,newData.converter)
-
             if(currentCols != newCols){
                 columns.value = newCols
             }
-
 
         }else{
             columns.value = ColumnData.getAllColumns(newData.converter)
@@ -116,7 +109,6 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
         }
     }
 
-
     override fun updateColumn(newColumn: ColumnData) {
         columns.value?.let { currentCols->
             val newCols = currentCols.map { if(it.key == newColumn.key) newColumn else it }
@@ -157,11 +149,9 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
         }
     }
 
-
     fun setNewColumns(columns: List<ColumnData>){
         updateColsIfNotEqual(columns)
     }
-
 
     private val queue = ConcurrentLinkedQueue<Triple<List<IResult>?, List<ColumnData>?, ResultExplorerSpreadSheet>>()
     private var isCarolineAlive = AtomicBoolean()
@@ -186,7 +176,5 @@ class ResultExplorerViewModel @Inject constructor(private val timeTrialRepositor
         }else{
             queue.add(Triple(results, columns, prev))
         }
-
     }
-
 }

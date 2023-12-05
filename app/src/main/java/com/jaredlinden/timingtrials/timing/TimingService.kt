@@ -76,7 +76,6 @@ class TimingService : Service(){
                 playSound()
             }
         }
-
         fun updateTimeTrial(newTt: TimeTrial){
             soundEvent = null
             timeTrial = newTt
@@ -85,7 +84,6 @@ class TimingService : Service(){
     fun playSound(){
 
         startPlayer?.let {player->
-
             if(playSound){
                 if (player.isPlaying ) {
                     player.pause()
@@ -110,8 +108,6 @@ class TimingService : Service(){
         }
     }
 
-
-
     fun stop(){
         Timber.d("Trying to end service")
         timerTask?.cancel()
@@ -123,7 +119,6 @@ class TimingService : Service(){
         startPlayer = null
         Timber.d("Service Stopped")
     }
-
 
     val prefListner = object : SharedPreferences.OnSharedPreferenceChangeListener{
         override fun onSharedPreferenceChanged(prefs: SharedPreferences?, key: String?) {
@@ -166,7 +161,6 @@ class TimingService : Service(){
         val not = getNotification().setContentTitle(newTitle).setContentText(newContentText).build()
         notificationManager?.notify(NOTIFICATION_ID, not)
     }
-
 
     private fun setInForeground(){
 

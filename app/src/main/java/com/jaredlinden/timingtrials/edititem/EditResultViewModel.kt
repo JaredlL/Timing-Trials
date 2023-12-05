@@ -39,7 +39,7 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
         }?:MutableLiveData("Select Rider...")
     }
 
-    //val gender: MutableLiveData<Gender> = MutableLiveData()
+
     val club = MutableLiveData("")
     val category = MutableLiveData("")
     val note = MutableLiveData("")
@@ -63,7 +63,6 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
             changeRider.value = Event(true)
             result.value = null
         }
-
     }
 
     val availibleRiders = excludedRiderIds.switchMap{exclusions->
@@ -149,7 +148,6 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
                     }else{
                         resultRepository.update(new)
                     }
-
                 }
 
                 resultSaved.postValue(Event(true))
@@ -178,8 +176,6 @@ class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
                                  val addToSelection: (Rider) -> Unit,
                                  val removeFromSelection:(Rider) -> Unit ) : ISelectRidersViewModel{
 
-
-
     override val selectedRidersInformation: MediatorLiveData<SelectedRidersInformation> = MediatorLiveData()
 
     override val close: MutableLiveData<Event<Boolean>> = MutableLiveData()
@@ -195,7 +191,6 @@ class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
     override fun setRiderFilter(filterString: String) {
         riderFilter.value = filterString
     }
-
 
     val liveSortMode : MutableLiveData<Int> = MutableLiveData(SORT_DEFAULT)
     override fun setSortMode(sortMode: Int) {

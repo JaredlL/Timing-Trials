@@ -1,4 +1,4 @@
-package com.jaredlinden.timingtrials
+package com.jaredlinden.timingtrials.test
 
 import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.data.*
@@ -63,7 +63,6 @@ class TestViewModel@Inject constructor(
             timingTrialsDatabase.timeTrialDao().deleteAll()
             timingTrialsDatabase.riderDao().deleteAll()
         }
-
     }
 
     fun testTiming(){
@@ -102,12 +101,6 @@ class TestViewModel@Inject constructor(
             }
         }
     }
-
-
-
-
-
-
 
     fun insertFinishedTt(){
 
@@ -233,8 +226,6 @@ class TestViewModel@Inject constructor(
                                 laps = 1,
                                 status = TimeTrialStatus.FINISHED)).updateCourse(courses[1])
 
-
-
                 val rListWithIds = _mTimeTrial.addRiders(rList).riderList.mapIndexed { index, filledTimeTrialRider -> filledTimeTrialRider.copy(timeTrialData = filledTimeTrialRider.timeTrialData.copy(id = index.toLong())) }
 
                 val copy = _mTimeTrial.copy(riderList = rListWithIds)
@@ -257,48 +248,4 @@ class TestViewModel@Inject constructor(
             }
         }
     }
-
-
-
-//    fun  addFakeEvents2(timeTrial: TimeTrial): TimeTrial{
-//
-//        val events = mutableListOf<RiderPassedEvent>()
-//        timeTrial.helper.riderStartTimes.forEach {
-//            for (i in 1..timeTrial.timeTrialHeader.laps) {
-//                events.add(RiderPassedEvent(timeTrial.timeTrialHeader.id
-//                        ?: 0, it.value.rider.id, it.key + 500 + i * 3000))
-//            }
-//        }
-//
-//        val newEvents = timeTrial.helper.riderStartTimes.asSequence().mapIndexed { index, entry ->
-//            RiderPassedEvent(timeTrial.timeTrialHeader.id ?: 0, entry.value.rider.id, entry.key + 500 + index * 3000)
-//        }
-//        return timeTrial.copy(eventList = newEvents.toList())
-//    }
-//
-//    fun addFakeEvents(timeTrial: TimeTrial): TimeTrial{
-//        val events = mutableListOf<RiderPassedEvent>()
-//        timeTrial.helper.riderStartTimes.forEach {
-//            //events.add(RiderPassedEvent(_mTimeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key))
-//
-//
-//            var prev = it.key
-//            for(i in 1..timeTrial.timeTrialHeader.laps){
-//                prev += prev + Random.nextLong(5000, 10000)
-//                events.add(RiderPassedEvent(timeTrial.timeTrialHeader.id?:0, it.value.rider.id, prev))
-//            }
-//
-//
-////                var i = 0
-////                while(i < setupTimeTrial.timeTrialHeader.laps){
-////                    events.add(RiderPassedEvent(setupTimeTrial.timeTrialHeader.id?:0, it.value.rider.id, it.key + 500 + i * 333, EventType.RIDER_PASSED))
-////                    i++
-////                }
-//
-//        }
-//        return timeTrial.copy(eventList = events)
-//    }
-
-    // endregion
-
 }

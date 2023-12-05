@@ -82,7 +82,6 @@ class LineToTimeTrialConverter : ILineToObjectConverter<TimeTrialHeader> {
         }catch (e:Exception){
             throw Exception("Error reading timetrial data", e)
         }
-
     }
 
     fun fromCttTitle(cttTitle: String): TimeTrialHeader{

@@ -51,7 +51,6 @@ class TimeTrialListFragment : Fragment() {
         }
 
         return binding.root
-
     }
 
     override fun onDetach() {

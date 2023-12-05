@@ -21,8 +21,6 @@ interface ISelectRidersViewModel{
 
 class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRidersViewModel {
 
-
-
     private val selectedRidersMediator: MediatorLiveData<SelectedRidersInformation> = MediatorLiveData()
 
     override val selectedRidersInformation: LiveData<SelectedRidersInformation> = selectedRidersMediator
@@ -42,7 +40,6 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
             }
         }
     }
-
 
     val liveSortMode : MutableLiveData<Int> = MutableLiveData(SORT_RECENT_ACTIVITY)
 
@@ -103,13 +100,10 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
                }else{
                    allRiders.filter { it.fullName().contains(filterString, ignoreCase = true) }
                }
-
            }
             selectedRidersMediator.value = SelectedRidersInformation(filteredRiders, timeTrial.riderList.mapNotNull { it.riderData.id })
         }
     }
-
-
 }
 
 data class SelectedRidersInformation(val allRiderList: List<Rider>, val selectedIds: List<Long>)

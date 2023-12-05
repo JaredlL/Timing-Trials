@@ -14,28 +14,20 @@ import javax.inject.Singleton
 interface ITimeTrialRepository{
 
     suspend fun insert(timeTrial: TimeTrial):Long
-
     suspend fun insertNewHeader(timeTrialHeader: TimeTrialHeader):Long
-
     suspend fun update(timeTrialHeader: TimeTrialHeader)
     suspend fun updateFull(timeTrial: TimeTrial)
     suspend fun getTimeTrialByName(name: String): TimeTrial?
     suspend fun getResultTimeTrialByIdSuspend(id: Long): TimeTrial
     suspend fun getHeadersByName(name: String): List<TimeTrialHeader>
-
     suspend fun delete(timeTrial: TimeTrial)
     suspend fun allTimeTrials(): List<TimeTrial>
     suspend fun allTimeTrialsOnCourse(courseId: Long): List<TimeTrialHeader>
     suspend fun deleteById(ttId: Long)
-
     fun getAllHeaderBasicInfo(): List<TimeTrialBasicInfo>
-
     suspend fun deleteHeader(timeTrialHeader: TimeTrialHeader)
-    //val nonFinishedTimeTrial: LiveData<TimeTrialWithCourse?>
     fun getSetupTimeTrialById(timeTrialId: Long): LiveData<TimeTrial?>
-
     fun getTimingTimeTrial():LiveData<TimeTrial?>
-
     fun getLiveTimeTrialByName(name:String): LiveData<TimeTrial>
     fun getResultTimeTrialById(id: Long): LiveData<TimeTrial?>
     val allTimeTrialsHeader: LiveData<List<TimeTrialHeader>>

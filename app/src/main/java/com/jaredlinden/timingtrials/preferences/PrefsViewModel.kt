@@ -29,7 +29,5 @@ class PrefsViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepos
             timingTrialsDatabase.riderDao().deleteAll()
             allDeleted.postValue(Event(true))
         }
-
     }
-
 }

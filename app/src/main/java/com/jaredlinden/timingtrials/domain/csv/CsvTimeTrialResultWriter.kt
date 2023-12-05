@@ -10,7 +10,6 @@ import java.io.*
 
 class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<List<String>>, val lengthConverter: LengthConverter){
 
-
     fun writeToPath(outputStream: OutputStream){
         val lines: MutableList<List<String>> = mutableListOf()
         lines.add(listOf("Results, Powered by Timing Trials"))
@@ -42,15 +41,14 @@ class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<List
             lines.add(listOf("Unknown Course"))
         }
     }
-
-
 }
+
 class CsvSheetWriter(val sheet: ResultExplorerSpreadSheet){
     fun writeToPath(ouputStream: OutputStream){
 
         val all = listOf(listOf(">>timing trials mixed results")) + listOf( sheet.sheetColumns.map { it.headingText }) + (sheet.data)
 
-       val csvWriter =  CSVWriter(ouputStream.bufferedWriter())
+        val csvWriter =  CSVWriter(ouputStream.bufferedWriter())
         csvWriter.writeAll(all.map { it.toTypedArray() })
         csvWriter.flush()
         csvWriter.close()

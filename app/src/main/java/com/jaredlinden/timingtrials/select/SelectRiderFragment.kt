@@ -151,7 +151,6 @@ class SelectRiderFragment : Fragment() {
                     viewModel.setRiderFilter(searchText ?: "")
                     return true
                 }
-
             })
         }
 
@@ -169,11 +168,9 @@ class SelectRiderFragment : Fragment() {
                     .create().show()
             true
         }
-
     }
 
     private fun editRider(riderId: Long){
         Toast.makeText(requireContext(), "Edit Rider $riderId", Toast.LENGTH_SHORT).show()
     }
-
 }

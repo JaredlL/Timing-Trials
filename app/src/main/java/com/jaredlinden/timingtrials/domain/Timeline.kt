@@ -14,8 +14,6 @@ interface ITimelineEvent {
 
 
 enum class TimelineEventType(type: Int) {
-//    RIDER_DNF(-2),
-//    RIDER_DNS(-1),
     RIDER_STARTED(0),
     RIDER_PASSED(1),
     RIDER_FINISHED(2)
@@ -24,7 +22,7 @@ enum class TimelineEventType(type: Int) {
 
 data class TimeLineEvent(override val timeStamp: Long, override val eventType: TimelineEventType, override val rider: FilledTimeTrialRider?) : ITimelineEvent
 
-class TimeLine(val timeTrial: TimeTrial, val timeStamp: Long) {
+class TimeLine(val timeTrial: TimeTrial, private val timeStamp: Long) {
     fun isValidForTimeStamp(newTimeStamp: Long): Boolean {
         return timeTrial.helper.sparseRiderStartTimes.indexOfKey(newTimeStamp) == index
     }
@@ -41,7 +39,7 @@ class TimeLine(val timeTrial: TimeTrial, val timeStamp: Long) {
 
     val index = timeTrial.helper.sparseRiderStartTimes.indexOfKey(timeStamp)
 
-    private fun gtl(): List<ITimelineEvent> {
+    private fun createTimeLine(): List<ITimelineEvent> {
         val startedEvents = timeTrial.riderList.asSequence()
                 .filter {
                     (it.timeTrialData.finishCode != null && it.timeTrialData.finishCode == FinishCode.DNS.type).not()
@@ -51,7 +49,6 @@ class TimeLine(val timeTrial: TimeTrial, val timeStamp: Long) {
 
         val unassignedEvents = timeTrial.timeTrialHeader.timeStamps.asSequence()
                 .map { TimeLineEvent(it, TimelineEventType.RIDER_PASSED, null) }
-
                 .takeWhile { it.timeStamp <= timeStamp }
         val assignedEvents = timeTrial.riderList.asSequence()
                 .flatMap { r ->
@@ -63,17 +60,12 @@ class TimeLine(val timeTrial: TimeTrial, val timeStamp: Long) {
                                     TimeLineEvent(timeTrial.helper.getRiderStartTime(r.timeTrialData) + ts, TimelineEventType.RIDER_FINISHED, r)
                                 }
                             }
-                }.takeWhile { it.timeStamp <= timeStamp }
+                }
+                .takeWhile{ it.timeStamp <= timeStamp }
         return (startedEvents + unassignedEvents + assignedEvents).sortedBy { it.timeStamp }.toList()
     }
 
-    val timeLine: List<ITimelineEvent> by lazy { gtl() }
+    val timeLine: List<ITimelineEvent> by lazy { createTimeLine() }
 
 }
-
-//    val timeLine: List<ITimelineEvent> =
-//        (timeTrial.riderList.asSequence()
-//                .map {ttr -> StartEvent(timeTrial.helper.getRider StartTime(ttr), ttr.rider.id) } + timeTrial.helper.riderEventMap.asSequence()
-//                .flatMap { rep -> rep.value.asSequence().mapIndexed { index, riderPassedEvent -> if(index + 1 < timeTrial.timeTrialHeader.laps || riderPassedEvent.riderId == null){PassEvent(riderPassedEvent)} else{FinishEvent(riderPassedEvent)} } })
-//                .sortedBy { it.timeStamp }.takeWhile { it.timeStamp <= timeStamp }.toList()
 

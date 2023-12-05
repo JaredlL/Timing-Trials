@@ -10,13 +10,11 @@ enum class NumberMode {INDEX, MAP}
 data class IndexNumberRules(val startNumber: Int = 1,
                             val direction: NumbersDirection = NumbersDirection.ASCEND,
                             val exclusions: List<Int> = listOf()){
-
     fun numberFromIndex(index: Int, totalCount: Int): Int{
 
         if(index >= totalCount){
-            throw Exception("Error getting rider number - index is equal or greater than count")
+            throw Exception("Error getting rider number - index $index is equal or greater than count $totalCount")
         }
-
 
         val dir = if(direction == NumbersDirection.ASCEND) 1 else -1
         val num = (startNumber) + index * dir
@@ -48,8 +46,6 @@ data class IndexNumberRules(val startNumber: Int = 1,
             return excString.splitToSequence(",").mapNotNull { it.toIntOrNull() }.toList()
         }
     }
-
-
 }
 
 data class NumberRules(val mode: NumberMode = NumberMode.INDEX,
@@ -61,13 +57,12 @@ data class NumberRules(val mode: NumberMode = NumberMode.INDEX,
 
     fun numberFromIndex(index: Int, totalCount: Int): Int {
          return indexRules.numberFromIndex(index, totalCount)
-
     }
 
     companion object{
 
-        val gson = Gson()
-        val rulesType = object : TypeToken<NumberRules>() {}.type
+        private val gson = Gson()
+        val rulesType = object : TypeToken<NumberRules>(){}.type
 
         fun fromString(str: String): NumberRules?{
             return gson.fromJson<NumberRules>(str, rulesType)

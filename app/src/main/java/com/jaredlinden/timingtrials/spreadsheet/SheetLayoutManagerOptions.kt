@@ -11,8 +11,6 @@ interface ISheetLayoutManagerOptions {
     fun getRowHeight(row: Int): Int
     fun onCellClick(row: Int, col: Int)
     fun onCellLongPress(row: Int, col: Int)
-
-
 }
 
 interface ISheetColumn{
@@ -37,9 +35,7 @@ class SheetLayoutManagerOptions(override val data: List<List<String>>, override 
         return  3
     }
 
-
     override fun onCellClick(row: Int, col: Int) {
-
     }
 
     override fun onCellLongPress(row: Int, col: Int) {

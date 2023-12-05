@@ -33,7 +33,6 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
                     true
                 }
 
-
                 executePendingBindings()
             }
 

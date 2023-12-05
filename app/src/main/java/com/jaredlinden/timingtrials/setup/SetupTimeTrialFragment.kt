@@ -37,7 +37,7 @@ class SetupTimeTrialFragment : Fragment() {
         val setupVm:SetupViewModel by activityViewModels()
         val propsViewModel = setupVm.timeTrialPropertiesViewModel
 
-        //Order is important
+        // Cant remember why this is needed... to force a livedata computation?
         propsViewModel.setupMediator.observe(viewLifecycleOwner)  {
 
         }

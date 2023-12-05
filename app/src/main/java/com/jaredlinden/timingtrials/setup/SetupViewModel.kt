@@ -6,8 +6,6 @@ import com.jaredlinden.timingtrials.data.roomrepo.ICourseRepository
 import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
-import com.jaredlinden.timingtrials.util.ConverterUtils
-import com.jaredlinden.timingtrials.util.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -62,7 +60,7 @@ class SetupViewModel @Inject constructor(
             res?.let { tt ->
                 val current = _mTimeTrial.value
                 val ordered = tt.copy(riderList = tt.riderList.sortedBy { it.timeTrialData.index })
-                if (!isCarolineAlive.get() && ordered != current) {
+                if (!isCoroutineAlive.get() && ordered != current) {
                     _mTimeTrial.value = ordered
                 }
             }
@@ -70,7 +68,7 @@ class SetupViewModel @Inject constructor(
     }
 
     private val queue = ConcurrentLinkedQueue<TimeTrial>()
-    private var isCarolineAlive = AtomicBoolean()
+    private var isCoroutineAlive = AtomicBoolean()
 
     fun updateTimeTrial(newTimeTrial: TimeTrial) {
 
@@ -79,19 +77,18 @@ class SetupViewModel @Inject constructor(
         if (previousTimeTrial != null) {
             _mTimeTrial.value = newTimeTrial
 
-            if (!isCarolineAlive.get()) {
+            if (!isCoroutineAlive.get()) {
                 queue.add(newTimeTrial)
                 viewModelScope.launch(Dispatchers.IO) {
-                    isCarolineAlive.set(true)
+                    isCoroutineAlive.set(true)
                     while (queue.peek() != null) {
                         var ttToInsert = queue.peek()
                         while (queue.peek() != null) {
                             ttToInsert = queue.poll()
                         }
                         ttToInsert?.let { timeTrialRepository.updateFull(it) }
-
                     }
-                    isCarolineAlive.set(false)
+                    isCoroutineAlive.set(false)
                 }
             } else {
                 queue.add(newTimeTrial)
@@ -135,17 +132,17 @@ class SetupViewModel @Inject constructor(
         }
     }
 
-    fun calculateSD(numArray: List<Long>): Double {
+    private fun calculateSD(numArray: List<Long>): Double {
         val mean = numArray.average()
         val meanSquareDifsAverage = numArray.map { (it - mean).pow(2) }.average()
         return sqrt(meanSquareDifsAverage)
     }
 
-    fun getCourseLap(timeTrialRider: TimeTrialRiderResult): CourseLap?{
+    private fun getCourseLap(timeTrialRider: TimeTrialRiderResult): CourseLap?{
         return timeTrialRider.course.id?.let { CourseLap(it,timeTrialRider.course.courseName, timeTrialRider.laps) }
     }
 
-    fun getAverageCourseTime(riderId: Long?, courseLap: CourseLap, allResults: List<TimeTrialRiderResult>):Double?{
+    private fun getAverageCourseTime(riderId: Long?, courseLap: CourseLap, allResults: List<TimeTrialRiderResult>):Double?{
         return if(riderId != null){
             allResults.asSequence().filter{it.riderData.id == riderId && courseLap == getCourseLap(it) && it.resultTime != null}.sortedByDescending { it.dateSet }.take(5).mapNotNull { it.resultTime }.average()
         }else{
@@ -158,13 +155,11 @@ class SetupViewModel @Inject constructor(
     override val selectRidersViewModel: ISelectRidersViewModel = SelectRidersViewModelImpl(this)
     override val timeTrialPropertiesViewModel: ITimeTrialPropertiesViewModel = TimeTrialPropertiesViewModelImpl(this)
 
-
     @ExperimentalCoroutinesApi
     override fun onCleared() {
         super.onCleared()
-        isCarolineAlive.set(false)
+        isCoroutineAlive.set(false)
         viewModelScope.cancel()
     }
 }
 data class CourseLap(val courseId: Long, val name: String, val laps:Int)
-data class RiderSeedHelper(val riderId: Long, val averagePos: Double)

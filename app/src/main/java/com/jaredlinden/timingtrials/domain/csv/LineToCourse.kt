@@ -13,9 +13,7 @@ class LineToCourseConverter: ILineToObjectConverter<Course> {
     var distanceIndex:Int? = 2
     var cttNameIndex:Int? = 1
     var conversion: Double = defaultConversion
-
     val conversions = mapOf("km" to 1000.0, "kilometers" to 1000.0, "miles" to 1609.34, "mi" to 1609.34, "meters" to 1.0)
-
 
     override fun setHeading(headingLine: String) {
         val splitLine = headingLine.splitToSequence(",", ignoreCase = true)
@@ -40,11 +38,8 @@ class LineToCourseConverter: ILineToObjectConverter<Course> {
                 Course(courseName, distance?:0.0, cctName?:"")
             }
 
-
         }catch (e:Exception){
             throw Exception("Error reading course data", e)
         }
     }
-
-
 }

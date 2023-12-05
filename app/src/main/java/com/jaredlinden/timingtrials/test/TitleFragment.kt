@@ -1,4 +1,4 @@
-package com.jaredlinden.timingtrials
+package com.jaredlinden.timingtrials.test
 
 import android.Manifest
 import android.content.ContentValues
@@ -18,10 +18,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
+import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.TimeTrialHeader
 import com.jaredlinden.timingtrials.data.TimeTrialStatus
 import com.jaredlinden.timingtrials.databinding.FragmentTitleBinding
@@ -82,7 +82,8 @@ class TitleFragment : Fragment()
 
         })
 
-        val binding =  DataBindingUtil.inflate<FragmentTitleBinding>(inflater, R.layout.fragment_title, container, false).apply{
+        val binding =  DataBindingUtil.inflate<FragmentTitleBinding>(inflater,
+            R.layout.fragment_title, container, false).apply{
 
             startTtSetupButton.setOnClickListener{
 
@@ -90,7 +91,8 @@ class TitleFragment : Fragment()
             }
 
             viewDatabaseButton.setOnClickListener {
-                val action = TitleFragmentDirections.actionDataBaseViewPagerFragmentToDataBaseViewPagerFragment2()
+                val action =
+                    TitleFragmentDirections.actionDataBaseViewPagerFragmentToDataBaseViewPagerFragment2()
                 Navigation.findNavController(this.root).navigate(action)
             }
 
@@ -209,15 +211,17 @@ class TitleFragment : Fragment()
                 .setMessage("${resources.getString(R.string.resume_setup)} ${timeTrial.ttName}?")
                 .setPositiveButton(resources.getString(R.string.ok)) { _, _ ->
 
-                    val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
+                    val action =
+                        TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
                     findNavController().navigate(action)
                 }
-                .setNegativeButton(resources.getString(R.string.start_new)){_,_->
+                .setNegativeButton(resources.getString(R.string.start_new)){ _, _->
                     titleViewModel.clearTimeTrial(timeTrial)
-                    val action = TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
+                    val action =
+                        TitleFragmentDirections.actionTitleFragmentToSetupViewPagerFragment2()
                     findNavController().navigate(action)
                 }
-                .setNeutralButton(resources.getString(R.string.dismiss)){_,_->
+                .setNeutralButton(resources.getString(R.string.dismiss)){ _, _->
 
                 }
                 .create().show()

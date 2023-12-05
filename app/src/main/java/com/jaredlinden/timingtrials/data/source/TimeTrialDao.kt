@@ -49,15 +49,12 @@ abstract class TimeTrialDao(db: RoomDatabase) {
         return id
     }
 
-
-
     @Delete
     fun delete(timeTrial: TimeTrial){
         timeTrial.timeTrialHeader.id?.let {ttId ->
             _deleteTtRiders(ttId)
             delete(timeTrial.timeTrialHeader)
         }
-
     }
 
     @Transaction
@@ -84,10 +81,7 @@ abstract class TimeTrialDao(db: RoomDatabase) {
                 }
             }
         }
-
     }
-
-
 
     @Query("DELETE FROM timetrial_table WHERE id = :ttId") abstract fun deleteTimeTrialById(ttId: Long)
 
