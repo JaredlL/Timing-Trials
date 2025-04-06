@@ -11,13 +11,11 @@ import com.jaredlinden.timingtrials.databinding.ListItemResultBinding
 
 class ResultListAdapter internal constructor(val context: Context, val editResult: (Long?) -> Unit): RecyclerView.Adapter<ResultListAdapter.ResultViewHolder>(){
 
-
     inner class ResultViewHolder(binding: ListItemResultBinding): RecyclerView.ViewHolder(binding.root){
         private val _binding = binding
 
         fun bind(result: ResultCell, position: Int){
             _binding.apply {
-                //lifecycleOwner = activity
                 viewModel = result
 
                 if(position.rem(rowLength) == 0 || position < rowLength){
@@ -32,11 +30,8 @@ class ResultListAdapter internal constructor(val context: Context, val editResul
                 }
                 executePendingBindings()
             }
-
         }
     }
-
-
 
     override fun onBindViewHolder(holder: ResultViewHolder, position: Int) {
         mResults[position].let {

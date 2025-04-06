@@ -81,7 +81,9 @@ data class TimeTrialRiderResult(
         @Relation(parentColumn = "timeTrialId", entityColumn = "id", entity = TimeTrialHeader::class)
         val timeTrialHeader: TimeTrialHeader,
 
-        @Relation(parentColumn = "courseId", entityColumn = "id", entity = Course::class)
+        @Relation(
+            parentColumn = "courseId",
+            entityColumn = "id")
         val resCourse: Course?):IResult {
 
     override val rider: Rider

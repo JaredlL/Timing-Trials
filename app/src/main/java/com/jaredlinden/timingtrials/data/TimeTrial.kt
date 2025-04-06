@@ -55,7 +55,9 @@ data class TimeTrialWithCourse(
 data class TimeTrial(
         @Embedded val timeTrialHeader: TimeTrialHeader = TimeTrialHeader.createBlank(),
 
-        @Relation(parentColumn = "courseId", entityColumn = "id", entity = Course::class)
+        @Relation(
+            parentColumn = "courseId",
+            entityColumn = "id")
         val course: Course? = null,
 
         @Relation(parentColumn = "id", entityColumn = "timeTrialId", entity = TimeTrialRider::class)
