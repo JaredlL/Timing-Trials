@@ -52,7 +52,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
 
     @WorkerThread
     override suspend fun updateFull(timeTrial: TimeTrial) {
-        Timber.d("JAREDMSG -> TTREPO -> Updating ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
+        Timber.d("Updating ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
         if((timeTrial.timeTrialHeader.id ?: 0L) == 0L){
             throw Exception("TT ID cannot be null")
         }
@@ -71,7 +71,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     // thread, blocking the UI.
     @WorkerThread
     override suspend fun insert(timeTrial: TimeTrial):Long {
-        Timber.d("JAREDMSG -> TTREPO -> Inserting New TT ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
+        Timber.d("Inserting New TT ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
 //        if(timeTrial.timeTrialHeader.status != TimeTrialStatus.FINISHED){
 //            throw Exception("Cannot insertFull non finished TT")
 //        }
@@ -80,7 +80,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
 
     @WorkerThread
     override suspend fun insertNewHeader(timeTrialHeader: TimeTrialHeader):Long {
-        Timber.d("JAREDMSG -> TTREPO -> Inserting New TT Header into DB from background thread")
+        Timber.d("Inserting New TT Header into DB from background thread")
         return timeTrialDao.insert(timeTrialHeader)
     }
 
@@ -102,7 +102,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
 
     @WorkerThread
     override suspend fun update(timeTrialHeader: TimeTrialHeader) {
-        Timber.d("JAREDMSG -> TTREPO -> Updating ${timeTrialHeader.id} ${timeTrialHeader.ttName} into DB from background thread")
+        Timber.d("Updating ${timeTrialHeader.id} ${timeTrialHeader.ttName} into DB from background thread")
         if((timeTrialHeader.id ?: 0L) == 0L){
             throw Exception("TT ID cannot be null")
         }
@@ -138,6 +138,4 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     override suspend fun deleteHeader(timeTrialHeader: TimeTrialHeader) {
         timeTrialDao.delete(timeTrialHeader)
     }
-
-
 }

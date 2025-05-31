@@ -34,7 +34,7 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
             results.getCourseResults(it)
         }?:MutableLiveData(listOf())
     }.map {res->
-        if(res!= null && res.isNotEmpty()){
+        if(res.isNotEmpty()){
             "Rides: ${res.size}"
         }else{
             ""
@@ -142,7 +142,7 @@ class EditCourseViewModel @Inject constructor(private val repository: ICourseRep
                 if(existing.isNotEmpty() && existing.first().id != trimmed.id){
                     message.postValue(Event(R.string.error_course_exists_with_name))
                 }else{
-                    if(trimmed.id?:0L == 0L){
+                    if((trimmed.id ?: 0L) == 0L){
                         repository.insert(trimmed)
                     }else{
                         repository.update(trimmed)

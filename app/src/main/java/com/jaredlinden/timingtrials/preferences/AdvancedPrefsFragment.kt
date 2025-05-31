@@ -24,7 +24,7 @@ class AdvancedPrefsFragment : PreferenceFragmentCompat() {
         (requireActivity() as? IFabCallbacks)?.setFabVisibility(View.GONE)
 
         findPreference(R.string.p_advanced_clear).setOnPreferenceClickListener {
-            val builder = AlertDialog.Builder(requireContext()).setTitle(resources.getString(R.string.clear_database))
+            AlertDialog.Builder(requireContext()).setTitle(resources.getString(R.string.clear_database))
                     .setMessage(resources.getString(R.string.confirm_delete_database_message))
                     .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
                         viewModel.deleteAll()

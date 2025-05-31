@@ -71,25 +71,21 @@ class RoomCourseRepository @Inject constructor(private val courseDao: CourseDao)
     // suspend function so the caller methods know this.
     // Like this, Room ensures that you're not doing any long running operations on the main
     // thread, blocking the UI.
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun insert(course: Course):Long {
        return courseDao.insert(course)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun update(course: Course) {
         courseDao.update(course)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun delete(course: Course) {
         courseDao.delete(course)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun insertOrUpdate(course: Course){
         val id = course.id ?: 0

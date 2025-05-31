@@ -2,7 +2,6 @@ package com.jaredlinden.timingtrials.setup
 
 
 import android.app.Dialog
-import android.content.Intent
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.LayoutInflater
@@ -13,20 +12,21 @@ import android.widget.TextView
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.TimeTrialStatus
 import com.jaredlinden.timingtrials.databinding.FragmentSetupTimeTrialBinding
-import com.jaredlinden.timingtrials.timing.TimingActivity
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import dagger.hilt.android.AndroidEntryPoint
-import org.threeten.bp.*
+import org.threeten.bp.Instant
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZonedDateTime
 
 @AndroidEntryPoint
 class SetupTimeTrialFragment : Fragment() {
@@ -59,7 +59,6 @@ class SetupTimeTrialFragment : Fragment() {
                 propsViewModel.timeTrial.value?.let {tt->
                     if(tt.riderList.isEmpty()){
                         Toast.makeText(requireActivity(), getString(R.string.tt_needs_one_rider), Toast.LENGTH_LONG).show()
-                        //container.currentItem = 1
                         return@let
                     }
                     if(tt.timeTrialHeader.startTime == null || tt.timeTrialHeader.startTime.isBefore(OffsetDateTime.now())){
@@ -103,17 +102,6 @@ class SetupTimeTrialFragment : Fragment() {
             }
         }
 
-        propsViewModel.timeTrial.observe(viewLifecycleOwner)  {tt->
-          tt?.let {
-              if (it.timeTrialHeader.ttName == "" && it.course == null) {
-                  // showCourseFrag()
-              }
-              if(it.timeTrialHeader.status == TimeTrialStatus.IN_PROGRESS){
-                  //val intent = Intent(requireActivity(), TimingActivity::class.java)
-                  //startActivity(intent)
-              }
-          }
-        }
         return binding.root
     }
 
@@ -164,7 +152,6 @@ class  TimePickerFragment2 : DialogFragment(){
                 val minDif = (h * 60 + m) - (ldt.hour * 60 + ldt.minute)
                 val corrected = if(minDif <= 0) minDif + 24*60 else minDif
                 title.text = resources.getString(R.string.start_in_string, corrected)
-                //Toast.makeText(requireContext(), "${currentTp.currentHour}:${currentTp.currentMinute}", Toast.LENGTH_SHORT).show()
             }
 
             // Inflate and set the layout for the dialog

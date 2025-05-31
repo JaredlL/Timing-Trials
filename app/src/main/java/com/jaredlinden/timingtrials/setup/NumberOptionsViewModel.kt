@@ -1,14 +1,11 @@
 package com.jaredlinden.timingtrials.setup
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.jaredlinden.timingtrials.data.IndexNumberRules
 import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.data.NumberRules
 import com.jaredlinden.timingtrials.data.NumbersDirection
 import com.jaredlinden.timingtrials.util.setIfNotEqual
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 class NumberOptionsViewModel(val setupViewModel: SetupViewModel) {
 
@@ -17,7 +14,6 @@ class NumberOptionsViewModel(val setupViewModel: SetupViewModel) {
 
     val numberDirection: MutableLiveData<NumbersDirection> = MutableLiveData()
     val startNumber: MutableLiveData<String> = MutableLiveData()
-//    val exclusions: MutableLiveData<String> = MutableLiveData()
     val selectedNumberOptionType: MutableLiveData<Int> = MutableLiveData(0)
     val modeList = listOf(NumberMode.INDEX, NumberMode.MAP)
     val mode: MutableLiveData<NumberMode> = MutableLiveData()

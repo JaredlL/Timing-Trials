@@ -50,6 +50,7 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.net.URL
 import kotlin.math.abs
+import androidx.core.content.edit
 
 
 interface IFabCallbacks{
@@ -154,7 +155,12 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
 
         if(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(HAS_SHOWN_ONBOARDING, false)){
             showDemoDataDialog()
-            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(HAS_SHOWN_ONBOARDING, true).apply()
+            PreferenceManager.getDefaultSharedPreferences(this).edit() {
+                putBoolean(
+                    HAS_SHOWN_ONBOARDING,
+                    true
+                )
+            }
         }
 
         binding.mainFab.setOnClickListener {
@@ -324,7 +330,7 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
             val data = intent.data
 
             if(!intent.getBooleanExtra(FROM_TIMING_TRIALS, false) && data != null){
-                //TODO probably shouldnt fire this off every rotation
+
                 intent.data = null
                 importData(data)
             }
@@ -347,17 +353,18 @@ class MainActivity : AppCompatActivity(), IFabCallbacks {
     private fun getFileName(uri: Uri): String? {
         var result: String? = null
         if (uri.scheme == "content") {
-            contentResolver.query(uri, null, null, null, null)?.let {cursor->
-                if (cursor.moveToFirst()) {
-                    val index = if (cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME) < 0)
+            val cursor = contentResolver.query(uri, null, null, null, null)
+            if ( cursor!= null && cursor.moveToFirst()) {
+                val index =
+                    if (cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME) < 0)
                     {
                         0
                     }else{
                         cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                     }
-                    result = cursor.getString(index)
-                }
+                result = cursor.getString(index)
             }
+            cursor?.close()
         }
         if (result == null) {
             result = uri.path

@@ -21,7 +21,9 @@ class EventViewWrapper(val event: ITimelineEvent, val timeTrial: TimeTrial) : Ba
         onSelectionChanged(event, value)
     }
 
-    private val riderName: String = event.rider?.let { "[${timeTrial.getRiderNumber(it.timeTrialData.index)}] ${it.riderData.firstName} ${it.riderData.lastName}" }?: "Null"
+    private val riderName: String = event.rider?.let {
+        "[${timeTrial.getRiderNumber(it.timeTrialData.index)}] ${it.riderData.firstName} ${it.riderData.lastName}"
+    }?: "Null"
 
     val displayString: String = when(event.eventType){
         TimelineEventType.RIDER_STARTED -> "$riderName Started"

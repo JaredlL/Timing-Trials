@@ -3,16 +3,13 @@ package com.jaredlinden.timingtrials.edititem
 import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
-import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
 import com.jaredlinden.timingtrials.setup.*
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.Event
-import com.jaredlinden.timingtrials.util.Utils
 import com.jaredlinden.timingtrials.util.setIfNotEqual
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
@@ -46,7 +43,7 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
     val splits: MutableLiveData<List<String>> = MutableLiveData(listOf())
     val resultTime = MutableLiveData("")
     val selectedGenderPosition = MutableLiveData(2)
-    val genders = Gender.values().map { it.fullString() }
+    val genders = Gender.entries.map { it.fullString() }
     val resultSaved: MutableLiveData<Event<Boolean>> = MutableLiveData()
     val changeRider: MutableLiveData<Event<Boolean>> = MutableLiveData()
 
@@ -65,7 +62,7 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
         }
     }
 
-    val availibleRiders = excludedRiderIds.switchMap{exclusions->
+    val availableRiders = excludedRiderIds.switchMap{ exclusions->
         riderRepository.allRiders.map{
             it?.let {
                 it.filter { !exclusions.contains(it.id) || result.value?.riderId == it.id || it.id == originalRiderId }
@@ -74,7 +71,7 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
     }
 
     val selectRiderVm: ISelectRidersViewModel = SelectSingleRiderViewModel(
-        availibleRiders,
+        availableRiders,
         resultRepository,
         result.map{ it?.riderId?.let { listOf(it) }?: listOf() },
         ::changeRider) {Unit}

@@ -19,7 +19,6 @@ interface IColumnDefinition{
     fun passesFilter(filterText: String, result:IResult):Boolean
 }
 
-
 data class ColumnData(
         val definition: IColumnDefinition,
         val sortOrder: Int = 0,
@@ -48,7 +47,6 @@ data class ColumnData(
                     ColumnData(DateColumn()),
                     ColumnData(DistanceColumn(distConverter)),
                     ColumnData(SpeedColumn(distConverter))).map { if(it.definition.javaClass == TimeColumn::class.java) it.copy(sortType = SortType.DESCENDING) else it }
-
         }
 
         fun updateConverter(oldList: List<ColumnData>, newConverter: LengthConverter): List<ColumnData>{

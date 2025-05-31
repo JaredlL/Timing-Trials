@@ -5,7 +5,6 @@ import com.jaredlinden.timingtrials.data.*
 import com.jaredlinden.timingtrials.data.roomrepo.*
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -31,11 +30,11 @@ class TimeTrialViewModel @Inject constructor (val timeTrialRepository: ITimeTria
     }
 
     var queue = ConcurrentLinkedQueue<TimeTrial>()
-    private val isCorotineAlive = AtomicBoolean()
+    private val isUpdating = AtomicBoolean()
 
     private fun updateTimeTrial(newtt: TimeTrial){
         Timber.d("Update TT, ${newtt.riderList.size} riders")
-        if(isCorotineAlive.compareAndSet(false, true)){
+        if(isUpdating.compareAndSet(false, true)){
             queue.add(newtt)
             viewModelScope.launch(Dispatchers.IO) {
                 while (queue.peek() != null){
@@ -47,7 +46,7 @@ class TimeTrialViewModel @Inject constructor (val timeTrialRepository: ITimeTria
                         timeTrialRepository.updateFull(it)
                     }
                 }
-                isCorotineAlive.set(false)
+                isUpdating.set(false)
             }
         }else{
             queue.add(newtt)

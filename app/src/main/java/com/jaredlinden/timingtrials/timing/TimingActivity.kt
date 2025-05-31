@@ -248,7 +248,9 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                 .setPositiveButton(getString(R.string.end_timing_and_return_to_setup)){ _, _->
 
                     viewModel.timeTrial.value?.let{
-                        if(it.timeTrialHeader.startTime?.toInstant()?:Instant.MAX > Instant.now()){
+                        if((it.timeTrialHeader.startTime?.toInstant()
+                                ?: Instant.MAX) > Instant.now()
+                        ){
                             if(mBound){
                                 applicationContext.unbindService(connection)
                                 mService.value?.stop()

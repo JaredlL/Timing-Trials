@@ -1,12 +1,10 @@
 package com.jaredlinden.timingtrials.setup
 
-
 import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.data.TimeTrial
 import com.jaredlinden.timingtrials.util.Event
 import org.threeten.bp.OffsetDateTime
-
 
 interface ISelectRidersViewModel{
     val selectedRidersInformation: LiveData<SelectedRidersInformation>

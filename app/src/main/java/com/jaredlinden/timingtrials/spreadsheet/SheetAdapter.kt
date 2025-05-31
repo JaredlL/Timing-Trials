@@ -1,21 +1,16 @@
 package com.jaredlinden.timingtrials.spreadsheet
 
-import android.R.attr.bottom
-import android.R.attr.top
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.drawable.ColorDrawable
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.domain.SortType
@@ -147,7 +142,7 @@ class SheetAdapter internal constructor(
     private val oneDpInPixel = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1F, displayMetrics).toInt()
 
     val widthOfALetter: Int = paint.measureText("0").toInt() + oneDpInPixel * 2
-    val hieghtOfALetter: Int = android.graphics.Rect().also {r ->  paint.getTextBounds("000",0,2,r) }.height() * 2 //+ oneDpInPixel
+    val heightOfALetter: Int = android.graphics.Rect().also {r ->  paint.getTextBounds("000",0,2,r) }.height() * 2 //+ oneDpInPixel
 
     private fun getRowHeight(row:Int):Int{
 
@@ -198,23 +193,23 @@ class SheetAdapter internal constructor(
 
         val sdk = android.os.Build.VERSION.SDK_INT
 
-        val mdrawable = context.getDrawable(R.drawable.background_spreadsheet_heading)
+        val mdrawable = AppCompatResources.getDrawable(context, R.drawable.background_spreadsheet_heading)
 
         if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
             viewHolder.textView.setBackgroundDrawable(mdrawable)
 
         } else {
-            viewHolder.textView.setBackground(mdrawable)
+            viewHolder.textView.background = mdrawable
         }
 
-        val width = ROW_MARKER_WIDTH *(widthOfALetter?:10)
+        val width = ROW_MARKER_WIDTH * widthOfALetter
         viewHolder.textView.width = width
         viewHolder.textView.gravity = Gravity.CENTER
         viewHolder.textView.text = " "
         viewHolder.textView.height = getRowHeight(0)
     }
 
-    val drawable = context.getDrawable(R.drawable.background_spreadsheet_heading)
+    val drawable = AppCompatResources.getDrawable(context, R.drawable.background_spreadsheet_heading)
     private fun makeRowMarker(viewHolder: CellViewHolder, position: Int) {
 
         var (row,_) = posToMarkers(position)
@@ -223,10 +218,9 @@ class SheetAdapter internal constructor(
         val sdk = android.os.Build.VERSION.SDK_INT
 
         if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            //setBackgroundDrawable();
             viewHolder.textView.setBackgroundDrawable(drawable)
         } else {
-            viewHolder.textView.setBackground(drawable)
+            viewHolder.textView.background = drawable
         }
 
         if(row+1 <= 0){
@@ -238,7 +232,7 @@ class SheetAdapter internal constructor(
             viewHolder.textView.height = getRowHeight(8)
         }
 
-        val width = ROW_MARKER_WIDTH *(widthOfALetter?:10)
+        val width = ROW_MARKER_WIDTH * widthOfALetter
         viewHolder.textView.width = width
         viewHolder.textView.gravity = Gravity.CENTER
     }

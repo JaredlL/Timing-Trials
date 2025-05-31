@@ -15,6 +15,7 @@ import com.jaredlinden.timingtrials.data.NumbersDirection
 import com.jaredlinden.timingtrials.databinding.FragmentNumberOptionsBinding
 import com.jaredlinden.timingtrials.util.PREF_NUMBERING_MODE
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.content.edit
 
 @AndroidEntryPoint
 class NumberOptionsDialog: DialogFragment(){
@@ -26,7 +27,7 @@ class NumberOptionsDialog: DialogFragment(){
         val setupVm:SetupViewModel by activityViewModels()
         val mViewModel = setupVm.numberOptionsViewModel
 
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.Theme_AppCompat_Dialog_Alert)
+        setStyle(STYLE_NORMAL, R.style.Theme_AppCompat_Dialog_Alert)
 
 
         val binding = DataBindingUtil.inflate<FragmentNumberOptionsBinding>(inflater, R.layout.fragment_number_options, container, false).apply {
@@ -50,7 +51,10 @@ class NumberOptionsDialog: DialogFragment(){
 
         mViewModel.mode.observe(viewLifecycleOwner, Observer {mode->
             mode?.let {
-                PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putString(PREF_NUMBERING_MODE, mode.name).apply()
+                PreferenceManager.getDefaultSharedPreferences(requireContext())
+                    .edit() {
+                        putString(PREF_NUMBERING_MODE, mode.name)
+                    }
             }
         })
 

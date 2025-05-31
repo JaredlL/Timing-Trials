@@ -10,9 +10,7 @@ import java.io.StringReader
 
 class LineToCompleteResult: ILineToObjectConverter<CompleteInformationRow>{
 
-    companion object{
-
-    }
+    companion object{}
 
     override fun isHeading(line: String): Boolean {
         return line.startsWith(">>timing trials mixed results")
@@ -21,7 +19,7 @@ class LineToCompleteResult: ILineToObjectConverter<CompleteInformationRow>{
     var stringToFieldList: List<StringToObjectField<CompleteInformationRow>> = listOf()
     override fun setHeading(headingLine: String) {
         val splitHeading = CSVReader(StringReader(headingLine)).readNext().map { it }
-        if(splitHeading.filter { it.contains(RIDER, ignoreCase = true) }.count() == 1){
+        if(splitHeading.count { it.contains(RIDER, ignoreCase = true) } == 1){
             stringToFieldList = listOf(
                     FullNameFieldSetter(splitHeading),
                     ClubFieldSetter(splitHeading),

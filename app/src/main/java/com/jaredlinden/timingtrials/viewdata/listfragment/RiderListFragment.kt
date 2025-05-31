@@ -17,6 +17,7 @@ import com.jaredlinden.timingtrials.databinding.ListItemRiderBinding
 import com.jaredlinden.timingtrials.viewdata.*
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import androidx.navigation.findNavController
 
 @AndroidEntryPoint
 class RiderListFragment : Fragment() {
@@ -65,13 +66,13 @@ class RiderViewHolder(binding: ListItemRiderBinding): GenericBaseHolder<Rider, L
             rider = data
             riderLayout.setOnLongClickListener {
                 val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(data.javaClass.simpleName,data.id?:0)
-                Navigation.findNavController(binding.root).navigate(action)
+                binding.root.findNavController().navigate(action)
                 true
             }
 
             riderLayout.setOnClickListener {
                 val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragment2ToEditRiderFragment(data.id ?: 0)
-                Navigation.findNavController(binding.root).navigate(action)
+                binding.root.findNavController().navigate(action)
             }
 
             executePendingBindings()

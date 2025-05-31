@@ -15,6 +15,13 @@ import com.jaredlinden.timingtrials.util.LengthConverter
 
 class CourseListAdapter internal constructor(val context: Context): RecyclerView.Adapter<CourseListAdapter.CourseViewHolder>()  {
 
+    private var selectedId : Long? = 0
+    private var mCourses: List<SelectableCourseViewModel> = listOf()
+    private val layoutInflater = LayoutInflater.from(context)
+
+    var courseLongPress = { course:Course -> Unit}
+    var courseSelected = {course:Course -> Unit}
+
     inner class CourseViewHolder(binding: ListItemCourseBinding): RecyclerView.ViewHolder(binding.root) {
         private val _binding = binding
 
@@ -43,19 +50,12 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
         }
     }
 
-    private var selectedId : Long? = 0
-    private var mCourses: List<SelectableCourseViewModel> = listOf()
-
-    val layoutInflater = LayoutInflater.from(context)
-    var editCourse = {_:Course -> Unit}
-    var courseSelected = {_:Course -> Unit}
-
 
     override fun onBindViewHolder(holder: CourseViewHolder, position: Int) {
-        mCourses.get(position).let { course ->
+        mCourses[position].let { course ->
             with(holder){
                 itemView.tag = course.course.id
-                holder.longPress = editCourse
+                holder.longPress = courseLongPress
                 bind(course)
             }
         }

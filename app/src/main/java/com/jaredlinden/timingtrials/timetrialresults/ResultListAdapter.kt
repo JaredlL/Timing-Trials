@@ -40,7 +40,6 @@ class ResultListAdapter internal constructor(val context: Context, val editResul
                 bind(it, position)
             }
         }
-
     }
 
     override fun getItemId(position: Int): Long {
@@ -74,6 +73,5 @@ class ResultListAdapter internal constructor(val context: Context, val editResul
         rowCount = newResults.size
         notifyDataSetChanged()
     }
-
 }
 

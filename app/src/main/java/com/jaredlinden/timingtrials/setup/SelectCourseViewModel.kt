@@ -6,7 +6,6 @@ import com.jaredlinden.timingtrials.ui.SelectableCourseData
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
-
 interface ISelectCourseViewModel{
     fun getAllCourses(): LiveData<SelectableCourseData>
     fun setSelectedCourse(course: Course)

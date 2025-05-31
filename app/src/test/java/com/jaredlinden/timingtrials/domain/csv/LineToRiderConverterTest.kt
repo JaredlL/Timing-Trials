@@ -8,7 +8,6 @@ class LineToRiderConverterTest {
 
     @Test
     fun importLine() {
-
         var heading = "firstname,lastname,club,time"
         var line = "jared,linden,RDFCC,23:40"
 
@@ -16,7 +15,7 @@ class LineToRiderConverterTest {
         riderImporter.setHeading(heading)
         var import = riderImporter.importLine(line.split(","))
 
-        assertEquals( "jared",import?.firstName)
+        assertEquals("jared", import?.firstName)
         assertEquals("linden", import?.lastName)
 
          heading = "name,club,time"
@@ -27,6 +26,5 @@ class LineToRiderConverterTest {
 
         assertEquals( "jared",import?.firstName)
         assertEquals("linden", import?.lastName)
-
     }
 }

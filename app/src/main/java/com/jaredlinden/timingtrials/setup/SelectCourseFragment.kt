@@ -1,23 +1,22 @@
 package com.jaredlinden.timingtrials.setup
 
 import android.os.Bundle
-import android.view.*
-import androidx.databinding.DataBindingUtil
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.adapters.CourseListAdapter
-import com.jaredlinden.timingtrials.data.*
+import com.jaredlinden.timingtrials.data.Course
 import com.jaredlinden.timingtrials.databinding.FragmentCourseListBinding
 import com.jaredlinden.timingtrials.ui.SelectableCourseViewModel
-import com.jaredlinden.timingtrials.util.*
+import com.jaredlinden.timingtrials.util.EventObserver
+import com.jaredlinden.timingtrials.util.getLengthConverter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -48,7 +47,7 @@ class SelectCourseFragment : Fragment() {
         val viewModel = setupViewModel.selectCourseViewModel
         val viewManager = LinearLayoutManager(context)
         val adapter = CourseListAdapter(requireContext())
-        adapter.editCourse = ::editCourse
+        adapter.courseLongPress = ::editCourse
 
         viewModel.getAllCourses().observe(viewLifecycleOwner) { courses ->
             courses?.let{adapter.setCourses(it, getLengthConverter())}

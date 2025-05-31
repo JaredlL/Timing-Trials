@@ -12,6 +12,11 @@ import com.jaredlinden.timingtrials.ui.IGenericListItem
 
 class GenericListItemAdapter internal constructor(val context: Context): RecyclerView.Adapter<GenericListItemAdapter.GenericListItemViewHolder>() {
 
+    val layoutInflater = LayoutInflater.from(context)
+    var onClick = {item: GenericListItemNext -> Unit}
+
+    private var mItems: List<IGenericListItem> = listOf()
+
     inner class GenericListItemViewHolder(val binding: ListItemGenericBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bind(genericItem: IGenericListItem){
@@ -30,12 +35,6 @@ class GenericListItemAdapter internal constructor(val context: Context): Recycle
         }
     }
 
-    private var mItems: List<IGenericListItem> = listOf()
-    //var mSelected: ArrayList<Long> = arrayListOf()
-    val layoutInflater = LayoutInflater.from(context)
-
-    var onClick = {item: GenericListItemNext -> Unit}
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GenericListItemViewHolder {
 
         val binding = DataBindingUtil.inflate<ListItemGenericBinding>(layoutInflater, R.layout.list_item_generic, parent, false)
@@ -49,12 +48,6 @@ class GenericListItemAdapter internal constructor(val context: Context): Recycle
                 bind(gitem)
             }
         }
-    }
-
-
-    fun setItems(newItems: List<IGenericListItem>){
-        mItems = newItems
-        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int{ return mItems.count() }

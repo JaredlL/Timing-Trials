@@ -25,6 +25,7 @@ import com.jaredlinden.timingtrials.databinding.FragmentDatabaseViewPagerBinding
 import com.jaredlinden.timingtrials.util.EventObserver
 import com.jaredlinden.timingtrials.util.showKeyboard
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.content.edit
 
 
 const val SORT_RECENT_ACTIVITY = 0
@@ -179,9 +180,13 @@ class SetupViewPagerFragment: Fragment() {
             AlertDialog.Builder(requireContext())
                     .setTitle(resources.getString(R.string.choose_sort))
                     .setIcon(R.mipmap.tt_logo_round)
-                    //.setMessage("Choose Sorting")
                     .setSingleChoiceItems(R.array.sortingArray, current) { _, j->
-                        PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putInt(SORT_KEY, j).apply()
+                        PreferenceManager.getDefaultSharedPreferences(requireContext()).edit() {
+                            putInt(
+                                SORT_KEY,
+                                j
+                            )
+                        }
                     }
                     .setPositiveButton(R.string.ok){_,_->
 

@@ -29,14 +29,14 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
     val selectedGenderPosition = MutableLiveData(2)
     val club = MutableLiveData<String>("")
     val category = MutableLiveData<String>("")
-    val genders = Gender.values().map { it.fullString() }
+    val genders = Gender.entries.map { it.fullString() }
 
     val statsString = mutableRider.switchMap{
         it?.id?.let {
             results.getRiderResults(it)
         }?:MutableLiveData(listOf())
     }.map {res->
-        if(res!= null && res.isNotEmpty()){
+        if(res.isNotEmpty()){
             "Rides: ${res.size}"
         }else{
             ""
@@ -54,26 +54,16 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
     init {
         mutableRider.addSource(mutableRider){
             it?.let { rider->
-                if(firstName.value != rider.firstName){
-                    firstName.value = rider.firstName
-                }
-                if(lastName.value != rider.lastName){
-                    lastName.value = rider.lastName
-                }
-                if(club.value != rider.club){
-                    club.value = rider.club
-                }
-                if(category.value != rider.category){
-                    category.value = rider.category
-                }
-                val yobString = rider.dateOfBirth?.year?.toString() ?:""
-                if(yearOfBirth.value != yobString){
-                    yearOfBirth.value = yobString
-                }
-                val genInt = Gender.values().indexOf(rider.gender)
-                if(selectedGenderPosition.value != genInt){
-                    selectedGenderPosition.value = genInt
-                }
+                firstName.updateIfChanged(rider.firstName)
+                lastName.updateIfChanged(rider.lastName)
+                club.updateIfChanged(rider.club)
+                category.updateIfChanged(rider.category)
+
+                val yobString = rider.dateOfBirth?.year?.toString() ?: ""
+                yearOfBirth.updateIfChanged(yobString)
+
+                val genInt = Gender.entries.indexOf(rider.gender)
+                selectedGenderPosition.updateIfChanged(genInt)
             }
         }
         mutableRider.addSource(firstName){res->
@@ -194,3 +184,8 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
     }
 }
 
+fun <T> MutableLiveData<T>.updateIfChanged(newValue: T?) {
+    if (this.value != newValue) {
+        this.value = newValue
+    }
+}

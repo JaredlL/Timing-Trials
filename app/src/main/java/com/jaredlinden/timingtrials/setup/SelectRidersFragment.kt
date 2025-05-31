@@ -4,34 +4,33 @@ package com.jaredlinden.timingtrials.setup
 import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.SearchView
-import androidx.fragment.app.Fragment
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
-
 import com.jaredlinden.timingtrials.adapters.SelectableRiderListAdapter
-import com.jaredlinden.timingtrials.data.*
+import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.jaredlinden.timingtrials.edititem.EditResultViewModel
-import com.jaredlinden.timingtrials.util.*
+import com.jaredlinden.timingtrials.util.EventObserver
+import com.jaredlinden.timingtrials.util.showKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SelectRidersFragment : Fragment() {
-
-
-
     private val args: SelectRidersFragmentArgs by navArgs()
     private lateinit var viewModel: ISelectRidersViewModel
 

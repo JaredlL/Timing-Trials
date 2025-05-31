@@ -60,7 +60,7 @@ class SetupViewModel @Inject constructor(
             res?.let { tt ->
                 val current = _mTimeTrial.value
                 val ordered = tt.copy(riderList = tt.riderList.sortedBy { it.timeTrialData.index })
-                if (!isCoroutineAlive.get() && ordered != current) {
+                if (!isProcessing.get() && ordered != current) {
                     _mTimeTrial.value = ordered
                 }
             }
@@ -68,7 +68,7 @@ class SetupViewModel @Inject constructor(
     }
 
     private val queue = ConcurrentLinkedQueue<TimeTrial>()
-    private var isCoroutineAlive = AtomicBoolean()
+    private var isProcessing = AtomicBoolean()
 
     fun updateTimeTrial(newTimeTrial: TimeTrial) {
 
@@ -77,10 +77,10 @@ class SetupViewModel @Inject constructor(
         if (previousTimeTrial != null) {
             _mTimeTrial.value = newTimeTrial
 
-            if (!isCoroutineAlive.get()) {
+            if (!isProcessing.get()) {
                 queue.add(newTimeTrial)
                 viewModelScope.launch(Dispatchers.IO) {
-                    isCoroutineAlive.set(true)
+                    isProcessing.set(true)
                     while (queue.peek() != null) {
                         var ttToInsert = queue.peek()
                         while (queue.peek() != null) {
@@ -88,7 +88,7 @@ class SetupViewModel @Inject constructor(
                         }
                         ttToInsert?.let { timeTrialRepository.updateFull(it) }
                     }
-                    isCoroutineAlive.set(false)
+                    isProcessing.set(false)
                 }
             } else {
                 queue.add(newTimeTrial)
@@ -155,10 +155,9 @@ class SetupViewModel @Inject constructor(
     override val selectRidersViewModel: ISelectRidersViewModel = SelectRidersViewModelImpl(this)
     override val timeTrialPropertiesViewModel: ITimeTrialPropertiesViewModel = TimeTrialPropertiesViewModelImpl(this)
 
-    @ExperimentalCoroutinesApi
     override fun onCleared() {
         super.onCleared()
-        isCoroutineAlive.set(false)
+        isProcessing.set(false)
         viewModelScope.cancel()
     }
 }

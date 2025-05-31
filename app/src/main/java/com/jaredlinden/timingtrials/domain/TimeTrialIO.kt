@@ -3,7 +3,6 @@ package com.jaredlinden.timingtrials.domain
 import com.jaredlinden.timingtrials.data.*
 import org.threeten.bp.LocalTime
 
-
 data class ImportAttempt<T>(val sucess: Boolean, val data: T, val message: String?)
 
 data class TimingTrialsExport(val timingTrialsData: List<TimeTrialIO>)

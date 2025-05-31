@@ -24,6 +24,7 @@ import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.viewdata.*
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import androidx.navigation.findNavController
 
 @AndroidEntryPoint
 class TimeTrialListFragment : Fragment() {
@@ -92,10 +93,10 @@ class TimeTrialListViewHolder(binding: ListItemTimetrialBinding): GenericBaseHol
 
                 if(data.status == TimeTrialStatus.FINISHED){
                     val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToResultFragment(data.id?:0)
-                    Navigation.findNavController(_binding.root).navigate(action)
+                    _binding.root.findNavController().navigate(action)
                 }else{
                     val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSetupViewPagerFragment(data.id?:0)
-                    Navigation.findNavController(_binding.root).navigate(action)
+                    _binding.root.findNavController().navigate(action)
                 }
             }
             timetrialLayout.setOnLongClickListener {

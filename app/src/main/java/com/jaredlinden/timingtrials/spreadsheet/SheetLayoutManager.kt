@@ -14,9 +14,6 @@ class SheetLayoutManager(private val options: ISheetLayoutManagerOptions) : Recy
         var leftColumn = 1
         var topRow = 1
 
-        //var bottomRow = 1
-        //var rightColumn = 1
-
         private const val HEADER_COLUMN: Int = 0
         private const val HEADER_ROW: Int = 0
         private const val CELL : String = "cell"

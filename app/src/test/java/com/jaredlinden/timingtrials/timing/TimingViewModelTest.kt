@@ -34,7 +34,6 @@ class TimingViewModelTest {
 
     @Test
     fun should_updateDisplayString_when_updateCalled(){
-
         // [arrange]
         val timeTrialRepository = mockk<ITimeTrialRepository>()
         every { timeTrialRepository.getTimingTimeTrial() } returns MutableLiveData(timingTimeTrial)
@@ -75,7 +74,6 @@ class TimingViewModelTest {
         // [act]
         underTest.updateLoop(nowTime.plus(milis2, ChronoUnit.MILLIS).toInstant().toEpochMilli())
 
-
         // [assert]
         Assert.assertEquals(expectedString,  underTest.timeString.getOrAwaitValue())
     }
@@ -100,7 +98,6 @@ class TimingViewModelTest {
 
         // [act]
         underTest.updateLoop(nowTime.plus(milis2, ChronoUnit.MILLIS).toInstant().toEpochMilli())
-
 
         // [assert]
         Assert.assertEquals(expectedString,  underTest.timeString.getOrAwaitValue())

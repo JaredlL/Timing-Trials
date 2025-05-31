@@ -4,7 +4,12 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
@@ -14,18 +19,16 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.jaredlinden.timingtrials.BuildConfig
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.NumberMode
 import com.jaredlinden.timingtrials.data.TimeTrial
-import com.jaredlinden.timingtrials.databinding.FragmentTimerBinding
 import com.jaredlinden.timingtrials.databinding.FragmentTimerHostBinding
 import com.jaredlinden.timingtrials.select.SELECTED_RIDERS
-import com.jaredlinden.timingtrials.util.*
+import com.jaredlinden.timingtrials.util.Event
+import com.jaredlinden.timingtrials.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.Instant
 

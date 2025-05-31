@@ -23,6 +23,7 @@ import com.jaredlinden.timingtrials.util.getLengthConverter
 import com.jaredlinden.timingtrials.viewdata.*
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import androidx.navigation.findNavController
 
 @AndroidEntryPoint
 class CourseListFragment : Fragment() {
@@ -77,13 +78,13 @@ class CourseListViewHolder(binding: ListItemCourseBinding): GenericBaseHolder<Se
 
             courseLayout.setOnLongClickListener {
                 val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToSheetFragment(Course::class.java.simpleName, data.id?:0)
-                Navigation.findNavController(_binding.root).navigate(action)
+                _binding.root.findNavController().navigate(action)
                 true
             }
 
             courseLayout.setOnClickListener {
                 val action = DataBaseViewPagerFragmentDirections.actionDataBaseViewPagerFragmentToEditCourseFragment( root.context.getString(R.string.edit_course),data.id ?: 0)
-                Navigation.findNavController(_binding.root).navigate(action)
+                _binding.root.findNavController().navigate(action)
             }
             executePendingBindings()
         }

@@ -17,6 +17,7 @@ import timber.log.Timber
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import androidx.core.util.size
 
 interface IEventSelectionData{
     var eventAwaitingSelection: Long?
@@ -440,8 +441,8 @@ class TimingViewModel  @Inject constructor(
     fun testFinishAll(){
         timeTrial.value?.let {tt->
             val now1 = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis
-            val timeLeft = (tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size() - 1)) - now1
-            var c = if(tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size() - 1) > now1){
+            val timeLeft = (tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size - 1)) - now1
+            var c = if(tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size - 1) > now1){
                 tt.copy(timeTrialHeader = tt.timeTrialHeader.copy(startTime = tt.timeTrialHeader.startTime?.minusSeconds(timeLeft/1000)))
             }else{
                 tt

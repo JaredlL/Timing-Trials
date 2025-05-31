@@ -65,7 +65,6 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
     // suspend function so the caller methods know this.
     // Like this, Room ensures that you're not doing any long running operations on the main
     // thread, blocking the UI.
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun insert(rider: Rider):Long {
         return riderDao.insert(rider)
@@ -79,13 +78,11 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
         return riderDao.ridersFromFirstLastName(firstName, lastName)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun update(rider: Rider) {
         riderDao.update(rider)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun updateRiders(riders: List<Rider>) {
         riderDao.updateList(riders)
@@ -98,13 +95,11 @@ class RoomRiderRepository @Inject constructor(private val riderDao: RiderDao) : 
         }
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     override suspend fun delete(rider: Rider) {
         riderDao.delete(rider)
     }
 
-        @Suppress("RedundantSuspendModifier")
         @WorkerThread
         override suspend fun insertOrUpdate(rider: Rider){
             val id = rider.id ?: 0

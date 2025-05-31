@@ -65,18 +65,18 @@ class  SelectRiderViewModel @Inject constructor (val riderRepository: IRiderRepo
     init {
         selectedRidersInformation.value = SelectedRidersInformation(listOf(), listOf())
         selectedRidersInformation.addSource(liveSortMode){sm->
-            updateselectedRiderInfo(groupedAllRiders.value, riderFilter.value, selectedRidersInformation.value, sm?:0)
+            updateSelectedRiderInfo(groupedAllRiders.value, riderFilter.value, selectedRidersInformation.value, sm?:0)
         }
         selectedRidersInformation.addSource(riderFilter){filter->
-            updateselectedRiderInfo(groupedAllRiders.value, filter, selectedRidersInformation.value, liveSortMode.value?:0)
+            updateSelectedRiderInfo(groupedAllRiders.value, filter, selectedRidersInformation.value, liveSortMode.value?:0)
         }
 
         selectedRidersInformation.addSource(groupedAllRiders){allRiders->
-            updateselectedRiderInfo(allRiders, riderFilter.value, selectedRidersInformation.value, liveSortMode.value?:0)
+            updateSelectedRiderInfo(allRiders, riderFilter.value, selectedRidersInformation.value, liveSortMode.value?:0)
         }
     }
 
-    fun updateselectedRiderInfo(allRiders: List<Rider>?, filterString: String?, selectedInfo: SelectedRidersInformation?, sortMode: Int){
+    fun updateSelectedRiderInfo(allRiders: List<Rider>?, filterString: String?, selectedInfo: SelectedRidersInformation?, sortMode: Int){
         if(allRiders != null && selectedInfo != null){
             val filteredRiders = if(filterString.isNullOrBlank()){
                 if(sortMode == SORT_ALPHABETICAL){

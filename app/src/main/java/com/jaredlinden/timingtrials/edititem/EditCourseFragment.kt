@@ -74,7 +74,6 @@ class EditCourseFragment : Fragment() {
             cttNameEdit.setOnEditorActionListener{_, actionId, keyEvent ->
                 if ((keyEvent != null && (keyEvent.keyCode == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     courseViewModel.addOrUpdate()
-                    //findNavController().popBackStack()
                 }
                 return@setOnEditorActionListener false
             }
@@ -85,7 +84,6 @@ class EditCourseFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        //menu.clear()
         inflater.inflate(R.menu.menu_delete, menu)
     }
 

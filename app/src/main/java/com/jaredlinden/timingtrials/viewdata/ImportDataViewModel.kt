@@ -558,7 +558,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
             when(existing.size){
                 0->{
-                    val id = timeTrialRiderRepository.insert(timeTrialRider)
+                    timeTrialRiderRepository.insert(timeTrialRider)
                 }
                 1->{
 

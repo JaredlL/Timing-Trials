@@ -41,7 +41,8 @@ class OrderableRiderListAdapter(val context: Context) : RecyclerView.Adapter<Ord
                 }
                 rider = rd
                 number = mTimeTrial.getRiderNumber(rd.timeTrialData.index)
-                startTime = ConverterUtils.offsetToHmsDisplayString(mTimeTrial.timeTrialHeader.startTime?.plusSeconds((mTimeTrial.timeTrialHeader.firstRiderStartOffset + mTimeTrial.timeTrialHeader.interval * rd.timeTrialData.index).toLong()))
+                startTime = ConverterUtils.offsetToHmsDisplayString(
+                    mTimeTrial.timeTrialHeader.startTime?.plusSeconds((mTimeTrial.timeTrialHeader.firstRiderStartOffset + mTimeTrial.timeTrialHeader.interval * rd.timeTrialData.index).toLong()))
             }
         }
     }
@@ -108,9 +109,4 @@ class OrderableRiderListAdapter(val context: Context) : RecyclerView.Adapter<Ord
         val binding = DataBindingUtil.inflate<ListItemOrderableRiderBinding>(layoutInflater, R.layout.list_item_orderable_rider, parent, false)
         return OrderableRiderViewHolder(binding)
     }
-
-
-
-
-
 }

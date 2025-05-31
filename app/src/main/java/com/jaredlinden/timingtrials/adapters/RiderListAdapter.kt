@@ -15,10 +15,7 @@ import com.jaredlinden.timingtrials.setup.SelectedRidersInformation
  * Adapter for the [RecyclerView] in [RiderListFragment].
  */
 
-
-
 class SelectableRiderListAdapter internal constructor(val context: Context): RecyclerView.Adapter<SelectableRiderListAdapter.SelectableRiderViewHolder>() {
-
 
     inner class SelectableRiderViewHolder(val binding: ListItemSelectableRiderBinding): RecyclerView.ViewHolder(binding.root) {
 
@@ -63,11 +60,10 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
 
         val binding = DataBindingUtil.inflate<ListItemSelectableRiderBinding>(layoutInflater, R.layout.list_item_selectable_rider, parent, false)
         return SelectableRiderViewHolder(binding)
-
     }
 
     override fun onBindViewHolder(holder: SelectableRiderViewHolder, position: Int) {
-        mRiders.get(position).let { rider ->
+        mRiders[position].let { rider ->
             with(holder){
                 itemView.tag = rider.id
                 holder.longPress = editRider
@@ -80,12 +76,9 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
         return mRiders[position].id?:0
     }
 
-    var editRider = {_: Long -> Unit}
-    var riderSelectionChanged = {_:List<Rider> -> Unit}
-
-    var removeRiderFromSelection = {_:Rider -> Unit}
-
-    var addRiderToSelection = {_:Rider -> Unit}
+    var editRider = {riderId: Long -> Unit}
+    var removeRiderFromSelection = {rider:Rider -> Unit}
+    var addRiderToSelection = {rider:Rider -> Unit}
 
     fun setRiders(newInfo: SelectedRidersInformation){
         val newSelected = newInfo.allRiderList.filter { newInfo.selectedIds.contains(it.id) }
@@ -93,10 +86,8 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
         if(mRiders != newInfo.allRiderList || mSelected != newSelected){
             mRiders = newInfo.allRiderList
             mSelected = newSelected
-            System.out.println("JAREDMSG -> NOTIFY Select Riders Changed")
             notifyDataSetChanged()
         }
-
     }
 
     override fun getItemCount(): Int{ return mRiders.count() }

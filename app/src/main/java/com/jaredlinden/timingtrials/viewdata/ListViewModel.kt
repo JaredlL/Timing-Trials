@@ -38,10 +38,8 @@ class ListViewModel @Inject constructor(
             allCourses
         }else{
             allCourses.map{res->
-                res.let {
-                    res.filter {courseVm->
-                        filterVal.passes(courseVm)
-                    }
+                res.filter {courseVm->
+                    filterVal.passes(courseVm)
                 }
             }
         }
@@ -52,9 +50,9 @@ class ListViewModel @Inject constructor(
             allRiders
         }else{
             allRiders.map{res->
-                res?.filter { riderVm->
+                res.filter { riderVm->
                     filterVal.passes(riderVm)
-                } ?: res
+                }
             }
         }
     }
@@ -64,11 +62,9 @@ class ListViewModel @Inject constructor(
             allTimeTrials
         }else{
             allTimeTrials.map{res->
-                res.let {
-                    res.filter {ttVm->
-                        filterVal.passes(ttVm)
-                    }
-                }?: res
+                res.filter {ttVm->
+                    filterVal.passes(ttVm)
+                }
             }
         }
     }
@@ -90,6 +86,5 @@ class ListViewModel @Inject constructor(
             _mTimeTrialInsertedEvent.postValue(Event(newId))
         }
     }
-
 }
 

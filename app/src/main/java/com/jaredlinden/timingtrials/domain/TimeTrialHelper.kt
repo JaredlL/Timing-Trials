@@ -4,7 +4,6 @@ import android.util.LongSparseArray
 import com.jaredlinden.timingtrials.data.*
 import java.util.*
 
-
 class TimeTrialHelper(val timeTrial: TimeTrial) {
 
 
@@ -130,9 +129,6 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
                 it
             }
         })
-
-
-
     }
 
 
@@ -182,12 +178,6 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
                 .sortedBy { it.resultTime?:Long.MAX_VALUE }
                 .toList()
     }
-
-
-
-
-
-
 }
 
 

@@ -71,7 +71,6 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
                 val curentName = timeTrialName.value
                 val ttName = it.ttName
                 if(curentName!= ttName){
-                    System.out.println("JAREDMSG -> Old Name = ${timeTrialName.value}, New Name = ${it.ttName}")
                     timeTrialName.value = it.ttName
                 }
                 if (firstRiderOffset.value != it.firstRiderStartOffset.toString()) {
@@ -139,9 +138,6 @@ class TimeTrialPropertiesViewModelImpl(private val ttSetup: SetupViewModel): ITi
             ttSetup.updateTimeTrial(new)
         }
     }
-
-
-
 }
 
 

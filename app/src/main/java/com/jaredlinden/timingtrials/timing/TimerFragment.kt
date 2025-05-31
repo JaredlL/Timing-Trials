@@ -88,6 +88,4 @@ class TimerFragment : Fragment() {
             return TimerFragment()
         }
     }
-
-
 }

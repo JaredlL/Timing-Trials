@@ -23,6 +23,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -49,6 +50,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.io.IOException
 import java.util.*
+import androidx.core.content.edit
 
 @AndroidEntryPoint
 class ResultFragment : Fragment() {
@@ -119,7 +121,12 @@ class ResultFragment : Fragment() {
 
         if(!PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(HAS_SHOWN_TIMETRIAL_RESULT_TIPS, false)){
             showTipsDialog()
-            PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putBoolean(HAS_SHOWN_TIMETRIAL_RESULT_TIPS, true).apply()
+            PreferenceManager.getDefaultSharedPreferences(requireContext()).edit() {
+                putBoolean(
+                    HAS_SHOWN_TIMETRIAL_RESULT_TIPS,
+                    true
+                )
+            }
         }
 
         mBinding = binding
@@ -208,7 +215,6 @@ class ResultFragment : Fragment() {
                 AlertDialog.Builder(requireContext())
                         .setTitle(getString(R.string.choose_export_type))
                         .setIcon(R.mipmap.tt_logo_round)
-                        //.setMessage(R.string.export_file_description)
                         .setItems(R.array.exportTypes){_, i ->
                             try {
                                 when (resources.getStringArray(R.array.exportTypes)[i]) {
@@ -276,7 +282,6 @@ class ResultFragment : Fragment() {
                     var intent = Intent()
                     intent.action = Intent.ACTION_VIEW
                     intent.setDataAndType(uri, "text/csv")
-                    //intent.data = uri
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
                     val activities: List<ResolveInfo> = requireActivity().packageManager.queryIntentActivities(
@@ -287,7 +292,6 @@ class ResultFragment : Fragment() {
                         intent = Intent()
                         intent.action = Intent.ACTION_VIEW
                         intent.setDataAndType(uri, "text/*")
-                        //intent.data = uri
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
                     intent.putExtra(FROM_TIMING_TRIALS, true)
@@ -406,7 +410,7 @@ class ResultFragment : Fragment() {
     }
 
     //API 29-30
-    @TargetApi(Build.VERSION_CODES.R)
+    @RequiresApi(Build.VERSION_CODES.R)
     fun saveScreenshotQ(bitmap: Bitmap, imageName:String){
 
         val cr = requireActivity().contentResolver
@@ -436,7 +440,6 @@ class ResultFragment : Fragment() {
 
 
     //API 21-25
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     fun saveScreenshotN(bitmap: Bitmap, imageName:String){
 
         val cr = requireActivity().contentResolver
@@ -463,19 +466,19 @@ class ResultFragment : Fragment() {
     }
 
     //API 26-28
-    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     fun saveScreenshotO(bitmap: Bitmap, imageName:String){
 
         val cr = requireActivity().contentResolver
 
-        //Dont divide milis by 1000!
-            val contentVals = ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
-                put(MediaStore.Images.Media.TITLE, imageName)
-                put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-                put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
-                put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
-            }
+        // Dont divide milis by 1000!
+        val contentVals = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
+            put(MediaStore.Images.Media.TITLE, imageName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
+            put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+        }
 
         val data = cr.insert(EXTERNAL_CONTENT_URI, contentVals)
 

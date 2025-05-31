@@ -68,7 +68,7 @@ class EditResultFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
         }
 
-        //For some reason gender spinner sometimes doesn't update
+        // For some reason gender spinner sometimes doesn't update
         binding.invalidateAll()
 
         return binding.root
