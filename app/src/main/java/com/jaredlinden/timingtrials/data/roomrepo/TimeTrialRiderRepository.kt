@@ -37,7 +37,7 @@ class TimeTrialRiderRepository @Inject constructor(private val timeTrialRiderDao
         return timeTrialRiderDao.getCourseResults(courseId)
     }
 
-    fun getCourseResultsSuspend(courseId: Long): List<TimeTrialRider>{
+    suspend fun getCourseResultsSuspend(courseId: Long): List<TimeTrialRider>{
         return timeTrialRiderDao.getCourseResultsSuspend(courseId)
     }
 

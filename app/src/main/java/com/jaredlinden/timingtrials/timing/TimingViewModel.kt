@@ -1,7 +1,16 @@
 package com.jaredlinden.timingtrials.timing
 
-import androidx.lifecycle.*
-import com.jaredlinden.timingtrials.data.*
+import androidx.core.util.size
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import com.jaredlinden.timingtrials.data.Gender
+import com.jaredlinden.timingtrials.data.TimeTrial
+import com.jaredlinden.timingtrials.data.TimeTrialRider
+import com.jaredlinden.timingtrials.data.TimeTrialStatus
 import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.data.roomrepo.RoomRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
@@ -11,13 +20,17 @@ import com.jaredlinden.timingtrials.domain.TimeTrialHelper
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import com.jaredlinden.timingtrials.util.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
 import timber.log.Timber
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import androidx.core.util.size
 
 interface IEventSelectionData{
     var eventAwaitingSelection: Long?
@@ -29,13 +42,19 @@ class TimingViewModel  @Inject constructor(
     val resultRepository: TimeTrialRiderRepository,
     val riderRepository: RoomRiderRepository) : ViewModel(), IEventSelectionData {
 
-    val timeTrial: MediatorLiveData<TimeTrial?> = MediatorLiveData()
-    private val liveMilisSinceStart: MutableLiveData<Long> = MutableLiveData()
-
-    val timeLine: MediatorLiveData<TimeLine> = MediatorLiveData()
+    private var currentStatusString = ""
+    private val liveMillisSinceStart: MutableLiveData<Long> = MutableLiveData()
+    private val timeTrialUpdateChannel = Channel<TimeTrial>(Channel.CONFLATED)
     private var prevMilis = 0L
     private var prevString = ""
-    val timeString: LiveData<String> = liveMilisSinceStart.map{
+
+    // Job to keep track of the ongoing PBS calculation
+    private var pbsCalculationJob: Job? = null
+
+    override var eventAwaitingSelection: Long? = null
+    val timeTrial: MediatorLiveData<TimeTrial?> = MediatorLiveData()
+    val timeLine: MediatorLiveData<TimeLine> = MediatorLiveData()
+    val timeString: LiveData<String> = liveMillisSinceStart.map{
         if((it / 100L) != prevMilis){
             prevMilis = it
             prevString = ConverterUtils.toTenthsDisplayString(it)
@@ -45,12 +64,10 @@ class TimingViewModel  @Inject constructor(
     val statusString: MutableLiveData<String> = MutableLiveData()
     val messageData: MutableLiveData<Event<String>> = MutableLiveData()
 
-    private var currentStatusString = ""
-    override var eventAwaitingSelection: Long? = null
 
     init {
         timeTrial.addSource(timeTrialRepository.getTimingTimeTrial()) {new ->
-            if(new != null && !isCorotineAlive.get() && !new.equalsOtherExcludingIds(timeTrial.value)) {
+            if(new != null && !new.equalsOtherExcludingIds(timeTrial.value)) {
                 Timber.d("TimingTt self updating TT, ${new.timeTrialHeader.timeStamps} unassigned")
                 timeTrial.value = new
             }else if(new == null){
@@ -64,13 +81,31 @@ class TimingViewModel  @Inject constructor(
             }
 
         }
-        timeLine.addSource(liveMilisSinceStart){millis->
+        timeLine.addSource(liveMillisSinceStart){millis->
             if(timeLine.value?.isValidForTimeStamp(millis) != true){
                 timeTrial.value?.let {tt->
                     timeLine.value = TimeLine(tt, millis)
                 }
             }
         }
+
+        timeTrialUpdateChannel.receiveAsFlow()
+            .onEach { ttToUpdate ->
+                // Check if the TT we are about to update is the one being/has been discarded.
+                // This is a safety check. The primary mechanism is to update LiveData to null.
+                if (timeTrial.value?.timeTrialHeader?.id == ttToUpdate.timeTrialHeader.id) {
+                    Timber.d("Processing TT update from channel for TT ID: ${ttToUpdate.timeTrialHeader.id}")
+                    try {
+                        timeTrialRepository.updateFull(ttToUpdate)
+                    } catch (e: Exception) {
+                        Timber.e(e, "Error updating TimeTrial from channel")
+                        showMessage("Error saving time trial update: ${e.localizedMessage}")
+                    }
+                } else {
+                    Timber.d("Skipping update for TT ID ${ttToUpdate.timeTrialHeader.id} as it might have been discarded or changed.")
+                }
+            }
+            .launchIn(viewModelScope) // Collects as long as the ViewModel is alive
     }
 
     private fun showMessage(mesg: String){
@@ -116,53 +151,19 @@ class TimingViewModel  @Inject constructor(
         }
     }
 
-    var iters = 0
+    var iterations = 0
     var looptime = 0L
 
-    var queue = ConcurrentLinkedQueue<TimeTrial>()
-    private val isCorotineAlive = AtomicBoolean()
-
     private fun updateTimeTrial(newtt: TimeTrial){
-        timeTrial.value = newtt
-        Timber.d("Update TT, ${newtt.riderList.size} riders")
-        if(isCorotineAlive.compareAndSet(false, true)){
-            queue.add(newtt)
-            viewModelScope.launch(Dispatchers.IO) {
-                while (queue.peek() != null){
-                    var ttToInsert = queue.peek()
-                    while (queue.peek() != null){
-                        ttToInsert = queue.poll()
-                    }
-                    ttToInsert?.let {
-                        timeTrialRepository.updateFull(it)
-                    }
-                }
-                isCorotineAlive.set(false)
-            }
-        }else{
-            queue.add(newtt)
-        }
-    }
-
-    private fun backgroundUpdateTt(newtt: TimeTrial){
+        // Update the LiveData immediately for UI responsiveness
         timeTrial.postValue(newtt)
-        Timber.d("Update TT, ${newtt.riderList.size} riders")
-        if(isCorotineAlive.compareAndSet(false, true)){
-            queue.add(newtt)
-            viewModelScope.launch(Dispatchers.IO) {
-                while (queue.peek() != null){
-                    var ttToInsert = queue.peek()
-                    while (queue.peek() != null){
-                        ttToInsert = queue.poll()
-                    }
-                    ttToInsert?.let {
-                        timeTrialRepository.updateFull(it)
-                    }
-                }
-                isCorotineAlive.set(false)
-            }
-        }else{
-            queue.add(newtt)
+        Timber.d("Queuing TT update, ${newtt.riderList.size} riders, ID: ${newtt.timeTrialHeader.id}")
+
+        // Send to the channel for background processing.
+        // trySend will not suspend and will succeed if the channel is not full (CONFLATED always accepts).
+        val offerResult = timeTrialUpdateChannel.trySend(newtt)
+        if (!offerResult.isSuccess) {
+            Timber.w("Failed to send TT update to channel. Closed: ${offerResult.isClosed}, Failed: ${offerResult.isFailure}")
         }
     }
 
@@ -171,7 +172,7 @@ class TimingViewModel  @Inject constructor(
 
             val millisSinceStart = currentTimeMillis - tt.timeTrialHeader.startTimeMilis
 
-            liveMilisSinceStart.value = millisSinceStart
+            liveMillisSinceStart.value = millisSinceStart
 
             val newStatusString = getStatusString(millisSinceStart, tt)
             if(newStatusString != currentStatusString){
@@ -181,10 +182,10 @@ class TimingViewModel  @Inject constructor(
 
             val endtime = System.currentTimeMillis() - currentTimeMillis
             looptime += endtime
-            if(iters++ == 100){
+            if(iterations++ == 100){
                 Timber.d("Time for 100 loops =  $looptime")
                 looptime = 0
-                iters = 0
+                iterations = 0
             }
         }
     }
@@ -232,38 +233,54 @@ class TimingViewModel  @Inject constructor(
         }
     }
 
-
     fun finishTt(){
         timeTrial.value?.let {
             calculatePbs()
         }
     }
 
-    val calcPbsCorotineAlive = AtomicBoolean()
     fun calculatePbs(){
-        timeTrial.value?.let {tt->
-            if (calcPbsCorotineAlive.compareAndSet(false, true)) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    val ttToInsert = try {
-                        tt.course?.id?.let { courseId ->
-                            //Must be ordered
-                            val ttsOnTheCourse = timeTrialRepository.getAllHeaderBasicInfo().asSequence().filter { it.courseId == courseId && it.laps == tt.timeTrialHeader.laps && it.id != tt.timeTrialHeader.id }.map { it.id }.filterNotNull().toList()
-                            val allRes = resultRepository.getCourseResultsSuspend(courseId).filter { courseResult ->
-                                courseResult.timeTrialId?.let { ttsOnTheCourse.contains(it) } ?: false
-                            }
-                            writeRecordsToNotes(tt, allRes)
-                        }?:tt
+        val currentTt = timeTrial.value ?: run {
+            Timber.w("calculatePbs called but timeTrial.value is null.")
+            return
+        }
+
+        if (pbsCalculationJob?.isActive == true) {
+            Timber.d("PBS calculation is already in progress. Ignoring new request.")
+            return
+        }
+
+        pbsCalculationJob = viewModelScope.launch {
+            Timber.d("Starting PBS calculation for TT ID: ${currentTt.timeTrialHeader.id}")
+            try {
+                val ttWithRecords = currentTt.course?.id?.let { courseId ->
+                    val ttLaps = currentTt.timeTrialHeader.laps
+                    val ttId = currentTt.timeTrialHeader.id
+
+                    // Fetch all relevant time trial headers on the same course and with the same number of laps
+                    val otherTtHeadersOnCourse = timeTrialRepository.getAllHeaderBasicInfo()
+                        .filter { header ->
+                            header.courseId == courseId &&
+                            header.laps == ttLaps &&
+                            header.id != ttId
+                        }
+                        .mapNotNull { it.id } // Get a list of valid IDs
+
+                    // Fetch results only for those identified time trials
+                    val allRelevantCourseResults = if (otherTtHeadersOnCourse.isNotEmpty()) {
+                        resultRepository.getCourseResultsSuspend(courseId)
+                            .filter { courseResult -> otherTtHeadersOnCourse.contains(courseResult.timeTrialId) }
+                    } else {
+                        emptyList()
                     }
-                    catch (e: Exception){
-                        showMessage("Error setting CRs and PRs - ${e.message}")
-                        tt
-                    }
-                    try {
-                        backgroundUpdateTt(ttToInsert.copy(timeTrialHeader = tt.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED)))
-                    }finally {
-                        calcPbsCorotineAlive.set(false)
-                    }
-                }
+                    writeRecordsToNotes(currentTt, allRelevantCourseResults)
+                } ?: currentTt // If no course ID, there are no course notes to write.
+
+                updateTimeTrial(ttWithRecords.copy(timeTrialHeader = ttWithRecords.timeTrialHeader.copy(status = TimeTrialStatus.FINISHED)))
+                Timber.d("PBS calculation finished and TT status updated for TT ID: ${currentTt.timeTrialHeader.id}")
+            } catch (e: Exception) {
+                Timber.e(e, "Error during PBS calculation for TT ID: ${currentTt.timeTrialHeader.id}")
+                showMessage("Error calculating Personal Bests: ${e.localizedMessage}")
             }
         }
     }
@@ -324,21 +341,23 @@ class TimingViewModel  @Inject constructor(
     }
 
     fun discardTt(){
-        Timber.d("Deleting TT")
+
+        val ttToDiscard = timeTrial.value ?: run {
+            Timber.w("discardTt called but timeTrial.value is null.")
+            ttDeleted.postValue(Event(false)) // Indicate failure or no-op
+            return
+        }
+
+        Timber.d("Attempting to discard TT with ID: ${ttToDiscard.timeTrialHeader.id}")
+
+        // 1. Immediately update LiveData to reflect deletion in UI and prevent further UI actions on it.
+        // This also helps the channel collector to potentially skip an update for this TT.
+        timeTrial.value = null
         viewModelScope.launch(Dispatchers.IO) {
-            var deleted = false
-            while (!deleted){
-                if(isCorotineAlive.compareAndSet(false, true)){
-                    timeTrial.value?.let {
-                        timeTrialRepository.delete(it)
-                    }
-                    isCorotineAlive.set(false)
-                    deleted = true
-                    ttDeleted.postValue(Event(true))
-                }else{
-                    delay(5L)
-                }
-            }
+            Timber.d("Performing delete operation for TT ID: ${ttToDiscard.timeTrialHeader.id}")
+            timeTrialRepository.delete(ttToDiscard)
+            Timber.d("TT ID: ${ttToDiscard.timeTrialHeader.id} deleted successfully from repository.")
+            ttDeleted.postValue(Event(true))
         }
     }
 
@@ -432,7 +451,7 @@ class TimingViewModel  @Inject constructor(
                     }else{
                         new
                     }
-                    backgroundUpdateTt(newer)
+                    updateTimeTrial(newer)
                 }
             }
         }

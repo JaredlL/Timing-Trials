@@ -24,7 +24,7 @@ interface ITimeTrialRepository{
     suspend fun allTimeTrials(): List<TimeTrial>
     suspend fun allTimeTrialsOnCourse(courseId: Long): List<TimeTrialHeader>
     suspend fun deleteById(ttId: Long)
-    fun getAllHeaderBasicInfo(): List<TimeTrialBasicInfo>
+    suspend fun getAllHeaderBasicInfo(): List<TimeTrialBasicInfo>
     suspend fun deleteHeader(timeTrialHeader: TimeTrialHeader)
     fun getSetupTimeTrialById(timeTrialId: Long): LiveData<TimeTrial?>
     fun getTimingTimeTrial():LiveData<TimeTrial?>
@@ -59,7 +59,7 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
         timeTrialDao.update(timeTrial)
     }
 
-    override fun getAllHeaderBasicInfo(): List<TimeTrialBasicInfo> {
+    override suspend fun getAllHeaderBasicInfo(): List<TimeTrialBasicInfo> {
         return timeTrialDao.getAllHeaderBasicInfo()
     }
 

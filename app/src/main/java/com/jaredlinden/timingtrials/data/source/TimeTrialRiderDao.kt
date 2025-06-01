@@ -42,7 +42,7 @@ interface TimeTrialRiderDao {
     fun getCourseResults(courseId: Long): LiveData<List<TimeTrialRiderResult>>
 
     @Transaction @Query ("SELECT * FROM timetrial_rider_table WHERE courseId = :courseId AND finishCode IS NOT NULL ORDER BY finishCode")
-    fun getCourseResultsSuspend(courseId: Long): List<TimeTrialRider>
+    suspend fun getCourseResultsSuspend(courseId: Long): List<TimeTrialRider>
 
     @Transaction @Query("SELECT * FROM timetrial_rider_table WHERE timeTrialId == :timeTrialId AND riderId == :riderId")
     fun getByRiderTimeTrialIds(riderId: Long, timeTrialId: Long): List<TimeTrialRider>

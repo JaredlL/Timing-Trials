@@ -85,7 +85,7 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     abstract fun deleteAllR()
 
     @Query("SELECT courseId, laps, interval, id FROM timetrial_table")
-    abstract fun getAllHeaderBasicInfo(): List<TimeTrialBasicInfo>
+    abstract suspend fun getAllHeaderBasicInfo(): List<TimeTrialBasicInfo>
 
     @Query("SELECT * from timetrial_table ORDER BY status ASC, startTime ASC")
     abstract fun getAllTimeTrials(): LiveData<List<TimeTrialHeader>>

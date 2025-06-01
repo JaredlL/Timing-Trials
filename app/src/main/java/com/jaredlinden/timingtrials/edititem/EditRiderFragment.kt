@@ -81,8 +81,6 @@ class EditRiderFragment : Fragment() {
                 if(it){
                     if(!riderViewModel.mutableRider.value?.firstName?.trim().isNullOrBlank()){
                         riderViewModel.addOrUpdate()
-                        //findNavController().popBackStack()
-
                     }else{
                         Toast.makeText(requireContext(), getString(R.string.rider_must_have_first_name_set), Toast.LENGTH_SHORT).show()
                     }

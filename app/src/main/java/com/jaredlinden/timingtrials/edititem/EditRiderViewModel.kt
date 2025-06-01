@@ -1,6 +1,5 @@
 package com.jaredlinden.timingtrials.edititem
 
-
 import androidx.lifecycle.*
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.Gender
@@ -12,7 +11,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import org.threeten.bp.LocalDate
 import javax.inject.Inject
-
 
 @HiltViewModel
 class EditRiderViewModel @Inject constructor(private val repository: IRiderRepository, private val results: TimeTrialRiderRepository): ViewModel() {
@@ -114,7 +112,7 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
         }
         mutableRider.addSource(selectedGenderPosition){res->
             res?.let { genPos->
-                val newGen = Gender.values()[genPos]
+                val newGen = Gender.entries[genPos]
                 mutableRider.value?.let { rider->
                     if(rider.gender != newGen){
                         mutableRider.value = rider.copy(gender = newGen)
