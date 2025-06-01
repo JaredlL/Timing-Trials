@@ -9,7 +9,7 @@ open class SelectableCourseViewModel(
     val nameString: String,
     val distString: String,
     val cttNameString: String,
-    override val id: Long? = null): ITimingTrialsEntity
+    override val id: Long = 0L): ITimingTrialsEntity
 {
     val course: Course = Course(nameString, 0.0, cttNameString, id)
     constructor(course: Course, converter: LengthConverter):

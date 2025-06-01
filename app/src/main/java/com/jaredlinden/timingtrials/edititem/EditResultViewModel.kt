@@ -24,7 +24,7 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
     var originalRiderId: Long? = null
     val result: MediatorLiveData<TimeTrialRider?> = MediatorLiveData()
 
-    val excludedRiderIds  =timeTrialId.switchMap{
+    val excludedRiderIds = timeTrialId.switchMap{
         resultRepository.getRidersForTimeTrial(it).map{
                it.map { it.riderData.id }
            }
@@ -79,8 +79,9 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
 
     private fun changeRider(newRider: Rider){
 
+            val courseId = result.value?.courseId
             val resultTimeTrialId = timeTrialId.value
-            if(newRider.id != null && resultTimeTrialId != null){
+            if(newRider.id != null && resultTimeTrialId != null && courseId != null){
                 val currentResVal = result.value
                 if(currentResVal?.riderId != newRider.id){
 
@@ -91,10 +92,16 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
                             selectRiderVm.showMessage.postValue(Event("This rider is already in the list of results for this timetrial!"))
                             result.postValue(result.value)
                         }else{
-                            result.postValue(currentResVal?.copy(riderId = newRider.id, club = newRider.club, category = newRider.category, gender = newRider.gender)?:TimeTrialRider.fromRiderAndTimeTrial(newRider, resultTimeTrialId))
+                            result.postValue(
+                                currentResVal?.copy(
+                                    riderId = newRider.id,
+                                    club = newRider.club,
+                                    category = newRider.category,
+                                    gender = newRider.gender)?:
+                                    TimeTrialRider.fromRiderAndTimeTrial(newRider, resultTimeTrialId))
                             club.postValue(newRider.club)
                             category.postValue(newRider.category)
-                            val genInt = Gender.values().indexOf(newRider.gender)
+                            val genInt = Gender.entries.indexOf(newRider.gender)
                             if(genInt != selectedGenderPosition.value){
                                 selectedGenderPosition.postValue(genInt)
                             }

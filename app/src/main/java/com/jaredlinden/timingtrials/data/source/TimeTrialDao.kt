@@ -51,35 +51,28 @@ abstract class TimeTrialDao(db: RoomDatabase) {
 
     @Delete
     fun delete(timeTrial: TimeTrial){
-        timeTrial.timeTrialHeader.id?.let {ttId ->
-            _deleteTtRiders(ttId)
-            delete(timeTrial.timeTrialHeader)
-        }
+        _deleteTtRiders(timeTrial.timeTrialHeader.id)
+        delete(timeTrial.timeTrialHeader)
     }
 
     @Transaction
     open suspend fun update(timeTrial: TimeTrial){
-        timeTrial.timeTrialHeader.id?.let { ttId->
-
-            update(timeTrial.timeTrialHeader)
-            val idSet = timeTrial.riderList.asSequence().map { it.timeTrialData }.groupBy { it.id }
-
-            getTimeTrialRiders(ttId).forEach {ttr->
-                ttr.id?.let {
-                    val new = idSet[it]?.firstOrNull()
-                    if(new == null){
-                        deleteRider(ttr)
-                    }else if(new != ttr){
-                        updateTimeTrialRider(new.copy(courseId = timeTrial.course?.id))
-                    }
-                }
-            }
-            idSet[null]?.let {
-                if(it.isNotEmpty()){
-                    insertMultipleRiders(it.map {rd-> rd.copy(courseId = timeTrial.course?.id) })
-                }
+        update(timeTrial.timeTrialHeader)
+        val idSet = timeTrial.riderList.asSequence().map { it.timeTrialData }.groupBy { it.id }
+        getTimeTrialRiders(timeTrial.timeTrialHeader.id).forEach {ttr->
+            val new = idSet[ttr.id]?.firstOrNull()
+            if(new == null){
+                deleteRider(ttr)
+            }else if(new != ttr){
+                updateTimeTrialRider(new.copy(courseId = timeTrial.course?.id))
             }
         }
+        idSet[0L]?.let {
+            if(it.isNotEmpty()){
+                insertMultipleRiders(it.map {rd-> rd.copy(courseId = timeTrial.course?.id) })
+            }
+        }
+
     }
 
     @Query("DELETE FROM timetrial_table WHERE id = :ttId")

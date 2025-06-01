@@ -9,7 +9,7 @@ data class Course(
         val courseName: String,
         val length: Double? = null,
         val cttName: String = "",
-        @PrimaryKey(autoGenerate = true) override val id: Long? = null
+        @PrimaryKey(autoGenerate = true) override val id: Long = 0L
 ) : ITimingTrialsEntity {
 
     companion object {

@@ -516,7 +516,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
                     val timeTrialRider = TimeTrialRider(
                             riderId = it,
-                            timeTrialId = headerInDb?.id,
+                            timeTrialId = headerInDb?.id?:0L,
                             courseId = courseInDb?.id,
                             index = index,
                             finishCode = if (headerInDb?.status == TimeTrialStatus.FINISHED) importRider.finishTime else null,

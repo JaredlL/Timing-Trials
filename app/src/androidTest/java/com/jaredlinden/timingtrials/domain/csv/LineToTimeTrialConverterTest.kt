@@ -1,16 +1,22 @@
 package com.jaredlinden.timingtrials.domain.csv
 
+import android.content.Context
+import com.jakewharton.threetenabp.AndroidThreeTen
 import org.junit.Test
-
 import org.junit.Assert.*
+import org.junit.Before
 import org.threeten.bp.Month
 
 class LineToTimeTrialConverterTest {
 
+    @Before
+    fun setUp() {
+        val context = androidx.test.core.app.ApplicationProvider.getApplicationContext<Context>()
+        AndroidThreeTen.init(context)
+    }
 
     @Test
     fun importLine() {
-
         val headingLine = "timetrial name,timetrial date,laps"
         var dataLine = "Vintage Tankard,10/08/2018,2"
 

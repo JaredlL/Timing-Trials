@@ -32,9 +32,9 @@ data class SimpleListItem(override val item1: GenericListItemField,override val 
 class ResultDataSource(private val timeTrialRepository: ITimeTrialRepository, private val riderRepository: IRiderRepository, private val courseRepository: ICourseRepository, private val timeTrialRiderRepository: TimeTrialRiderRepository){
 
     private val riderResultFact = RiderResultDataFactory(riderRepository, timeTrialRiderRepository)
-    private val courseResultfact = CourseResultDataFactory(courseRepository, timeTrialRiderRepository)
+    private val courseResultFact = CourseResultDataFactory(courseRepository, timeTrialRiderRepository)
 
-    private val factList: List<IResultDataFactory> = listOf(riderResultFact, courseResultfact)
+    private val factList: List<IResultDataFactory> = listOf(riderResultFact, courseResultFact)
 
     fun getResutTitle(typeIdData: GenericListItemNext): LiveData<String>{
          typeIdData.nextId?.let { id->

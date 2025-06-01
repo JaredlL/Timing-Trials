@@ -9,20 +9,20 @@ import org.threeten.bp.OffsetDateTime
         foreignKeys =
         [
             ForeignKey(
-                entity =TimeTrialHeader::class,
+                entity = TimeTrialHeader::class,
                 parentColumns = arrayOf("id"),
                 childColumns = arrayOf("timeTrialId"),
                 onDelete = ForeignKey.CASCADE,
                 deferred = false),
             ForeignKey(
-                entity =Rider::class,
+                entity = Rider::class,
                 parentColumns = arrayOf("id"),
                 childColumns = arrayOf("riderId"),
                 onDelete = ForeignKey.CASCADE,
                 deferred = false)
         ])
 data class TimeTrialRider(val riderId: Long,
-                          val timeTrialId: Long?,
+                          val timeTrialId: Long,
                           val courseId: Long?,
                           val index: Int,
                           val startTimeOffset: Int = 0,
@@ -34,7 +34,7 @@ data class TimeTrialRider(val riderId: Long,
                           val gender: Gender = Gender.UNKNOWN,
                           val club: String = "",
                           val notes: String = "",
-                          @PrimaryKey(autoGenerate = true) val id: Long? = null){
+                          @PrimaryKey(autoGenerate = true) val id: Long = 0L){
 
     fun hasNotDnfed():Boolean{
         return finishCode == null || finishCode >0

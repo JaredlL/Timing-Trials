@@ -92,7 +92,7 @@ class TestViewModel@Inject constructor(
                 val copy = _mTimeTrial.copy(riderList = rListWithIds)
                 var current = copy
 
-                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = null)) }
+                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = 0L)) }
 
                 val id = timeTrialRepository.insert(current.copy(riderList = rListWithoutIds))
                 testInsertedEvent.postValue(Event(id))
@@ -138,7 +138,7 @@ class TestViewModel@Inject constructor(
                     }
                 }
 
-                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = null)) }
+                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = 0L)) }
 
                val id = timeTrialRepository.insert(current.copy(riderList = rListWithoutIds))
                 testInsertedEvent.postValue(Event(id))
@@ -197,7 +197,7 @@ class TestViewModel@Inject constructor(
                     }
                 }
 
-                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = null)) }
+                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = 0L)) }
 
                 val id = timeTrialRepository.insert(current.copy(riderList = rListWithoutIds))
                 testInsertedEvent.postValue(Event(id))
@@ -239,7 +239,7 @@ class TestViewModel@Inject constructor(
                     }
                 }
 
-                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = null)) }
+                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = 0L)) }
 
                 val id = timeTrialRepository.insert(current.copy(riderList = rListWithoutIds))
                 testInsertedEvent.postValue(Event(id))

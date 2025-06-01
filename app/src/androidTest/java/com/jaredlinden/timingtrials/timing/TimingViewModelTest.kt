@@ -1,9 +1,11 @@
 package com.jaredlinden.timingtrials.timing
 
+import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.jaredlinden.timingtrials.data.TimeTrial
 import com.jaredlinden.timingtrials.data.TimeTrialHeader
 import com.jaredlinden.timingtrials.data.TimeTrialStatus
@@ -14,23 +16,30 @@ import com.jaredlinden.timingtrials.util.ConverterUtils
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-@RunWith(RobolectricTestRunner::class)
 class TimingViewModelTest {
 
     private val nowTime = OffsetDateTime.now()
 
+    @Before
+    fun setUp() {
+        // Initialize ThreeTenBP
+        val context = androidx.test.core.app.ApplicationProvider.getApplicationContext<Context>()
+        AndroidThreeTen.init(context)
+    }
+
+    // This rule swaps the background executor used by the Architecture Components with a
+    // different one which executes each task synchronously.
     @get:Rule
-    val rule = InstantTaskExecutorRule()
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Test
     fun should_updateDisplayString_when_updateCalled(){
@@ -132,7 +141,7 @@ class TimingViewModelTest {
         TimeTrialHeader(
             "TestTT",
             null,
-        1,
+            1,
             60,
             nowTime,
             60,

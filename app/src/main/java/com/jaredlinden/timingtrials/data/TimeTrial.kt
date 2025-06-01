@@ -20,7 +20,7 @@ data class TimeTrialHeader(val ttName: String,
                            val timeStamps: List<Long> = listOf(),
                            val description: String = "",
                            val guid:String = UUID.randomUUID().toString(),
-                           @PrimaryKey(autoGenerate = true) override val id: Long? = null) : ITimingTrialsEntity {
+                           @PrimaryKey(autoGenerate = true) override val id: Long = 0L) : ITimingTrialsEntity {
 
     @delegate: Ignore
     @delegate: Transient
@@ -66,7 +66,14 @@ data class TimeTrial(
     
     fun updateCourse(newCourse: Course):TimeTrial{
         val newHeader = this.timeTrialHeader.copy(courseId = newCourse.id)
-        return this.copy(course = newCourse, timeTrialHeader = newHeader, riderList = this.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(courseId = newCourse.id)) })
+        return this.copy(
+            course = newCourse,
+            timeTrialHeader = newHeader,
+            riderList = this.riderList.map {
+                it.copy(timeTrialData = it.timeTrialData.copy(
+                    courseId = newCourse.id
+                ))
+            })
     }
 
     fun updateHeader(newTimeTrialHeader: TimeTrialHeader): TimeTrial{
@@ -74,8 +81,6 @@ data class TimeTrial(
     }
 
     fun updateRiderList(newRiderList: List<FilledTimeTrialRider>): TimeTrial{
-        //val currentMaxNumber = newRiderList.map { it.timeTrialData.assignedNumber?:0 }.max()?:1
-
         val newMutableRiderList: MutableList<FilledTimeTrialRider> = mutableListOf()
         for ((i,r) in newRiderList.withIndex()){
             val availableNumber = (newMutableRiderList.map { it.timeTrialData.assignedNumber?:0 }.maxOrNull()?:0) + 1
@@ -130,7 +135,7 @@ data class TimeTrial(
 
     fun equalsOtherExcludingIds(other: TimeTrial?): Boolean{
         if(other == null) return false
-        if(timeTrialHeader.copy(id = null) != other.timeTrialHeader.copy(id = null)) return false
+        if(timeTrialHeader.copy(id = 0L) != other.timeTrialHeader.copy(id = 0L)) return false
         if(riderList.size != other.riderList.size) return false
         return riderList == other.riderList
     }
