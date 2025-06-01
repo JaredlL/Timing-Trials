@@ -1,15 +1,20 @@
 package com.jaredlinden.timingtrials.timetrialresults
 
-import androidx.lifecycle.*
-import com.jaredlinden.timingtrials.data.*
-import com.jaredlinden.timingtrials.data.roomrepo.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
+import com.jaredlinden.timingtrials.data.IResult
+import com.jaredlinden.timingtrials.data.TimeTrial
+import com.jaredlinden.timingtrials.data.TimeTrialStatus
+import com.jaredlinden.timingtrials.data.roomrepo.ICourseRepository
+import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
+import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.util.ConverterUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,39 +22,9 @@ class TimeTrialViewModel @Inject constructor (val timeTrialRepository: ITimeTria
 
     private val idLiveData: MutableLiveData<Long?> = MutableLiveData()
 
-    fun changeTimeTrial(newId: Long){
-        if(idLiveData.value != newId){
-            idLiveData.postValue(newId)
-        }
-    }
-
     val timeTrial = idLiveData.switchMap{
         it?.let { id->
             timeTrialRepository.getResultTimeTrialById(id)
-        }
-    }
-
-    var queue = ConcurrentLinkedQueue<TimeTrial>()
-    private val isUpdating = AtomicBoolean()
-
-    private fun updateTimeTrial(newtt: TimeTrial){
-        Timber.d("Update TT, ${newtt.riderList.size} riders")
-        if(isUpdating.compareAndSet(false, true)){
-            queue.add(newtt)
-            viewModelScope.launch(Dispatchers.IO) {
-                while (queue.peek() != null){
-                    var ttToInsert = queue.peek()
-                    while (queue.peek() != null){
-                        ttToInsert = queue.poll()
-                    }
-                    ttToInsert?.let {
-                        timeTrialRepository.updateFull(it)
-                    }
-                }
-                isUpdating.set(false)
-            }
-        }else{
-            queue.add(newtt)
         }
     }
 }
@@ -58,8 +33,7 @@ class TimeTrialViewModel @Inject constructor (val timeTrialRepository: ITimeTria
 class ResultViewModel @Inject constructor(
     val timeTrialRepository: ITimeTrialRepository,
     val riderRepository: IRiderRepository,
-    val courseRepository: ICourseRepository,
-    val resultRepository: TimeTrialRiderRepository) : ViewModel() {
+    val courseRepository: ICourseRepository) : ViewModel() {
 
     private val idLiveData: MutableLiveData<Long?> = MutableLiveData()
 

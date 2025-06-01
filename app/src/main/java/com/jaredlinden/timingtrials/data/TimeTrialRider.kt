@@ -54,18 +54,14 @@ data class TimeTrialRider(val riderId: Long,
 
     companion object {
         fun fromRiderAndTimeTrial(rider:Rider, ttId: Long): TimeTrialRider{
-            if(rider.id !=null){
-                return TimeTrialRider(
-                    rider.id,
-                    ttId,
-                    null,
-                    1,
-                    gender = rider.gender,
-                    category = rider.category,
-                    club = rider.club)
-            }else{
-                throw Exception("Can't create result, rider id is null")
-            }
+            return TimeTrialRider(
+                rider.id,
+                ttId,
+                null,
+                1,
+                gender = rider.gender,
+                category = rider.category,
+                club = rider.club)
         }
     }
 }
@@ -118,16 +114,6 @@ data class TimeTrialRiderResult(
     override val timeTrial: TimeTrialHeader?
         get() = timeTrialHeader
 
-    fun changeRider(newRider: Rider): TimeTrialRiderResult{
-        if(newRider.id != null){
-            return this.copy(riderData = newRider,
-                    timeTrialData = this.timeTrialData.copy(riderId = newRider.id, gender = newRider.gender, category = newRider.category))
-        }else{
-            throw Exception("Rider id is null")
-        }
-
-    }
-
 }
 
 data class FilledTimeTrialRider(
@@ -137,15 +123,6 @@ data class FilledTimeTrialRider(
 ){
     fun updateTimeTrialData(newTimeTrialData: TimeTrialRider): FilledTimeTrialRider{
         return this.copy(timeTrialData = newTimeTrialData)
-    }
-
-    fun addSplit(split: Long): FilledTimeTrialRider{
-        return this.copy(timeTrialData = this.timeTrialData.copy(splits = this.timeTrialData.splits + split))
-    }
-
-    fun firstNameAndFirstLetterOfSecond():String{
-        val lastL= riderData.lastName.first()
-        return riderData.firstName
     }
 
     fun riderId(): Long? = riderData.id
@@ -174,7 +151,7 @@ data class FilledTimeTrialRider(
             if(timeTrial.riderList.mapNotNull { it.riderId() }.contains(rider.id)){
                 throw Exception("Rider already in this time trial")
             }
-            else if(rider.id != null){
+            else{
                 val ttRider = TimeTrialRider(riderId = rider.id,
                         timeTrialId = timeTrial.timeTrialHeader.id,
                         courseId = timeTrial.course?.id,
@@ -183,8 +160,6 @@ data class FilledTimeTrialRider(
                         gender = rider.gender,
                         club = rider.club)
                 return FilledTimeTrialRider(timeTrialData = ttRider, riderData = rider)
-            }else{
-                throw Exception("Rider ID is null")
             }
         }
     }

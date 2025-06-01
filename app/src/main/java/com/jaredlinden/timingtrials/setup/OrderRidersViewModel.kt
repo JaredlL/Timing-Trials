@@ -14,12 +14,12 @@ interface IOrderRidersViewModel{
 
 class OrderRidersViewModel(val setupViewModel: SetupViewModel) : IOrderRidersViewModel{
 
-    val _mTimeTrial = setupViewModel.timeTrial
+    val timeTrial = setupViewModel.timeTrial
 
     override val setNumberMessage: LiveData<Event<String>> = MutableLiveData()
 
     override fun moveItem(fromPosition: Int, toPosition: Int) {
-        _mTimeTrial.value?.let { currentTimeTrial ->
+        timeTrial.value?.let { currentTimeTrial ->
             val mutList = currentTimeTrial.riderList.toMutableList()
 
             if (fromPosition > toPosition) {
@@ -36,7 +36,7 @@ class OrderRidersViewModel(val setupViewModel: SetupViewModel) : IOrderRidersVie
 
 
     override fun setRiderNumber(newNumber: Int, riderToChange: FilledTimeTrialRider) {
-        _mTimeTrial.value?.let {tt->
+        timeTrial.value?.let { tt->
             val otherRider = tt.riderList.filterNot { it.riderData.id == riderToChange.riderData.id }.firstOrNull { it.timeTrialData.assignedNumber == newNumber }
             if(otherRider != null){
                 val oldNumber = riderToChange.timeTrialData.assignedNumber
@@ -55,6 +55,6 @@ class OrderRidersViewModel(val setupViewModel: SetupViewModel) : IOrderRidersVie
     }
 
     override fun getOrderableRiderData(): LiveData<TimeTrial?> {
-        return _mTimeTrial
+        return timeTrial
     }
 }

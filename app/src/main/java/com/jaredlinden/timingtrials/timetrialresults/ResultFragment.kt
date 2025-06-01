@@ -1,13 +1,14 @@
 package com.jaredlinden.timingtrials.timetrialresults
 
-import android.Manifest
-import android.annotation.TargetApi
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Bitmap.createBitmap
+import android.graphics.Canvas
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -17,19 +18,22 @@ import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 import android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY
 import android.text.InputType
 import android.util.TypedValue
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -37,20 +41,19 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import com.jaredlinden.timingtrials.IFabCallbacks
-import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.FragmentTimetrialResultBinding
 import com.jaredlinden.timingtrials.dialog.ErrorDialog
 import com.jaredlinden.timingtrials.domain.JsonResultsWriter
 import com.jaredlinden.timingtrials.domain.csv.CsvTimeTrialResultWriter
-import com.jaredlinden.timingtrials.util.*
+import com.jaredlinden.timingtrials.util.FROM_TIMING_TRIALS
+import com.jaredlinden.timingtrials.util.HAS_SHOWN_TIMETRIAL_RESULT_TIPS
+import com.jaredlinden.timingtrials.util.Utils
+import com.jaredlinden.timingtrials.util.getLengthConverter
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import java.io.IOException
-import java.util.*
-import androidx.core.content.edit
+import java.util.Date
 
 @AndroidEntryPoint
 class ResultFragment : Fragment() {
@@ -369,7 +372,7 @@ class ResultFragment : Fragment() {
 
             view.layout(0,0, view.measuredWidth, view.measuredHeight)
 
-            val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
+            val bitmap = createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
 
            if(view.background!=null){

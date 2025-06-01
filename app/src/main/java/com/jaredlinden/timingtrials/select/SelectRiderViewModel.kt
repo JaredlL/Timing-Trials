@@ -1,8 +1,11 @@
 package com.jaredlinden.timingtrials.select
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import com.jaredlinden.timingtrials.data.Rider
-import com.jaredlinden.timingtrials.data.TimeTrial
 import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
 import com.jaredlinden.timingtrials.setup.ISelectRidersViewModel
@@ -17,9 +20,6 @@ import javax.inject.Inject
 @HiltViewModel
 class  SelectRiderViewModel @Inject constructor (val riderRepository: IRiderRepository, val timeTrialRiderRepository: TimeTrialRiderRepository): ISelectRidersViewModel, ViewModel()
 {
-
-    //rivate val selectedRidersMediator: MediatorLiveData<SelectedRidersInformation> = MediatorLiveData()
-
     override val selectedRidersInformation: MediatorLiveData<SelectedRidersInformation> = MediatorLiveData()
 
     private val lastYear = OffsetDateTime.now().minusYears(1).minusMonths(6)
@@ -27,15 +27,17 @@ class  SelectRiderViewModel @Inject constructor (val riderRepository: IRiderRepo
     private val groupedStartTimeRiders = timeTrialRiderRepository.lastTimeTrialRiders()
 
     private val groupedAllRiders = riderRepository.allRiders.switchMap{ riderList->
-        riderList?.let { rList->
             groupedStartTimeRiders.map{ lastTimeTrialList->
-                lastTimeTrialList?.let {
-                    val startTimeMap = it.asSequence().filter { it.startTime.isAfter(lastYear) }.groupBy { it.riderId }.map { Pair(it.key, it.value.count()) }.toMap()
-                    val ordered = rList.sortedByDescending { startTimeMap[it.id]?:0 }
-                    ordered
-                }?:riderList
+
+                val startTimeMap = lastTimeTrialList
+                    .asSequence()
+                    .filter { it.startTime.isAfter(lastYear) }
+                    .groupBy { it.riderId }
+                    .map { Pair(it.key, it.value.count()) }
+                    .toMap()
+                val ordered = riderList.sortedByDescending { startTimeMap[it.id]?:0 }
+                ordered
             }
-        }
     }
 
     val liveSortMode : MutableLiveData<Int> = MutableLiveData(SORT_RECENT_ACTIVITY)

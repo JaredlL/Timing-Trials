@@ -7,9 +7,6 @@ import com.jaredlinden.timingtrials.domain.*
 import com.jaredlinden.timingtrials.util.changeValIfNotEqual
 import com.jaredlinden.timingtrials.util.setIfNotEqual
 
-
-
-
 class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
 
     private val columnKey = column.key
@@ -20,7 +17,6 @@ class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
 
     val mutableColumn = MediatorLiveData<ColumnData>().apply { value = currentCol() }
 
-
     val imageRes = mutableColumn.map{
         it?.imageRes
     }
@@ -30,11 +26,6 @@ class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
     val sortIndex= MutableLiveData(0)
     val description = mutableColumn.map{
         it?.description
-
-    }
-
-    fun clearText(){
-        filterText.value  =""
     }
 
     init {
@@ -59,9 +50,4 @@ class ResultFilterViewModel(column: ColumnData, val sheetVm:ISheetViewModel) {
             }
         }
     }
-
-
-
-
-
 }
