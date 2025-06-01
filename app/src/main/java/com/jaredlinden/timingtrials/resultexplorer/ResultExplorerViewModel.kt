@@ -1,19 +1,25 @@
 package com.jaredlinden.timingtrials.resultexplorer
 
 import android.graphics.Paint
-import androidx.lifecycle.*
-import com.jaredlinden.timingtrials.data.*
-import com.jaredlinden.timingtrials.data.roomrepo.*
-import com.jaredlinden.timingtrials.domain.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import com.jaredlinden.timingtrials.data.Course
+import com.jaredlinden.timingtrials.data.ITimingTrialsEntity
+import com.jaredlinden.timingtrials.data.Rider
+import com.jaredlinden.timingtrials.data.roomrepo.ICourseRepository
+import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
+import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
+import com.jaredlinden.timingtrials.domain.ColumnData
+import com.jaredlinden.timingtrials.domain.CourseNameColumn
+import com.jaredlinden.timingtrials.domain.RiderNameColumn
 import com.jaredlinden.timingtrials.util.Event
 import com.jaredlinden.timingtrials.util.LengthConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-
 
 interface ISheetViewModel{
     val columns: MutableLiveData<List<ColumnData>>
@@ -35,7 +41,6 @@ class ResultExplorerViewModel @Inject constructor(
 
     private val cols = ColumnData.getAllColumns(LengthConverter.default)
 
-    //This drives the spreadsheet data display
     override val columns: MutableLiveData<List<ColumnData>> = MutableLiveData(cols)
 
     val columnViewModels = cols.map { ResultFilterViewModel(it, this) }
@@ -116,7 +121,6 @@ class ResultExplorerViewModel @Inject constructor(
         }
     }
 
-
     fun setRiderColumnFilter(riderName: String){
         columns.value?.let { currentCols->
             val newCols = currentCols.map { if(it.definition.javaClass == RiderNameColumn::class.java) it.copy(filterText = riderName) else it.copy(filterText = "") }
@@ -126,7 +130,6 @@ class ResultExplorerViewModel @Inject constructor(
 
     fun clearAllColumnFilters(){
         columns.value?.let { currentCols->
-            //val newCols = currentCols.map { it.copy(filterText = "", isVisible = true, isFocused = false, sortType = SortType.NONE) }
             val conv = columnsContext.value?.converter?: LengthConverter.default
             setNewColumns(ColumnData.getAllColumns(conv))
         }
@@ -151,30 +154,5 @@ class ResultExplorerViewModel @Inject constructor(
 
     fun setNewColumns(columns: List<ColumnData>){
         updateColsIfNotEqual(columns)
-    }
-
-    private val queue = ConcurrentLinkedQueue<Triple<List<IResult>?, List<ColumnData>?, ResultExplorerSpreadSheet>>()
-    private var isCarolineAlive = AtomicBoolean()
-
-    fun newTransform(results: List<IResult>?, columns: List<ColumnData>?, prev: ResultExplorerSpreadSheet){
-        if(!isCarolineAlive.get()){
-            //queue.add(Triple(results, columns, prev))
-            viewModelScope.launch(Dispatchers.Default) {
-                isCarolineAlive.set(true)
-                var mnew: ResultExplorerSpreadSheet? = null
-                var newResults: List<IResult>? = null
-                var newCols : List<ColumnData>? = null
-                while (queue.peek() != null){
-                   queue.poll()?.let { currentItem->
-                       val n = mnew
-                       mnew = n?.copy(currentItem.first?:n.results, currentItem.second?:n.columns) ?: currentItem.third.copy(currentItem.first?:currentItem.third.results, currentItem.second?:currentItem.third.columns)
-                   }
-                }
-                mnew?.let { resultSpreadSheet.postValue(it) }
-                isCarolineAlive.set(false)
-            }
-        }else{
-            queue.add(Triple(results, columns, prev))
-        }
     }
 }

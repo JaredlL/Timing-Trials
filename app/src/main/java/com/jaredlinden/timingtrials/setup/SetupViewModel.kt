@@ -1,15 +1,27 @@
 package com.jaredlinden.timingtrials.setup
 
-import androidx.lifecycle.*
-import com.jaredlinden.timingtrials.data.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
+import com.jaredlinden.timingtrials.data.TimeTrial
+import com.jaredlinden.timingtrials.data.TimeTrialRiderResult
 import com.jaredlinden.timingtrials.data.roomrepo.ICourseRepository
 import com.jaredlinden.timingtrials.data.roomrepo.IRiderRepository
 import com.jaredlinden.timingtrials.data.roomrepo.ITimeTrialRepository
 import com.jaredlinden.timingtrials.data.roomrepo.TimeTrialRiderRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -41,6 +53,8 @@ class SetupViewModel @Inject constructor(
 
     private val currentId: MutableLiveData<Long?> = MutableLiveData()
 
+    private val timeTrialUpdateChannel = Channel<TimeTrial>(Channel.CONFLATED)
+
     private val idSwitcher = currentId.switchMap{
         it?.let {ttId->
             timeTrialRepository.getSetupTimeTrialById(ttId)
@@ -60,39 +74,38 @@ class SetupViewModel @Inject constructor(
             res?.let { tt ->
                 val current = _mTimeTrial.value
                 val ordered = tt.copy(riderList = tt.riderList.sortedBy { it.timeTrialData.index })
-                if (!isProcessing.get() && ordered != current) {
+                if (ordered != current) {
                     _mTimeTrial.value = ordered
                 }
             }
         }
-    }
 
-    private val queue = ConcurrentLinkedQueue<TimeTrial>()
-    private var isProcessing = AtomicBoolean()
+        // Launch a collector for the channel in the ViewModel's scope
+        timeTrialUpdateChannel.receiveAsFlow()
+            .onEach { ttToUpdate ->
+                Timber.d("Processing TT update from channel. ID: ${ttToUpdate.timeTrialHeader.id}, Riders: ${ttToUpdate.riderList.size}")
+                try {
+                    timeTrialRepository.updateFull(ttToUpdate)
+                    Timber.d("Successfully updated TT from channel. ID: ${ttToUpdate.timeTrialHeader.id}")
+                } catch (e: Exception) {
+                    Timber.e(e, "Error updating TimeTrial (ID: ${ttToUpdate.timeTrialHeader.id}) from channel")
+                }
+            }
+            .launchIn(viewModelScope)
+    }
 
     fun updateTimeTrial(newTimeTrial: TimeTrial) {
 
-        val previousTimeTrial = _mTimeTrial.value
-        _mTimeTrial.value = newTimeTrial
-        if (previousTimeTrial != null) {
-            _mTimeTrial.value = newTimeTrial
+        // Update LiveData immediately for UI responsiveness
+        val orderedNewTimeTrial = newTimeTrial.copy(riderList = newTimeTrial.riderList.sortedBy { it.timeTrialData.index })
+        _mTimeTrial.value = orderedNewTimeTrial
 
-            if (!isProcessing.get()) {
-                queue.add(newTimeTrial)
-                viewModelScope.launch(Dispatchers.IO) {
-                    isProcessing.set(true)
-                    while (queue.peek() != null) {
-                        var ttToInsert = queue.peek()
-                        while (queue.peek() != null) {
-                            ttToInsert = queue.poll()
-                        }
-                        ttToInsert?.let { timeTrialRepository.updateFull(it) }
-                    }
-                    isProcessing.set(false)
-                }
-            } else {
-                queue.add(newTimeTrial)
-            }
+        // Send to the channel for background processing (CONFLATED always accepts).
+        val offerResult = timeTrialUpdateChannel.trySend(orderedNewTimeTrial)
+        if (offerResult.isSuccess) {
+            Timber.d("TT update (ID: ${orderedNewTimeTrial.timeTrialHeader.id}) successfully sent to channel.")
+        } else {
+            Timber.w("Failed to send TT update (ID: ${orderedNewTimeTrial.timeTrialHeader.id}) to channel. Closed: ${offerResult.isClosed}, Failed: ${offerResult.isFailure}")
         }
     }
 
@@ -157,7 +170,6 @@ class SetupViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        isProcessing.set(false)
         viewModelScope.cancel()
     }
 }

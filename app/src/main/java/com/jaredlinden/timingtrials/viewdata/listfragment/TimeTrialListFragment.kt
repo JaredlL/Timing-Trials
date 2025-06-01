@@ -45,7 +45,7 @@ class TimeTrialListFragment : Fragment() {
         val viewManager = LinearLayoutManager(context)
 
         val binding = DataBindingUtil.inflate<FragmentListGenericBinding>(inflater, R.layout.fragment_list_generic, container, false).apply{
-            lifecycleOwner = (this@TimeTrialListFragment)
+            lifecycleOwner = (viewLifecycleOwner)
             listHeading.addView(viewFactory.createTitle(inflater, container), 0, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
             genericRecyclerView.adapter = adapter
             genericRecyclerView.layoutManager = viewManager
