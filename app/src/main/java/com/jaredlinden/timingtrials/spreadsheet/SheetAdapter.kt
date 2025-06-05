@@ -193,13 +193,13 @@ class SheetAdapter internal constructor(
 
         val sdk = android.os.Build.VERSION.SDK_INT
 
-        val mdrawable = AppCompatResources.getDrawable(context, R.drawable.background_spreadsheet_heading)
+        val drawableHeading = AppCompatResources.getDrawable(context, R.drawable.background_spreadsheet_heading)
 
         if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            viewHolder.textView.setBackgroundDrawable(mdrawable)
+            viewHolder.textView.setBackgroundDrawable(drawableHeading)
 
         } else {
-            viewHolder.textView.background = mdrawable
+            viewHolder.textView.background = drawableHeading
         }
 
         val width = ROW_MARKER_WIDTH * widthOfALetter

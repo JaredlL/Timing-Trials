@@ -67,10 +67,6 @@ class RoomCourseRepository @Inject constructor(private val courseDao: CourseDao)
        return  courseDao.getFirst()
     }
 
-    // You must call this on a non-UI thread or your app will crash. So we're making this a
-    // suspend function so the caller methods know this.
-    // Like this, Room ensures that you're not doing any long running operations on the main
-    // thread, blocking the UI.
     @WorkerThread
     override suspend fun insert(course: Course):Long {
        return courseDao.insert(course)
@@ -88,7 +84,7 @@ class RoomCourseRepository @Inject constructor(private val courseDao: CourseDao)
 
     @WorkerThread
     override suspend fun insertOrUpdate(course: Course){
-        val id = course.id ?: 0
+        val id = course.id
         if(id != 0L){
             courseDao.update(course)
         }else{

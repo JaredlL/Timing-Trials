@@ -10,7 +10,6 @@ import com.jaredlinden.timingtrials.data.Rider
 import com.jaredlinden.timingtrials.databinding.ListItemSelectableRiderBinding
 import com.jaredlinden.timingtrials.setup.SelectedRidersInformation
 
-
 /**
  * Adapter for the [RecyclerView] in [RiderListFragment].
  */
@@ -26,26 +25,23 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
             binding.apply{
                 rider = riderVm
                 checkBox.isChecked = mSelected.asSequence().map { it.id }.contains(riderVm.id)
-                riderLayout.setOnLongClickListener { longPress(riderVm.id?:0)
+                riderLayout.setOnLongClickListener { longPress(riderVm.id)
                     true
                 }
 
                 executePendingBindings()
 
                 checkBox.setOnClickListener {
-                    if(riderVm.id != null && checkBox.isChecked != mSelected.asSequence().map { it.id }.contains(riderVm.id)){
+                    if(checkBox.isChecked != mSelected.asSequence().map { it.id }.contains(riderVm.id)){
                         if(checkBox.isChecked){
                             val nSelected = mSelected + listOf(riderVm)
                             mSelected = nSelected
-                            //riderSelectionChanged(mSelected)
                             addRiderToSelection(riderVm)
                         }else{
                             val nSelected = mSelected.filterNot { it.id == riderVm.id }
                             mSelected = nSelected
-                            //riderSelectionChanged(mSelected)
                             removeRiderFromSelection(riderVm)
                         }
-
                     }
                 }
             }
@@ -73,7 +69,7 @@ class SelectableRiderListAdapter internal constructor(val context: Context): Rec
     }
 
     override fun getItemId(position: Int): Long {
-        return mRiders[position].id?:0
+        return mRiders[position].id
     }
 
     var editRider = {riderId: Long -> Unit}

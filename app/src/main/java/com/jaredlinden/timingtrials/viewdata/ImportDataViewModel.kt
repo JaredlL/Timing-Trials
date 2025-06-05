@@ -32,13 +32,12 @@ import org.threeten.bp.*
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
-import java.net.UnknownHostException
 import java.security.InvalidParameterException
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
 @HiltViewModel
-class IOViewModel @Inject constructor(private val riderRespository: IRiderRepository,
+class IOViewModel @Inject constructor(private val riderRepository: IRiderRepository,
                                       private val courseRepository: ICourseRepository,
                                       private val timeTrialRepository: ITimeTrialRepository,
                                       private val timeTrialRiderRepository: TimeTrialRiderRepository): ViewModel() {
@@ -277,7 +276,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                             headerList.first().id
                         }
                         else->{
-                            val onCourseList = headerList.filter { it.courseId == dbCourse.id }.sortedBy { it.startTimeMilis - insertHeader.startTimeMilis }
+                            val onCourseList = headerList.filter { it.courseId == dbCourse.id }.sortedBy { it.startTimeMillis - insertHeader.startTimeMillis }
                             onCourseList.firstOrNull()?.id
                         }
                     }
@@ -342,12 +341,12 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
     suspend fun getDbRider(importRider:Rider): Rider{
         val riderInDbId:Rider
 
-            val existingRiders = riderRespository.ridersFromFirstLastName(importRider.firstName, importRider.lastName)
+            val existingRiders = riderRepository.ridersFromFirstLastName(importRider.firstName, importRider.lastName)
             //var timeTrialRider:TimeTrialRider? = null
             riderInDbId = when(existingRiders.size){
                 0->{
                     val newRider = Rider(importRider.firstName, importRider.lastName, importRider.club, null, importRider.category?:"", importRider.gender)
-                    val id = riderRespository.insert(newRider)
+                    val id = riderRepository.insert(newRider)
                     newRider.copy(id = id)
                 }
                 1->{
@@ -357,7 +356,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                     val byGender = existingRiders.filter { importRider.gender!= Gender.UNKNOWN && it.gender == importRider.gender }
                     if(byGender.isEmpty()){
                         val newRider = Rider(importRider.firstName, importRider.lastName, importRider.club, null, importRider.category, importRider.gender)
-                        val id = riderRespository.insert(newRider)
+                        val id = riderRepository.insert(newRider)
                         newRider.copy(id = id)
                     }else{
                         byGender.first()
@@ -476,18 +475,18 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                     headerList.first()
                 }
                 else->{
-                    val onCourseList = headerList.filter { it.courseId == courseInDb?.id }.sortedBy { it.startTimeMilis - headerToInsert.startTimeMilis }
+                    val onCourseList = headerList.filter { it.courseId == courseInDb?.id }.sortedBy { it.startTimeMillis - headerToInsert.startTimeMillis }
                     onCourseList.firstOrNull()
                 }
             }
         }
         importTt.timeTrialRiders.asSequence().filter { it.firstName.isNotBlank() }.sortedBy { it.bib?:it.startTime?.toSecondOfDay()?:0 }.forEachIndexed { index, importRider ->
 
-            val existingRiders = riderRespository.ridersFromFirstLastName(importRider.firstName, importRider.lastName)
+            val existingRiders = riderRepository.ridersFromFirstLastName(importRider.firstName, importRider.lastName)
             val riderInDbId:Rider = when(existingRiders.size){
                 0->{
                     val newRider = Rider(importRider.firstName, importRider.lastName, importRider.club, null, importRider.category?:"", importRider.gender)
-                    val id = riderRespository.insert(newRider)
+                    val id = riderRepository.insert(newRider)
                     newRider.copy(id = id)
                 }
                 1->{
@@ -497,7 +496,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
                     val byGender = existingRiders.filter { importRider.gender!= Gender.UNKNOWN && it.gender == importRider.gender }
                     if(byGender.isEmpty()){
                         val newRider = Rider(importRider.firstName, importRider.lastName, importRider.club, null, importRider.category, importRider.gender)
-                        val id = riderRespository.insert(newRider)
+                        val id = riderRepository.insert(newRider)
                         newRider.copy(id = id)
                     }else{
                         byGender.first()
@@ -548,7 +547,7 @@ class IOViewModel @Inject constructor(private val riderRespository: IRiderReposi
 
     }
 
-    fun insertTimeTrialRider(timeTrialRider: TimeTrialRider){
+    suspend fun insertTimeTrialRider(timeTrialRider: TimeTrialRider){
 
         val riderId = timeTrialRider.riderId
         val timeTrialId = timeTrialRider.timeTrialId

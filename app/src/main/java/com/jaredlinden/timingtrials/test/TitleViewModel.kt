@@ -28,5 +28,4 @@ class TitleViewModel@Inject constructor(val timeTrialRepository: ITimeTrialRepos
             timeTrialRepository.deleteHeader(tt)
         }
     }
-
 }

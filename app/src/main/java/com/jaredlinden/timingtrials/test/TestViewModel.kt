@@ -24,14 +24,9 @@ class TestViewModel@Inject constructor(
         val timingTrialsDatabase: TimingTrialsDatabase
 ) : ViewModel(){
 
-
-
     private val inserting = AtomicBoolean()
 
-     val insertedTestTiming: MutableLiveData<Event<Boolean>> = MutableLiveData()
-
-
-
+    val insertedTestTiming: MutableLiveData<Event<Boolean>> = MutableLiveData()
 
     fun testSetup(){
 

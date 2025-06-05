@@ -167,7 +167,7 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                     service.stop()
                     mBound = false
                 }
-                val args = SetupViewPagerFragmentArgs(timeTrialHeader.id?:0)
+                val args = SetupViewPagerFragmentArgs(timeTrialHeader.id)
                 val pendingIntent = NavDeepLinkBuilder(this)
                         .setGraph(R.navigation.nav_graph)
                         .setArguments(args.toBundle())
@@ -192,7 +192,7 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                     }
                 }
 
-                val args = ResultFragmentArgs(timeTrialHeader.id?:0)
+                val args = ResultFragmentArgs(timeTrialHeader.id)
                 val pendingIntent = NavDeepLinkBuilder(this)
                         .setGraph(R.navigation.nav_graph)
                         .setDestination(R.id.resultFragment)

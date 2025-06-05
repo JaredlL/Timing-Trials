@@ -53,8 +53,8 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @WorkerThread
     override suspend fun updateFull(timeTrial: TimeTrial) {
         Timber.d("Updating ${timeTrial.timeTrialHeader.id} ${timeTrial.timeTrialHeader.ttName} into DB from background thread")
-        if((timeTrial.timeTrialHeader.id ?: 0L) == 0L){
-            throw Exception("TT ID cannot be null")
+        if(timeTrial.timeTrialHeader.id == 0L){
+            throw Exception("TT ID must be set")
         }
         timeTrialDao.update(timeTrial)
     }
@@ -103,8 +103,8 @@ class RoomTimeTrialRepository @Inject constructor(private val timeTrialDao: Time
     @WorkerThread
     override suspend fun update(timeTrialHeader: TimeTrialHeader) {
         Timber.d("Updating ${timeTrialHeader.id} ${timeTrialHeader.ttName} into DB from background thread")
-        if((timeTrialHeader.id ?: 0L) == 0L){
-            throw Exception("TT ID cannot be null")
+        if(timeTrialHeader.id == 0L){
+            throw Exception("TT ID must be set")
         }
         timeTrialDao.update(timeTrialHeader)
     }

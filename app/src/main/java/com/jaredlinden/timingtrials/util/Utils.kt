@@ -1,12 +1,8 @@
 package com.jaredlinden.timingtrials.util
 
-import android.graphics.ColorFilter
-import android.graphics.ColorMatrixColorFilter
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
-import androidx.core.content.ContextCompat
-import com.jaredlinden.timingtrials.R
 
 object Utils {
 
@@ -20,5 +16,4 @@ object Utils {
     fun colorDrawable(mColor: Int, d: Drawable?){
         d?.colorFilter = PorterDuffColorFilter(mColor, PorterDuff.Mode.MULTIPLY)
     }
-
 }

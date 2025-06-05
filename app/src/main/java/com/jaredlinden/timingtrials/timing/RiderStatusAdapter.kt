@@ -35,7 +35,6 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
 
                 executePendingBindings()
             }
-
         }
     }
 
@@ -61,7 +60,6 @@ class RiderStatusAdapter internal constructor(val context: Context): RecyclerVie
     override fun getItemId(position: Int): Long {
         return mStatus[position].timeTrialRider.riderId
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RiderStatusViewHolder {
         val binding: ListItemRiderStatusBinding = DataBindingUtil.inflate(layoutInflater, R.layout.list_item_rider_status, parent, false)

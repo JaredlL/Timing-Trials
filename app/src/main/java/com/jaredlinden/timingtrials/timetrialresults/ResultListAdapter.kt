@@ -4,9 +4,7 @@ import android.content.Context
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.databinding.ListItemResultBinding
 
 class ResultListAdapter internal constructor(val context: Context, val editResult: (Long?) -> Unit): RecyclerView.Adapter<ResultListAdapter.ResultViewHolder>(){

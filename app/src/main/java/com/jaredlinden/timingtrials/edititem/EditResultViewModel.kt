@@ -36,7 +36,6 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
         }?:MutableLiveData("Select Rider...")
     }
 
-
     val club = MutableLiveData("")
     val category = MutableLiveData("")
     val note = MutableLiveData("")
@@ -64,9 +63,7 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
 
     val availableRiders = excludedRiderIds.switchMap{ exclusions->
         riderRepository.allRiders.map{
-            it?.let {
-                it.filter { !exclusions.contains(it.id) || result.value?.riderId == it.id || it.id == originalRiderId }
-            }
+            it.filter { !exclusions.contains(it.id) || result.value?.riderId == it.id || it.id == originalRiderId }
         }
     }
 
@@ -77,40 +74,40 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
         ::changeRider) {Unit}
 
 
-    private fun changeRider(newRider: Rider){
-
-            val courseId = result.value?.courseId
-            val resultTimeTrialId = timeTrialId.value
-            if(newRider.id != null && resultTimeTrialId != null && courseId != null){
-                val currentResVal = result.value
-                if(currentResVal?.riderId != newRider.id){
-
-                    viewModelScope.launch(Dispatchers.IO) {
-
-                        val tt = resultRepository.getRidersForTimeTrialSuspend(resultTimeTrialId)
-                        if(originalRiderId != newRider.id && tt.mapNotNull { it.riderData.id }.any { it == newRider.id } ){
-                            selectRiderVm.showMessage.postValue(Event("This rider is already in the list of results for this timetrial!"))
-                            result.postValue(result.value)
-                        }else{
-                            result.postValue(
-                                currentResVal?.copy(
-                                    riderId = newRider.id,
-                                    club = newRider.club,
-                                    category = newRider.category,
-                                    gender = newRider.gender)?:
-                                    TimeTrialRider.fromRiderAndTimeTrial(newRider, resultTimeTrialId))
-                            club.postValue(newRider.club)
-                            category.postValue(newRider.category)
-                            val genInt = Gender.entries.indexOf(newRider.gender)
-                            if(genInt != selectedGenderPosition.value){
-                                selectedGenderPosition.postValue(genInt)
-                            }
-                            selectRiderVm.close.postValue(Event(true))
+    // todo fix a bug when adding a new result. Cant select a rider
+    private fun changeRider(newRider: Rider) {
+        val courseId = result.value?.courseId
+        val resultTimeTrialId = timeTrialId.value
+        if (resultTimeTrialId != null && courseId != null) {
+            val currentResVal = result.value
+            if (currentResVal?.riderId != newRider.id) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    val tt = resultRepository.getRidersForTimeTrialSuspend(resultTimeTrialId)
+                    if (originalRiderId != newRider.id && tt.map { it.riderData.id }
+                            .any { it == newRider.id }) {
+                        selectRiderVm.showMessage.postValue(Event("This rider is already in the list of results for this timetrial!"))
+                        result.postValue(result.value)
+                    } else {
+                        result.postValue(
+                            currentResVal?.copy(
+                                riderId = newRider.id,
+                                club = newRider.club,
+                                category = newRider.category,
+                                gender = newRider.gender
+                            ) ?: TimeTrialRider.fromRiderAndTimeTrial(newRider, resultTimeTrialId)
+                        )
+                        club.postValue(newRider.club)
+                        category.postValue(newRider.category)
+                        val genInt = Gender.entries.indexOf(newRider.gender)
+                        if (genInt != selectedGenderPosition.value) {
+                            selectedGenderPosition.postValue(genInt)
                         }
+                        selectRiderVm.close.postValue(Event(true))
                     }
                 }
             }
         }
+    }
 
     init {
         result.addSource(resultId.switchMap{it?.let { resultRepository.getResultById(it) }}){ttResult->
@@ -123,7 +120,7 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
                 resultTime.setIfNotEqual(ttResult.resultTime?.let { ConverterUtils.toTenthsDisplayString(it) }?:"")
                 splits.setIfNotEqual(ttResult.splits.map { ConverterUtils.toTenthsDisplayString(it) })
 
-                val genInt = Gender.values().indexOf(ttResult.gender)
+                val genInt = Gender.entries.indexOf(ttResult.gender)
 
                 selectedGenderPosition.value = genInt
 
@@ -143,11 +140,11 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
                         notes = note.value?:"",
                         splits = splits.value?.mapNotNull { ConverterUtils.fromTenthsDisplayString(it) } ?:listOf(),
                         finishCode = resultTime.value?.let { ConverterUtils.fromTenthsDisplayString(it) }?: FinishCode.DNF.type,
-                        gender = selectedGenderPosition.value?.let { Gender.values()[it] }?:Gender.UNKNOWN
+                        gender = selectedGenderPosition.value?.let { Gender.entries[it] }?:Gender.UNKNOWN
 
                 )
                 if(new != ttr || originalRiderId != ttr.riderId){
-                    if(new.id == null){
+                    if(new.id == 0L){
                         resultRepository.insert(new)
                     }else{
                         resultRepository.update(new)
@@ -157,9 +154,7 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
                 resultSaved.postValue(Event(true))
                 selectRiderVm.riderFilter.postValue("")
             }
-
         }
-
     }
 
 
@@ -174,14 +169,14 @@ class EditResultViewModel @Inject constructor(val resultRepository: TimeTrialRid
 
 }
 
-class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
-                                 val timeTrialRiderRepository: TimeTrialRiderRepository,
-                                 val selectedRiders: LiveData<List<Long>?>,
-                                 val addToSelection: (Rider) -> Unit,
-                                 val removeFromSelection:(Rider) -> Unit ) : ISelectRidersViewModel{
+class SelectSingleRiderViewModel(
+    availableRiders: LiveData<List<Rider>>,
+    val timeTrialRiderRepository: TimeTrialRiderRepository,
+    val selectedRiders: LiveData<List<Long>?>,
+    val addToSelection: (Rider) -> Unit,
+    val removeFromSelection:(Rider) -> Unit ) : ISelectRidersViewModel{
 
     override val selectedRidersInformation: MediatorLiveData<SelectedRidersInformation> = MediatorLiveData()
-
     override val close: MutableLiveData<Event<Boolean>> = MutableLiveData()
     override val showMessage: MutableLiveData<Event<String>> = MutableLiveData()
 
@@ -190,7 +185,10 @@ class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
         addToSelection(newSelectedRider)
     }
 
-    override fun riderUnselected(riderToRemove: Rider) { removeFromSelection(riderToRemove)}
+    override fun riderUnselected(riderToRemove: Rider)
+    {
+        removeFromSelection(riderToRemove)
+    }
 
     override fun setRiderFilter(filterString: String) {
         riderFilter.value = filterString
@@ -206,34 +204,37 @@ class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
 
     private val ridersWithStartTimes = timeTrialRiderRepository.lastTimeTrialRiders()
 
-    private val ridersOrderedByRecentActivity = availibleRiders.switchMap{riderList->
-        riderList?.let { rList->
-            ridersWithStartTimes.map{lastTimeTrialList->
-                lastTimeTrialList?.let {
-                    val startTimeMap = it.asSequence().filter { it.startTime.isAfter(lastYear) }.groupBy { it.riderId }.map { Pair(it.key, it.value.count()) }.toMap()
-                    val ordered = rList.sortedByDescending { startTimeMap[it.id]?:0 }
-                    ordered
-                }?:riderList
-            }
+    private val ridersOrderedByRecentActivity = availableRiders.switchMap{ riderList->
+        ridersWithStartTimes.map{ lastTimeTrialList->
+
+            val startTimeMap = lastTimeTrialList
+                .asSequence()
+                .filter { it.startTime.isAfter(lastYear) }
+                .groupBy { it.riderId }
+                .map { Pair(it.key, it.value.count()) }
+                .toMap()
+
+            val ordered = riderList.sortedByDescending { startTimeMap[it.id]?:0 }
+                ordered
         }
     }
 
     init {
         selectedRidersInformation.addSource(ridersOrderedByRecentActivity){res->
-            updateselectedRiderInfo(res, riderFilter.value, selectedRiders.value, liveSortMode.value?:SORT_DEFAULT)
+            updateSelectedRiderInfo(res, riderFilter.value, selectedRiders.value, liveSortMode.value?:SORT_DEFAULT)
         }
         selectedRidersInformation.addSource(selectedRiders){
-            updateselectedRiderInfo(ridersOrderedByRecentActivity.value, riderFilter.value, it, liveSortMode.value?:SORT_DEFAULT)
+            updateSelectedRiderInfo(ridersOrderedByRecentActivity.value, riderFilter.value, it, liveSortMode.value?:SORT_DEFAULT)
         }
         selectedRidersInformation.addSource(riderFilter){it
-            updateselectedRiderInfo(ridersOrderedByRecentActivity.value, it, selectedRiders.value, liveSortMode.value?:0)
+            updateSelectedRiderInfo(ridersOrderedByRecentActivity.value, it, selectedRiders.value, liveSortMode.value?:0)
         }
         selectedRidersInformation.addSource(liveSortMode){
-            updateselectedRiderInfo(ridersOrderedByRecentActivity.value, riderFilter.value, selectedRiders.value, it)
+            updateSelectedRiderInfo(ridersOrderedByRecentActivity.value, riderFilter.value, selectedRiders.value, it)
         }
     }
 
-    fun updateselectedRiderInfo(allRiders: List<Rider>?, filterString: String?, selectedIds: List<Long>?, sortMode: Int){
+    fun updateSelectedRiderInfo(allRiders: List<Rider>?, filterString: String?, selectedIds: List<Long>?, sortMode: Int){
         if(allRiders != null && selectedIds != null)
         {
             val filteredRiders = if(filterString.isNullOrBlank())
@@ -256,5 +257,4 @@ class SelectSingleRiderViewModel(val availibleRiders: LiveData<List<Rider>?>,
             selectedRidersInformation.value = SelectedRidersInformation(filteredRiders, selectedIds)
         }
     }
-
 }

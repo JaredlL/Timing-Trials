@@ -11,7 +11,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaredlinden.timingtrials.IFabCallbacks
 import com.jaredlinden.timingtrials.R
-import com.jaredlinden.timingtrials.adapters.CourseListAdapter
+import com.jaredlinden.timingtrials.adapters.SelectableCourseListAdapter
 import com.jaredlinden.timingtrials.data.Course
 import com.jaredlinden.timingtrials.databinding.FragmentCourseListBinding
 import com.jaredlinden.timingtrials.ui.SelectableCourseViewModel
@@ -46,7 +46,7 @@ class SelectCourseFragment : Fragment() {
 
         val viewModel = setupViewModel.selectCourseViewModel
         val viewManager = LinearLayoutManager(context)
-        val adapter = CourseListAdapter(requireContext())
+        val adapter = SelectableCourseListAdapter(requireContext())
         adapter.courseLongPress = ::editCourse
 
         viewModel.getAllCourses().observe(viewLifecycleOwner) { courses ->

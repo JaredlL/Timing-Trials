@@ -13,7 +13,7 @@ import com.jaredlinden.timingtrials.ui.SelectableCourseViewModel
 import com.jaredlinden.timingtrials.ui.SelectableCourseData
 import com.jaredlinden.timingtrials.util.LengthConverter
 
-class CourseListAdapter internal constructor(val context: Context): RecyclerView.Adapter<CourseListAdapter.CourseViewHolder>()  {
+class SelectableCourseListAdapter internal constructor(val context: Context): RecyclerView.Adapter<SelectableCourseListAdapter.CourseViewHolder>()  {
 
     private var selectedId : Long? = 0
     private var mCourses: List<SelectableCourseViewModel> = listOf()
@@ -41,7 +41,7 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
                 checkBox.setOnClickListener {
                     if(checkBox.isChecked != (courseWrapper.course.id == selectedId)){
                         if(checkBox.isChecked){
-                            selectedId = courseWrapper.course.id ?: 0
+                            selectedId = courseWrapper.course.id
                         }
                         courseSelected(courseWrapper.course)
                     }
@@ -67,11 +67,10 @@ class CourseListAdapter internal constructor(val context: Context): RecyclerView
             mCourses = data.courses.map { SelectableCourseViewModel(it, unitConverter) }
             notifyDataSetChanged()
         }
-
     }
 
     override fun getItemId(position: Int): Long {
-        return mCourses[position].course.id?:0
+        return mCourses[position].course.id
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseViewHolder {

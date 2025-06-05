@@ -28,13 +28,13 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
     private val groupedStartTimeRiders = ttSetup.timeTrialRiderRepository.lastTimeTrialRiders()
 
     private val groupedAllRiders = ttSetup.riderRepository.allRiders.switchMap{riderList->
-        riderList?.let { rList->
+        riderList.let { rList->
             groupedStartTimeRiders.map{lastTimeTrialList->
-                lastTimeTrialList?.let {
+                lastTimeTrialList.let {
                     val startTimeMap = it.asSequence().filter { it.startTime.isAfter(lastYear) }.groupBy { it.riderId }.map { Pair(it.key, it.value.count()) }.toMap()
                     val ordered = rList.sortedByDescending { startTimeMap[it.id]?:0 }
                     ordered
-                }?:riderList
+                }
             }
         }
     }
@@ -69,21 +69,21 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
 
     init {
         selectedRidersMediator.addSource(liveSortMode){sm->
-            updateselectedRiderInfo(groupedAllRiders.value, riderFilter.value, ttSetup.timeTrial.value, sm?:0)
+            updateSelectedRiderInfo(groupedAllRiders.value, riderFilter.value, ttSetup.timeTrial.value, sm?:0)
         }
         selectedRidersMediator.addSource(riderFilter){filter->
-            updateselectedRiderInfo(groupedAllRiders.value, filter, ttSetup.timeTrial.value, liveSortMode.value?:0)
+            updateSelectedRiderInfo(groupedAllRiders.value, filter, ttSetup.timeTrial.value, liveSortMode.value?:0)
         }
 
         selectedRidersMediator.addSource(groupedAllRiders){allRiders->
-            updateselectedRiderInfo(allRiders, riderFilter.value, ttSetup.timeTrial.value, liveSortMode.value?:0)
+            updateSelectedRiderInfo(allRiders, riderFilter.value, ttSetup.timeTrial.value, liveSortMode.value?:0)
         }
         selectedRidersMediator.addSource(ttSetup.timeTrial){ tt->
-            updateselectedRiderInfo(groupedAllRiders.value, riderFilter.value, tt, liveSortMode.value?:0)
+            updateSelectedRiderInfo(groupedAllRiders.value, riderFilter.value, tt, liveSortMode.value?:0)
         }
     }
 
-    fun updateselectedRiderInfo(allRiders: List<Rider>?, filterString: String?, timeTrial: TimeTrial?, sortMode: Int){
+    fun updateSelectedRiderInfo(allRiders: List<Rider>?, filterString: String?, timeTrial: TimeTrial?, sortMode: Int){
         if(allRiders != null && timeTrial != null){
            val filteredRiders = if(filterString.isNullOrBlank()){
                if(sortMode == SORT_ALPHABETICAL){
@@ -99,7 +99,7 @@ class SelectRidersViewModelImpl(private val ttSetup: SetupViewModel):ISelectRide
                    allRiders.filter { it.fullName().contains(filterString, ignoreCase = true) }
                }
            }
-            selectedRidersMediator.value = SelectedRidersInformation(filteredRiders, timeTrial.riderList.mapNotNull { it.riderData.id })
+            selectedRidersMediator.value = SelectedRidersInformation(filteredRiders, timeTrial.riderList.map { it.riderData.id })
         }
     }
 }

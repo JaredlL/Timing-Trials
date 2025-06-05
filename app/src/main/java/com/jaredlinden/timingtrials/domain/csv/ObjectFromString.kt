@@ -63,7 +63,6 @@ object ObjectFromString
             val fval = if(sum > 0) sum else null
             fval
         }
-
     }
 
     fun gender(valString: String): Gender{
@@ -90,7 +89,7 @@ object ObjectFromString
                 date = LocalDate.parse(valString, formatter)
                 break
             }catch(e:Exception) {
-                val b = e
+                // todo - notify user, dont squash general exceptions
             }
         }
         if(date == null){
@@ -101,13 +100,10 @@ object ObjectFromString
                     date = LocalDate.parse(new, formatter)
                     break
                 }catch(e:Exception) {
-                    val b = e
+                    // todo - notify user, dont squash general exceptions
                 }
             }
         }
-
-
         return date
     }
-
 }

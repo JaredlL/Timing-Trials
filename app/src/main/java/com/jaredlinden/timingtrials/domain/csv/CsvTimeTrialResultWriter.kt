@@ -44,11 +44,11 @@ class CsvTimeTrialResultWriter (val timeTrial: TimeTrial, val results: List<List
 }
 
 class CsvSheetWriter(val sheet: ResultExplorerSpreadSheet){
-    fun writeToPath(ouputStream: OutputStream){
+    fun writeToPath(outputStream: OutputStream){
 
         val all = listOf(listOf(">>timing trials mixed results")) + listOf( sheet.sheetColumns.map { it.headingText }) + (sheet.data)
 
-        val csvWriter =  CSVWriter(ouputStream.bufferedWriter())
+        val csvWriter =  CSVWriter(outputStream.bufferedWriter())
         csvWriter.writeAll(all.map { it.toTypedArray() })
         csvWriter.flush()
         csvWriter.close()

@@ -98,9 +98,9 @@ class RiderStatusFragment : Fragment() {
         val tt = timingViewModel.timeTrial.value ?: return
 
         val millisNow = System.currentTimeMillis()
-        val millisTtLast = tt.timeTrialHeader.startTimeMilis + tt.helper.sortedRiderStartTimes.lastKey()
+        val millisTtLast = tt.timeTrialHeader.startTimeMillis + tt.helper.sortedRiderStartTimes.lastKey()
 
-        val dnfDnsString = if(millisNow > tt.helper.getRiderStartTime(rs.timeTrialRider) + tt.timeTrialHeader.startTimeMilis){
+        val dnfDnsString = if(millisNow > tt.helper.getRiderStartTime(rs.timeTrialRider) + tt.timeTrialHeader.startTimeMillis){
             getString(R.string.rider_dnf_did_not_finish)
         }else{
             getString(R.string.rider_dns_did_not_start)
@@ -130,7 +130,7 @@ class RiderStatusFragment : Fragment() {
 
                     when(which){
                         0 -> {
-                            if(millisNow > tt.helper.getRiderStartTime(timeTrialRider) + tt.timeTrialHeader.startTimeMilis){
+                            if(millisNow > tt.helper.getRiderStartTime(timeTrialRider) + tt.timeTrialHeader.startTimeMillis){
                                 timingViewModel.riderDnf(timeTrialRider)
                             }else{
                                 timingViewModel.riderDns(timeTrialRider)
@@ -141,7 +141,7 @@ class RiderStatusFragment : Fragment() {
                         2 -> {
                             TimingTimePickerFragment.newInstance(
                                 timeTrialRider.riderId,
-                                tt.timeTrialHeader.startTimeMilis
+                                tt.timeTrialHeader.startTimeMillis
                             ).show(requireActivity().supportFragmentManager, "tpd")
                         }
                     }

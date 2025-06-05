@@ -70,9 +70,7 @@ class TimeTrialListFragment : Fragment() {
                 .setTitle(resources.getString(R.string.delete_timetrial))
                 .setMessage(msg)
                 .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
-                    header.id?.let {
-                        listViewModel.deleteTimeTrial(it)
-                    }
+                    listViewModel.deleteTimeTrial(header.id)
                 }
                 .setNegativeButton(getString(R.string.dismiss)){ _, _->
 

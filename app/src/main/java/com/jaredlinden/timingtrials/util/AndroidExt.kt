@@ -2,20 +2,11 @@ package com.jaredlinden.timingtrials.util
 
 import android.app.Activity
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
-import com.jaredlinden.timingtrials.TimingTrialsApplication
-
-@Suppress("UNCHECKED_CAST")
-fun <T : Any> Fragment.argument(key: String) =
-        lazy { arguments?.get(key) as? T ?: error("Intent Argument $key is missing") }
-
-@Suppress("UNCHECKED_CAST")
-fun <T : Any> AppCompatActivity.argument(key: String) =
-        lazy { intent?.extras?.get(key) as? T ?: error("Intent Argument $key is missing") }
 
 
 fun Fragment.getLengthConverter():LengthConverter{

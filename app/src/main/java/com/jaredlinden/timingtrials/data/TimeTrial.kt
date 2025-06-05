@@ -24,7 +24,7 @@ data class TimeTrialHeader(val ttName: String,
 
     @delegate: Ignore
     @delegate: Transient
-    val startTimeMilis: Long by lazy { startTime?.toInstant()?.toEpochMilli()?:0L }
+    val startTimeMillis: Long by lazy { startTime?.toInstant()?.toEpochMilli()?:0L }
 
     companion object {
         fun createBlank(): TimeTrialHeader {
@@ -40,17 +40,6 @@ data class TimeTrialBasicInfo(
         val interval:Int = 60,
         val id: Long? = null
 )
-
-data class TimeTrialWithCourse(
-    @Embedded val timeTrialHeader: TimeTrialHeader,
-
-    @Relation(parentColumn = "courseId", entityColumn = "id", entity = Course::class)
-    val course: Course? = null
-){
-    fun updateCourse(newCourse: Course): TimeTrialWithCourse{
-        return this.copy(course = newCourse, timeTrialHeader = this.timeTrialHeader.copy(courseId = newCourse.id))
-    }
-}
 
 data class TimeTrial(
         @Embedded val timeTrialHeader: TimeTrialHeader = TimeTrialHeader.createBlank(),
@@ -83,7 +72,9 @@ data class TimeTrial(
     fun updateRiderList(newRiderList: List<FilledTimeTrialRider>): TimeTrial{
         val newMutableRiderList: MutableList<FilledTimeTrialRider> = mutableListOf()
         for ((i,r) in newRiderList.withIndex()){
-            val availableNumber = (newMutableRiderList.map { it.timeTrialData.assignedNumber?:0 }.maxOrNull()?:0) + 1
+            val availableNumber = (newMutableRiderList.maxOfOrNull {
+                it.timeTrialData.assignedNumber ?: 0
+            } ?:0) + 1
             newMutableRiderList.add(r.updateTimeTrialData( r.timeTrialData.copy(
                     timeTrialId = this.timeTrialHeader.id,
                     courseId = this.course?.id,

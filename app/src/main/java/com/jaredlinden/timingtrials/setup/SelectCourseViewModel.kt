@@ -12,14 +12,11 @@ interface ISelectCourseViewModel{
 
 class SelectCourseViewModelImpl(private val ttSetup: SetupViewModel): ISelectCourseViewModel {
 
-
-
     override fun getAllCourses(): LiveData<SelectableCourseData> = ttSetup.timeTrial.switchMap {
         ttSetup.courseRepository.allCoursesLight.map { courseList ->
             SelectableCourseData(courseList, it?.course?.id)
         }
     }
-
 
     override fun setSelectedCourse(course: Course) {
 

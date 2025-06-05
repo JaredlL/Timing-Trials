@@ -3,7 +3,6 @@ package com.jaredlinden.timingtrials.domain.csv
 import com.jaredlinden.timingtrials.data.CompleteInformationRow
 import com.jaredlinden.timingtrials.domain.ILineToObjectConverter
 import com.jaredlinden.timingtrials.domain.StringToObjectField
-import com.jaredlinden.timingtrials.domain.TimeTrialRiderIO
 import com.jaredlinden.timingtrials.util.LengthConverter
 import com.opencsv.CSVReader
 import java.io.StringReader
@@ -262,10 +261,4 @@ class LineToCompleteResult: ILineToObjectConverter<CompleteInformationRow>{
 
         }
     }
-
-
-
-
-
-
 }

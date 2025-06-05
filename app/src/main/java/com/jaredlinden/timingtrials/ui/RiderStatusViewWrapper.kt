@@ -14,7 +14,7 @@ class RiderStatusViewWrapper(val filledRider: FilledTimeTrialRider, timeLine: Ti
     val timeTrialRider = filledRider.timeTrialData
     val number: String = timeLine.timeTrial.getRiderNumber(filledRider.riderData.id).toString()
 
-    val startTimeMillis: Long = timeLine.timeTrial.timeTrialHeader.startTimeMilis + timeLine.timeTrial.helper.getRiderStartTime(timeTrialRider)
+    val startTimeMillis: Long = timeLine.timeTrial.timeTrialHeader.startTimeMillis + timeLine.timeTrial.helper.getRiderStartTime(timeTrialRider)
     val startTimeDisplay: String = ConverterUtils.offsetToHmsDisplayString(
         timeLine.timeTrial.timeTrialHeader.startTime?.plusSeconds(
             timeLine.timeTrial.helper.getRiderStartTime(timeTrialRider)/1000))

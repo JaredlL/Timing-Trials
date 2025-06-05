@@ -77,7 +77,7 @@ class TimingViewModel  @Inject constructor(
 
         timeLine.addSource(timeTrial){tt->
             tt?.let {
-                timeLine.value = TimeLine(tt, Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis)
+                timeLine.value = TimeLine(tt, Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMillis)
             }
 
         }
@@ -114,7 +114,7 @@ class TimingViewModel  @Inject constructor(
 
     fun onRiderPassed(){
         timeTrial.value?.let { tte->
-            val now = Instant.now().toEpochMilli() - tte.timeTrialHeader.startTimeMilis
+            val now = Instant.now().toEpochMilli() - tte.timeTrialHeader.startTimeMillis
             if (tte.helper.sortedRiderStartTimes.firstKey() > now){
                 showMessage("First rider has not started yet")
             }else{
@@ -170,7 +170,7 @@ class TimingViewModel  @Inject constructor(
     fun updateLoop(currentTimeMillis: Long){
         timeTrial.value?.let { tt->
 
-            val millisSinceStart = currentTimeMillis - tt.timeTrialHeader.startTimeMilis
+            val millisSinceStart = currentTimeMillis - tt.timeTrialHeader.startTimeMillis
 
             liveMillisSinceStart.value = millisSinceStart
 
@@ -445,7 +445,7 @@ class TimingViewModel  @Inject constructor(
                     }
                     val new = oldTt.addRiderWithNumber(rider, number)
                     val ttr = new.riderList.first { it.riderId() == riderId }
-                    val millisSinceStart = Instant.now().toEpochMilli() - new.timeTrialHeader.startTimeMilis
+                    val millisSinceStart = Instant.now().toEpochMilli() - new.timeTrialHeader.startTimeMillis
                     val newer = if(new.helper.getRiderStartTime(ttr.timeTrialData) < millisSinceStart){
                         new.helper.moveRiderToBack(ttr.timeTrialData)
                     }else{
@@ -459,7 +459,7 @@ class TimingViewModel  @Inject constructor(
 
     fun testFinishAll(){
         timeTrial.value?.let {tt->
-            val now1 = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis
+            val now1 = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMillis
             val timeLeft = (tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size - 1)) - now1
             var c = if(tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size - 1) > now1){
                 tt.copy(timeTrialHeader = tt.timeTrialHeader.copy(startTime = tt.timeTrialHeader.startTime?.minusSeconds(timeLeft/1000)))
@@ -468,7 +468,7 @@ class TimingViewModel  @Inject constructor(
             }
 
             tt.riderList.forEach{ttr->
-                val now = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMilis
+                val now = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMillis
                 val helper = c.helper
                 c = helper.assignRiderToEvent(ttr.timeTrialData, now).tt
             }

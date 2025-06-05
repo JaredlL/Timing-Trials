@@ -22,7 +22,7 @@ enum class Gender{
     abstract fun smallString():String
 
     companion object {
-        private val map = values().associateBy(Gender::ordinal)
+        private val map = entries.associateBy(Gender::ordinal)
         fun fromInt(type: Int) = map[type]
     }
 
@@ -34,7 +34,7 @@ enum class TimeTrialStatus(val type: Int){
     FINISHED(2);
 
     companion object {
-        private val map = values().associateBy(TimeTrialStatus::ordinal)
+        private val map = entries.associateBy(TimeTrialStatus::ordinal)
         fun fromInt(type: Int) = map[type]
     }
 }

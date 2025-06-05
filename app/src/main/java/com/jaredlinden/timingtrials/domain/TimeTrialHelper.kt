@@ -68,7 +68,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
         return timeTrial.copy(riderList = timeTrial.riderList.map {
             if(it.riderId() == riderId)
             {
-                val baseRiderStartTime = getBaseRiderStartTime(it.timeTrialData) + timeTrial.timeTrialHeader.startTimeMilis
+                val baseRiderStartTime = getBaseRiderStartTime(it.timeTrialData) + timeTrial.timeTrialHeader.startTimeMillis
                 val offset  = newStartTime - baseRiderStartTime
                 it.copy(timeTrialData = it.timeTrialData.copy(startTimeOffset = (offset/1000).toInt()))
             }
@@ -107,7 +107,7 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
 
         val milisNow = System.currentTimeMillis()
 
-        val lastStartTime = timeTrial.timeTrialHeader.startTimeMilis + sortedRiderStartTimes.filter { it.value.timeTrialData.hasNotDnfed() }.keys.last()
+        val lastStartTime = timeTrial.timeTrialHeader.startTimeMillis + sortedRiderStartTimes.filter { it.value.timeTrialData.hasNotDnfed() }.keys.last()
 
         val interval = (if(timeTrial.timeTrialHeader.interval == 0) 60 else timeTrial.timeTrialHeader.interval) * 1000
 
@@ -115,11 +115,11 @@ class TimeTrialHelper(val timeTrial: TimeTrial) {
 
             lastStartTime + interval
         }else{
-            val millisSinceStart = milisNow - timeTrial.timeTrialHeader.startTimeMilis
-            (millisSinceStart / interval) * interval + interval *2 + timeTrial.timeTrialHeader.startTimeMilis
+            val millisSinceStart = milisNow - timeTrial.timeTrialHeader.startTimeMillis
+            (millisSinceStart / interval) * interval + interval *2 + timeTrial.timeTrialHeader.startTimeMillis
         }
 
-        val offsetTime = nextStartTime -  getBaseRiderStartTime(ttr) - timeTrial.timeTrialHeader.startTimeMilis
+        val offsetTime = nextStartTime -  getBaseRiderStartTime(ttr) - timeTrial.timeTrialHeader.startTimeMillis
         return timeTrial.copy(riderList = timeTrial.riderList.map {
             if(it.riderId() == ttr.riderId)
             {

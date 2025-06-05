@@ -60,12 +60,6 @@ class TitleFragment : Fragment()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
 
-//        (requireActivity() as MainActivity).mMainFab.setOnClickListener {
-//            Toast.makeText(it.context, "i", Toast.LENGTH_SHORT).show()
-//        }
-        //(requireActivity() as MainActivity).mMainFab.setImageResource(R.drawable.ic_timer_black_24dp)
-
-
         titleViewModel.nonFinishedTimeTrial.observe(viewLifecycleOwner, Observer {tt->
             tt?.let { timeTrial->
                 if(timeTrial.status == TimeTrialStatus.IN_PROGRESS){
@@ -117,9 +111,6 @@ class TitleFragment : Fragment()
 
 
             testTimingButton.setOnClickListener {
-
-                //view?.let {  testScreenShot(it)}
-
                 testViewModel.testTiming()
             }
 
@@ -141,16 +132,6 @@ class TitleFragment : Fragment()
                     }
                 })
             }
-//
-//            button2.setOnClickListener {
-//                testViewModel.insertFinishedTt3()
-//                testViewModel.testInsertedEvent.observe(viewLifecycleOwner,EventObserver{
-//                    it?.let {id->
-//                        val action = TitleFragmentDirections.actionTitleFragmentToResultFragment(id)
-//                        findNavController().navigate(action)
-//                    }
-//                })
-//            }
         }
 
 
@@ -198,8 +179,6 @@ class TitleFragment : Fragment()
     }
     fun refreshGallery(filePath: Uri) {
         val scanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-        //val newPhotoPath = "file:" + image.getAbsolutePath() // image is the created file image
-        //val contentUri = Uri.fromFile(filePath)
         scanIntent.data = filePath
         requireActivity().sendBroadcast(scanIntent)
     }

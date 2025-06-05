@@ -83,7 +83,7 @@ class ResultExplorerViewModel @Inject constructor(
     }
 
     private val orig = ResultExplorerSpreadSheet(listOf(), cols, ::setNewColumns, ::navigateToTt) { s ->
-        m_paint?.measureText(s) ?: s.length * 16F
+        m_paint?.measureText(s) ?: (s.length * 16F)
     }
     init {
         resultSpreadSheet.value = orig

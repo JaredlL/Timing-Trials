@@ -152,7 +152,7 @@ class SetupViewModel @Inject constructor(
     }
 
     private fun getCourseLap(timeTrialRider: TimeTrialRiderResult): CourseLap?{
-        return timeTrialRider.course.id?.let { CourseLap(it,timeTrialRider.course.courseName, timeTrialRider.laps) }
+        return CourseLap(timeTrialRider.course.id, timeTrialRider.course.courseName, timeTrialRider.laps)
     }
 
     private fun getAverageCourseTime(riderId: Long?, courseLap: CourseLap, allResults: List<TimeTrialRiderResult>):Double?{

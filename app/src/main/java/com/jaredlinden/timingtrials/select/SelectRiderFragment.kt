@@ -24,6 +24,7 @@ import com.jaredlinden.timingtrials.databinding.FragmentSelectriderListBinding
 import com.jaredlinden.timingtrials.setup.*
 import com.jaredlinden.timingtrials.util.*
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.content.edit
 
 const val SELECTED_RIDERS = "selected_riders"
 
@@ -159,7 +160,12 @@ class SelectRiderFragment : Fragment() {
             AlertDialog.Builder(requireContext())
                     .setTitle(resources.getString(R.string.choose_sort))
                     .setSingleChoiceItems(R.array.sortingArray, current) { _, j ->
-                        PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putInt(SORT_KEY, j).apply()
+                        PreferenceManager.getDefaultSharedPreferences(requireContext()).edit {
+                            putInt(
+                                SORT_KEY,
+                                j
+                            )
+                        }
                         viewModel.setSortMode(j)
                     }
                     .setPositiveButton(R.string.ok) { _, _ ->

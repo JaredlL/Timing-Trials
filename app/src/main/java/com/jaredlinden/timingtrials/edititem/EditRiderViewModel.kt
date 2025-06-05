@@ -155,7 +155,7 @@ class EditRiderViewModel @Inject constructor(private val repository: IRiderRepos
                 if(existing.isNotEmpty() && existing.first().id != trimmed.id){
                     message.postValue(Event(R.string.error_rider_exists_with_name))
                 }else{
-                    if(trimmed.id?:0L == 0L){
+                    if(trimmed.id == 0L){
                         repository.insert(trimmed)
                     }else{
                         repository.update(trimmed)

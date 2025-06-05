@@ -29,7 +29,7 @@ class OrderableRiderListAdapter(val context: Context) : RecyclerView.Adapter<Ord
     override fun getItemId(position: Int): Long {
         // requires static value, it means need to keep the same value
         // even if the item position has been changed.
-        return mTimeTrial.riderList[position].riderData.id ?: 0L
+        return mTimeTrial.riderList[position].riderData.id
     }
 
     inner class OrderableRiderViewHolder(val binding: ListItemOrderableRiderBinding): AbstractDraggableItemViewHolder(binding.root){

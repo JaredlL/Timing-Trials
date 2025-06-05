@@ -20,8 +20,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import com.jaredlinden.timingtrials.R
 import com.jaredlinden.timingtrials.data.TimeTrial
-import com.jaredlinden.timingtrials.data.TimeTrialHeader
-import com.jaredlinden.timingtrials.util.Event
 import timber.log.Timber
 import kotlin.math.abs
 
@@ -50,7 +48,7 @@ class TimingService : Service(){
         var soundEvent: Int? = null
         override fun run() {
             val now = Instant.now()
-            val millisSinceStart = now.toEpochMilli() - timeTrial.timeTrialHeader.startTimeMilis
+            val millisSinceStart = now.toEpochMilli() - timeTrial.timeTrialHeader.startTimeMillis
             val millis = abs(millisSinceStart)
             val secsLong =  (millis/1000)
             if(prevSecs != secsLong){

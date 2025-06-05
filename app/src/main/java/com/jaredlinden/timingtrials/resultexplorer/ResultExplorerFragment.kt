@@ -1,18 +1,21 @@
 package com.jaredlinden.timingtrials.resultexplorer
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.graphics.*
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -31,9 +34,15 @@ import com.jaredlinden.timingtrials.dialog.ErrorDialog
 import com.jaredlinden.timingtrials.domain.csv.CsvSheetWriter
 import com.jaredlinden.timingtrials.spreadsheet.SheetAdapter
 import com.jaredlinden.timingtrials.spreadsheet.SheetLayoutManager
-import com.jaredlinden.timingtrials.util.*
+import com.jaredlinden.timingtrials.util.Event
+import com.jaredlinden.timingtrials.util.EventObserver
+import com.jaredlinden.timingtrials.util.FROM_TIMING_TRIALS
+import com.jaredlinden.timingtrials.util.HAS_SHOWN_RESULT_EXPLORER_TIPS
+import com.jaredlinden.timingtrials.util.Utils
+import com.jaredlinden.timingtrials.util.getLengthConverter
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
+import androidx.core.content.edit
 
 @AndroidEntryPoint
 class ResultExplorerFragment : Fragment()  {
@@ -109,7 +118,12 @@ class ResultExplorerFragment : Fragment()  {
 
        if(!PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(HAS_SHOWN_RESULT_EXPLORER_TIPS, false)){
            showTipsDialog()
-           PreferenceManager.getDefaultSharedPreferences(requireContext()).edit().putBoolean(HAS_SHOWN_RESULT_EXPLORER_TIPS, true).apply()
+           PreferenceManager.getDefaultSharedPreferences(requireContext()).edit {
+               putBoolean(
+                   HAS_SHOWN_RESULT_EXPLORER_TIPS,
+                   true
+               )
+           }
        }
 
         return binding.root

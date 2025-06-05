@@ -57,7 +57,7 @@ class  SelectRiderViewModel @Inject constructor (val riderRepository: IRiderRepo
     }
 
     override fun riderSelected(newSelectedRider: Rider) {
-        selectedRidersInformation.value = SelectedRidersInformation(riderRepository.allRiders.value?: listOf(), listOf(newSelectedRider.id?:0L))
+        selectedRidersInformation.value = SelectedRidersInformation(riderRepository.allRiders.value?: listOf(), listOf(newSelectedRider.id))
     }
 
     override fun riderUnselected(riderToRemove: Rider) {

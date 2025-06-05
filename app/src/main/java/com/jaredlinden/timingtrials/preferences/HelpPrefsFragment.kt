@@ -14,6 +14,7 @@ import com.jaredlinden.timingtrials.MainActivity
 import com.jaredlinden.timingtrials.R
 import timber.log.Timber
 import java.util.*
+import androidx.core.net.toUri
 
 
 class HelpPrefsFragment : PreferenceFragmentCompat() {
@@ -25,7 +26,7 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
         findPreference(R.string.p_helpref_documentation).setOnPreferenceClickListener {
             val url = getString(R.string.help_url)
             val i = Intent(Intent.ACTION_VIEW)
-            i.data = Uri.parse(url)
+            i.data = url.toUri()
             startActivity(i)
             true
         }
@@ -35,7 +36,7 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
             try{
                 val t = getDebugInfo()
                 val intent = Intent(Intent.ACTION_SENDTO).apply {
-                    setDataAndType(Uri.parse("mailto:"), "*/*")
+                    setDataAndType("mailto:".toUri(), "*/*")
                     putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.email)))
                     putExtra(Intent.EXTRA_SUBJECT, "Timing Trials Feedback")
                     putExtra(Intent.EXTRA_TEXT, t)
@@ -66,24 +67,26 @@ class HelpPrefsFragment : PreferenceFragmentCompat() {
     fun getDebugInfo(): String? {
         try {
 
-            return Arrays.asList("",
-                    "----------",
-                    ("Timing Trials: "
-                            + BuildConfig.VERSION_NAME
-                            ) + " ("
-                            .toString() + " build "
-                            + BuildConfig.VERSION_CODE
-                            .toString() + ")",
-                    "Android: " + Build.VERSION.RELEASE + " (" + Build.DISPLAY + ")",
-                    "Model: " + Build.MANUFACTURER + " " + Build.MODEL,
-                    "Product: " + Build.PRODUCT + " (" + Build.DEVICE + ")",
-                    "Kernel: "
-                            + System.getProperty("os.version")
-                            + " ("
-                            + Build.VERSION.INCREMENTAL
-                            + ")",
-                    "----------",
-                    "").joinToString("\n")
+            return listOf(
+                "",
+                "----------",
+                ("Timing Trials: "
+                        + BuildConfig.VERSION_NAME
+                        ) + " ("
+                    .toString() + " build "
+                        + BuildConfig.VERSION_CODE
+                    .toString() + ")",
+                "Android: " + Build.VERSION.RELEASE + " (" + Build.DISPLAY + ")",
+                "Model: " + Build.MANUFACTURER + " " + Build.MODEL,
+                "Product: " + Build.PRODUCT + " (" + Build.DEVICE + ")",
+                "Kernel: "
+                        + System.getProperty("os.version")
+                        + " ("
+                        + Build.VERSION.INCREMENTAL
+                        + ")",
+                "----------",
+                ""
+            ).joinToString("\n")
         } catch (e: Exception) {
             Timber.e(e)
         }
