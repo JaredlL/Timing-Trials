@@ -22,7 +22,7 @@ class EventViewWrapper(val event: ITimelineEvent, val timeTrial: TimeTrial) : Ba
     }
 
     private val riderName: String = event.rider?.let {
-        "[${timeTrial.getRiderNumber(it.timeTrialData.index)}] ${it.riderData.firstName} ${it.riderData.lastName}"
+        "[${timeTrial.getRiderNumber(it.timeTrialRiderData.index)}] ${it.riderData.firstName} ${it.riderData.lastName}"
     }?: "Null"
 
     val displayString: String = when(event.eventType){

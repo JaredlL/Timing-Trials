@@ -29,7 +29,7 @@ class OrderRidersViewModel(val setupViewModel: SetupViewModel) : IOrderRidersVie
                 mutList.add(toPosition + 1, mutList[fromPosition])
                 mutList.removeAt(fromPosition)
             }
-            val updateList = mutList.mapIndexed { i, r -> r.copy(timeTrialData = r.timeTrialData.copy(index = i)) }.sortedBy { it.timeTrialData.index }
+            val updateList = mutList.mapIndexed { i, r -> r.copy(timeTrialRiderData = r.timeTrialRiderData.copy(index = i)) }.sortedBy { it.timeTrialRiderData.index }
             setupViewModel.updateTimeTrial(currentTimeTrial.updateRiderList(updateList))
         }
     }
@@ -37,19 +37,19 @@ class OrderRidersViewModel(val setupViewModel: SetupViewModel) : IOrderRidersVie
 
     override fun setRiderNumber(newNumber: Int, riderToChange: FilledTimeTrialRider) {
         timeTrial.value?.let { tt->
-            val otherRider = tt.riderList.filterNot { it.riderData.id == riderToChange.riderData.id }.firstOrNull { it.timeTrialData.assignedNumber == newNumber }
+            val otherRider = tt.riderList.filterNot { it.riderData.id == riderToChange.riderData.id }.firstOrNull { it.timeTrialRiderData.assignedNumber == newNumber }
             if(otherRider != null){
-                val oldNumber = riderToChange.timeTrialData.assignedNumber
+                val oldNumber = riderToChange.timeTrialRiderData.assignedNumber
                 val newRiderList = tt.riderList.map {
                     when(it.riderData.id){
-                        riderToChange.riderData.id -> riderToChange.copy(timeTrialData = riderToChange.timeTrialData.copy(assignedNumber = newNumber))
-                        otherRider.riderData.id-> otherRider.copy(timeTrialData = otherRider.timeTrialData.copy(assignedNumber = oldNumber))
+                        riderToChange.riderData.id -> riderToChange.copy(timeTrialRiderData = riderToChange.timeTrialRiderData.copy(assignedNumber = newNumber))
+                        otherRider.riderData.id-> otherRider.copy(timeTrialRiderData = otherRider.timeTrialRiderData.copy(assignedNumber = oldNumber))
                         else -> it
                     }
                 }
                 setupViewModel.updateTimeTrial(tt.updateRiderList(newRiderList))
             }else{
-                setupViewModel.updateTimeTrial(tt.updateRiderList(tt.riderList.map { if(it.riderData.id == riderToChange.riderData.id) riderToChange.copy(timeTrialData = riderToChange.timeTrialData.copy(assignedNumber = newNumber)) else it }))
+                setupViewModel.updateTimeTrial(tt.updateRiderList(tt.riderList.map { if(it.riderData.id == riderToChange.riderData.id) riderToChange.copy(timeTrialRiderData = riderToChange.timeTrialRiderData.copy(assignedNumber = newNumber)) else it }))
             }
         }
     }

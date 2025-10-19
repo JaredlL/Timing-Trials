@@ -82,12 +82,12 @@ class TestViewModel@Inject constructor(
 
 
                 val rListWithIds = _mTimeTrial.addRiders(rList).riderList.mapIndexed { index, filledTimeTrialRider ->
-                    filledTimeTrialRider.copy(timeTrialData = filledTimeTrialRider.timeTrialData.copy(id = index.toLong())) }
+                    filledTimeTrialRider.copy(timeTrialRiderData = filledTimeTrialRider.timeTrialRiderData.copy(id = index.toLong())) }
 
                 val copy = _mTimeTrial.copy(riderList = rListWithIds)
                 var current = copy
 
-                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = 0L)) }
+                val rListWithoutIds = current.riderList.map { it.copy(timeTrialRiderData = it.timeTrialRiderData.copy(id = 0L)) }
 
                 val id = timeTrialRepository.insert(current.copy(riderList = rListWithoutIds))
                 testInsertedEvent.postValue(Event(id))
@@ -120,20 +120,20 @@ class TestViewModel@Inject constructor(
 
 
                 val rListWithIds = _mTimeTrial.addRiders(rList).riderList.mapIndexed { index, filledTimeTrialRider ->
-                    filledTimeTrialRider.copy(timeTrialData = filledTimeTrialRider.timeTrialData.copy(id = index.toLong())) }
+                    filledTimeTrialRider.copy(timeTrialRiderData = filledTimeTrialRider.timeTrialRiderData.copy(id = index.toLong())) }
 
                 val copy = _mTimeTrial.copy(riderList = rListWithIds)
                 var current = copy
                 for(rider in copy.riderList){
-                    val startTime = copy.helper.getRiderStartTime(rider.timeTrialData)
+                    val startTime = copy.helper.getRiderStartTime(rider.timeTrialRiderData)
                     for(i in (1..copy.timeTrialHeader.laps)){
-                        val timeStamp = startTime + i * 2000L + rider.timeTrialData.index * 200L
+                        val timeStamp = startTime + i * 2000L + rider.timeTrialRiderData.index * 200L
                         current = current.updateHeader(current.timeTrialHeader.copy(timeStamps = listOf(timeStamp)))
-                        current = current.helper.assignRiderToEvent(rider.timeTrialData, current.timeTrialHeader.timeStamps.last()).tt
+                        current = current.helper.assignRiderToEvent(rider.timeTrialRiderData, current.timeTrialHeader.timeStamps.last()).tt
                     }
                 }
 
-                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = 0L)) }
+                val rListWithoutIds = current.riderList.map { it.copy(timeTrialRiderData = it.timeTrialRiderData.copy(id = 0L)) }
 
                val id = timeTrialRepository.insert(current.copy(riderList = rListWithoutIds))
                 testInsertedEvent.postValue(Event(id))
@@ -179,20 +179,20 @@ class TestViewModel@Inject constructor(
 
 
                 val rListWithIds = _mTimeTrial.addRiders(rList).riderList.mapIndexed { index, filledTimeTrialRider ->
-                    filledTimeTrialRider.copy(timeTrialData = filledTimeTrialRider.timeTrialData.copy(id = index.toLong())) }
+                    filledTimeTrialRider.copy(timeTrialRiderData = filledTimeTrialRider.timeTrialRiderData.copy(id = index.toLong())) }
 
                 val copy = _mTimeTrial.copy(riderList = rListWithIds)
                 var current = copy
                 for(rider in copy.riderList){
-                    val startTime = copy.helper.getRiderStartTime(rider.timeTrialData)
+                    val startTime = copy.helper.getRiderStartTime(rider.timeTrialRiderData)
                     for(i in (1..copy.timeTrialHeader.laps)){
-                        val timeStamp = startTime + i * 2000L + rider.timeTrialData.index * 200L
+                        val timeStamp = startTime + i * 2000L + rider.timeTrialRiderData.index * 200L
                         current = current.updateHeader(current.timeTrialHeader.copy(timeStamps = listOf(timeStamp)))
-                        current = current.helper.assignRiderToEvent(rider.timeTrialData, current.timeTrialHeader.timeStamps.last()).tt
+                        current = current.helper.assignRiderToEvent(rider.timeTrialRiderData, current.timeTrialHeader.timeStamps.last()).tt
                     }
                 }
 
-                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = 0L)) }
+                val rListWithoutIds = current.riderList.map { it.copy(timeTrialRiderData = it.timeTrialRiderData.copy(id = 0L)) }
 
                 val id = timeTrialRepository.insert(current.copy(riderList = rListWithoutIds))
                 testInsertedEvent.postValue(Event(id))
@@ -221,20 +221,20 @@ class TestViewModel@Inject constructor(
                                 laps = 1,
                                 status = TimeTrialStatus.FINISHED)).updateCourse(courses[1])
 
-                val rListWithIds = _mTimeTrial.addRiders(rList).riderList.mapIndexed { index, filledTimeTrialRider -> filledTimeTrialRider.copy(timeTrialData = filledTimeTrialRider.timeTrialData.copy(id = index.toLong())) }
+                val rListWithIds = _mTimeTrial.addRiders(rList).riderList.mapIndexed { index, filledTimeTrialRider -> filledTimeTrialRider.copy(timeTrialRiderData = filledTimeTrialRider.timeTrialRiderData.copy(id = index.toLong())) }
 
                 val copy = _mTimeTrial.copy(riderList = rListWithIds)
                 var current = copy
                 for(rider in copy.riderList){
-                    val startTime = copy.helper.getRiderStartTime(rider.timeTrialData)
+                    val startTime = copy.helper.getRiderStartTime(rider.timeTrialRiderData)
                     for(i in (1..copy.timeTrialHeader.laps)){
-                        val timeStamp = startTime + i * 2000L + rider.timeTrialData.index * 200L
+                        val timeStamp = startTime + i * 2000L + rider.timeTrialRiderData.index * 200L
                         current = current.updateHeader(current.timeTrialHeader.copy(timeStamps = listOf(timeStamp)))
-                        current = current.helper.assignRiderToEvent(rider.timeTrialData, current.timeTrialHeader.timeStamps.last()).tt
+                        current = current.helper.assignRiderToEvent(rider.timeTrialRiderData, current.timeTrialHeader.timeStamps.last()).tt
                     }
                 }
 
-                val rListWithoutIds = current.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(id = 0L)) }
+                val rListWithoutIds = current.riderList.map { it.copy(timeTrialRiderData = it.timeTrialRiderData.copy(id = 0L)) }
 
                 val id = timeTrialRepository.insert(current.copy(riderList = rListWithoutIds))
                 testInsertedEvent.postValue(Event(id))

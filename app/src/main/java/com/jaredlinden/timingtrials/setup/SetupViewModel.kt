@@ -73,7 +73,7 @@ class SetupViewModel @Inject constructor(
         _mTimeTrial.addSource(idSwitcher) { res ->
             res?.let { tt ->
                 val current = _mTimeTrial.value
-                val ordered = tt.copy(riderList = tt.riderList.sortedBy { it.timeTrialData.index })
+                val ordered = tt.copy(riderList = tt.riderList.sortedBy { it.timeTrialRiderData.index })
                 if (ordered != current) {
                     _mTimeTrial.value = ordered
                 }
@@ -97,7 +97,7 @@ class SetupViewModel @Inject constructor(
     fun updateTimeTrial(newTimeTrial: TimeTrial) {
 
         // Update LiveData immediately for UI responsiveness
-        val orderedNewTimeTrial = newTimeTrial.copy(riderList = newTimeTrial.riderList.sortedBy { it.timeTrialData.index })
+        val orderedNewTimeTrial = newTimeTrial.copy(riderList = newTimeTrial.riderList.sortedBy { it.timeTrialRiderData.index })
         _mTimeTrial.value = orderedNewTimeTrial
 
         // Send to the channel for background processing (CONFLATED always accepts).

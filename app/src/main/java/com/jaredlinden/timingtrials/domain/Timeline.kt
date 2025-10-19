@@ -42,9 +42,9 @@ class TimeLine(val timeTrial: TimeTrial, private val timeStamp: Long) {
     private fun createTimeLine(): List<ITimelineEvent> {
         val startedEvents = timeTrial.riderList.asSequence()
                 .filter {
-                    (it.timeTrialData.finishCode != null && it.timeTrialData.finishCode == FinishCode.DNS.type).not()
+                    (it.timeTrialRiderData.finishCode != null && it.timeTrialRiderData.finishCode == FinishCode.DNS.type).not()
                 }
-                .map { ttr -> TimeLineEvent(timeTrial.helper.getRiderStartTime(ttr.timeTrialData), TimelineEventType.RIDER_STARTED, ttr) }
+                .map { ttr -> TimeLineEvent(timeTrial.helper.getRiderStartTime(ttr.timeTrialRiderData), TimelineEventType.RIDER_STARTED, ttr) }
                 .filter { it.timeStamp <= timeStamp }
 
         val unassignedEvents = timeTrial.timeTrialHeader.timeStamps.asSequence()
@@ -52,12 +52,12 @@ class TimeLine(val timeTrial: TimeTrial, private val timeStamp: Long) {
                 .takeWhile { it.timeStamp <= timeStamp }
         val assignedEvents = timeTrial.riderList.asSequence()
                 .flatMap { r ->
-                    r.timeTrialData.splits.asSequence()
+                    r.timeTrialRiderData.splits.asSequence()
                             .mapIndexed { i, ts ->
                                 if (i < timeTrial.timeTrialHeader.laps - 1) {
-                                    TimeLineEvent(timeTrial.helper.getRiderStartTime(r.timeTrialData) + ts, TimelineEventType.RIDER_PASSED, r)
+                                    TimeLineEvent(timeTrial.helper.getRiderStartTime(r.timeTrialRiderData) + ts, TimelineEventType.RIDER_PASSED, r)
                                 } else {
-                                    TimeLineEvent(timeTrial.helper.getRiderStartTime(r.timeTrialData) + ts, TimelineEventType.RIDER_FINISHED, r)
+                                    TimeLineEvent(timeTrial.helper.getRiderStartTime(r.timeTrialRiderData) + ts, TimelineEventType.RIDER_FINISHED, r)
                                 }
                             }
                 }

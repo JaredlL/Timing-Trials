@@ -40,9 +40,11 @@ class OrderableRiderListAdapter(val context: Context) : RecyclerView.Adapter<Ord
                     onNumberPressed(rd)
                 }
                 rider = rd
-                number = mTimeTrial.getRiderNumber(rd.timeTrialData.index)
+                number = mTimeTrial.getRiderNumber(rd.timeTrialRiderData.index)
                 startTime = ConverterUtils.offsetToHmsDisplayString(
-                    mTimeTrial.timeTrialHeader.startTime?.plusSeconds((mTimeTrial.timeTrialHeader.firstRiderStartOffset + mTimeTrial.timeTrialHeader.interval * rd.timeTrialData.index).toLong()))
+                    mTimeTrial.timeTrialHeader.startTime?.plusSeconds(
+                        (mTimeTrial.timeTrialHeader.firstRiderStartOffset + mTimeTrial.timeTrialHeader.interval * rd.timeTrialRiderData.index)
+                            .toLong()))
             }
         }
     }

@@ -117,12 +117,12 @@ data class TimeTrialRiderResult(
 }
 
 data class FilledTimeTrialRider(
-        @Embedded val timeTrialData: TimeTrialRider,
+        @Embedded val timeTrialRiderData: TimeTrialRider,
         @Relation(parentColumn = "riderId", entityColumn = "id", entity = Rider::class)
-        val riderData: Rider
-){
+        val riderData: Rider)
+{
     fun updateTimeTrialData(newTimeTrialData: TimeTrialRider): FilledTimeTrialRider{
-        return this.copy(timeTrialData = newTimeTrialData)
+        return this.copy(timeTrialRiderData = newTimeTrialData)
     }
 
     fun riderId(): Long? = riderData.id
@@ -132,19 +132,17 @@ data class FilledTimeTrialRider(
             if(timeTrial.riderList.mapNotNull { it.riderId() }.contains(rider.id)){
                 throw Exception("Rider already in this time trial")
             }
-            else if(rider.id != null){
-                val ttRider = TimeTrialRider(riderId = rider.id,
-                        timeTrialId = timeTrial.timeTrialHeader.id,
-                        courseId = timeTrial.course?.id,
-                        assignedNumber = number,
-                        index = timeTrial.riderList.size,
-                        category = rider.category,
-                        gender = rider.gender,
-                        club = rider.club)
-                return FilledTimeTrialRider(timeTrialData = ttRider, riderData = rider)
-            }else{
-                throw Exception("Rider ID is null")
-            }
+
+            val ttRider = TimeTrialRider(riderId = rider.id,
+                    timeTrialId = timeTrial.timeTrialHeader.id,
+                    courseId = timeTrial.course?.id,
+                    assignedNumber = number,
+                    index = timeTrial.riderList.size,
+                    category = rider.category,
+                    gender = rider.gender,
+                    club = rider.club)
+            return FilledTimeTrialRider(timeTrialRiderData = ttRider, riderData = rider)
+
         }
 
         fun createFromRiderAndTimeTrial(rider: Rider, timeTrial: TimeTrial): FilledTimeTrialRider{
@@ -159,7 +157,7 @@ data class FilledTimeTrialRider(
                         category = rider.category,
                         gender = rider.gender,
                         club = rider.club)
-                return FilledTimeTrialRider(timeTrialData = ttRider, riderData = rider)
+                return FilledTimeTrialRider(timeTrialRiderData = ttRider, riderData = rider)
             }
         }
     }

@@ -159,7 +159,7 @@ class TimerHostFragment : Fragment() {
         val alert = AlertDialog.Builder(requireContext())
         val edittext = EditText(requireContext())
 
-        val usedNumbers = tt.riderList.mapNotNull { it.timeTrialData.assignedNumber }
+        val usedNumbers = tt.riderList.mapNotNull { it.timeTrialRiderData.assignedNumber }
         val max = if(usedNumbers.any()) usedNumbers.maxOrNull()?:0 else 0
 
         edittext.setText((max + 1).toString())

@@ -70,7 +70,7 @@ class ResultViewModel @Inject constructor(
 
     fun clearNotesColumn(){
         timeTrial.value?.let{
-            val newRes = it.riderList.map { it.copy(timeTrialData = it.timeTrialData.copy(notes = "")) }
+            val newRes = it.riderList.map { it.copy(timeTrialRiderData = it.timeTrialRiderData.copy(notes = "")) }
             viewModelScope.launch(Dispatchers.IO) { timeTrialRepository.updateFull(it.copy(riderList = newRes)) }
         }
     }
@@ -107,15 +107,15 @@ class ResultViewModel @Inject constructor(
     }
 
     private fun hasAnyCategory(tt: TimeTrial): Boolean{
-        return tt.riderList.any { x -> x.timeTrialData.category.any() }
+        return tt.riderList.any { x -> x.timeTrialRiderData.category.any() }
     }
 
     private fun hasAnyNotes(tt: TimeTrial): Boolean{
-        return tt.riderList.any { x -> x.timeTrialData.notes.any() }
+        return tt.riderList.any { x -> x.timeTrialRiderData.notes.any() }
     }
 
     private fun anySplitHasValue(tt: TimeTrial): Boolean{
-        return tt.riderList.flatMap { x -> x.timeTrialData.splits }.any()
+        return tt.riderList.flatMap { x -> x.timeTrialRiderData.splits }.any()
     }
 }
 
@@ -135,11 +135,11 @@ class ResultRowViewModel{
          row.add(ResultCell(resId,MutableLiveData(result.riderClub)))
          row.add(ResultCell(resId,MutableLiveData(result.gender.fullString())))
 
-         if(tt.riderList.any { x -> x.timeTrialData.category.any() }){
+         if(tt.riderList.any { x -> x.timeTrialRiderData.category.any() }){
              row.add(ResultCell(resId,MutableLiveData(result.category)))
          }
 
-         if(tt.riderList.any { x -> x.timeTrialData.notes.any() }){
+         if(tt.riderList.any { x -> x.timeTrialRiderData.notes.any() }){
              row.add(ResultCell(resId,MutableLiveData(result.notes)))
          }
 

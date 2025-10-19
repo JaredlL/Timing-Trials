@@ -57,7 +57,7 @@ class RiderStatusFragment : Fragment() {
 
         timingViewModel.timeLine.observe(viewLifecycleOwner) {tt->
             val newList = tt.timeTrial.riderList.asSequence()
-                .filter { tt.getRiderStatus(it.timeTrialData) != RiderStatus.FINISHED }
+                .filter { tt.getRiderStatus(it.timeTrialRiderData) != RiderStatus.FINISHED }
                 .map { r -> RiderStatusViewWrapper(r, tt )
                     .apply {
                         onPressedCallback = { timingViewModel.tryAssignRider(it) }

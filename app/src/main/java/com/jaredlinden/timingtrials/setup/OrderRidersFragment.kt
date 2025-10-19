@@ -77,7 +77,7 @@ class OrderRidersFragment : Fragment() {
         val alert = AlertDialog.Builder(requireContext())
         val edittext = EditText(requireContext())
 
-        edittext.setText((rd.timeTrialData.assignedNumber?:1).toString())
+        edittext.setText((rd.timeTrialRiderData.assignedNumber?:1).toString())
         alert.setTitle("${getString(R.string.set_number)} (${rd.riderData.fullName()})")
 
         alert.setView(edittext)
@@ -88,7 +88,7 @@ class OrderRidersFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {
                 edittext.text?.toString()?.toIntOrNull()?.let {newNum->
                     setupVm.orderRidersViewModel.getOrderableRiderData().value?.let { tt->
-                        if(tt.riderList.filterNot { it.riderData.id == rd.riderData.id }.any { it.timeTrialData.assignedNumber == newNum }){
+                        if(tt.riderList.filterNot { it.riderData.id == rd.riderData.id }.any { it.timeTrialRiderData.assignedNumber == newNum }){
                             edittext.error = getString(R.string.number_already_taken_swap)
                         }else{
                             edittext.error = null

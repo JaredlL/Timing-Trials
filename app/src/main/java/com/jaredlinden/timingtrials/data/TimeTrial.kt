@@ -59,7 +59,7 @@ data class TimeTrial(
             course = newCourse,
             timeTrialHeader = newHeader,
             riderList = this.riderList.map {
-                it.copy(timeTrialData = it.timeTrialData.copy(
+                it.copy(timeTrialRiderData = it.timeTrialRiderData.copy(
                     courseId = newCourse.id
                 ))
             })
@@ -73,13 +73,13 @@ data class TimeTrial(
         val newMutableRiderList: MutableList<FilledTimeTrialRider> = mutableListOf()
         for ((i,r) in newRiderList.withIndex()){
             val availableNumber = (newMutableRiderList.maxOfOrNull {
-                it.timeTrialData.assignedNumber ?: 0
+                it.timeTrialRiderData.assignedNumber ?: 0
             } ?:0) + 1
-            newMutableRiderList.add(r.updateTimeTrialData( r.timeTrialData.copy(
+            newMutableRiderList.add(r.updateTimeTrialData( r.timeTrialRiderData.copy(
                     timeTrialId = this.timeTrialHeader.id,
                     courseId = this.course?.id,
                     index = i,
-                    assignedNumber = r.timeTrialData.assignedNumber?:availableNumber)))
+                    assignedNumber = r.timeTrialRiderData.assignedNumber?:availableNumber)))
         }
 
         return  this.copy(riderList = newMutableRiderList)
@@ -106,7 +106,7 @@ data class TimeTrial(
 
     fun getRiderNumber(index: Int): Int{
         return if(timeTrialHeader.numberRules.mode == NumberMode.MAP){
-             riderList[index].timeTrialData.assignedNumber?:0
+             riderList[index].timeTrialRiderData.assignedNumber?:0
         }else{
             timeTrialHeader.numberRules.numberFromIndex(index, riderList.size)
         }
@@ -115,9 +115,9 @@ data class TimeTrial(
 
     fun getRiderNumber(riderId: Long?): Int{
         return if(timeTrialHeader.numberRules.mode == NumberMode.MAP){
-            riderList.first { it.riderData.id == riderId }.timeTrialData.assignedNumber?:0
+            riderList.first { it.riderData.id == riderId }.timeTrialRiderData.assignedNumber?:0
         }else{
-            timeTrialHeader.numberRules.numberFromIndex(riderList.first { it.riderData.id == riderId }.timeTrialData.index, riderList.size)
+            timeTrialHeader.numberRules.numberFromIndex(riderList.first { it.riderData.id == riderId }.timeTrialRiderData.index, riderList.size)
         }
     }
 

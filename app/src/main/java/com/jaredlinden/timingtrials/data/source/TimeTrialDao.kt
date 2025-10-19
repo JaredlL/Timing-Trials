@@ -42,7 +42,7 @@ abstract class TimeTrialDao(db: RoomDatabase) {
         val id = insert(timeTrial.timeTrialHeader)
         Timber.d("Insert New TT $id + ${timeTrial.timeTrialHeader.ttName}, ${timeTrial.riderList.count()} riders into DB")
 
-        val newRiderList = timeTrial.riderList.map { it.timeTrialData.copy(timeTrialId = id) }
+        val newRiderList = timeTrial.riderList.map { it.timeTrialRiderData.copy(timeTrialId = id) }
 
         _insertAllTimeTrialRiders(newRiderList)
 
@@ -58,7 +58,7 @@ abstract class TimeTrialDao(db: RoomDatabase) {
     @Transaction
     open suspend fun update(timeTrial: TimeTrial){
         update(timeTrial.timeTrialHeader)
-        val idSet = timeTrial.riderList.asSequence().map { it.timeTrialData }.groupBy { it.id }
+        val idSet = timeTrial.riderList.asSequence().map { it.timeTrialRiderData }.groupBy { it.id }
         getTimeTrialRiders(timeTrial.timeTrialHeader.id).forEach {ttr->
             val new = idSet[ttr.id]?.firstOrNull()
             if(new == null){
