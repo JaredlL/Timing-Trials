@@ -32,7 +32,7 @@ import java.util.concurrent.TimeoutException
 @RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class TimingViewModelTest {
 
-    private val nowTime = OffsetDateTime.now()
+    private val testStartTime = OffsetDateTime.now()
 
     @Before
     fun setUp() {
@@ -59,7 +59,7 @@ class TimingViewModelTest {
 
         // [act]
         underTest.timeTrial.getOrAwaitValue()
-        underTest.updateLoop(nowTime.plus(expectedMillis, ChronoUnit.MILLIS).toInstant().toEpochMilli())
+        underTest.updateLoop(testStartTime.plus(expectedMillis, ChronoUnit.MILLIS).toInstant().toEpochMilli())
 
         // [assert]
         Assert.assertEquals(expectedString, underTest.timeString.getOrAwaitValue())
@@ -73,18 +73,18 @@ class TimingViewModelTest {
         val resultRepository = mockk<TimeTrialRiderRepository>()
         val riderRepository = mockk<RoomRiderRepository>()
         val underTest = TimingViewModel(timeTrialRepository, resultRepository, riderRepository)
-        val milis1 = 1000L
-        val milis2 = 1099L // Less than 100ms difference
-        val expectedString = ConverterUtils.toTenthsDisplayString(milis1)
+        val millis1 = 1000L
+        val millis2 = 1099L // Less than 100ms difference
+        val expectedString = ConverterUtils.toTenthsDisplayString(millis1)
 
         underTest.timeTrial.getOrAwaitValue()
-        underTest.updateLoop(nowTime.plus(milis1, ChronoUnit.MILLIS).toInstant().toEpochMilli())
+        underTest.updateLoop(testStartTime.plus(millis1, ChronoUnit.MILLIS).toInstant().toEpochMilli())
 
         // Observe the first time string to ensure it is calculated
-        val y = underTest.timeString.getOrAwaitValue()
+        val initialTimeString = underTest.timeString.getOrAwaitValue()
 
         // [act]
-        underTest.updateLoop(nowTime.plus(milis2, ChronoUnit.MILLIS).toInstant().toEpochMilli())
+        underTest.updateLoop(testStartTime.plus(millis2, ChronoUnit.MILLIS).toInstant().toEpochMilli())
 
         // [assert]
         Assert.assertEquals(expectedString, underTest.timeString.getOrAwaitValue())
@@ -98,17 +98,17 @@ class TimingViewModelTest {
         val resultRepository = mockk<TimeTrialRiderRepository>()
         val riderRepository = mockk<RoomRiderRepository>()
         val underTest = TimingViewModel(timeTrialRepository, resultRepository, riderRepository)
-        val milis1 = 1000L
-        val milis2 = 1100L // More than 100ms difference
-        val expectedString = ConverterUtils.toTenthsDisplayString(milis2)
+        val millis1 = 1000L
+        val millis2 = 1100L // More than 100ms difference
+        val expectedString = ConverterUtils.toTenthsDisplayString(millis2)
         underTest.timeTrial.getOrAwaitValue()
-        underTest.updateLoop(nowTime.plus(milis1, ChronoUnit.MILLIS).toInstant().toEpochMilli())
+        underTest.updateLoop(testStartTime.plus(millis1, ChronoUnit.MILLIS).toInstant().toEpochMilli())
 
         // Observe the first time string to ensure it is calculated
-        val y = underTest.timeString.getOrAwaitValue()
+        val initialTimeString = underTest.timeString.getOrAwaitValue()
 
         // [act]
-        underTest.updateLoop(nowTime.plus(milis2, ChronoUnit.MILLIS).toInstant().toEpochMilli())
+        underTest.updateLoop(testStartTime.plus(millis2, ChronoUnit.MILLIS).toInstant().toEpochMilli())
 
         // [assert]
         Assert.assertEquals(expectedString, underTest.timeString.getOrAwaitValue())
@@ -353,7 +353,7 @@ class TimingViewModelTest {
         courseId = 1L,
         laps = 1,
         interval = 60, // 60 second intervals
-        startTime = nowTime,
+        startTime = testStartTime,
         firstRiderStartOffset = 60, // First rider starts 60 seconds after TT start
         status = TimeTrialStatus.IN_PROGRESS
     )
@@ -385,6 +385,6 @@ class TimingViewModelTest {
     )
 
     private val timingTimeTrial = baseTimeTrial.copy(
-        timeTrialHeader = baseTimeTrialHeader.copy(startTime = nowTime)
+        timeTrialHeader = baseTimeTrialHeader.copy(startTime = testStartTime)
     )
 }

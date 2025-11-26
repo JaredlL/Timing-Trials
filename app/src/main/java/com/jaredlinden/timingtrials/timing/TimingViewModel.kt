@@ -45,7 +45,7 @@ class TimingViewModel  @Inject constructor(
     private var currentStatusString = ""
     private val liveMillisSinceStart: MutableLiveData<Long> = MutableLiveData()
     private val timeTrialUpdateChannel = Channel<TimeTrial>(Channel.CONFLATED)
-    private var prevMilis = 0L
+    private var prevMillis = 0L
     private var prevString = ""
 
     // Job to keep track of the ongoing PBS calculation
@@ -55,8 +55,8 @@ class TimingViewModel  @Inject constructor(
     val timeTrial: MediatorLiveData<TimeTrial?> = MediatorLiveData()
     val timeLine: MediatorLiveData<TimeLine> = MediatorLiveData()
     val timeString: LiveData<String> = liveMillisSinceStart.map{
-        if((it / 100L) != prevMilis){
-            prevMilis = it
+        if((it / 100L) != prevMillis){
+            prevMillis = it
             prevString = ConverterUtils.toTenthsDisplayString(it)
         }
         prevString
@@ -66,25 +66,25 @@ class TimingViewModel  @Inject constructor(
 
 
     init {
-        timeTrial.addSource(timeTrialRepository.getTimingTimeTrial()) {new ->
-            if(new != null && !new.equalsOtherExcludingIds(timeTrial.value)) {
-                Timber.d("TimingTt self updating TT, ${new.timeTrialHeader.timeStamps} unassigned")
-                timeTrial.value = new
-            }else if(new == null){
-                timeTrial.value = new
+        timeTrial.addSource(timeTrialRepository.getTimingTimeTrial()) {newTimeTrial ->
+            if(newTimeTrial != null && !newTimeTrial.equalsOtherExcludingIds(timeTrial.value)) {
+                Timber.d("TimingTt self updating TT, ${newTimeTrial.timeTrialHeader.timeStamps} unassigned")
+                timeTrial.value = newTimeTrial
+            }else if(newTimeTrial == null){
+                timeTrial.value = newTimeTrial
             }
         }
 
-        timeLine.addSource(timeTrial){tt->
-            tt?.let {
-                timeLine.value = TimeLine(tt, Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMillis)
+        timeLine.addSource(timeTrial){timeTrialValue->
+            timeTrialValue?.let {
+                timeLine.value = TimeLine(timeTrialValue, Instant.now().toEpochMilli() - timeTrialValue.timeTrialHeader.startTimeMillis)
             }
 
         }
         timeLine.addSource(liveMillisSinceStart){millis->
             if(timeLine.value?.isValidForTimeStamp(millis) != true){
-                timeTrial.value?.let {tt->
-                    timeLine.value = TimeLine(tt, millis)
+                timeTrial.value?.let {timeTrialValue->
+                    timeLine.value = TimeLine(timeTrialValue, millis)
                 }
             }
         }
@@ -108,18 +108,18 @@ class TimingViewModel  @Inject constructor(
             .launchIn(viewModelScope) // Collects as long as the ViewModel is alive
     }
 
-    private fun showMessage(mesg: String){
-        messageData.postValue(Event(mesg))
+    private fun showMessage(message: String){
+        messageData.postValue(Event(message))
     }
 
     fun onRiderPassed(){
-        timeTrial.value?.let { tte->
-            val timeSinceTtStarted = Instant.now().toEpochMilli() - tte.timeTrialHeader.startTimeMillis
-            if (tte.helper.sortedRiderStartTimes.firstKey() > timeSinceTtStarted){
+        timeTrial.value?.let { currentTimeTrial->
+            val timeSinceTtStarted = Instant.now().toEpochMilli() - currentTimeTrial.timeTrialHeader.startTimeMillis
+            if (currentTimeTrial.helper.sortedRiderStartTimes.firstKey() > timeSinceTtStarted){
                 showMessage("First rider has not started yet")
             }else{
-                val newHeader = tte.timeTrialHeader.copy(timeStamps = tte.timeTrialHeader.timeStamps + timeSinceTtStarted)
-                updateTimeTrial(tte.copy(timeTrialHeader = newHeader))
+                val newHeader = currentTimeTrial.timeTrialHeader.copy(timeStamps = currentTimeTrial.timeTrialHeader.timeStamps + timeSinceTtStarted)
+                updateTimeTrial(currentTimeTrial.copy(timeTrialHeader = newHeader))
                 if(eventAwaitingSelection == null){
                     eventAwaitingSelection = timeSinceTtStarted
                 }
@@ -128,16 +128,16 @@ class TimingViewModel  @Inject constructor(
     }
 
     fun tryAssignRider(ttRider: TimeTrialRider){
-        timeTrial.value?.let{tt->
-            eventAwaitingSelection?.let { eid->
-                val helper = TimeTrialHelper(tt)
-                val res = helper.assignRiderToEvent(ttRider, eid)
-                if(res.succeeded)
+        timeTrial.value?.let{timeTrialValue->
+            eventAwaitingSelection?.let { eventId->
+                val helper = TimeTrialHelper(timeTrialValue)
+                val assignmentResult = helper.assignRiderToEvent(ttRider, eventId)
+                if(assignmentResult.succeeded)
                 {
-                    updateTimeTrial(res.tt)
+                    updateTimeTrial(assignmentResult.tt)
                     eventAwaitingSelection = null
                 }else{
-                    showMessage(res.message)
+                    showMessage(assignmentResult.message)
                 }
             }
         }
@@ -151,27 +151,27 @@ class TimingViewModel  @Inject constructor(
         }
     }
 
-    private fun updateTimeTrial(newtt: TimeTrial){
+    private fun updateTimeTrial(newTimeTrial: TimeTrial){
         // Update the LiveData immediately for UI responsiveness
-        timeTrial.postValue(newtt)
-        Timber.d("Queuing TT update, ${newtt.riderList.size} riders, ID: ${newtt.timeTrialHeader.id}")
+        timeTrial.postValue(newTimeTrial)
+        Timber.d("Queuing TT update, ${newTimeTrial.riderList.size} riders, ID: ${newTimeTrial.timeTrialHeader.id}")
 
         // Send to the channel for background processing.
         // trySend will not suspend and will succeed if the channel is not full (CONFLATED always accepts).
-        val offerResult = timeTrialUpdateChannel.trySend(newtt)
+        val offerResult = timeTrialUpdateChannel.trySend(newTimeTrial)
         if (!offerResult.isSuccess) {
             Timber.w("Failed to send TT update to channel. Closed: ${offerResult.isClosed}, Failed: ${offerResult.isFailure}")
         }
     }
 
     fun updateLoop(currentTimeMillis: Long){
-        timeTrial.value?.let { tt->
+        timeTrial.value?.let { timeTrialValue->
 
-            val millisSinceStart = currentTimeMillis - tt.timeTrialHeader.startTimeMillis
+            val millisSinceStart = currentTimeMillis - timeTrialValue.timeTrialHeader.startTimeMillis
 
             liveMillisSinceStart.value = millisSinceStart
 
-            val newStatusString = getStatusString(millisSinceStart, tt)
+            val newStatusString = getStatusString(millisSinceStart, timeTrialValue)
             if(newStatusString != currentStatusString){
                 currentStatusString = newStatusString
                 statusString.value = newStatusString
@@ -180,10 +180,10 @@ class TimingViewModel  @Inject constructor(
     }
 
     fun moveRiderToBack(rider: TimeTrialRider){
-        timeTrial.value?.let {tt->
-            tt.riderList.firstOrNull { rider.riderId == it.riderId() }?.let {
+        timeTrial.value?.let {timeTrialValue->
+            timeTrialValue.riderList.firstOrNull { rider.riderId == it.riderId() }?.let {
                 if(it.timeTrialRiderData.splits.isEmpty()){
-                    updateTimeTrial(tt.helper.moveRiderToBack(rider))
+                    updateTimeTrial(timeTrialValue.helper.moveRiderToBack(rider))
                 }else{
                     showMessage("This rider has already passed. You must unassign them from any pass events first.")
                 }
@@ -204,10 +204,10 @@ class TimingViewModel  @Inject constructor(
     }
 
     fun setRiderStartTime(riderId: Long, startTime: Long){
-        timeTrial.value?.let {tt->
-            tt.riderList.firstOrNull { it.riderId() == riderId }?.let {
+        timeTrial.value?.let {timeTrialValue->
+            timeTrialValue.riderList.firstOrNull { it.riderId() == riderId }?.let {
                 if(it.timeTrialRiderData.splits.isEmpty()){
-                    updateTimeTrial(tt.helper.setRiderStartTime(riderId, startTime))
+                    updateTimeTrial(timeTrialValue.helper.setRiderStartTime(riderId, startTime))
                 }else{
                     showMessage("This rider has already passed. You must unassign them from any pass events first.")
                 }
@@ -364,38 +364,38 @@ class TimingViewModel  @Inject constructor(
         viewModelScope.cancel()
     }
 
-    private fun getStatusString(millisSinceStart: Long, tte: TimeTrial): String{
+    private fun getStatusString(millisSinceStart: Long, timeTrial: TimeTrial): String{
 
-        val sparse = tte.helper.sparseRiderStartTimes
+        val sparse = timeTrial.helper.sparseRiderStartTimes
         val index = sparse.indexOfKey(millisSinceStart)
         val prevIndex = if(index >= 0){ index }else{ Math.abs(index) - 2 }
         val nextIndex = prevIndex + 1
-        val ttIntervalMilis = (tte.timeTrialHeader.interval * 1000L)
+        val ttIntervalMillis = (timeTrial.timeTrialHeader.interval * 1000L)
 
-        if(nextIndex < tte.helper.sparseRiderStartTimes.size){
+        if(nextIndex < timeTrial.helper.sparseRiderStartTimes.size){
 
             //If we are more than 1 min before TT start time
             val nextStartMilli = sparse.keyAt(nextIndex)
             if((nextStartMilli - millisSinceStart) > 60000){
-                return "${tte.timeTrialHeader.ttName} starts at 0:00:00:0"
+                return "${timeTrial.timeTrialHeader.ttName} starts at 0:00:00:0"
             }
             val nextStartRider = sparse.valueAt(nextIndex)
             val millisToNextRider = (nextStartMilli - millisSinceStart)
 
-            val riderString = if(tte.timeTrialHeader.interval != 0){
-                "(${tte.getRiderNumber(nextStartRider.timeTrialRiderData.index)}) ${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName}"
+            val riderString = if(timeTrial.timeTrialHeader.interval != 0){
+                "(${timeTrial.getRiderNumber(nextStartRider.timeTrialRiderData.index)}) ${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName}"
             }else{
                 "All Riders"
             }
             return when(millisToNextRider){
                 in 0L..5000 -> {
-                    var x = millisToNextRider
-                    if(x > 1000){
-                        do{x /= 10} while (x > 9)
+                    var countdownSeconds = millisToNextRider
+                    if(countdownSeconds > 1000){
+                        do{countdownSeconds /= 10} while (countdownSeconds > 9)
                     }else{
-                        x = 0
+                        countdownSeconds = 0
                     }
-                    "${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName} - ${x+1}!"
+                    "${nextStartRider.riderData.firstName} ${nextStartRider.riderData.lastName} - ${countdownSeconds+1}!"
                 }
                 in 5000..10000 ->
                     "$riderString starts in 10 seconds"
@@ -403,7 +403,7 @@ class TimingViewModel  @Inject constructor(
                     "$riderString starts in 15 seconds"
                 in 15000.. 30000 ->
                     "$riderString starts in 30 seconds"
-                in (ttIntervalMilis - 3000)..ttIntervalMilis ->
+                in (ttIntervalMillis - 3000)..ttIntervalMillis ->
                 {
                     if(prevIndex >= 0)
                     {
@@ -419,47 +419,47 @@ class TimingViewModel  @Inject constructor(
                     "Next rider is $riderString"
             }
         } else {
-            return "${tte.helper.finishedRiders.size} riders have finished, ${tte.helper.ridersOnCourse(millisSinceStart).size} riders on course"
+            return "${timeTrial.helper.finishedRiders.size} riders have finished, ${timeTrial.helper.ridersOnCourse(millisSinceStart).size} riders on course"
         }
     }
 
     fun addLateRider(riderId: Long, number:Int?){
-        timeTrial.value?.let { oldTt->
+        timeTrial.value?.let { oldTimeTrial->
             viewModelScope.launch(Dispatchers.IO) {
                 riderRepository.ridersFromIds(listOf(riderId)).firstOrNull()?.let { rider->
-                    if(oldTt.riderList.any { it.riderId() == riderId }){
+                    if(oldTimeTrial.riderList.any { it.riderId() == riderId }){
                         throw Exception("Rider already in TT")
                     }
-                    val new = oldTt.addRiderWithNumber(rider, number)
-                    val ttr = new.riderList.first { it.riderId() == riderId }
-                    val millisSinceStart = Instant.now().toEpochMilli() - new.timeTrialHeader.startTimeMillis
-                    val newer = if(new.helper.getRiderStartTime(ttr.timeTrialRiderData) < millisSinceStart){
-                        new.helper.moveRiderToBack(ttr.timeTrialRiderData)
+                    val timeTrialWithNewRider = oldTimeTrial.addRiderWithNumber(rider, number)
+                    val timeTrialRider = timeTrialWithNewRider.riderList.first { it.riderId() == riderId }
+                    val millisSinceStart = Instant.now().toEpochMilli() - timeTrialWithNewRider.timeTrialHeader.startTimeMillis
+                    val updatedTimeTrial = if(timeTrialWithNewRider.helper.getRiderStartTime(timeTrialRider.timeTrialRiderData) < millisSinceStart){
+                        timeTrialWithNewRider.helper.moveRiderToBack(timeTrialRider.timeTrialRiderData)
                     }else{
-                        new
+                        timeTrialWithNewRider
                     }
-                    updateTimeTrial(newer)
+                    updateTimeTrial(updatedTimeTrial)
                 }
             }
         }
     }
 
     fun testFinishAll(){
-        timeTrial.value?.let {tt->
-            val now1 = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMillis
-            val timeLeft = (tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size - 1)) - now1
-            var c = if(tt.helper.sparseRiderStartTimes.keyAt(tt.helper.sparseRiderStartTimes.size - 1) > now1){
-                tt.copy(timeTrialHeader = tt.timeTrialHeader.copy(startTime = tt.timeTrialHeader.startTime?.minusSeconds(timeLeft/1000)))
+        timeTrial.value?.let {timeTrialValue->
+            val millisSinceStart = Instant.now().toEpochMilli() - timeTrialValue.timeTrialHeader.startTimeMillis
+            val timeLeft = (timeTrialValue.helper.sparseRiderStartTimes.keyAt(timeTrialValue.helper.sparseRiderStartTimes.size - 1)) - millisSinceStart
+            var updatedTimeTrial = if(timeTrialValue.helper.sparseRiderStartTimes.keyAt(timeTrialValue.helper.sparseRiderStartTimes.size - 1) > millisSinceStart){
+                timeTrialValue.copy(timeTrialHeader = timeTrialValue.timeTrialHeader.copy(startTime = timeTrialValue.timeTrialHeader.startTime?.minusSeconds(timeLeft/1000)))
             }else{
-                tt
+                timeTrialValue
             }
 
-            tt.riderList.forEach{ttr->
-                val now = Instant.now().toEpochMilli() - tt.timeTrialHeader.startTimeMillis
-                val helper = c.helper
-                c = helper.assignRiderToEvent(ttr.timeTrialRiderData, now).tt
+            timeTrialValue.riderList.forEach{timeTrialRider->
+                val currentTime = Instant.now().toEpochMilli() - timeTrialValue.timeTrialHeader.startTimeMillis
+                val helper = updatedTimeTrial.helper
+                updatedTimeTrial = helper.assignRiderToEvent(timeTrialRider.timeTrialRiderData, currentTime).tt
             }
-            updateTimeTrial(c)
+            updateTimeTrial(updatedTimeTrial)
         }
     }
 

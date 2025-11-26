@@ -47,9 +47,9 @@ object ConverterUtils{
 
     fun toTenthsDisplayString(milliseconds: Long?): String{
         return milliseconds?.let {
-            val milis = abs(milliseconds)
-            val secs =  (milis/1000)
-            return String.format("%d:%02d:%02d.%1d", secs / 3600, (secs % 3600) / 60, (secs % 60),  (milis % 1000) / 100)
+            val millis = abs(milliseconds)
+            val secs =  (millis/1000)
+            return String.format("%d:%02d:%02d.%1d", secs / 3600, (secs % 3600) / 60, (secs % 60),  (millis % 1000) / 100)
         }?:""
     }
 
@@ -65,9 +65,9 @@ object ConverterUtils{
             val hour = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
 
             val sum = (hour + min + sec + ms).toLong()
-            val fval = if(sum > 0) sum else null
+            val resultMillis = if(sum > 0) sum else null
 
-            return fval
+            return resultMillis
 
         }else{
             val splits = splitAtPoint.first().split(":").reversed()
@@ -87,9 +87,9 @@ object ConverterUtils{
                 hour = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
             }
             val sum = (hour + min + sec + ms).toLong()
-            val fval = if(sum > 0) sum else null
+            val resultMillis = if(sum > 0) sum else null
 
-            return fval
+            return resultMillis
         }
 
     }

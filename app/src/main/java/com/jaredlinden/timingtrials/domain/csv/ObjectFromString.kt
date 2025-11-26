@@ -39,8 +39,8 @@ object ObjectFromString
             val hour = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
 
             val sum = (hour + min + sec + ms).toLong()
-            val fval = if(sum > 0) sum else null
-            fval
+            val resultMillis = if(sum > 0) sum else null
+            resultMillis
 
         }else{
             val splits = splitAtPoint.first().split(":").reversed()
@@ -60,8 +60,8 @@ object ObjectFromString
                 hour = splits.getOrNull(2)?.toIntOrNull()?.times(1000 * 60 * 60)?:0
             }
             val sum = (hour + min + sec + ms).toLong()
-            val fval = if(sum > 0) sum else null
-            fval
+            val resultMillis = if(sum > 0) sum else null
+            resultMillis
         }
     }
 
@@ -93,11 +93,11 @@ object ObjectFromString
             }
         }
         if(date == null){
-            val new = valString.split(" ").mapIndexed { index, s -> if(index == 0) Regex("[^0-9]").replace(s, "") else s  }.joinToString(" ")
+            val cleanedDateString = valString.split(" ").mapIndexed { index, s -> if(index == 0) Regex("[^0-9]").replace(s, "") else s  }.joinToString(" ")
             for(pattern in formatList){
                 try {
                     val formatter = DateTimeFormatter.ofPattern(pattern)
-                    date = LocalDate.parse(new, formatter)
+                    date = LocalDate.parse(cleanedDateString, formatter)
                     break
                 }catch(e:Exception) {
                     // todo - notify user, dont squash general exceptions

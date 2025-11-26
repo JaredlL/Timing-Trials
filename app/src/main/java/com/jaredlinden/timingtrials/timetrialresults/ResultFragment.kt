@@ -474,7 +474,7 @@ class ResultFragment : Fragment() {
 
         val cr = requireActivity().contentResolver
 
-        // Dont divide milis by 1000!
+        // Don't divide millis by 1000!
         val contentVals = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
             put(MediaStore.Images.Media.TITLE, imageName)

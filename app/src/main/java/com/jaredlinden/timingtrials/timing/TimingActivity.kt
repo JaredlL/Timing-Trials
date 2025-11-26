@@ -39,9 +39,9 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
     private val TIMERTAG = "timing_tag"
     private val STATUSTAG = "status_tag"
 
-    private val mService: MutableLiveData<TimingService?> = MutableLiveData()
+    private val timingService: MutableLiveData<TimingService?> = MutableLiveData()
     private val viewModel: TimingViewModel by viewModels()
-    private var mBound: Boolean = false
+    private var isBound: Boolean = false
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityTimingBinding
     private var timingFab: FloatingActionButton? = null
@@ -50,12 +50,12 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             val binder = service as TimingService.TimingServiceBinder
-            mService.value = binder.getService()
+            timingService.value = binder.getService()
             serviceCreated.value = true
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
+            isBound = false
         }
     }
 
@@ -67,10 +67,10 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                 .setTitle("End Timing")
                 .setMessage("Are you sure you want to end TT? All information will be lost!")
                 .setPositiveButton("End timing and discard") { _, _ ->
-                    if(mBound){
+                    if(isBound){
                         applicationContext.unbindService(connection)
-                        mService.value?.stop()
-                        mBound = false
+                        timingService.value?.stop()
+                        isBound = false
 
                     }
                     viewModel.discardTt()
@@ -81,7 +81,7 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                 .create().show()
     }
 
-    private val timeMed = MediatorLiveData<Long>()
+    private val timeMediator = MediatorLiveData<Long>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,7 +93,7 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
         setSupportActionBar(binding.timingToolBar)
 
         applicationContext.startService(Intent(applicationContext, TimingService::class.java))
-        mBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)
+        isBound = applicationContext.bindService(Intent(applicationContext, TimingService::class.java), connection, Context.BIND_AUTO_CREATE)
         val navController = findNavController(R.id.nav_host_timer_fragment)
 
         appBarConfiguration = AppBarConfiguration(navController.graph)
@@ -101,8 +101,8 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
         binding.timingToolBar.setupWithNavController(navController, appBarConfiguration)
         title = getString(R.string.time_trial_in_progress)
 
-        val liveTick = mService.switchMap{result->
-            result?.timerTick
+        val liveTick = timingService.switchMap{service->
+            service?.timerTick
         }
 
         viewModel.messageData.observe(this, EventObserver{
@@ -115,10 +115,10 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
         viewModel.ttDeleted.observe(this, EventObserver{
             if(it){
-                if(mBound){
+                if(isBound){
                     applicationContext.unbindService(connection)
-                    mService.value?.stop()
-                    mBound = false
+                    timingService.value?.stop()
+                    isBound = false
 
                 }
                 val pendingIntent = NavDeepLinkBuilder(this)
@@ -132,18 +132,18 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
         })
 
 
-        timeMed.apply {
-            addSource(mService){service->
-                   viewModel.timeTrial.value?.let{tt->
+        timeMediator.apply {
+            addSource(timingService){service->
+                   viewModel.timeTrial.value?.let{timeTrialValue->
                        service?.let {
-                           viewModelChange(tt, it)
+                           viewModelChange(timeTrialValue, it)
                        }
                    }
             }
-            addSource(viewModel.timeTrial){res->
-                if(res != null){
-                    mService.value?.let {
-                        viewModelChange(res, it)
+            addSource(viewModel.timeTrial){timeTrialValue->
+                if(timeTrialValue != null){
+                    timingService.value?.let {
+                        viewModelChange(timeTrialValue, it)
                     }
                 }else{
                     endTiming()
@@ -161,11 +161,11 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
         val timeTrialHeader = timeTrial.timeTrialHeader
         when(timeTrialHeader.status){
             TimeTrialStatus.SETTING_UP -> {
-                if(mBound){
+                if(isBound){
                     Timber.d("Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
                     applicationContext.unbindService(connection)
                     service.stop()
-                    mBound = false
+                    isBound = false
                 }
                 val args = SetupViewPagerFragmentArgs(timeTrialHeader.id)
                 val pendingIntent = NavDeepLinkBuilder(this)
@@ -181,12 +181,12 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                 service.startTiming(timeTrial)
             }
             TimeTrialStatus.FINISHED -> {
-                if(mBound){
+                if(isBound){
                     try {
                         Timber.d("Got new timetrial, Stopping ${timeTrialHeader.ttName} ${timeTrialHeader.status}")
                         applicationContext.unbindService(connection)
                         service.stop()
-                        mBound = false
+                        isBound = false
                     }catch (e:Exception){
                         Timber.e(e)
                     }
@@ -209,11 +209,11 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
     override fun endTiming() {
         try {
-            if(mBound){
+            if(isBound){
                 applicationContext.unbindService(connection)
-                mBound = false
+                isBound = false
             }
-            mService.value?.stop()
+            timingService.value?.stop()
         }catch (e:Exception){
             Timber.e(e)
         }
@@ -223,9 +223,9 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
 
     override fun onStop() {
         try{
-            if(mBound){
+            if(isBound){
                 applicationContext.unbindService(connection)
-                mBound = false
+                isBound = false
             }
         }catch (e:Exception){
             Timber.e(e)
@@ -238,10 +238,10 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                 .setTitle(getString(R.string.end_timing))
                 .setMessage(getString(R.string.are_you_sure_you_want_to_end_tt))
                 .setNeutralButton(getString(R.string.end_and_discard_tt)) { _, _ ->
-                    if(mBound){
+                    if(isBound){
                         applicationContext.unbindService(connection)
-                        mService.value?.stop()
-                        mBound = false
+                        timingService.value?.stop()
+                        isBound = false
                     }
                     viewModel.discardTt()
                 }
@@ -251,10 +251,10 @@ class TimingActivity : AppCompatActivity(), ITimingActivity, IFabCallbacks {
                         if((it.timeTrialHeader.startTime?.toInstant()
                                 ?: Instant.MAX) > Instant.now()
                         ){
-                            if(mBound){
+                            if(isBound){
                                 applicationContext.unbindService(connection)
-                                mService.value?.stop()
-                                mBound = false
+                                timingService.value?.stop()
+                                isBound = false
 
                             }
                             viewModel.backToSetup()

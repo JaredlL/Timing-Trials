@@ -51,9 +51,9 @@ abstract class StringToObjectField<T>
     abstract val fieldIndex: Int?
 
     fun applyFieldToObject(row: List<String>, target:T): T{
-        val fi = fieldIndex
-        if(fi !=null){
-            row.getOrNull(fi)?.let {
+        val currentFieldIndex = fieldIndex
+        if(currentFieldIndex !=null){
+            row.getOrNull(currentFieldIndex)?.let {
                 if(it.isNotBlank()){
                     return applyFieldFromString(it, target)
                 }
